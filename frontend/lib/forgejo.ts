@@ -6,10 +6,15 @@ import matter from 'gray-matter';
 // ---------------------------------------------------------------------------
 const FORGEJO_API = process.env.FORGEJO_API || 'http://forgejo:3000/api/v1';
 const FORGEJO_TOKEN_FILE = process.env.FORGEJO_TOKEN_FILE || '/shared/token';
+const README_CACHE_TTL_MS = Math.max(
+  60,
+  Number.parseInt(process.env.README_CACHE_TTL_SECONDS || '300', 10) || 300,
+) * 1000;
 export const PUBLIC_BASE_URL =
   process.env.PUBLIC_BASE_URL || 'http://localhost:8090';
 
 let cachedToken: string | null | undefined;
+const readmeCache = new Map<string, { value: string | null; expiresAt: number }>();
 
 function getToken(): string | null {
   if (cachedToken !== undefined) return cachedToken;
@@ -267,15 +272,28 @@ export async function getRawFile(
 // README (base64 decode via contents API)
 // ---------------------------------------------------------------------------
 export async function getReadme(owner: string, repo: string): Promise<string | null> {
+  const cacheKey = `${owner}/${repo}`;
+  const cached = readmeCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) return cached.value;
+
   const res = await getContents(owner, repo, 'README.md');
-  if (!res.ok || !res.data || Array.isArray(res.data)) return null;
+  if (!res.ok || !res.data || Array.isArray(res.data)) {
+    readmeCache.set(cacheKey, { value: null, expiresAt: Date.now() + README_CACHE_TTL_MS });
+    return null;
+  }
   const entry = res.data;
-  if (!entry.content) return null;
+  if (!entry.content) {
+    readmeCache.set(cacheKey, { value: null, expiresAt: Date.now() + README_CACHE_TTL_MS });
+    return null;
+  }
   try {
-    return Buffer.from(entry.content, (entry.encoding as BufferEncoding) || 'base64').toString(
+    const value = Buffer.from(entry.content, (entry.encoding as BufferEncoding) || 'base64').toString(
       'utf-8'
     );
+    readmeCache.set(cacheKey, { value, expiresAt: Date.now() + README_CACHE_TTL_MS });
+    return value;
   } catch {
+    readmeCache.set(cacheKey, { value: null, expiresAt: Date.now() + README_CACHE_TTL_MS });
     return null;
   }
 }

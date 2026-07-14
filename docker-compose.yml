@@ -40,6 +40,7 @@ services:
       FORGEJO_TOKEN_FILE: /shared/token
       PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8090}
       RUNNER_API: http://spaces-runner:8000/api
+      README_CACHE_TTL_SECONDS: ${README_CACHE_TTL_SECONDS:-300}
     volumes:
       - shared-token:/shared:ro
     networks:
