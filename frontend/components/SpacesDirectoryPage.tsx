@@ -4,7 +4,9 @@ import { timeAgoEn } from '@/lib/format';
 import { getSpaceTheme } from '@/lib/space-theme';
 import HfIcon, { type HfIconName } from './HfIcon';
 import SpaceStatusBadge from './SpaceStatusBadge';
+import SpaceStatusProvider from './SpaceStatusProvider';
 import { getRepoMetricsBatch } from '@/lib/agent-metrics';
+import { getSpaceStatuses } from '@/lib/space-status';
 
 const PAGE_SIZE = 48;
 
@@ -47,10 +49,14 @@ export default async function SpacesDirectoryPage({
   const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
   const result = await searchReposByTopicAndQuery('space', q, sort, PAGE_SIZE, page);
   const repos = result.ok ? result.data : [];
-  const metricsByRepo = await getRepoMetricsBatch(repos.map((repo) => ({
+  const targets = repos.map((repo) => ({
     owner: repo.owner?.login ?? repo.full_name.split('/')[0],
     repo: repo.name,
-  })));
+  }));
+  const [metricsByRepo, spaceStatuses] = await Promise.all([
+    getRepoMetricsBatch(targets),
+    getSpaceStatuses(),
+  ]);
   const visibleRepos = sort === 'stars'
     ? [...repos].sort((a, b) => (metricsByRepo[b.full_name]?.likes ?? 0) - (metricsByRepo[a.full_name]?.likes ?? 0))
     : repos;
@@ -170,6 +176,7 @@ export default async function SpacesDirectoryPage({
           Could not connect to Forgejo. Please try again shortly.
         </div>
       ) : (
+        <SpaceStatusProvider initialStatuses={spaceStatuses}>
         <div className="mx-auto grid max-w-[1536px] grid-cols-1 gap-x-4 gap-y-5 px-4 sm:grid-cols-2 xl:grid-cols-[repeat(4,minmax(0,1fr))]">
           {visibleRepos.map((repo) => {
             const owner = repo.owner?.login ?? repo.full_name.split('/')[0];
@@ -221,6 +228,7 @@ export default async function SpacesDirectoryPage({
             );
           })}
         </div>
+        </SpaceStatusProvider>
       )}
 
       {result.ok && (

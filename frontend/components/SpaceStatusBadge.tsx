@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
-type SpaceStatus = 'building' | 'running' | 'stopped' | 'error';
+import { useContext, useEffect, useState } from 'react';
+import type { SpaceStatus } from '@/lib/space-status';
+import { SpaceStatusContext } from './SpaceStatusProvider';
 
 const labels: Record<SpaceStatus, string> = {
   building: 'CPU · Building',
@@ -20,9 +20,13 @@ export default function SpaceStatusBadge({
   repo: string;
   variant?: 'card' | 'header';
 }) {
-  const [status, setStatus] = useState<SpaceStatus>('stopped');
+  const directoryStatuses = useContext(SpaceStatusContext);
+  const directoryStatus = directoryStatuses?.[`${owner}/${repo}`];
+  const [detailStatus, setDetailStatus] = useState<SpaceStatus>('stopped');
+  const status = directoryStatuses ? (directoryStatus || 'stopped') : detailStatus;
 
   useEffect(() => {
+    if (directoryStatuses) return;
     let active = true;
     const refresh = async () => {
       try {
@@ -30,9 +34,9 @@ export default function SpaceStatusBadge({
           cache: 'no-store',
         });
         const data = (await response.json()) as { status?: SpaceStatus };
-        if (active && data.status && data.status in labels) setStatus(data.status);
+        if (active && data.status && data.status in labels) setDetailStatus(data.status);
       } catch {
-        if (active) setStatus('error');
+        if (active) setDetailStatus('error');
       }
     };
     void refresh();
@@ -41,7 +45,7 @@ export default function SpaceStatusBadge({
       active = false;
       window.clearInterval(timer);
     };
-  }, [owner, repo]);
+  }, [directoryStatuses, owner, repo]);
 
   const className = variant === 'header'
     ? status === 'running'

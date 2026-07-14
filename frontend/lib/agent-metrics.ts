@@ -31,6 +31,20 @@ export async function getRepoMetrics(owner: string, repo: string): Promise<RepoA
 export async function getRepoMetricsBatch(
   repos: Array<{ owner: string; repo: string }>,
 ): Promise<Record<string, RepoAgentMetrics>> {
-  const rows = await Promise.all(repos.map(({ owner, repo }) => getRepoMetrics(owner, repo)));
-  return Object.fromEntries(rows.map((row) => [`${row.owner}/${row.repo}`, row]));
+  if (repos.length === 0) return {};
+  try {
+    const response = await fetch(`${RUNNER_API}/metrics/repos/batch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ repos }),
+      cache: 'no-store',
+    });
+    if (!response.ok) throw new Error(`metrics batch HTTP ${response.status}`);
+    return await response.json() as Record<string, RepoAgentMetrics>;
+  } catch {
+    return Object.fromEntries(repos.map(({ owner, repo }) => [
+      `${owner}/${repo}`,
+      { owner, repo, views: 0, likes: 0, recent_agents: [] },
+    ]));
+  }
 }

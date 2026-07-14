@@ -16,6 +16,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Header, HTTPException, Request, WebSocket
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
 
 import config
 import agent_metrics
@@ -42,6 +43,15 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="OpenFace spaces-runner", lifespan=lifespan)
+
+
+class RepoMetricsTarget(BaseModel):
+    owner: str = Field(min_length=1, max_length=100)
+    repo: str = Field(min_length=1, max_length=100)
+
+
+class RepoMetricsBatchRequest(BaseModel):
+    repos: list[RepoMetricsTarget] = Field(max_length=48)
 
 
 def authenticated_agent(authorization: str | None):
@@ -99,6 +109,12 @@ async def api_list_spaces():
 async def api_list_agents():
     """Public agent profiles. API keys are never returned."""
     return await asyncio.to_thread(agent_metrics.list_agents)
+
+
+@app.post("/api/metrics/repos/batch")
+async def api_repo_metrics_batch(payload: RepoMetricsBatchRequest):
+    targets = [(target.owner, target.repo) for target in payload.repos]
+    return await asyncio.to_thread(agent_metrics.metrics_batch, targets)
 
 
 @app.get("/api/metrics/repos/{owner}/{repo}")

@@ -171,6 +171,62 @@ def metrics(owner: str, repo: str) -> dict[str, Any]:
     }
 
 
+def metrics_batch(repos: list[tuple[str, str]]) -> dict[str, dict[str, Any]]:
+    """Return card metrics for many repositories using three grouped queries."""
+    unique_repos = list(dict.fromkeys(repos))
+    result = {
+        f"{owner}/{repo}": {
+            "owner": owner,
+            "repo": repo,
+            "views": 0,
+            "agent_views": 0,
+            "browser_views": 0,
+            "likes": 0,
+            "recent_agents": [],
+        }
+        for owner, repo in unique_repos
+    }
+    if not unique_repos:
+        return result
+
+    targets = [f"{owner}/{repo}" for owner, repo in unique_repos]
+    placeholders = ",".join("?" for _ in targets)
+    with _connect() as db:
+        agent_rows = db.execute(
+            f"""SELECT owner, repo, COUNT(*) AS count
+                FROM repo_views
+                WHERE owner || '/' || repo IN ({placeholders})
+                GROUP BY owner, repo""",
+            targets,
+        ).fetchall()
+        browser_rows = db.execute(
+            f"""SELECT owner, repo, COUNT(*) AS count
+                FROM browser_views
+                WHERE owner || '/' || repo IN ({placeholders})
+                GROUP BY owner, repo""",
+            targets,
+        ).fetchall()
+        like_rows = db.execute(
+            f"""SELECT owner, repo, COUNT(*) AS count
+                FROM repo_likes
+                WHERE owner || '/' || repo IN ({placeholders})
+                GROUP BY owner, repo""",
+            targets,
+        ).fetchall()
+
+    for row in agent_rows:
+        item = result[f"{row['owner']}/{row['repo']}"]
+        item["agent_views"] = row["count"]
+        item["views"] += row["count"]
+    for row in browser_rows:
+        item = result[f"{row['owner']}/{row['repo']}"]
+        item["browser_views"] = row["count"]
+        item["views"] += row["count"]
+    for row in like_rows:
+        result[f"{row['owner']}/{row['repo']}"]["likes"] = row["count"]
+    return result
+
+
 def record_view(agent_id: int, owner: str, repo: str, idempotency_key: str | None) -> tuple[bool, dict[str, Any]]:
     created = False
     with _connect() as db:
