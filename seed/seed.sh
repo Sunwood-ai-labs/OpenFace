@@ -26,6 +26,7 @@ OPENFACE_ADMIN_EMAIL="${OPENFACE_ADMIN_EMAIL:-admin@example.com}"
 
 ORG_NAME="openface"
 SUNWOOD_CATALOG="${SUNWOOD_CATALOG:-/catalog/sunwood-ai-labs.json}"
+PROMPT_CATALOG="${PROMPT_CATALOG:-/catalog/prompts.json}"
 
 log() { echo "[seed] $*"; }
 
@@ -976,6 +977,64 @@ import_sunwood_catalog() {
   done < <(jq -r '.entries[] | @base64' "$SUNWOOD_CATALOG")
 }
 
+# ------------------------------------------------------------------------
+# Import one vetted public prompt into its own local Git repository.
+#
+# Keeping each prompt as a repository is intentional: prompt edits, branches,
+# tags, forks, and rollbacks use the same Forgejo workflow as every other
+# OpenFace artifact.  PROMPT.md is the verbatim upstream source; README.md
+# adds OpenFace metadata and a durable provenance link.
+# ------------------------------------------------------------------------
+import_prompt_catalog_entry() {
+  local name="$1" description="$2" version="$3" collection="$4" family="$5" license="$6" source_url="$7" source_repo="$8"
+  local prompt_file readme_file source_file
+
+  prompt_file="${WORKDIR}/${name}_PROMPT.md"
+  readme_file="${WORKDIR}/${name}_README.md"
+  source_file="${WORKDIR}/${name}_SOURCE.md"
+
+  if ! curl -fsSL --retry 3 "$source_url" -o "$prompt_file"; then
+    log "WARNING: could not download prompt source for '${name}': ${source_url}"
+    return 0
+  fi
+
+  ensure_repo "$name" "$description"
+  set_topics "$name" "prompt" "$collection" "$family" "version-${version}" "github-import"
+
+  printf -- '---\nlicense: %s\ntags:\n  - prompt\n  - %s\n  - %s\n  - %s\n---\n\n# %s\n\n%s\n\n> **Prompt version: %s** — this repository is ready to branch, tag, compare, and fork in Forgejo.\n\n## Provenance\n\nImported verbatim from [%s](%s). The original project license is `%s`.\n\n## Prompt source\n\n' \
+    "$license" "$collection" "$family" "version-${version}" "$name" "$description" "$version" "$source_repo" "$source_url" "$license" > "$readme_file"
+  cat "$prompt_file" >> "$readme_file"
+
+  printf -- '# Source provenance\n\n- Source repository: [%s](%s)\n- Raw source: <%s>\n- Imported prompt version: `%s`\n- Source license: `%s`\n' \
+    "$source_repo" "$source_repo" "$source_url" "$version" "$license" > "$source_file"
+
+  put_file "$name" "PROMPT.md" "$prompt_file" "Import ${name} prompt source (${version})"
+  put_file "$name" "README.md" "$readme_file" "Add ${name} prompt card (${version})"
+  put_file "$name" "SOURCE.md" "$source_file" "Record ${name} source provenance"
+  log "Imported prompt '${name}' (${version}, ${collection})."
+}
+
+import_prompt_catalog() {
+  if [ ! -f "$PROMPT_CATALOG" ]; then
+    log "ERROR: prompt catalog not found at '${PROMPT_CATALOG}'."
+    exit 1
+  fi
+
+  local encoded entry name description version collection family license source_url source_repo
+  while IFS= read -r encoded; do
+    entry=$(printf '%s' "$encoded" | base64 -d)
+    name=$(printf '%s' "$entry" | jq -r '.name')
+    description=$(printf '%s' "$entry" | jq -r '.description')
+    version=$(printf '%s' "$entry" | jq -r '.version')
+    collection=$(printf '%s' "$entry" | jq -r '.collection')
+    family=$(printf '%s' "$entry" | jq -r '.family')
+    license=$(printf '%s' "$entry" | jq -r '.license')
+    source_url=$(printf '%s' "$entry" | jq -r '.sourceUrl')
+    source_repo=$(printf '%s' "$entry" | jq -r '.sourceRepo')
+    import_prompt_catalog_entry "$name" "$description" "$version" "$collection" "$family" "$license" "$source_url" "$source_repo"
+  done < <(jq -r '.entries[] | @base64' "$PROMPT_CATALOG")
+}
+
 for legacy in \
   hello-space realtime-voice-space rampart-redaction face-anything \
   scail2-animation sun-direction-flux unlimited-ocr gemma-avatar \
@@ -1272,6 +1331,10 @@ create_dataset_fixture "table-question-answering" "Table Question Answering" "Ta
 
 # Real Skill and MCP samples selected from Sunwood-ai-labs on GitHub.
 import_sunwood_catalog
+
+# Vetted, versioned prompts from MysticLibrary plus public goal-command
+# patterns.  Each source URL is pinned in catalog/prompts.json.
+import_prompt_catalog
 
 rm -rf "${WORKDIR}"
 
