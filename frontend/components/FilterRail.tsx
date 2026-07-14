@@ -1,4 +1,5 @@
 import HfIcon, { HfIconName } from './HfIcon';
+import type { RepoKind } from '@/lib/forgejo';
 
 interface FilterGroup {
   title: string;
@@ -89,9 +90,52 @@ const datasetFilters: FilterGroup[] = [
   },
 ];
 
-export default function FilterRail({ topic }: { topic: 'model' | 'dataset' }) {
-  const groups = topic === 'model' ? modelFilters : datasetFilters;
-  const basePath = topic === 'model' ? '/models' : '/datasets';
+const skillFilters: FilterGroup[] = [
+  {
+    title: 'Use cases',
+    items: [
+      { label: 'Automation', icon: 'gear', tone: 'text-violet-500' },
+      { label: 'Developer tools', icon: 'code', tone: 'text-indigo-500' },
+      { label: 'Design', icon: 'sparkles', tone: 'text-fuchsia-500' },
+      { label: 'Hardware', icon: 'cube', tone: 'text-orange-500' },
+      { label: 'Documentation', icon: 'file', tone: 'text-blue-500' },
+      { label: 'Workflow', icon: 'skill', tone: 'text-violet-600' },
+    ],
+  },
+  {
+    title: 'Clients',
+    items: [
+      { label: 'Codex', icon: 'code' },
+      { label: 'Claude Code', icon: 'sparkles' },
+      { label: 'CLI', icon: 'gear' },
+    ],
+  },
+];
+
+const mcpFilters: FilterGroup[] = [
+  {
+    title: 'Capabilities',
+    items: [
+      { label: 'Search', icon: 'search', tone: 'text-cyan-600' },
+      { label: 'Developer tools', icon: 'code', tone: 'text-blue-600' },
+      { label: 'Messaging', icon: 'link', tone: 'text-indigo-500' },
+      { label: 'Media', icon: 'image', tone: 'text-fuchsia-500' },
+      { label: 'Automation', icon: 'gear', tone: 'text-zinc-600' },
+    ],
+  },
+  {
+    title: 'Languages',
+    items: [
+      { label: 'TypeScript', icon: 'code' },
+      { label: 'Python', icon: 'filePen' },
+      { label: 'Docker', icon: 'box' },
+    ],
+  },
+];
+
+export default function FilterRail({ topic }: { topic: Exclude<RepoKind, 'space'> }) {
+  const groups = topic === 'dataset' ? datasetFilters : topic === 'skill' ? skillFilters : topic === 'mcp' ? mcpFilters : modelFilters;
+  const basePath = topic === 'dataset' ? '/datasets' : topic === 'skill' ? '/skills' : topic === 'mcp' ? '/mcps' : '/models';
   const filterHref = (label: string) => `${basePath}?q=${encodeURIComponent(label.toLowerCase())}`;
 
   return (

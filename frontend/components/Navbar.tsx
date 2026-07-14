@@ -6,6 +6,8 @@ const navItems = [
   { href: '/models', label: 'Models' },
   { href: '/datasets', label: 'Datasets' },
   { href: '/spaces', label: 'Spaces' },
+  { href: '/skills', label: 'Skills' },
+  { href: '/mcps', label: 'MCPs' },
   { href: '/git/openface/realtime-voice-space/src/branch/main/README.md', label: 'Docs' },
 ];
 
@@ -25,7 +27,7 @@ export default function Navbar() {
 
         <SearchForm className="ml-auto hidden flex-1 sm:ml-6 sm:block sm:max-w-[325px]" />
 
-        <nav className="ml-auto hidden items-center gap-5 text-sm font-medium text-zinc-900 lg:flex">
+        <nav className="ml-auto hidden items-center gap-4 text-sm font-medium text-zinc-900 lg:flex">
           {navItems.map((item) => (
             <Link key={item.href} href={item.href} className="inline-flex items-center gap-1.5 hover:text-zinc-600">
               {item.label}
@@ -41,6 +43,8 @@ export default function Navbar() {
                 <a href="/models" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Models</a>
                 <a href="/datasets" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Datasets</a>
                 <a href="/spaces" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Spaces</a>
+                <a href="/skills" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Skills</a>
+                <a href="/mcps" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">MCPs</a>
                 <a href="/git/openface/realtime-voice-space/src/branch/main/README.md" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Docs</a>
               </div>
               <div>

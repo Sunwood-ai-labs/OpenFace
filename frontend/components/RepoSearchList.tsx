@@ -10,7 +10,7 @@ export default function RepoSearchList({
   emptyMessage,
 }: {
   repos: Repo[];
-  kind: 'model' | 'dataset';
+  kind: 'model' | 'dataset' | 'skill' | 'mcp';
   emptyMessage?: string;
 }) {
   if (!repos || repos.length === 0) {
@@ -26,17 +26,24 @@ export default function RepoSearchList({
       {repos.map((repo) => {
         const owner = repo.owner?.login ?? repo.full_name.split('/')[0];
         const badges = nonTypeTopics(repo.topics).slice(0, 2);
-        const basePath = kind === 'dataset' ? '/datasets' : '/models';
-        const primaryBadge = badges[0] || (kind === 'dataset' ? 'Viewer' : 'Text Generation');
+        const basePath = kind === 'dataset' ? '/datasets' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : '/models';
+        const primaryBadge = badges[0] || (kind === 'dataset' ? 'Viewer' : kind === 'skill' ? 'Codex skill' : kind === 'mcp' ? 'MCP server' : 'Text Generation');
         const secondaryBadge = badges[1];
+        const iconTheme = kind === 'dataset'
+          ? 'rounded bg-emerald-50 text-emerald-700'
+          : kind === 'skill'
+            ? 'rounded-lg bg-violet-50 text-violet-700'
+            : kind === 'mcp'
+              ? 'rounded-lg bg-cyan-50 text-cyan-700'
+              : 'rounded-full bg-amber-50 text-amber-700';
         return (
           <article
             key={repo.id ?? repo.full_name}
             className="block h-[62px] overflow-hidden rounded-lg border border-zinc-100 bg-white px-3 py-2 transition hover:border-zinc-200 hover:bg-zinc-50 hover:shadow-sm"
           >
             <div className="flex min-w-0 items-center gap-2.5">
-              <span className={kind === 'model' ? 'inline-flex h-5 w-5 items-center justify-center rounded-full bg-violet-50 text-violet-700' : 'inline-flex h-5 w-5 items-center justify-center rounded bg-blue-50 text-blue-700'}>
-                <HfIcon name={kind === 'model' ? 'model' : 'dataset'} className="h-3 w-3" />
+              <span className={`inline-flex h-5 w-5 items-center justify-center ${iconTheme}`}>
+                <HfIcon name={kind} className="h-3 w-3" />
               </span>
               <Link href={`/${owner}/${repo.name}`} className="truncate font-mono text-[15px] font-semibold leading-5 text-zinc-900 hover:underline">
                 {repo.full_name}
