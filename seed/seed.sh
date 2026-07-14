@@ -239,6 +239,29 @@ put_file() {
 }
 
 # ------------------------------------------------------------------------
+# Helper: create a lightweight, idempotent tag for a prompt's imported
+# version. This makes the visible `version-v*` topic traceable through the
+# native Forgejo Git history as well as through the OpenFace directory.
+# ------------------------------------------------------------------------
+ensure_tag() {
+  local name="$1" tag="$2" message="$3"
+  local code
+  code=$(api GET "/repos/${ORG_NAME}/${name}/tags?limit=100")
+  if [ "$code" = "200" ] && jq -e --arg tag "$tag" '.[] | select(.name == $tag)' /tmp/api_resp.json >/dev/null; then
+    log "Tag '${tag}' already exists on '${name}'."
+    return 0
+  fi
+
+  code=$(api POST "/repos/${ORG_NAME}/${name}/tags" "$(jq -n --arg tag "$tag" --arg message "$message" '{tag_name:$tag,target:"main",message:$message}')")
+  if [ "$code" = "201" ]; then
+    log "Created tag '${tag}' on '${name}'."
+  else
+    log "WARNING: create tag '${tag}' on '${name}' returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+  fi
+}
+
+# ------------------------------------------------------------------------
 # Helper: create an issue/discussion sample only when the title is absent.
 # This keeps the Community page useful for HF-style visual comparison while
 # remaining safe to rerun after docker resets.
@@ -1018,6 +1041,7 @@ import_prompt_catalog_entry() {
   put_file "$name" "PROMPT.md" "$prompt_file" "Import ${name} prompt source (${version})"
   put_file "$name" "README.md" "$readme_file" "Add ${name} prompt card (${version})"
   put_file "$name" "SOURCE.md" "$source_file" "Record ${name} source provenance"
+  ensure_tag "$name" "$version" "Imported prompt version ${version}"
   log "Imported prompt '${name}' (${version}, ${collection})."
 }
 
