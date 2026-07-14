@@ -1,0 +1,111 @@
+import Link from 'next/link';
+import { Repo, nonTypeTopics } from '@/lib/forgejo';
+import { timeAgoEn } from '@/lib/format';
+import { getSpaceTheme } from '@/lib/space-theme';
+import HfIcon, { HfIconName } from './HfIcon';
+
+const KIND_ICON: Record<string, HfIconName> = {
+  model: 'model',
+  dataset: 'dataset',
+  space: 'space',
+};
+
+const KIND_THEME = {
+  model: {
+    card: 'border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-zinc-200/70',
+    icon: 'bg-amber-100 text-amber-700 ring-amber-200',
+    badge: 'bg-zinc-50 text-amber-800 ring-zinc-200 hover:bg-zinc-100',
+    title: 'text-amber-800 hover:text-amber-950',
+  },
+  space: {
+    card: 'border-indigo-200/80 bg-white hover:border-indigo-400 hover:shadow-indigo-100/80',
+    icon: 'bg-indigo-100 text-indigo-700 ring-indigo-200',
+    badge: 'bg-indigo-50 text-indigo-800 ring-indigo-200 hover:bg-indigo-100',
+    title: 'text-indigo-800 hover:text-indigo-950',
+  },
+  dataset: {
+    card: 'border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-zinc-200/70',
+    icon: 'bg-emerald-100 text-emerald-700 ring-emerald-200',
+    badge: 'bg-zinc-50 text-emerald-800 ring-zinc-200 hover:bg-zinc-100',
+    title: 'text-emerald-800 hover:text-emerald-950',
+  },
+  default: {
+    card: 'border-zinc-200 bg-white hover:border-amber-400',
+    icon: 'bg-zinc-100 text-zinc-600 ring-zinc-200',
+    badge: 'bg-zinc-100 text-zinc-600 ring-zinc-200 hover:bg-zinc-200',
+    title: 'text-zinc-900',
+  },
+};
+
+export default function RepoCard({ repo, kind }: { repo: Repo; kind?: 'model' | 'dataset' | 'space' }) {
+  const owner = repo.owner?.login ?? repo.full_name.split('/')[0];
+  const name = repo.name;
+  const badges = nonTypeTopics(repo.topics).slice(0, 4);
+  const icon = kind ? KIND_ICON[kind] : 'box';
+  const basePath = kind === 'dataset' ? '/datasets' : kind === 'space' ? '/spaces' : '/models';
+  const theme = kind ? KIND_THEME[kind] : KIND_THEME.default;
+  const spaceTheme = getSpaceTheme(repo.full_name);
+
+  return (
+    <article className={`group relative flex min-h-44 flex-col overflow-hidden rounded-xl border shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 ${kind === 'space' ? 'p-0' : 'p-4'} ${theme.card}`}>
+      {kind === 'space' ? (
+        <Link
+          href={`/${owner}/${name}`}
+          className={`relative flex h-24 shrink-0 items-center justify-center overflow-hidden bg-gradient-to-br ${spaceTheme.gradient}`}
+          aria-label={`Open ${repo.full_name}`}
+        >
+          <span className={`absolute -left-8 -top-12 h-28 w-28 rounded-full opacity-60 blur-2xl ${spaceTheme.glow}`} />
+          <span className="absolute -bottom-16 -right-8 h-32 w-32 rounded-full bg-white/25 blur-2xl" />
+          <span className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,.35)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.35)_1px,transparent_1px)] [background-size:18px_18px]" />
+          <span className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-2xl text-white shadow-lg ring-1 ring-white/35 backdrop-blur-sm transition duration-300 group-hover:scale-110 group-hover:rotate-3">
+            <span role="img" aria-label={`${name} icon`}>{repo.space_emoji || '🚀'}</span>
+          </span>
+          <span className="absolute bottom-2.5 left-3 rounded-full bg-black/20 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-white/90 backdrop-blur-sm">
+            OpenFace Space
+          </span>
+          <HfIcon name="space" className="absolute right-3 top-3 h-3.5 w-3.5 text-white/80 transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1" />
+        </Link>
+      ) : null}
+
+      <div className={`flex flex-1 flex-col ${kind === 'space' ? 'p-4' : ''}`}>
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2 truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ring-1 ${theme.icon}`}>
+              <HfIcon name={icon} className="h-3 w-3" />
+            </span>
+            <a href={`/git/${owner}`} className="text-zinc-500 hover:text-zinc-900 hover:underline dark:text-zinc-400">
+              {owner}/
+            </a>
+            <Link href={`/${owner}/${name}`} className={`truncate hover:underline ${theme.title}`}>
+              {name}
+            </Link>
+          </div>
+        </div>
+
+        <Link href={`/${owner}/${name}`} className="mt-2 line-clamp-2 min-h-[2.5rem] text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400">
+          {repo.description || 'No description'}
+        </Link>
+
+        {badges.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {badges.map((t) => (
+              <Link
+                key={t}
+                href={`${basePath}?q=${encodeURIComponent(t)}`}
+                className={`rounded-md px-2 py-0.5 text-xs ring-1 ring-inset transition-colors dark:bg-zinc-800 dark:text-zinc-300 ${theme.badge}`}
+              >
+                {t}
+              </Link>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-auto flex items-center gap-3 pt-3 text-xs text-zinc-500 dark:text-zinc-400">
+          <a href={`/git/${owner}/${name}`} className="inline-flex items-center gap-1 hover:text-zinc-900" title="Stars"><HfIcon name="star" className="h-3 w-3" />{repo.stars_count ?? 0}</a>
+          <a href={`/git/${owner}/${name}/forks`} className="inline-flex items-center gap-1 hover:text-zinc-900" title="Forks"><HfIcon name="download" className="h-3 w-3" />{repo.forks_count ?? 0}</a>
+          <span className="ml-auto">{timeAgoEn(repo.updated_at)}</span>
+        </div>
+      </div>
+    </article>
+  );
+}

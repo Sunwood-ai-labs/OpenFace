@@ -1,0 +1,200 @@
+"""OpenFace spaces-runner.
+
+FastAPI service that builds & runs Gradio "Space" repos as Docker containers
+and reverse-proxies traffic to them. Mounted by the gateway as:
+
+    /runner-api/  -> this app's /api/
+    /run/         -> this app's /  (HTTP + WebSocket)
+
+No authentication: this is a LAN-only management tool, see top-level README.
+"""
+from __future__ import annotations
+
+import asyncio
+import logging
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, Header, HTTPException, Request, WebSocket
+from fastapi.responses import JSONResponse
+
+import config
+import agent_metrics
+import forgejo
+import proxy
+import spaces
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("spaces-runner")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    agent_metrics.initialize()
+    try:
+        spaces.adopt_running_containers()
+    except Exception as exc:  # noqa: BLE001 - docker may not be reachable yet
+        logger.warning("could not adopt running containers at startup: %s", exc)
+    reaper_task = asyncio.create_task(spaces.reap_idle_loop())
+    try:
+        yield
+    finally:
+        reaper_task.cancel()
+
+
+app = FastAPI(title="OpenFace spaces-runner", lifespan=lifespan)
+
+
+def authenticated_agent(authorization: str | None):
+    prefix = "Bearer "
+    api_key = authorization[len(prefix):].strip() if authorization and authorization.startswith(prefix) else None
+    agent = agent_metrics.authenticate(api_key)
+    if not agent:
+        raise HTTPException(status_code=401, detail="A valid agent Bearer token is required")
+    return agent
+
+
+async def verify_repo(owner: str, repo: str) -> None:
+    try:
+        await forgejo.get_repo_info(owner, repo, config.read_forgejo_token())
+    except forgejo.ForgejoError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+# ---------------------------------------------------------------------------
+# Management API (mounted at /runner-api/ -> here at /api/)
+# ---------------------------------------------------------------------------
+
+@app.post("/api/spaces/{owner}/{repo}/start")
+async def api_start_space(owner: str, repo: str):
+    token = config.read_forgejo_token()
+    try:
+        await forgejo.verify_space_repo(owner, repo, token)
+    except forgejo.ForgejoError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    result = await asyncio.to_thread(spaces.start_space, owner, repo, token)
+    return result
+
+
+@app.get("/api/spaces/{owner}/{repo}/status")
+async def api_space_status(owner: str, repo: str):
+    return await asyncio.to_thread(spaces.get_status, owner, repo)
+
+
+@app.post("/api/spaces/{owner}/{repo}/stop")
+async def api_stop_space(owner: str, repo: str):
+    return await asyncio.to_thread(spaces.stop_space, owner, repo)
+
+
+@app.get("/api/spaces")
+async def api_list_spaces():
+    return await asyncio.to_thread(spaces.list_spaces)
+
+
+# ---------------------------------------------------------------------------
+# Agent interaction API
+# ---------------------------------------------------------------------------
+
+@app.get("/api/agents")
+async def api_list_agents():
+    """Public agent profiles. API keys are never returned."""
+    return await asyncio.to_thread(agent_metrics.list_agents)
+
+
+@app.get("/api/metrics/repos/{owner}/{repo}")
+async def api_repo_metrics(owner: str, repo: str):
+    return await asyncio.to_thread(agent_metrics.metrics, owner, repo)
+
+
+@app.post("/api/metrics/repos/{owner}/{repo}/views")
+async def api_browser_view(
+    owner: str,
+    repo: str,
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+):
+    """Record a real browser visit. One detail-page load supplies one stable key."""
+    await verify_repo(owner, repo)
+    if not idempotency_key:
+        raise HTTPException(status_code=400, detail="Idempotency-Key is required")
+    if len(idempotency_key) > 200:
+        raise HTTPException(status_code=400, detail="Idempotency-Key must be 200 characters or fewer")
+    created, result = await asyncio.to_thread(
+        agent_metrics.record_browser_view, owner, repo, idempotency_key
+    )
+    return {"ok": True, "created": created, "source": "browser", "metrics": result}
+
+
+@app.post("/api/agent/v1/repos/{owner}/{repo}/views")
+async def api_agent_view(
+    owner: str,
+    repo: str,
+    authorization: str | None = Header(default=None),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+):
+    agent = authenticated_agent(authorization)
+    await verify_repo(owner, repo)
+    if idempotency_key and len(idempotency_key) > 200:
+        raise HTTPException(status_code=400, detail="Idempotency-Key must be 200 characters or fewer")
+    created, result = await asyncio.to_thread(
+        agent_metrics.record_view, agent["id"], owner, repo, idempotency_key
+    )
+    return {"ok": True, "created": created, "agent": agent["slug"], "metrics": result}
+
+
+@app.put("/api/agent/v1/repos/{owner}/{repo}/like")
+async def api_agent_like(
+    owner: str,
+    repo: str,
+    authorization: str | None = Header(default=None),
+):
+    agent = authenticated_agent(authorization)
+    await verify_repo(owner, repo)
+    changed, result = await asyncio.to_thread(agent_metrics.set_like, agent["id"], owner, repo, True)
+    return {"ok": True, "changed": changed, "liked": True, "agent": agent["slug"], "metrics": result}
+
+
+@app.delete("/api/agent/v1/repos/{owner}/{repo}/like")
+async def api_agent_unlike(
+    owner: str,
+    repo: str,
+    authorization: str | None = Header(default=None),
+):
+    agent = authenticated_agent(authorization)
+    await verify_repo(owner, repo)
+    changed, result = await asyncio.to_thread(agent_metrics.set_like, agent["id"], owner, repo, False)
+    return {"ok": True, "changed": changed, "liked": False, "agent": agent["slug"], "metrics": result}
+
+
+# ---------------------------------------------------------------------------
+# Reverse proxy (mounted at /run/ -> here at /)
+# ---------------------------------------------------------------------------
+
+@app.websocket("/{owner}/{repo}/{path:path}")
+async def ws_proxy(websocket: WebSocket, owner: str, repo: str, path: str):
+    await proxy.proxy_websocket(websocket, owner, repo, path)
+
+
+@app.websocket("/{owner}/{repo}")
+async def ws_proxy_root(websocket: WebSocket, owner: str, repo: str):
+    await proxy.proxy_websocket(websocket, owner, repo, "")
+
+
+@app.api_route(
+    "/{owner}/{repo}/{path:path}",
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
+)
+async def http_proxy(request: Request, owner: str, repo: str, path: str = ""):
+    return await proxy.proxy_http(request, owner, repo, path)
+
+
+@app.api_route(
+    "/{owner}/{repo}",
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
+)
+async def http_proxy_root(request: Request, owner: str, repo: str):
+    return await proxy.proxy_http(request, owner, repo, "")
+
+
+@app.get("/healthz")
+async def healthz():
+    return JSONResponse({"status": "ok"})

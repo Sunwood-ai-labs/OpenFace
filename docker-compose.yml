@@ -1,0 +1,127 @@
+name: openface
+
+networks:
+  openface:
+    name: openface
+
+volumes:
+  forgejo-data:
+    name: openface_forgejo-data
+  shared-token:
+    name: openface_shared-token
+  agent-metrics-data:
+    name: openface_agent-metrics-data
+
+services:
+  gateway:
+    image: nginx:alpine
+    container_name: openface-gateway
+    restart: unless-stopped
+    ports:
+      - "${OPENFACE_PORT:-8090}:80"
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - openface
+    depends_on:
+      - frontend
+      - forgejo
+      - spaces-runner
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: openface-frontend
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      FORGEJO_API: http://forgejo:3000/api/v1
+      FORGEJO_TOKEN_FILE: /shared/token
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8090}
+      RUNNER_API: http://spaces-runner:8000/api
+    volumes:
+      - shared-token:/shared:ro
+    networks:
+      - openface
+    depends_on:
+      forgejo:
+        condition: service_healthy
+
+  forgejo:
+    build:
+      context: ./forgejo
+    container_name: openface-forgejo
+    restart: unless-stopped
+    ports:
+      - "2222:22"
+    expose:
+      - "3000"
+    environment:
+      USER_UID: 1000
+      USER_GID: 1000
+      FORGEJO__DEFAULT__APP_NAME: OpenFace
+      FORGEJO__server__ROOT_URL: ${PUBLIC_BASE_URL:-http://localhost:8090}/git/
+      FORGEJO__server__HTTP_PORT: 3000
+      FORGEJO__server__SSH_PORT: 22
+      FORGEJO__server__LFS_START_SERVER: "true"
+      FORGEJO__lfs__STORAGE_TYPE: local
+      FORGEJO__service__DISABLE_REGISTRATION: ${DISABLE_REGISTRATION:-false}
+      FORGEJO__webhook__ALLOWED_HOST_LIST: "*"
+      FORGEJO__security__INSTALL_LOCK: "true"
+      FORGEJO__database__DB_TYPE: sqlite3
+    volumes:
+      - forgejo-data:/data
+    networks:
+      - openface
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:3000/api/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  spaces-runner:
+    build:
+      context: ./spaces-runner
+    container_name: openface-spaces-runner
+    restart: unless-stopped
+    expose:
+      - "8000"
+    environment:
+      FORGEJO_API: http://forgejo:3000/api/v1
+      FORGEJO_TOKEN_FILE: /shared/token
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8090}
+      DOCKER_NETWORK: openface
+      IDLE_TIMEOUT_MINUTES: ${IDLE_TIMEOUT_MINUTES:-0}
+      AGENT_DATA_DIR: /data/agents
+    volumes:
+      - shared-token:/shared:ro
+      - agent-metrics-data:/data/agents
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - openface
+    depends_on:
+      forgejo:
+        condition: service_healthy
+
+  seed:
+    build:
+      context: ./seed
+    container_name: openface-seed
+    restart: "no"
+    environment:
+      OPENFACE_ADMIN_USER: ${OPENFACE_ADMIN_USER:-openface-admin}
+      OPENFACE_ADMIN_PASSWORD: ${OPENFACE_ADMIN_PASSWORD:-openface1234}
+      OPENFACE_ADMIN_EMAIL: ${OPENFACE_ADMIN_EMAIL:-admin@example.com}
+      FORGEJO_API: http://forgejo:3000/api/v1
+      FORGEJO_TOKEN_FILE: /shared/token
+      FORGEJO_CONTAINER_NAME: openface-forgejo
+    volumes:
+      - shared-token:/shared
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - openface
+    depends_on:
+      forgejo:
+        condition: service_healthy

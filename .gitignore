@@ -1,0 +1,47 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+**/credentials.json
+**/*token*
+!**/*token*.py
+
+# Docker/build runtime state
+/.docker-tmp/
+*.pid
+
+# Dependencies and generated builds
+**/node_modules/
+**/.next/
+**/dist/
+**/build/
+**/.cache/
+**/__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Persistent runtime databases
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+
+# Local diagnostics and visual verification artifacts
+*.log
+/forgejo-*.html
+/screenshots/
+/.sync-probe
+
+# These are independent Git repositories published to the local Forgejo.
+# Keep the publishing helper here, but do not turn the checkouts into nested
+# gitlinks inside the OpenFace platform repository.
+/sample-spaces/*/
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

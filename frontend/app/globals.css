@@ -1,0 +1,299 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #fafafa;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #18181b;
+  }
+}
+
+.prose-openface {
+  line-height: 1.75;
+}
+
+.prose-openface h1,
+.prose-openface h2,
+.prose-openface h3 {
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose-openface h1 {
+  font-size: 1.75rem;
+  border-bottom: 1px solid rgb(228 228 231);
+  padding-bottom: 0.3em;
+}
+
+.prose-openface h2 {
+  font-size: 1.4rem;
+  border-bottom: 1px solid rgb(228 228 231);
+  padding-bottom: 0.3em;
+}
+
+.prose-openface h3 {
+  font-size: 1.15rem;
+}
+
+.prose-openface p {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.prose-openface ul,
+.prose-openface ol {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  padding-left: 1.5em;
+}
+
+.prose-openface ul {
+  list-style-type: disc;
+}
+
+.prose-openface ol {
+  list-style-type: decimal;
+}
+
+.prose-openface a {
+  color: #b45309;
+  text-decoration: underline;
+}
+
+.prose-openface code {
+  background-color: rgb(244 244 245);
+  border-radius: 0.25rem;
+  padding: 0.15em 0.4em;
+  font-size: 0.9em;
+}
+
+.prose-openface pre {
+  background-color: rgb(24 24 27);
+  color: rgb(244 244 245);
+  border-radius: 0.75rem;
+  padding: 1em;
+  overflow-x: auto;
+}
+
+.prose-openface pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+@media (max-width: 640px) {
+  .prose-openface {
+    min-width: 0;
+  }
+
+  .prose-openface pre {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .prose-openface pre code {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+
+.prose-openface blockquote {
+  border-left: 4px solid #ffd21e;
+  padding-left: 1em;
+  color: rgb(113 113 122);
+  margin: 1em 0;
+}
+
+.prose-openface table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+}
+
+.prose-openface th,
+.prose-openface td {
+  border: 1px solid rgb(228 228 231);
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+
+.prose-openface img {
+  max-width: 100%;
+  border-radius: 0.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .prose-openface h1,
+  .prose-openface h2 {
+    border-color: rgb(63 63 70);
+  }
+  .prose-openface code {
+    background-color: rgb(39 39 42);
+  }
+  .prose-openface th,
+  .prose-openface td {
+    border-color: rgb(63 63 70);
+  }
+}
+
+body:has(.openface-space-app-page) {
+  background: #fff;
+}
+
+body:has(.openface-space-app-page) > header,
+body:has(.openface-space-app-page) > nav,
+body:has(.openface-space-app-page) > footer {
+  display: none;
+}
+
+body:has(.openface-space-app-page) > main {
+  max-width: none;
+  padding: 0;
+}
+
+body:has(.openface-spaces-directory) > main {
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Keep repository identity and status crisp above tabs and embedded content. */
+.openface-repo-header {
+  position: relative;
+  z-index: 20;
+  isolation: isolate;
+  background: #fff;
+  filter: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.openface-repo-header > * {
+  filter: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .openface-repo-header {
+    background: #09090b;
+  }
+}
+
+.openface-space-app-page {
+  min-height: 100vh;
+  background: #fff;
+}
+
+.openface-space-app-header {
+  height: 50px;
+  padding: 0 16px;
+  background: #fff;
+  border-bottom-color: #e5e7eb;
+}
+
+.openface-space-app-header > div:first-child {
+  height: 50px;
+  padding: 0;
+}
+
+.openface-space-app-header h1 {
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.openface-space-app-header [href*="/git/"][title*="like"] {
+  height: 24px;
+  border-radius: 6px;
+}
+
+.openface-space-app-header [href*="/git/"] + a {
+  height: 24px;
+  border-radius: 6px;
+}
+
+.openface-space-app-header span:has(> span.rounded-full),
+.openface-space-app-header .bg-emerald-50 {
+  height: 24px;
+  border-radius: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+.openface-space-app-header > div:last-child {
+  height: 50px;
+}
+
+.openface-space-app-header a[href$="?tab=card"],
+.openface-space-app-header a[href*="/src/branch/main"],
+.openface-space-app-header a[href*="/issues"] {
+  min-height: 50px;
+  height: 50px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.openface-space-app-runner,
+.openface-space-runner {
+  height: calc(100vh - 50px);
+}
+
+.openface-space-runner {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.openface-space-runner-toolbar {
+  display: none;
+}
+
+.openface-space-frame,
+.openface-space-stage {
+  height: calc(100vh - 50px);
+  min-height: calc(100vh - 50px);
+}
+
+@media (max-width: 640px) {
+  .openface-space-app-header {
+    height: auto;
+    min-height: 116px;
+    align-content: flex-start;
+    padding: 10px 16px 0;
+  }
+
+  .openface-space-app-header > div:first-child {
+    height: auto;
+    min-height: 48px;
+  }
+
+  .openface-space-app-header > div:last-child {
+    display: flex;
+    width: 100%;
+    height: 50px;
+  }
+
+  .openface-space-app-header a[href$="?tab=card"],
+  .openface-space-app-header a[href*="/src/branch/main"],
+  .openface-space-app-header a[href*="/issues"] {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+
+  .openface-space-app-runner,
+  .openface-space-runner,
+  .openface-space-frame,
+  .openface-space-stage {
+    height: calc(100vh - 133px);
+    min-height: calc(100vh - 133px);
+  }
+}

@@ -1,0 +1,91 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faArrowLeft,
+  faArrowRight,
+  faBoxArchive,
+  faBars,
+  faChartColumn,
+  faClock,
+  faCode,
+  faCodeFork,
+  faCube,
+  faDatabase,
+  faDownload,
+  faEye,
+  faFire,
+  faFilter,
+  faFileLines,
+  faFilePen,
+  faFolder,
+  faGear,
+  faGlobe,
+  faImage,
+  faLayerGroup,
+  faLink,
+  faMicrophone,
+  faMusic,
+  faPlay,
+  faMagnifyingGlass,
+  faHeart,
+  faPlus,
+  faRocket,
+  faSliders,
+  faSort,
+  faStar,
+  faTableCells,
+  faTrophy,
+  faVideo,
+  faWandMagicSparkles,
+} from '@fortawesome/free-solid-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+
+const icons = {
+  arrowLeft: faArrowLeft,
+  arrowRight: faArrowRight,
+  bars: faBars,
+  box: faBoxArchive,
+  chart: faChartColumn,
+  clock: faClock,
+  code: faCode,
+  fork: faCodeFork,
+  cube: faCube,
+  dataset: faDatabase,
+  download: faDownload,
+  eye: faEye,
+  fire: faFire,
+  filter: faFilter,
+  file: faFileLines,
+  filePen: faFilePen,
+  folder: faFolder,
+  gear: faGear,
+  globe: faGlobe,
+  image: faImage,
+  link: faLink,
+  microphone: faMicrophone,
+  model: faLayerGroup,
+  music: faMusic,
+  play: faPlay,
+  heart: faHeart,
+  plus: faPlus,
+  search: faMagnifyingGlass,
+  sliders: faSliders,
+  sort: faSort,
+  space: faRocket,
+  sparkles: faWandMagicSparkles,
+  star: faStar,
+  table: faTableCells,
+  trophy: faTrophy,
+  video: faVideo,
+} satisfies Record<string, IconDefinition>;
+
+export type HfIconName = keyof typeof icons;
+
+export default function HfIcon({
+  name,
+  className,
+}: {
+  name: HfIconName;
+  className?: string;
+}) {
+  return <FontAwesomeIcon icon={icons[name]} className={className} aria-hidden="true" />;
+}
