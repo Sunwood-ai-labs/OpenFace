@@ -36,7 +36,9 @@ async def get_repo_topics(owner: str, repo: str, token: str | None) -> list[str]
 
 async def verify_space_repo(owner: str, repo: str, token: str | None) -> None:
     """Raise ForgejoError unless the repo exists and carries the `space` topic."""
-    await get_repo_info(owner, repo, token)
+    repo_info = await get_repo_info(owner, repo, token)
+    if repo_info.get("private") and not config.ALLOW_PRIVATE_SPACES:
+        raise ForgejoError("private Spaces are disabled by OPENFACE_ALLOW_PRIVATE_SPACES")
     topics = await get_repo_topics(owner, repo, token)
     if "space" not in topics:
         raise ForgejoError(f"repository {owner}/{repo} does not have the 'space' topic")

@@ -6,12 +6,14 @@ and reverse-proxies traffic to them. Mounted by the gateway as:
     /runner-api/  -> this app's /api/
     /run/         -> this app's /  (HTTP + WebSocket)
 
-No authentication: this is a LAN-only management tool, see top-level README.
+Mutating management calls are accepted only from the OpenFace frontend, which
+checks the caller's Forgejo repository permission before forwarding them.
 """
 from __future__ import annotations
 
 import asyncio
 import logging
+import secrets
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Header, HTTPException, Request, WebSocket
@@ -63,6 +65,18 @@ def authenticated_agent(authorization: str | None):
     return agent
 
 
+def require_frontend_control(control_token: str | None) -> None:
+    """Reject browser-direct runner mutations.
+
+    The Forgejo admin token is shared read-only with the frontend and runner;
+    it is never sent to a browser. The frontend uses it only after verifying
+    the signed-in Forgejo user's push permission for the target repository.
+    """
+    expected = config.read_forgejo_token()
+    if not expected or not control_token or not secrets.compare_digest(control_token, expected):
+        raise HTTPException(status_code=403, detail="Space control must be authorized by OpenFace")
+
+
 async def verify_repo(owner: str, repo: str) -> None:
     try:
         await forgejo.get_repo_info(owner, repo, config.read_forgejo_token())
@@ -75,7 +89,12 @@ async def verify_repo(owner: str, repo: str) -> None:
 # ---------------------------------------------------------------------------
 
 @app.post("/api/spaces/{owner}/{repo}/start")
-async def api_start_space(owner: str, repo: str):
+async def api_start_space(
+    owner: str,
+    repo: str,
+    x_openface_control_token: str | None = Header(default=None),
+):
+    require_frontend_control(x_openface_control_token)
     token = config.read_forgejo_token()
     try:
         await forgejo.verify_space_repo(owner, repo, token)
@@ -92,7 +111,12 @@ async def api_space_status(owner: str, repo: str):
 
 
 @app.post("/api/spaces/{owner}/{repo}/stop")
-async def api_stop_space(owner: str, repo: str):
+async def api_stop_space(
+    owner: str,
+    repo: str,
+    x_openface_control_token: str | None = Header(default=None),
+):
+    require_frontend_control(x_openface_control_token)
     return await asyncio.to_thread(spaces.stop_space, owner, repo)
 
 

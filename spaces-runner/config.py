@@ -18,6 +18,10 @@ DOCKER_NETWORK: str = os.environ.get("DOCKER_NETWORK", "openface")
 # remain available like ordinary local services.
 IDLE_TIMEOUT_MINUTES: int = int(os.environ.get("IDLE_TIMEOUT_MINUTES", "0"))
 MAX_RUNNING_SPACES: int = max(1, int(os.environ.get("MAX_RUNNING_SPACES", "24")))
+# Private repository content must stay inside Forgejo's native access-control
+# boundary. The runner only serves public Spaces unless this is explicitly
+# enabled in a separately isolated deployment.
+ALLOW_PRIVATE_SPACES: bool = os.environ.get("OPENFACE_ALLOW_PRIVATE_SPACES", "false").lower() == "true"
 
 # Derived: forgejo host:port for git clone URLs (http://forgejo:3000/...)
 FORGEJO_GIT_BASE: str = FORGEJO_API.split("/api/")[0].rstrip("/")

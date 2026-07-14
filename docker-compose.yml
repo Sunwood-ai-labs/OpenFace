@@ -67,7 +67,7 @@ services:
       FORGEJO__server__SSH_PORT: 22
       FORGEJO__server__LFS_START_SERVER: "true"
       FORGEJO__lfs__STORAGE_TYPE: local
-      FORGEJO__service__DISABLE_REGISTRATION: ${DISABLE_REGISTRATION:-false}
+      FORGEJO__service__DISABLE_REGISTRATION: ${DISABLE_REGISTRATION:-true}
       FORGEJO__webhook__ALLOWED_HOST_LIST: "*"
       FORGEJO__security__INSTALL_LOCK: "true"
       FORGEJO__database__DB_TYPE: sqlite3

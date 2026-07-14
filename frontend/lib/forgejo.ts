@@ -51,6 +51,7 @@ export interface Repo {
   html_url?: string;
   default_branch?: string;
   space_emoji?: string;
+  private?: boolean;
 }
 
 export interface SearchReposResult {
@@ -168,12 +169,15 @@ export async function searchRepos(params: SearchReposParams): Promise<SearchRepo
   if (!res.ok || !res.json) {
     return { ok: false, data: [], total_count: 0 };
   }
-  const data = Array.isArray(res.json.data) ? res.json.data as Repo[] : [];
+  // This server-side client uses the seed admin token to read repository
+  // metadata. Never let that privileged token turn private Forgejo assets into
+  // public OpenFace catalog entries.
+  const data = (Array.isArray(res.json.data) ? res.json.data as Repo[] : []).filter((repo) => !repo.private);
   const headerTotal = Number.parseInt(res.headers?.get('x-total-count') || '', 10);
   return {
     ok: true,
     data: topic === 'space' ? await enrichSpaceMetadata(data) : data,
-    total_count: Number.isFinite(headerTotal) ? headerTotal : (res.json.total_count ?? data.length),
+    total_count: data.length,
   };
 }
 
@@ -208,7 +212,7 @@ export async function searchReposByTopicAndQuery(
 // ---------------------------------------------------------------------------
 export async function getRepo(owner: string, repo: string): Promise<Repo | null> {
   const res = await apiFetch(`/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`);
-  if (!res.ok || !res.json) return null;
+  if (!res.ok || !res.json || res.json.private) return null;
   return res.json as Repo;
 }
 

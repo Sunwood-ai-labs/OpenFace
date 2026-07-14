@@ -35,6 +35,7 @@ export default function SpaceRunner({
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const base = `/runner-api/spaces/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
+  const controlBase = `/api/spaces/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
   const runUrl = `/run/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/`;
   const displayName = repo
     .replace(/-space$/i, '')
@@ -59,39 +60,20 @@ export default function SpaceRunner({
     }
   }, [base]);
 
-  const startOnDemand = useCallback(async () => {
-    const current = await fetchStatus();
-    if (current !== 'stopped') return;
-    setBusy(true);
-    setErrorMsg(null);
-    try {
-      const response = await fetch(`${base}/start`, { method: 'POST' });
-      if (!response.ok) {
-        setErrorMsg(`Failed to start this Space (HTTP ${response.status})`);
-      }
-      await fetchStatus();
-    } catch {
-      setErrorMsg('Could not connect to spaces-runner.');
-    } finally {
-      setBusy(false);
-    }
-  }, [base, fetchStatus]);
-
   useEffect(() => {
-    void startOnDemand();
     pollRef.current = setInterval(fetchStatus, 5000);
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
-  }, [fetchStatus, startOnDemand]);
+  }, [fetchStatus]);
 
   async function start() {
     setBusy(true);
     setErrorMsg(null);
     try {
-      const res = await fetch(`${base}/start`, { method: 'POST' });
+      const res = await fetch(`${controlBase}/start`, { method: 'POST' });
       if (!res.ok) {
-        setErrorMsg(`Failed to restart this Space (HTTP ${res.status})`);
+        setErrorMsg(res.status === 401 ? 'Sign in to Forgejo, then try again.' : res.status === 403 ? 'Write permission on this Space is required.' : `Failed to restart this Space (HTTP ${res.status})`);
       }
       await fetchStatus();
     } catch {
@@ -105,9 +87,9 @@ export default function SpaceRunner({
     setBusy(true);
     setErrorMsg(null);
     try {
-      const res = await fetch(`${base}/stop`, { method: 'POST' });
+      const res = await fetch(`${controlBase}/stop`, { method: 'POST' });
       if (!res.ok) {
-        setErrorMsg(`Failed to pause this Space (HTTP ${res.status})`);
+        setErrorMsg(res.status === 401 ? 'Sign in to Forgejo, then try again.' : res.status === 403 ? 'Write permission on this Space is required.' : `Failed to pause this Space (HTTP ${res.status})`);
       }
       await fetchStatus();
     } catch {
