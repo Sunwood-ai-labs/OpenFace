@@ -6,7 +6,7 @@ export default function CardBadges({
   basePath = '/models',
 }: {
   frontmatter: ModelCardFrontmatter;
-  basePath?: '/models' | '/datasets' | '/spaces';
+  basePath?: '/models' | '/datasets' | '/spaces' | '/skills' | '/mcps';
 }) {
   const { license, pipeline_tag, tags } = frontmatter;
   const languages = languageList(frontmatter.language);

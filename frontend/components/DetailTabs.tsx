@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import HfIcon from './HfIcon';
+import type { RepoKind } from '@/lib/forgejo';
 
 export default function DetailTabs({
   owner,
@@ -13,11 +14,19 @@ export default function DetailTabs({
   repo: string;
   active: 'card' | 'files';
   isSpace?: boolean;
-  kind?: 'model' | 'dataset' | 'space' | null;
+  kind?: RepoKind | null;
   communityCount?: number;
 }) {
   const filesHref = `/git/${owner}/${repo}/src/branch/main`;
-  const cardLabel = isSpace ? 'App' : kind === 'dataset' ? 'Dataset card' : 'Model card';
+  const cardLabel = isSpace
+    ? 'App'
+    : kind === 'dataset'
+      ? 'Dataset card'
+      : kind === 'skill'
+        ? 'Skill card'
+        : kind === 'mcp'
+          ? 'MCP card'
+          : 'Model card';
   const tabClass = (tab: string) =>
     `inline-flex min-h-12 items-center gap-2 border-b-2 px-4 py-2 text-sm font-semibold ${
       active === tab

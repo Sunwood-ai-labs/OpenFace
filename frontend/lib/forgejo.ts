@@ -126,8 +126,10 @@ async function apiFetch(path: string): Promise<{ ok: boolean; status: number; js
 // ---------------------------------------------------------------------------
 // Repo search — topic-classified listing (models / datasets / spaces)
 // ---------------------------------------------------------------------------
+export type RepoKind = 'model' | 'dataset' | 'space' | 'skill' | 'mcp';
+
 export interface SearchReposParams {
-  topic?: string; // model | dataset | space
+  topic?: RepoKind;
   q?: string;
   sort?: SortOption;
   limit?: number;
@@ -182,7 +184,7 @@ export async function searchRepos(params: SearchReposParams): Promise<SearchRepo
 // against name/description. This keeps the "固定契約" endpoint shape intact
 // while still giving usable search-within-category behaviour.
 export async function searchReposByTopicAndQuery(
-  topic: string,
+  topic: RepoKind,
   q: string | undefined,
   sort: SortOption,
   limit = 50,
@@ -382,17 +384,19 @@ export function forgejoCommitsUrl(owner: string, repo: string, path = '', branch
   return `${forgejoRepoUrl(owner, repo)}/commits/branch/${branch}${cleanPath ? `/${cleanPath}` : ''}`;
 }
 
-const TYPE_TOPICS = new Set(['model', 'dataset', 'space']);
+const TYPE_TOPICS = new Set<string>(['model', 'dataset', 'space', 'skill', 'mcp']);
 
 export function nonTypeTopics(topics: string[] | undefined): string[] {
   if (!topics) return [];
   return topics.filter((t) => !TYPE_TOPICS.has(t));
 }
 
-export function repoKind(topics: string[] | undefined): 'model' | 'dataset' | 'space' | null {
+export function repoKind(topics: string[] | undefined): RepoKind | null {
   if (!topics) return null;
   if (topics.includes('space')) return 'space';
   if (topics.includes('dataset')) return 'dataset';
   if (topics.includes('model')) return 'model';
+  if (topics.includes('skill')) return 'skill';
+  if (topics.includes('mcp')) return 'mcp';
   return null;
 }
