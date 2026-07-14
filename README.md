@@ -62,6 +62,18 @@ flowchart LR
 |---|---|
 | <img src="docs/images/openface-home.png" alt="モデル、Space、データセットを表示する OpenFace のホーム画面" width="100%"> | <img src="docs/images/openface-files.png" alt="OpenFace の Space リポジトリにある Files 画面" width="100%"> |
 
+## ⚙️ Spacesのスケーラビリティ
+
+サービスやDBを増やさず、現在のDocker Compose・Forgejo・SQLite構成のまま、リポジトリ数が増えても一覧処理量がほぼ一定になるようにしています。
+
+- 一覧は **48件単位**。`/spaces?page=2` の形式で前後移動できます。
+- カードの閲覧数・いいね数は **1回のバッチAPI**、Docker状態は **`/runner-api/spaces` 1回**で取得します。
+- Space絵文字用READMEは現在ページの最大48件だけを対象に、既定 **5分間**メモリキャッシュします。
+- 同時起動は既定 **24件**。25件目を開くと自動起動し、最終アクセスが最も古いSpaceを1件だけ停止します。
+- 停止中のSpaceは `Paused` ではなく **`On demand`** と表示します。
+
+実ブラウザでの検証画像とリクエスト数の記録は [Spaces scalability verification evidence](docs/evidence/scalability/README.md) にまとめています。
+
 ## 必要要件
 
 - Docker
@@ -138,8 +150,9 @@ if __name__ == "__main__":
 gradio
 ```
 
-3. OpenFace の該当 Space ページで **▶ Run** ボタンを押すと、`spaces-runner` がリポジトリを clone → イメージビルド → コンテナ起動を行い、`/run/{owner}/{repo}/` 配下で埋め込み表示されます。ビルドには数十秒〜数分かかることがあります（ステータスは building → running / error で確認可能）。
-4. 一定時間（既定30分、`IDLE_TIMEOUT_MINUTES`）アクセスがない Space は自動的に停止されます。
+3. OpenFace の該当 Space ページを開くと、停止中のSpaceは自動的にオンデマンド起動します。`spaces-runner` がリポジトリを clone → イメージビルド → コンテナ起動し、`/run/{owner}/{repo}/` 配下で埋め込み表示します。ビルドには数十秒〜数分かかることがあります（ステータスは building → running / error で確認可能）。
+4. 同時起動数は `MAX_RUNNING_SPACES`（既定24）で制限されます。上限到達時は、最終アクセスが最も古いSpaceを停止してから新しいSpaceを起動します。
+5. `IDLE_TIMEOUT_MINUTES` は既定0（時間による自動停止なし）です。必要な環境だけ正の分数を設定できます。
 
 ## ポート一覧
 
@@ -162,7 +175,8 @@ OpenFace/
 ├── forgejo/              # Dockerfile + custom/ (templates, assets)
 ├── frontend/             # Next.js アプリ
 ├── spaces-runner/         # FastAPI + Dockerfile（Spaceのビルド・実行・プロキシ）
-└── seed/                  # seed.sh + Dockerfile（初回ブートストラップ）
+├── seed/                  # seed.sh + Dockerfile（初回ブートストラップ）
+└── docs/evidence/         # 実ブラウザ検証のスクリーンショットと計測記録
 ```
 
 ## トラブルシューティング
