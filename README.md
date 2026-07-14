@@ -1,6 +1,6 @@
 # OpenFace
 
-セルフホスト版 HuggingFace ライクなプラットフォームです。Forgejo（Git + LFS）を土台に、HuggingFace 風の Web ポータルと、Dockerfile ベースのアプリ（Spaces）をその場でビルド・実行できるランナーを組み合わせています。`docker compose up -d --build` だけで、自分の LAN / サーバー内に「モデル・データセット・Spaces を公開できる場所」を丸ごと立ち上げられます。
+セルフホスト版 HuggingFace ライクなプラットフォームです。Forgejo（Git + LFS）を土台に、HuggingFace 風の Web ポータルと、Dockerfile ベースのアプリ（Spaces）をその場でビルド・実行できるランナーを組み合わせています。`docker compose up -d --build` だけで、自分の LAN / サーバー内に「モデル・データセット・Spaces・Skill・MCP を公開できる場所」を丸ごと立ち上げられます。
 
 <p align="center">
   <img src="docs/images/openface-home.png" alt="OpenFace のホーム画面" width="100%">
@@ -20,7 +20,7 @@ OpenFace は次の4つのサービスで構成されています。
 | `spaces-runner` | Docker Space のビルド・起動・プロキシ (FastAPI + Docker SDK) | 8000 |
 | `seed` | 初回起動時に admin ユーザーとサンプルrepoを作成する one-shot ジョブ | - |
 
-リポジトリの種別（モデル / データセット / Space）は Forgejo の **topics**（`model` / `dataset` / `space`）で判定します。モデルカード・データセットカードはリポジトリ直下の `README.md`（HuggingFace互換の YAML frontmatter）をそのまま使います。
+リポジトリの種別（モデル / データセット / Space / Skill / MCP）は Forgejo の **topics**（`model` / `dataset` / `space` / `skill` / `mcp`）で判定します。各詳細カードはリポジトリ直下の `README.md` を使い、相対画像もローカル Forgejo の実ファイルから表示します。
 
 ### アーキテクチャ図
 
@@ -37,7 +37,7 @@ flowchart LR
         SpaceA["Space container<br/>Docker app :7860"]
         SpaceB["Space container<br/>Docker app :7860"]
 
-        Gateway -- "/ , /models, /datasets, /spaces, /:owner/:repo/*" --> Frontend
+        Gateway -- "/ , /models, /datasets, /spaces, /skills, /mcps, /:owner/:repo/*" --> Frontend
         Gateway -- "/git/" --> Forgejo
         Gateway -- "/run/ (WebSocket対応)" --> Runner
         Gateway -- "/runner-api/ → /api/" --> Runner
@@ -61,6 +61,20 @@ flowchart LR
 | ホーム | リポジトリの Files 画面 |
 |---|---|
 | <img src="docs/images/openface-home.png" alt="モデル、Space、データセットを表示する OpenFace のホーム画面" width="100%"> | <img src="docs/images/openface-files.png" alt="OpenFace の Space リポジトリにある Files 画面" width="100%"> |
+
+### Skills / MCPs
+
+Sunwood AI Labs の公開 GitHub リポジトリから、実ファイルとコミット履歴を含む Skill 10件・MCPサーバー10件を取り込みます。名前だけのダミーではなく、Skill は `SKILL.md`、MCP はサーバー実装と依存定義を検証済みです。
+
+| Skills | MCPs |
+|---|---|
+| <img src="docs/evidence/skills-mcps/skills-directory.png" alt="実在するSkill 10件を表示するOpenFace Skills一覧" width="100%"> | <img src="docs/evidence/skills-mcps/mcps-directory.png" alt="実在するMCPサーバー10件を表示するOpenFace MCP一覧" width="100%"> |
+
+| ホームのAgent tooling | Skill詳細 |
+|---|---|
+| <img src="docs/evidence/skills-mcps/home-agent-tooling.png" alt="SkillsとMCPsを追加したOpenFaceホーム" width="100%"> | <img src="docs/evidence/skills-mcps/skill-detail.png" alt="実READMEと相対画像を表示するSkill詳細" width="100%"> |
+
+選定根拠と検証結果は [Skill / MCP verification evidence](docs/evidence/skills-mcps/README.md) にまとめています。
 
 ## ⚙️ Spacesのスケーラビリティ
 
@@ -93,14 +107,14 @@ docker compose up -d --build
 起動後、ブラウザで [http://localhost:8090](http://localhost:8090) を開いてください。
 
 - 初期 admin ユーザーの資格情報は `.env` の `OPENFACE_ADMIN_USER` / `OPENFACE_ADMIN_PASSWORD`（デフォルト: `openface-admin` / `openface1234`。※`admin`はForgejoの予約名のため使用不可）です。初回ログイン後にパスワードを変更することを推奨します。
-- `seed` サービスが初回起動時に自動的にサンプルリポジトリ（`openface/sample-model`, `openface/sample-dataset`, `openface/hello-space`）を作成します。トップページや `/models` `/datasets` `/spaces` で確認できます。
+- `seed` サービスがサンプルリポジトリと、`seed/catalog/sunwood-ai-labs.json` に固定した実在 Skill 10件・MCP 10件を冪等に取り込みます。トップページや `/models` `/datasets` `/spaces` `/skills` `/mcps` で確認できます。
 
 ## 使い方
 
-### モデル/データセットの公開手順
+### モデル / データセット / Skill / MCP の公開手順
 
 1. Forgejo の Web UI（`/git/repo/create` 、またはトップページの「新規作成」導線）でリポジトリを作成します。
-2. リポジトリ設定画面から **topic** に `model` または `dataset` を追加します（これで OpenFace 上での種別が決まります）。
+2. リポジトリ設定画面から **topic** に `model`、`dataset`、`skill`、`mcp` のいずれかを追加します（これで OpenFace 上での種別が決まります）。
 3. `README.md` に HuggingFace 互換の YAML frontmatter（`license`, `tags`, `pipeline_tag`, `language` など）を書くと、frontend がバッジとして表示します。
 4. 大きなファイルは Git LFS でpushします。
 
@@ -175,7 +189,7 @@ OpenFace/
 ├── forgejo/              # Dockerfile + custom/ (templates, assets)
 ├── frontend/             # Next.js アプリ
 ├── spaces-runner/         # FastAPI + Dockerfile（Spaceのビルド・実行・プロキシ）
-├── seed/                  # seed.sh + Dockerfile（初回ブートストラップ）
+├── seed/                  # seed.sh + 実在Skill/MCPのインポートマニフェスト
 └── docs/evidence/         # 実ブラウザ検証のスクリーンショットと計測記録
 ```
 
