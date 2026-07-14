@@ -25,6 +25,7 @@ OPENFACE_ADMIN_PASSWORD="${OPENFACE_ADMIN_PASSWORD:-openface1234}"
 OPENFACE_ADMIN_EMAIL="${OPENFACE_ADMIN_EMAIL:-admin@example.com}"
 
 ORG_NAME="openface"
+SUNWOOD_CATALOG="${SUNWOOD_CATALOG:-/catalog/sunwood-ai-labs.json}"
 
 log() { echo "[seed] $*"; }
 
@@ -910,6 +911,71 @@ import_hf_space() {
   log "Imported '${source}' as '${ORG_NAME}/${name}'."
 }
 
+# ------------------------------------------------------------------------
+# Import a public GitHub repository with its real files and commit history.
+# The OpenFace catalog uses a normalized local `main` branch while retaining
+# the upstream commit graph. Existing repositories are never overwritten.
+# ------------------------------------------------------------------------
+import_github_catalog_repo() {
+  local source="$1" name="$2" kind="$3" branch="$4" description="$5"
+  local code clone_dir push_url
+
+  code=$(api GET "/repos/${ORG_NAME}/${name}")
+  if [ "$code" = "200" ]; then
+    log "GitHub sample '${ORG_NAME}/${name}' already exists; keeping local changes."
+    api PATCH "/repos/${ORG_NAME}/${name}" "$(jq -n --arg desc "$description" '{description:$desc}')" >/dev/null
+    set_topics "$name" "$kind" "sunwood-ai-labs" "github-import"
+    return 0
+  fi
+
+  clone_dir="${WORKDIR}/github-${name}"
+  rm -rf "$clone_dir"
+  log "Cloning public ${kind} sample '${source}'..."
+  if ! git clone --branch "$branch" --single-branch "$source" "$clone_dir"; then
+    log "ERROR: failed to clone '${source}'."
+    exit 1
+  fi
+
+  code=$(api POST "/orgs/${ORG_NAME}/repos" "$(jq -n \
+    --arg name "$name" --arg desc "$description" \
+    '{name:$name, description:$desc, auto_init:false, private:false, default_branch:"main"}')")
+  if [ "$code" != "201" ]; then
+    log "ERROR: repo create for GitHub sample '${name}' returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+    exit 1
+  fi
+
+  push_url="http://${OPENFACE_ADMIN_USER}:${TOKEN}@forgejo:3000/${ORG_NAME}/${name}.git"
+  git -C "$clone_dir" remote remove openface 2>/dev/null || true
+  git -C "$clone_dir" remote add openface "$push_url"
+  if ! git -C "$clone_dir" push openface HEAD:main; then
+    log "ERROR: failed to push GitHub sample '${source}' to '${name}'."
+    api DELETE "/repos/${ORG_NAME}/${name}" >/dev/null || true
+    exit 1
+  fi
+
+  set_topics "$name" "$kind" "sunwood-ai-labs" "github-import"
+  log "Imported '${source}' as '${ORG_NAME}/${name}' (${kind})."
+}
+
+import_sunwood_catalog() {
+  if [ ! -f "$SUNWOOD_CATALOG" ]; then
+    log "ERROR: Sunwood AI Labs catalog not found at '${SUNWOOD_CATALOG}'."
+    exit 1
+  fi
+
+  local encoded entry source name kind branch description
+  while IFS= read -r encoded; do
+    entry=$(printf '%s' "$encoded" | base64 -d)
+    source=$(printf '%s' "$entry" | jq -r '.source')
+    name=$(printf '%s' "$entry" | jq -r '.name')
+    kind=$(printf '%s' "$entry" | jq -r '.kind')
+    branch=$(printf '%s' "$entry" | jq -r '.branch')
+    description=$(printf '%s' "$entry" | jq -r '.description')
+    import_github_catalog_repo "$source" "$name" "$kind" "$branch" "$description"
+  done < <(jq -r '.entries[] | @base64' "$SUNWOOD_CATALOG")
+}
+
 for legacy in \
   hello-space realtime-voice-space rampart-redaction face-anything \
   scail2-animation sun-direction-flux unlimited-ocr gemma-avatar \
@@ -1203,6 +1269,9 @@ create_dataset_fixture "robot-demo-rollouts" "Robot Demo Rollouts" "Small roboti
 create_dataset_fixture "financial-news-signals" "Financial News Signals" "Financial headline signal classification fixture" "text" "finance"
 create_dataset_fixture "image-edit-prompts" "Image Edit Prompts" "Instruction dataset fixture for image editing tasks" "image" "editing"
 create_dataset_fixture "table-question-answering" "Table Question Answering" "Tabular QA fixture with small CSV splits" "tabular" "qa"
+
+# Real Skill and MCP samples selected from Sunwood-ai-labs on GitHub.
+import_sunwood_catalog
 
 rm -rf "${WORKDIR}"
 
