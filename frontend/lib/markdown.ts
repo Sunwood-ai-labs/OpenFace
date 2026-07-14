@@ -20,25 +20,55 @@ marked.setOptions({
   breaks: false,
 });
 
-function resolveRelativeImageSources(html: string, assetBaseUrl?: string): string {
-  if (!assetBaseUrl) return html;
-  return html.replace(/(<img\b[^>]*?\bsrc=["'])([^"']+)(["'])/gi, (match, prefix, source, suffix) => {
-    if (/^(?:[a-z][a-z0-9+.-]*:|\/|#)/i.test(source)) return match;
-    const cleanSource = source.replace(/^\.\//, '');
-    return `${prefix}${assetBaseUrl}${cleanSource}${suffix}`;
-  });
+export interface ReadmeRenderUrls {
+  assetBaseUrl?: string;
+  relativeLinkBaseUrl?: string;
 }
 
-export function parseReadme(raw: string | null, assetBaseUrl?: string): ParsedReadme {
+function isAbsoluteOrAnchor(url: string): boolean {
+  return /^(?:[a-z][a-z0-9+.-]*:|\/|#)/i.test(url);
+}
+
+function resolveRelativeUrl(source: string, baseUrl: string): string {
+  if (isAbsoluteOrAnchor(source)) return source;
+  try {
+    const resolved = new URL(source, `https://openface.invalid${baseUrl}`);
+    return `${resolved.pathname}${resolved.search}${resolved.hash}`;
+  } catch {
+    return source;
+  }
+}
+
+function resolveRelativeRepositoryUrls(html: string, urls?: ReadmeRenderUrls): string {
+  if (!urls) return html;
+  let resolved = html;
+  if (urls.assetBaseUrl) {
+    const assetBaseUrl = urls.assetBaseUrl;
+    resolved = resolved.replace(/(<img\b[^>]*?\bsrc=["'])([^"']+)(["'])/gi, (match, prefix, source, suffix) => {
+      if (isAbsoluteOrAnchor(source)) return match;
+      return `${prefix}${resolveRelativeUrl(source, assetBaseUrl)}${suffix}`;
+    });
+  }
+  if (urls.relativeLinkBaseUrl) {
+    const relativeLinkBaseUrl = urls.relativeLinkBaseUrl;
+    resolved = resolved.replace(/(<a\b[^>]*?\bhref=["'])([^"']+)(["'])/gi, (match, prefix, href, suffix) => {
+      if (isAbsoluteOrAnchor(href)) return match;
+      return `${prefix}${resolveRelativeUrl(href, relativeLinkBaseUrl)}${suffix}`;
+    });
+  }
+  return resolved;
+}
+
+export function parseReadme(raw: string | null, urls?: ReadmeRenderUrls): ParsedReadme {
   if (!raw) {
     return { frontmatter: {}, bodyHtml: '', bodyMarkdown: '' };
   }
   try {
     const { data, content } = matter(raw);
-    const bodyHtml = resolveRelativeImageSources(marked.parse(content, { async: false }) as string, assetBaseUrl);
+    const bodyHtml = resolveRelativeRepositoryUrls(marked.parse(content, { async: false }) as string, urls);
     return { frontmatter: data || {}, bodyHtml, bodyMarkdown: content };
   } catch {
-    const bodyHtml = resolveRelativeImageSources(marked.parse(raw, { async: false }) as string, assetBaseUrl);
+    const bodyHtml = resolveRelativeRepositoryUrls(marked.parse(raw, { async: false }) as string, urls);
     return { frontmatter: {}, bodyHtml, bodyMarkdown: raw };
   }
 }

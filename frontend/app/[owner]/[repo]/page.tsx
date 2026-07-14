@@ -159,8 +159,8 @@ export default async function RepoDetailPage({
         </div>
       )}
 
-      {!isSpaceApp && <div className={tab === 'files' ? '' : 'grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px]'}>
-        <div>
+      {!isSpaceApp && <div className={tab === 'files' ? '' : 'grid min-w-0 grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_280px]'}>
+        <div className="min-w-0">
           {tab === 'card' ? (
             <CardTabContent owner={owner} repo={repo} kind={kind} defaultBranch={repoInfo.default_branch || 'main'} />
           ) : (
@@ -282,7 +282,10 @@ async function CardTabContent({
   defaultBranch: string;
 }) {
   const readmeRaw = await getReadme(owner, repo);
-  const { frontmatter, bodyHtml } = parseReadme(readmeRaw, forgejoRawUrl(owner, repo, '', defaultBranch));
+  const { frontmatter, bodyHtml } = parseReadme(readmeRaw, {
+    assetBaseUrl: forgejoRawUrl(owner, repo, '', defaultBranch),
+    relativeLinkBaseUrl: `/${owner}/${repo}/blob/`,
+  });
 
   if (!readmeRaw) {
     return (
@@ -296,7 +299,9 @@ async function CardTabContent({
     <div>
       <CardBadges frontmatter={frontmatter} basePath={kind === 'dataset' ? '/datasets' : kind === 'space' ? '/spaces' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : '/models'} />
       <div
-        className="prose-openface rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900"
+        className={kind === 'skill'
+          ? 'github-markdown-body prose-openface min-w-0 bg-white dark:bg-zinc-900'
+          : 'prose-openface min-w-0 rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900'}
         dangerouslySetInnerHTML={{ __html: bodyHtml }}
       />
     </div>
