@@ -1003,7 +1003,14 @@ import_prompt_catalog_entry() {
 
   printf -- '---\nlicense: %s\ntags:\n  - prompt\n  - %s\n  - %s\n  - %s\n---\n\n# %s\n\n%s\n\n> **Prompt version: %s** — this repository is ready to branch, tag, compare, and fork in Forgejo.\n\n## Provenance\n\nImported verbatim from [%s](%s). The original project license is `%s`.\n\n## Prompt source\n\n' \
     "$license" "$collection" "$family" "version-${version}" "$name" "$description" "$version" "$source_repo" "$source_url" "$license" > "$readme_file"
-  cat "$prompt_file" >> "$readme_file"
+  # Many prompt libraries store their own YAML front matter. Keep that source
+  # intact in PROMPT.md, but remove only the leading block from the rendered
+  # README so it does not become a giant Markdown heading in the card view.
+  awk '
+    NR == 1 && $0 == "---" { in_frontmatter = 1; next }
+    in_frontmatter && $0 == "---" { in_frontmatter = 0; next }
+    !in_frontmatter { print }
+  ' "$prompt_file" >> "$readme_file"
 
   printf -- '# Source provenance\n\n- Source repository: [%s](%s)\n- Raw source: <%s>\n- Imported prompt version: `%s`\n- Source license: `%s`\n' \
     "$source_repo" "$source_repo" "$source_url" "$version" "$license" > "$source_file"
