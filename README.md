@@ -174,7 +174,7 @@ if __name__ == "__main__":
 gradio
 ```
 
-3. OpenFace の該当 Space ページを開くと、停止中のSpaceは自動的にオンデマンド起動します。`spaces-runner` がリポジトリを clone → イメージビルド → コンテナ起動し、`/run/{owner}/{repo}/` 配下で埋め込み表示します。ビルドには数十秒〜数分かかることがあります（ステータスは building → running / error で確認可能）。
+3. 停止中の Space は、Forgejo にサインイン済みで当該リポジトリへの **write** 権限を持つメンテナーだけがオンデマンド起動できます。`spaces-runner` がリポジトリを clone → イメージビルド → コンテナ起動し、`/run/{owner}/{repo}/` 配下で埋め込み表示します。ビルドには数十秒〜数分かかることがあります（ステータスは building → running / error で確認可能）。
 4. 同時起動数は `MAX_RUNNING_SPACES`（既定24）で制限されます。上限到達時は、最終アクセスが最も古いSpaceを停止してから新しいSpaceを起動します。
 5. `IDLE_TIMEOUT_MINUTES` は既定0（時間による自動停止なし）です。必要な環境だけ正の分数を設定できます。
 
@@ -209,7 +209,7 @@ OpenFace/
 - **API tokenを再生成したい**: `seed` は `/shared/token`（共有ボリューム `shared-token`）に一度だけ書き込みます。作り直したい場合はボリュームを削除して `docker compose up -d --build` を再実行するか、Forgejo の Web UI（設定 → アプリケーション）からトークンを再発行し、`/shared/token` を手動で書き換えてください。
 - **Space が起動しない / building のまま止まる**: `docker compose logs spaces-runner` を確認してください。多くの場合 `requirements.txt` の依存解決失敗か、`app.py` の実行時エラーです。`GET /runner-api/spaces/{owner}/{repo}/status` のレスポンスにエラーメッセージが入ります。
 - **セキュリティ上の注意（重要）**: `spaces-runner` はホストの `/var/run/docker.sock` をマウントしており、任意の Docker イメージのビルド・実行が可能な強い権限を持っています。信頼できないユーザーにリポジトリ作成を許可する環境（`DISABLE_REGISTRATION=false`）では、実質的にホスト上で任意コード実行が可能になることを理解した上で運用してください。インターネットに直接公開せず、信頼できるLAN内での利用を強く推奨します。
-- **ランナーAPIには認証がありません**: `spaces-runner` の `/api/*`（gateway経由では `/runner-api/*`）にはユーザー認証・アクセス制御が一切実装されていません。LAN内のツールとして設計されているため、外部に公開する場合は別途リバースプロキシでのIP制限やBasic認証などを追加してください。
+- **企業向けのアクセス境界**: カタログは public repo のみ、Space の起動・停止は Forgejo の write 権限を持つメンテナーのみです。private Space は既定で実行不可です。詳細と実ブラウザ検証は [docs/enterprise-access.md](docs/enterprise-access.md) を参照してください。
 
 ## ライセンス
 
