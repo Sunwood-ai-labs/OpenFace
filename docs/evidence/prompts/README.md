@@ -14,6 +14,10 @@ Verified on 2026-07-15 against the running Docker Compose stack at
   record).
 - Each prompt has a separate `version-v*` topic. The UI renders it as an
   individual version badge on both the directory and the detail card.
+- The seed also creates the matching native Forgejo Git tag (`v1`, `v3`,
+  `v4.2`, and so on) for all 20 imported prompts. The topic and Git tag are
+  therefore the same individual prompt version, rather than a catalog-wide
+  release number.
 - Prompt details link back to `/prompts`, show the version, source repository,
   source license, prompt body, file tree, and Forgejo fork/clone actions.
 - The imported source uses its own front matter only in `PROMPT.md`; the
