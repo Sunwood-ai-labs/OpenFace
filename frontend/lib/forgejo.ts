@@ -94,7 +94,7 @@ export interface CommitInfo {
 // Low-level fetch helper — never throws; callers get {ok:false} on failure so
 // pages can render an empty-state instead of crashing SSR / the build.
 // ---------------------------------------------------------------------------
-async function apiFetch(path: string): Promise<{ ok: boolean; status: number; json: any }> {
+async function apiFetch(path: string): Promise<{ ok: boolean; status: number; json: any; headers: Headers | null }> {
   const token = getToken();
   const headers: Record<string, string> = { Accept: 'application/json' };
   if (token) headers['Authorization'] = `token ${token}`;
@@ -111,10 +111,10 @@ async function apiFetch(path: string): Promise<{ ok: boolean; status: number; js
     } catch {
       json = null;
     }
-    return { ok: res.ok, status: res.status, json };
+    return { ok: res.ok, status: res.status, json, headers: res.headers };
   } catch (err) {
     // Network error (Forgejo down, DNS failure, etc.)
-    return { ok: false, status: 0, json: null };
+    return { ok: false, status: 0, json: null, headers: null };
   }
 }
 
@@ -162,10 +162,11 @@ export async function searchRepos(params: SearchReposParams): Promise<SearchRepo
     return { ok: false, data: [], total_count: 0 };
   }
   const data = Array.isArray(res.json.data) ? res.json.data as Repo[] : [];
+  const headerTotal = Number.parseInt(res.headers?.get('x-total-count') || '', 10);
   return {
     ok: true,
     data: topic === 'space' ? await enrichSpaceMetadata(data) : data,
-    total_count: res.json.total_count ?? data.length,
+    total_count: Number.isFinite(headerTotal) ? headerTotal : (res.json.total_count ?? data.length),
   };
 }
 
@@ -179,9 +180,10 @@ export async function searchReposByTopicAndQuery(
   topic: string,
   q: string | undefined,
   sort: SortOption,
-  limit = 50
+  limit = 50,
+  page = 1,
 ): Promise<SearchReposResult> {
-  const res = await searchRepos({ topic, sort, limit });
+  const res = await searchRepos({ topic, sort, limit, page });
   if (!q) return res;
   const needle = q.toLowerCase();
   const filtered = res.data.filter((r) => {

@@ -6,6 +6,8 @@ import HfIcon, { type HfIconName } from './HfIcon';
 import SpaceStatusBadge from './SpaceStatusBadge';
 import { getRepoMetricsBatch } from '@/lib/agent-metrics';
 
+const PAGE_SIZE = 48;
+
 const compactName = (name: string) =>
   (name === 'realtime-voice-space' ? 'HF Realtime Voice' : name.replace(/-space$/i, ''))
     .split('-')
@@ -37,11 +39,13 @@ const categoryItems: Array<{ label: string; icon: HfIconName }> = [
 export default async function SpacesDirectoryPage({
   searchParams,
 }: {
-  searchParams?: { q?: string; sort?: string };
+  searchParams?: { q?: string; sort?: string; page?: string };
 }) {
   const q = searchParams?.q?.trim() || undefined;
   const sort: SortOption = searchParams?.sort === 'stars' ? 'stars' : 'updated';
-  const result = await searchReposByTopicAndQuery('space', q, sort, 48);
+  const requestedPage = Number.parseInt(searchParams?.page || '1', 10);
+  const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const result = await searchReposByTopicAndQuery('space', q, sort, PAGE_SIZE, page);
   const repos = result.ok ? result.data : [];
   const metricsByRepo = await getRepoMetricsBatch(repos.map((repo) => ({
     owner: repo.owner?.login ?? repo.full_name.split('/')[0],
@@ -52,6 +56,17 @@ export default async function SpacesDirectoryPage({
     : repos;
   const querySuffix = q ? `&q=${encodeURIComponent(q)}` : '';
   const sortLabel = sort === 'stars' ? 'Most liked' : 'Relevance';
+  const totalPages = Math.max(1, Math.ceil(result.total_count / PAGE_SIZE));
+  const pageStart = result.total_count === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const pageEnd = Math.min(page * PAGE_SIZE, result.total_count);
+  const pageHref = (targetPage: number) => {
+    const params = new URLSearchParams();
+    if (q) params.set('q', q);
+    if (sort !== 'updated') params.set('sort', sort);
+    if (targetPage > 1) params.set('page', String(targetPage));
+    const suffix = params.toString();
+    return suffix ? `/spaces?${suffix}` : '/spaces';
+  };
 
   return (
     <div className="openface-spaces-directory w-full overflow-x-hidden px-0 pt-8 [box-sizing:border-box]">
@@ -209,14 +224,43 @@ export default async function SpacesDirectoryPage({
       )}
 
       {result.ok && (
-        <div className="mx-auto mt-7 flex max-w-[1536px] flex-wrap items-center gap-3 px-4">
-          <h2 className="inline-flex items-center gap-2 rounded-lg bg-zinc-50 px-4 py-2 text-sm font-bold text-zinc-800">
-            <HfIcon name="bars" className="h-3.5 w-3.5 text-zinc-600" />
-            Public CPU apps, trending first
-          </h2>
-          <span className="ml-auto text-lg text-zinc-400">
-            <strong className="font-medium text-zinc-800">{visibleRepos.length.toLocaleString()}</strong> Spaces
-          </span>
+        <div className="mx-auto mt-7 flex max-w-[1536px] flex-wrap items-center gap-3 px-4 pb-10">
+          <div>
+            <h2 className="inline-flex items-center gap-2 rounded-lg bg-zinc-50 px-4 py-2 text-sm font-bold text-zinc-800">
+              <HfIcon name="bars" className="h-3.5 w-3.5 text-zinc-600" />
+              Public CPU apps, trending first
+            </h2>
+            <p className="mt-2 pl-1 text-xs font-medium text-zinc-500">
+              Showing {pageStart.toLocaleString()}–{pageEnd.toLocaleString()} of {result.total_count.toLocaleString()} Spaces
+            </p>
+          </div>
+          <nav aria-label="Spaces pagination" className="ml-auto flex items-center gap-2">
+            {page > 1 ? (
+              <Link href={pageHref(page - 1)} className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 shadow-sm hover:border-zinc-300 hover:bg-zinc-50">
+                <HfIcon name="arrowLeft" className="h-3 w-3" />
+                Previous
+              </Link>
+            ) : (
+              <span aria-disabled="true" className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-100 bg-zinc-50 px-4 text-sm font-semibold text-zinc-300">
+                <HfIcon name="arrowLeft" className="h-3 w-3" />
+                Previous
+              </span>
+            )}
+            <span className="inline-flex h-9 min-w-24 items-center justify-center rounded-full bg-zinc-900 px-4 text-sm font-bold text-white">
+              {page} / {totalPages}
+            </span>
+            {page < totalPages ? (
+              <Link href={pageHref(page + 1)} className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 shadow-sm hover:border-zinc-300 hover:bg-zinc-50">
+                Next
+                <HfIcon name="arrowRight" className="h-3 w-3" />
+              </Link>
+            ) : (
+              <span aria-disabled="true" className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-100 bg-zinc-50 px-4 text-sm font-semibold text-zinc-300">
+                Next
+                <HfIcon name="arrowRight" className="h-3 w-3" />
+              </span>
+            )}
+          </nav>
         </div>
       )}
     </div>
