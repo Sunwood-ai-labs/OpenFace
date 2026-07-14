@@ -30,6 +30,18 @@ const repoTypes: Array<{
     icon: 'space',
     description: 'Interactive apps backed by Gradio, Docker, or static files.',
   },
+  {
+    label: 'Skill',
+    topic: 'skill',
+    icon: 'skill',
+    description: 'Reusable agent instructions centered on a SKILL.md file.',
+  },
+  {
+    label: 'MCP server',
+    topic: 'mcp',
+    icon: 'mcp',
+    description: 'Tools and resources exposed through Model Context Protocol.',
+  },
 ];
 
 const templates = [
@@ -37,6 +49,8 @@ const templates = [
   { label: 'Docker Space', topic: 'space', repo: 'my-docker-space', slug: 'docker-space' },
   { label: 'Model card', topic: 'model', repo: 'my-model', slug: 'model-card' },
   { label: 'Dataset card', topic: 'dataset', repo: 'my-dataset', slug: 'dataset-card' },
+  { label: 'Agent Skill', topic: 'skill', repo: 'my-agent-skill', slug: 'agent-skill' },
+  { label: 'MCP server', topic: 'mcp', repo: 'my-mcp-server', slug: 'mcp-server' },
   { label: 'Empty repository', topic: 'model', repo: 'my-openface-repo', slug: 'empty-repository' },
 ];
 
@@ -44,6 +58,8 @@ const typeConfig: Record<string, { title: string; repoPlaceholder: string; cance
   model: { title: 'Create a new model', repoPlaceholder: 'my-awesome-model', cancelHref: '/models' },
   dataset: { title: 'Create a new dataset', repoPlaceholder: 'my-awesome-dataset', cancelHref: '/datasets' },
   space: { title: 'Create a new Space', repoPlaceholder: 'my-awesome-space', cancelHref: '/spaces' },
+  skill: { title: 'Create a new Skill', repoPlaceholder: 'my-agent-skill', cancelHref: '/skills' },
+  mcp: { title: 'Create a new MCP server', repoPlaceholder: 'my-mcp-server', cancelHref: '/mcps' },
 };
 
 export default function NewRepoGuidePage({
@@ -51,7 +67,7 @@ export default function NewRepoGuidePage({
 }: {
   searchParams?: { type?: string; template?: string };
 }) {
-  const requestedType = searchParams?.type === 'model' || searchParams?.type === 'dataset' || searchParams?.type === 'space'
+  const requestedType = searchParams?.type === 'model' || searchParams?.type === 'dataset' || searchParams?.type === 'space' || searchParams?.type === 'skill' || searchParams?.type === 'mcp'
     ? searchParams.type
     : 'space';
   const config = typeConfig[requestedType];
@@ -72,7 +88,7 @@ export default function NewRepoGuidePage({
         <div>
           <h1 className="text-3xl font-extrabold tracking-normal text-zinc-950">{effectiveConfig.title}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-            Choose the OpenFace repository type first, then finish creation in Forgejo. The selected topic keeps the repository visible in Models, Datasets, or Spaces.
+            Choose the OpenFace repository type first, then finish creation in Forgejo. The selected topic keeps the repository visible in its matching OpenFace directory.
           </p>
           {duplicateSource ? (
             <p className="mt-2 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-semibold text-zinc-600">
@@ -102,7 +118,7 @@ export default function NewRepoGuidePage({
             {duplicateSource ? <input type="hidden" name="duplicate_from" value={duplicateSource} /> : null}
             <fieldset>
               <legend className="mb-2 text-sm font-semibold text-zinc-900">Repository type</legend>
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
                 {orderedTypes.map((type) => (
                   <label
                     key={type.topic}
