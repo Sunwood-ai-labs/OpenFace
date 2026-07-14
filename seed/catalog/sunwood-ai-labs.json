@@ -1,0 +1,26 @@
+{
+  "owner": "Sunwood-ai-labs",
+  "verifiedAt": "2026-07-14",
+  "entries": [
+    { "name": "android-termux-ssh-bootstrap-skill", "kind": "skill", "source": "https://github.com/Sunwood-ai-labs/android-termux-ssh-bootstrap-skill.git", "branch": "main" },
+    { "name": "cc-orchestrator-cli-skill", "kind": "skill", "source": "https://github.com/Sunwood-ai-labs/cc-orchestrator-cli-skill.git", "branch": "main" },
+    { "name": "cities-skylines1-agent-skill", "kind": "skill", "source": "https://github.com/Sunwood-ai-labs/cities-skylines1-agent-skill.git", "branch": "main" },
+    { "name": "draw-io-skill", "kind": "skill", "source": "https://github.com/Sunwood-ai-labs/draw-io-skill.git", "branch": "main" },
+    { "name": "frontend-design-skill", "kind": "skill", "source": "https://github.com/Sunwood-ai-labs/frontend-design-skill.git", "branch": "main" },
+    { "name": "gh-release-notes-skill", "kind": "skill", "source": "https://github.com/Sunwood-ai-labs/gh-release-notes-skill.git", "branch": "main" },
+    { "name": "git-flow-skill", "kind": "skill", "source": "https://github.com/Sunwood-ai-labs/git-flow-skill.git", "branch": "main" },
+    { "name": "jupytext-skill", "kind": "skill", "source": "https://github.com/Sunwood-ai-labs/jupytext-skill.git", "branch": "main" },
+    { "name": "m5stack-arduino-cli-skill", "kind": "skill", "source": "https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill.git", "branch": "main" },
+    { "name": "repository-polish-skill", "kind": "skill", "source": "https://github.com/Sunwood-ai-labs/repository-polish-skill.git", "branch": "main" },
+    { "name": "aira-mcp-server", "kind": "mcp", "source": "https://github.com/Sunwood-ai-labs/aira-mcp-server.git", "branch": "main" },
+    { "name": "command-executor-mcp-server", "kind": "mcp", "source": "https://github.com/Sunwood-ai-labs/command-executor-mcp-server.git", "branch": "master" },
+    { "name": "discord-mcp", "kind": "mcp", "source": "https://github.com/Sunwood-ai-labs/discord-mcp.git", "branch": "main" },
+    { "name": "duckduckgo-web-search", "kind": "mcp", "source": "https://github.com/Sunwood-ai-labs/duckduckgo-web-search.git", "branch": "main" },
+    { "name": "github-kanban-mcp-server", "kind": "mcp", "source": "https://github.com/Sunwood-ai-labs/github-kanban-mcp-server.git", "branch": "main" },
+    { "name": "gitlab-kanban-mcp-server", "kind": "mcp", "source": "https://github.com/Sunwood-ai-labs/gitlab-kanban-mcp-server.git", "branch": "master" },
+    { "name": "ideagram-mcp-server", "kind": "mcp", "source": "https://github.com/Sunwood-ai-labs/ideagram-mcp-server.git", "branch": "main" },
+    { "name": "mcp-voicevox", "kind": "mcp", "source": "https://github.com/Sunwood-ai-labs/mcp-voicevox.git", "branch": "main" },
+    { "name": "mcp-weather-service-server", "kind": "mcp", "source": "https://github.com/Sunwood-ai-labs/mcp-weather-service-server.git", "branch": "main" },
+    { "name": "source-sage-mcp-server", "kind": "mcp", "source": "https://github.com/Sunwood-ai-labs/source-sage-mcp-server.git", "branch": "master" }
+  ]
+}
