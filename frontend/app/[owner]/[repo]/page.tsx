@@ -7,6 +7,7 @@ import {
   cloneUrl,
   forgejoRepoUrl,
   forgejoTreeUrl,
+  forgejoRawUrl,
   nonTypeTopics,
   repoKind,
   ContentEntry,
@@ -161,7 +162,7 @@ export default async function RepoDetailPage({
       {!isSpaceApp && <div className={tab === 'files' ? '' : 'grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px]'}>
         <div>
           {tab === 'card' ? (
-            <CardTabContent owner={owner} repo={repo} kind={kind} />
+            <CardTabContent owner={owner} repo={repo} kind={kind} defaultBranch={repoInfo.default_branch || 'main'} />
           ) : (
             <FilesTabContent
               owner={owner}
@@ -273,13 +274,15 @@ async function CardTabContent({
   owner,
   repo,
   kind,
+  defaultBranch,
 }: {
   owner: string;
   repo: string;
   kind: RepoKind | null;
+  defaultBranch: string;
 }) {
   const readmeRaw = await getReadme(owner, repo);
-  const { frontmatter, bodyHtml } = parseReadme(readmeRaw);
+  const { frontmatter, bodyHtml } = parseReadme(readmeRaw, forgejoRawUrl(owner, repo, '', defaultBranch));
 
   if (!readmeRaw) {
     return (
