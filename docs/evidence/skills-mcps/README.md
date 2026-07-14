@@ -40,3 +40,7 @@ the reproducible import list lives in
 ### Skill detail
 
 ![Skill detail rendering the imported README and local asset](skill-detail.png)
+
+### GitHub README parity
+
+![Skill card rendering with GitHub-compatible README spacing and centered media](skill-detail-github-parity.png)
