@@ -218,7 +218,7 @@ export default function SpaceRunner({
                 Tap to start
               </p>
               <p className="mx-auto max-w-[300px] text-xs leading-5 text-zinc-500">
-                This Space runs on demand and starts automatically when you open it.
+                This Space runs on demand. A signed-in project maintainer can start it.
               </p>
             </div>
           </div>
