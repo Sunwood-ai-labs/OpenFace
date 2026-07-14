@@ -1,6 +1,10 @@
 # OpenFace
 
-セルフホスト版 HuggingFace ライクなプラットフォームです。Forgejo（Git + LFS）を土台に、HuggingFace 風の Web ポータルと、Gradio アプリ（Spaces）をその場でビルド・実行できるランナーを組み合わせています。`docker compose up -d --build` だけで、自分の LAN / サーバー内に「モデル・データセット・Spaces を公開できる場所」を丸ごと立ち上げられます。
+セルフホスト版 HuggingFace ライクなプラットフォームです。Forgejo（Git + LFS）を土台に、HuggingFace 風の Web ポータルと、Dockerfile ベースのアプリ（Spaces）をその場でビルド・実行できるランナーを組み合わせています。`docker compose up -d --build` だけで、自分の LAN / サーバー内に「モデル・データセット・Spaces を公開できる場所」を丸ごと立ち上げられます。
+
+<p align="center">
+  <img src="docs/images/openface-home.png" alt="OpenFace のホーム画面" width="100%">
+</p>
 
 計画: Claude Fable 5 / 実装: Claude Sonnet 5
 
@@ -13,7 +17,7 @@ OpenFace は次の4つのサービスで構成されています。
 | `gateway` | nginx リバースプロキシ（唯一の公開口） | 80 (公開: 8090) |
 | `frontend` | HF風ポータル (Next.js + Tailwind) | 3000 |
 | `forgejo` | 改造版 Forgejo（Git + LFS + API + 認証） | 3000 (http), 22 (ssh) |
-| `spaces-runner` | Gradio Space の起動・プロキシ (FastAPI + Docker SDK) | 8000 |
+| `spaces-runner` | Docker Space のビルド・起動・プロキシ (FastAPI + Docker SDK) | 8000 |
 | `seed` | 初回起動時に admin ユーザーとサンプルrepoを作成する one-shot ジョブ | - |
 
 リポジトリの種別（モデル / データセット / Space）は Forgejo の **topics**（`model` / `dataset` / `space`）で判定します。モデルカード・データセットカードはリポジトリ直下の `README.md`（HuggingFace互換の YAML frontmatter）をそのまま使います。
@@ -30,8 +34,8 @@ flowchart LR
         Forgejo["forgejo<br/>Git/LFS/API :3000, ssh:22"]
         Runner["spaces-runner<br/>FastAPI :8000"]
         Seed["seed<br/>(one-shot)"]
-        SpaceA["Space container<br/>Gradio :7860"]
-        SpaceB["Space container<br/>Gradio :7860"]
+        SpaceA["Space container<br/>Docker app :7860"]
+        SpaceB["Space container<br/>Docker app :7860"]
 
         Gateway -- "/ , /models, /datasets, /spaces, /:owner/:repo/*" --> Frontend
         Gateway -- "/git/" --> Forgejo
@@ -45,6 +49,18 @@ flowchart LR
 
     User -- ":8090" --> Gateway
 ```
+
+## 📸 スクリーンショット
+
+以下はローカルで起動した OpenFace の実画面です。Spaces は CPU 上で稼働し、Gradio に加えて静的 HTML、React、Vue、Next.js、Streamlit、FastAPI、Node.js などの Dockerfile ベースのアプリを同じ画面内で公開できます。
+
+| Spaces ディレクトリ | 埋め込みアプリ |
+|---|---|
+| <img src="docs/images/openface-spaces.png" alt="CPU で稼働中の Space が並ぶ OpenFace の Spaces ディレクトリ" width="100%"> | <img src="docs/images/openface-space-app.png" alt="OpenFace 内に埋め込まれた React Space" width="100%"> |
+
+| ホーム | リポジトリの Files 画面 |
+|---|---|
+| <img src="docs/images/openface-home.png" alt="モデル、Space、データセットを表示する OpenFace のホーム画面" width="100%"> | <img src="docs/images/openface-files.png" alt="OpenFace の Space リポジトリにある Files 画面" width="100%"> |
 
 ## 必要要件
 
