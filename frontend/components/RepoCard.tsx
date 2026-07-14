@@ -8,6 +8,8 @@ const KIND_ICON: Record<string, HfIconName> = {
   model: 'model',
   dataset: 'dataset',
   space: 'space',
+  skill: 'skill',
+  mcp: 'mcp',
 };
 
 const KIND_THEME = {
@@ -29,6 +31,18 @@ const KIND_THEME = {
     badge: 'bg-zinc-50 text-emerald-800 ring-zinc-200 hover:bg-zinc-100',
     title: 'text-emerald-800 hover:text-emerald-950',
   },
+  skill: {
+    card: 'border-violet-200/80 bg-white hover:border-violet-400 hover:shadow-violet-100/80',
+    icon: 'bg-violet-100 text-violet-700 ring-violet-200',
+    badge: 'bg-violet-50 text-violet-800 ring-violet-200 hover:bg-violet-100',
+    title: 'text-violet-800 hover:text-violet-950',
+  },
+  mcp: {
+    card: 'border-cyan-200/80 bg-white hover:border-cyan-400 hover:shadow-cyan-100/80',
+    icon: 'bg-cyan-100 text-cyan-700 ring-cyan-200',
+    badge: 'bg-cyan-50 text-cyan-800 ring-cyan-200 hover:bg-cyan-100',
+    title: 'text-cyan-800 hover:text-cyan-950',
+  },
   default: {
     card: 'border-zinc-200 bg-white hover:border-amber-400',
     icon: 'bg-zinc-100 text-zinc-600 ring-zinc-200',
@@ -37,12 +51,12 @@ const KIND_THEME = {
   },
 };
 
-export default function RepoCard({ repo, kind }: { repo: Repo; kind?: 'model' | 'dataset' | 'space' }) {
+export default function RepoCard({ repo, kind }: { repo: Repo; kind?: 'model' | 'dataset' | 'space' | 'skill' | 'mcp' }) {
   const owner = repo.owner?.login ?? repo.full_name.split('/')[0];
   const name = repo.name;
   const badges = nonTypeTopics(repo.topics).slice(0, 4);
   const icon = kind ? KIND_ICON[kind] : 'box';
-  const basePath = kind === 'dataset' ? '/datasets' : kind === 'space' ? '/spaces' : '/models';
+  const basePath = kind === 'dataset' ? '/datasets' : kind === 'space' ? '/spaces' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : '/models';
   const theme = kind ? KIND_THEME[kind] : KIND_THEME.default;
   const spaceTheme = getSpaceTheme(repo.full_name);
 

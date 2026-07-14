@@ -20,7 +20,7 @@ function CompactRepoList({
   href: string;
   label: string;
 }) {
-  const kind = label === 'Models' ? 'model' : label === 'Datasets' ? 'dataset' : 'space';
+  const kind = label === 'Models' ? 'model' : label === 'Datasets' ? 'dataset' : label === 'Skills' ? 'skill' : label === 'MCPs' ? 'mcp' : 'space';
   const theme = {
     model: {
       shell: 'border-zinc-200 bg-white',
@@ -45,6 +45,22 @@ function CompactRepoList({
       dot: 'bg-emerald-500',
       browse: 'text-emerald-700 hover:text-emerald-900',
       title: 'text-emerald-800',
+    },
+    skill: {
+      shell: 'border-violet-200/80 bg-gradient-to-b from-violet-50/70 via-white to-white shadow-violet-100/60',
+      icon: 'bg-violet-100 text-violet-700 ring-violet-200',
+      link: 'hover:bg-violet-50/80',
+      dot: 'bg-violet-500',
+      browse: 'text-violet-700 hover:text-violet-900',
+      title: 'text-violet-800',
+    },
+    mcp: {
+      shell: 'border-cyan-200/80 bg-gradient-to-b from-cyan-50/70 via-white to-white shadow-cyan-100/60',
+      icon: 'bg-cyan-100 text-cyan-700 ring-cyan-200',
+      link: 'hover:bg-cyan-50/80',
+      dot: 'bg-cyan-500',
+      browse: 'text-cyan-700 hover:text-cyan-900',
+      title: 'text-cyan-800',
     },
   }[kind];
 
@@ -85,10 +101,12 @@ function CompactRepoList({
 }
 
 export default async function HomePage() {
-  const [models, datasets, spaces] = await Promise.all([
+  const [models, datasets, spaces, skills, mcps] = await Promise.all([
     searchRepos({ topic: 'model', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'dataset', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'space', sort: 'updated', limit: 8 }),
+    searchRepos({ topic: 'skill', sort: 'updated', limit: 8 }),
+    searchRepos({ topic: 'mcp', sort: 'updated', limit: 8 }),
   ]);
 
   return (
@@ -101,7 +119,7 @@ export default async function HomePage() {
           The AI community building locally.
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-zinc-500">
-          The platform where your team collaborates on models, datasets, and applications.
+          The platform where your team collaborates on models, datasets, applications, agent skills, and MCP servers.
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm">
           <Link href="/spaces" className="inline-flex h-10 items-center rounded-full border border-zinc-300 bg-white px-5 font-semibold text-zinc-950 shadow-sm hover:bg-zinc-50">
@@ -111,6 +129,18 @@ export default async function HomePage() {
           <Link href="/models" className="inline-flex h-10 items-center font-semibold text-zinc-700 underline decoration-zinc-200 underline-offset-8 hover:text-zinc-950">
             Browse models
           </Link>
+        </div>
+      </section>
+
+      <section className="mx-auto mb-12 max-w-[1180px]">
+        <div className="mb-5 flex items-center justify-center gap-4 text-lg font-bold text-zinc-950">
+          <span className="h-px w-24 bg-violet-200" />
+          <span>Agent tooling</span>
+          <span className="h-px w-24 bg-cyan-200" />
+        </div>
+        <div className="grid gap-5 lg:grid-cols-2">
+          <CompactRepoList repos={skills.data} href="/skills" label="Skills" />
+          <CompactRepoList repos={mcps.data} href="/mcps" label="MCPs" />
         </div>
       </section>
 
@@ -171,6 +201,7 @@ export default async function HomePage() {
         </div>
         <RepoGrid repos={datasets.data} kind="dataset" emptyMessage="No datasets yet." />
       </section>
+
     </div>
   );
 }
