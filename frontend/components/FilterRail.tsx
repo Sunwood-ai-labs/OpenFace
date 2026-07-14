@@ -133,9 +133,29 @@ const mcpFilters: FilterGroup[] = [
   },
 ];
 
+const promptFilters: FilterGroup[] = [
+  {
+    title: 'Prompt families',
+    items: [
+      { label: 'Goal command', icon: 'prompt', tone: 'text-orange-600' },
+      { label: 'Coding agent', icon: 'code', tone: 'text-blue-600' },
+      { label: 'Workflow', icon: 'skill', tone: 'text-violet-600' },
+      { label: 'Review', icon: 'filePen', tone: 'text-rose-500' },
+      { label: 'Documentation', icon: 'file', tone: 'text-emerald-600' },
+    ],
+  },
+  {
+    title: 'Prompt version',
+    items: [
+      { label: 'version-v7', icon: 'prompt', tone: 'text-orange-500' },
+      { label: 'version-v8', icon: 'prompt', tone: 'text-orange-700' },
+    ],
+  },
+];
+
 export default function FilterRail({ topic }: { topic: Exclude<RepoKind, 'space'> }) {
-  const groups = topic === 'dataset' ? datasetFilters : topic === 'skill' ? skillFilters : topic === 'mcp' ? mcpFilters : modelFilters;
-  const basePath = topic === 'dataset' ? '/datasets' : topic === 'skill' ? '/skills' : topic === 'mcp' ? '/mcps' : '/models';
+  const groups = topic === 'dataset' ? datasetFilters : topic === 'skill' ? skillFilters : topic === 'mcp' ? mcpFilters : topic === 'prompt' ? promptFilters : modelFilters;
+  const basePath = topic === 'dataset' ? '/datasets' : topic === 'skill' ? '/skills' : topic === 'mcp' ? '/mcps' : topic === 'prompt' ? '/prompts' : '/models';
   const filterHref = (label: string) => `${basePath}?q=${encodeURIComponent(label.toLowerCase())}`;
 
   return (

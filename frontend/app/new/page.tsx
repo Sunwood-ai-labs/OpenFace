@@ -42,6 +42,12 @@ const repoTypes: Array<{
     icon: 'mcp',
     description: 'Tools and resources exposed through Model Context Protocol.',
   },
+  {
+    label: 'Prompt',
+    topic: 'prompt',
+    icon: 'prompt',
+    description: 'Versioned instructions for agents, workflows, and reusable commands.',
+  },
 ];
 
 const templates = [
@@ -51,6 +57,7 @@ const templates = [
   { label: 'Dataset card', topic: 'dataset', repo: 'my-dataset', slug: 'dataset-card' },
   { label: 'Agent Skill', topic: 'skill', repo: 'my-agent-skill', slug: 'agent-skill' },
   { label: 'MCP server', topic: 'mcp', repo: 'my-mcp-server', slug: 'mcp-server' },
+  { label: 'Versioned prompt', topic: 'prompt', repo: 'my-agent-prompt', slug: 'versioned-prompt' },
   { label: 'Empty repository', topic: 'model', repo: 'my-openface-repo', slug: 'empty-repository' },
 ];
 
@@ -60,6 +67,7 @@ const typeConfig: Record<string, { title: string; repoPlaceholder: string; cance
   space: { title: 'Create a new Space', repoPlaceholder: 'my-awesome-space', cancelHref: '/spaces' },
   skill: { title: 'Create a new Skill', repoPlaceholder: 'my-agent-skill', cancelHref: '/skills' },
   mcp: { title: 'Create a new MCP server', repoPlaceholder: 'my-mcp-server', cancelHref: '/mcps' },
+  prompt: { title: 'Create a new Prompt', repoPlaceholder: 'my-agent-prompt', cancelHref: '/prompts' },
 };
 
 export default function NewRepoGuidePage({
@@ -67,7 +75,7 @@ export default function NewRepoGuidePage({
 }: {
   searchParams?: { type?: string; template?: string };
 }) {
-  const requestedType = searchParams?.type === 'model' || searchParams?.type === 'dataset' || searchParams?.type === 'space' || searchParams?.type === 'skill' || searchParams?.type === 'mcp'
+  const requestedType = searchParams?.type === 'model' || searchParams?.type === 'dataset' || searchParams?.type === 'space' || searchParams?.type === 'skill' || searchParams?.type === 'mcp' || searchParams?.type === 'prompt'
     ? searchParams.type
     : 'space';
   const config = typeConfig[requestedType];
@@ -118,7 +126,7 @@ export default function NewRepoGuidePage({
             {duplicateSource ? <input type="hidden" name="duplicate_from" value={duplicateSource} /> : null}
             <fieldset>
               <legend className="mb-2 text-sm font-semibold text-zinc-900">Repository type</legend>
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {orderedTypes.map((type) => (
                   <label
                     key={type.topic}
@@ -238,9 +246,7 @@ export default function NewRepoGuidePage({
           <section className="rounded-lg border border-zinc-200 bg-white p-4">
             <h2 className="mb-2 text-sm font-bold text-zinc-950">Required topic</h2>
             <p className="text-sm leading-6 text-zinc-500">
-              After creation, add <code className="rounded bg-zinc-100 px-1.5 py-0.5">model</code>,{' '}
-              <code className="rounded bg-zinc-100 px-1.5 py-0.5">dataset</code>, or{' '}
-              <code className="rounded bg-zinc-100 px-1.5 py-0.5">space</code> in Forgejo so OpenFace can index it.
+              After creation, add the matching topic such as <code className="rounded bg-zinc-100 px-1.5 py-0.5">prompt</code> in Forgejo so OpenFace can index it. Prompt versions use an additional topic such as <code className="rounded bg-zinc-100 px-1.5 py-0.5">version-v8</code>.
             </p>
           </section>
 

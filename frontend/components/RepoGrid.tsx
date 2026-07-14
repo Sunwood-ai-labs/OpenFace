@@ -7,7 +7,7 @@ export default function RepoGrid({
   emptyMessage,
 }: {
   repos: Repo[];
-  kind?: 'model' | 'dataset' | 'space' | 'skill' | 'mcp';
+  kind?: 'model' | 'dataset' | 'space' | 'skill' | 'mcp' | 'prompt';
   emptyMessage?: string;
 }) {
   if (!repos || repos.length === 0) {

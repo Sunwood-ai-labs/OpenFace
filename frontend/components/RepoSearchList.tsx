@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Repo } from '@/lib/forgejo';
 import { timeAgoEn } from '@/lib/format';
-import { nonTypeTopics } from '@/lib/forgejo';
+import { nonTypeTopics, repoPromptVersion } from '@/lib/forgejo';
 import HfIcon from './HfIcon';
 
 export default function RepoSearchList({
@@ -10,7 +10,7 @@ export default function RepoSearchList({
   emptyMessage,
 }: {
   repos: Repo[];
-  kind: 'model' | 'dataset' | 'skill' | 'mcp';
+  kind: 'model' | 'dataset' | 'skill' | 'mcp' | 'prompt';
   emptyMessage?: string;
 }) {
   if (!repos || repos.length === 0) {
@@ -26,8 +26,9 @@ export default function RepoSearchList({
       {repos.map((repo) => {
         const owner = repo.owner?.login ?? repo.full_name.split('/')[0];
         const badges = nonTypeTopics(repo.topics).slice(0, 2);
-        const basePath = kind === 'dataset' ? '/datasets' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : '/models';
-        const primaryBadge = badges[0] || (kind === 'dataset' ? 'Viewer' : kind === 'skill' ? 'Codex skill' : kind === 'mcp' ? 'MCP server' : 'Text Generation');
+        const promptVersion = kind === 'prompt' ? repoPromptVersion(repo.topics) : null;
+        const basePath = kind === 'dataset' ? '/datasets' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : '/models';
+        const primaryBadge = badges[0] || (kind === 'dataset' ? 'Viewer' : kind === 'skill' ? 'Codex skill' : kind === 'mcp' ? 'MCP server' : kind === 'prompt' ? 'Prompt' : 'Text Generation');
         const secondaryBadge = badges[1];
         const iconTheme = kind === 'dataset'
           ? 'rounded bg-emerald-50 text-emerald-700'
@@ -35,6 +36,8 @@ export default function RepoSearchList({
             ? 'rounded-lg bg-violet-50 text-violet-700'
             : kind === 'mcp'
               ? 'rounded-lg bg-cyan-50 text-cyan-700'
+              : kind === 'prompt'
+                ? 'rounded-lg bg-orange-50 text-orange-700'
               : 'rounded-full bg-amber-50 text-amber-700';
         return (
           <article
@@ -48,6 +51,7 @@ export default function RepoSearchList({
               <Link href={`/${owner}/${repo.name}`} className="truncate font-mono text-[15px] font-semibold leading-5 text-zinc-900 hover:underline">
                 {repo.full_name}
               </Link>
+              {promptVersion ? <span className="shrink-0 rounded-full bg-orange-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-orange-800">{promptVersion}</span> : null}
             </div>
             <div className="mt-1 flex min-w-0 items-center gap-2 text-sm text-zinc-400">
               <p className="min-w-0 flex-1 truncate">

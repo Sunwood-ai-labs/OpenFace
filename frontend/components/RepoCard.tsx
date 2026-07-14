@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Repo, nonTypeTopics } from '@/lib/forgejo';
+import { Repo, nonTypeTopics, repoPromptVersion } from '@/lib/forgejo';
 import { timeAgoEn } from '@/lib/format';
 import { getSpaceTheme } from '@/lib/space-theme';
 import HfIcon, { HfIconName } from './HfIcon';
@@ -10,6 +10,7 @@ const KIND_ICON: Record<string, HfIconName> = {
   space: 'space',
   skill: 'skill',
   mcp: 'mcp',
+  prompt: 'prompt',
 };
 
 const KIND_THEME = {
@@ -43,6 +44,12 @@ const KIND_THEME = {
     badge: 'bg-cyan-50 text-cyan-800 ring-cyan-200 hover:bg-cyan-100',
     title: 'text-cyan-800 hover:text-cyan-950',
   },
+  prompt: {
+    card: 'border-orange-200/90 bg-white hover:border-orange-400 hover:shadow-orange-100/80',
+    icon: 'bg-orange-100 text-orange-700 ring-orange-200',
+    badge: 'bg-orange-50 text-orange-800 ring-orange-200 hover:bg-orange-100',
+    title: 'text-orange-800 hover:text-orange-950',
+  },
   default: {
     card: 'border-zinc-200 bg-white hover:border-amber-400',
     icon: 'bg-zinc-100 text-zinc-600 ring-zinc-200',
@@ -51,12 +58,13 @@ const KIND_THEME = {
   },
 };
 
-export default function RepoCard({ repo, kind }: { repo: Repo; kind?: 'model' | 'dataset' | 'space' | 'skill' | 'mcp' }) {
+export default function RepoCard({ repo, kind }: { repo: Repo; kind?: 'model' | 'dataset' | 'space' | 'skill' | 'mcp' | 'prompt' }) {
   const owner = repo.owner?.login ?? repo.full_name.split('/')[0];
   const name = repo.name;
   const badges = nonTypeTopics(repo.topics).slice(0, 4);
+  const promptVersion = kind === 'prompt' ? repoPromptVersion(repo.topics) : null;
   const icon = kind ? KIND_ICON[kind] : 'box';
-  const basePath = kind === 'dataset' ? '/datasets' : kind === 'space' ? '/spaces' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : '/models';
+  const basePath = kind === 'dataset' ? '/datasets' : kind === 'space' ? '/spaces' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : '/models';
   const theme = kind ? KIND_THEME[kind] : KIND_THEME.default;
   const spaceTheme = getSpaceTheme(repo.full_name);
 
@@ -94,6 +102,11 @@ export default function RepoCard({ repo, kind }: { repo: Repo; kind?: 'model' | 
               {name}
             </Link>
           </div>
+          {promptVersion ? (
+            <Link href={`${basePath}?q=${encodeURIComponent(`version-${promptVersion}`)}`} className="shrink-0 rounded-full border border-orange-200 bg-orange-50 px-2 py-0.5 font-mono text-[11px] font-bold text-orange-800 transition hover:bg-orange-100">
+              {promptVersion}
+            </Link>
+          ) : null}
         </div>
 
         <Link href={`/${owner}/${name}`} className="mt-2 line-clamp-2 min-h-[2.5rem] text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400">

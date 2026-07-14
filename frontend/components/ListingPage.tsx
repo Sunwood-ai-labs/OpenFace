@@ -25,14 +25,16 @@ export default async function ListingPage({
   const filterHref = (term: string) => `${basePath}?q=${encodeURIComponent(term)}&sort=${sort}`;
 
   const result = await searchReposByTopicAndQuery(topic, q, sort, 50);
-  const iconTone = topic === 'dataset' ? 'text-emerald-600' : topic === 'skill' ? 'text-violet-600' : topic === 'mcp' ? 'text-cyan-600' : 'text-amber-600';
-  const createLabel = topic === 'dataset' ? 'Dataset' : topic === 'space' ? 'Space' : topic === 'skill' ? 'Skill' : topic === 'mcp' ? 'MCP server' : 'Model';
+  const iconTone = topic === 'dataset' ? 'text-emerald-600' : topic === 'skill' ? 'text-violet-600' : topic === 'mcp' ? 'text-cyan-600' : topic === 'prompt' ? 'text-orange-600' : 'text-amber-600';
+  const createLabel = topic === 'dataset' ? 'Dataset' : topic === 'space' ? 'Space' : topic === 'skill' ? 'Skill' : topic === 'mcp' ? 'MCP server' : topic === 'prompt' ? 'Prompt' : 'Model';
   const mobileFilters = topic === 'dataset'
     ? ['Audio', 'Image', 'Text', 'Tabular', 'parquet', 'Benchmark']
     : topic === 'skill'
       ? ['Codex', 'Automation', 'Design', 'Developer tools', 'Workflow']
       : topic === 'mcp'
         ? ['TypeScript', 'Python', 'API', 'Search', 'Developer tools']
+        : topic === 'prompt'
+          ? ['Goal command', 'Coding agent', 'Workflow', 'version-v7', 'version-v8']
         : ['Text Generation', 'Image-to-Text', 'Safetensors', 'Transformers', 'GGUF', 'vLLM'];
 
   return (
@@ -110,7 +112,7 @@ export default async function ListingPage({
         ) : (
           <RepoSearchList
             repos={result.data}
-            kind={topic === 'dataset' ? 'dataset' : topic === 'skill' ? 'skill' : topic === 'mcp' ? 'mcp' : 'model'}
+            kind={topic === 'dataset' ? 'dataset' : topic === 'skill' ? 'skill' : topic === 'mcp' ? 'mcp' : topic === 'prompt' ? 'prompt' : 'model'}
             emptyMessage={`No ${title.toLowerCase()} yet.`}
           />
         )}

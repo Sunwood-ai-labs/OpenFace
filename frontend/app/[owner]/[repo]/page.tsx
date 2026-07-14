@@ -9,6 +9,7 @@ import {
   forgejoTreeUrl,
   forgejoRawUrl,
   nonTypeTopics,
+  repoPromptVersion,
   repoKind,
   ContentEntry,
   RepoKind,
@@ -34,7 +35,7 @@ export async function generateMetadata({
 }) {
   const repoInfo = await getRepo(params.owner, params.repo);
   const kind = repoInfo ? repoKind(repoInfo.topics) : null;
-  const label = kind === 'space' ? 'Space' : kind === 'dataset' ? 'Dataset' : kind === 'skill' ? 'Skill' : kind === 'mcp' ? 'MCP server' : 'Model';
+  const label = kind === 'space' ? 'Space' : kind === 'dataset' ? 'Dataset' : kind === 'skill' ? 'Skill' : kind === 'mcp' ? 'MCP server' : kind === 'prompt' ? 'Prompt' : 'Model';
   const repoName = repoInfo?.full_name || `${params.owner}/${params.repo}`;
   return {
     title: `${repoName} - ${label} - OpenFace`,
@@ -48,6 +49,7 @@ const KIND_ICON: Record<string, HfIconName> = {
   space: 'space',
   skill: 'skill',
   mcp: 'mcp',
+  prompt: 'prompt',
 };
 
 export default async function RepoDetailPage({
@@ -78,10 +80,11 @@ export default async function RepoDetailPage({
 
   const kind = repoKind(repoInfo.topics);
   const topicBadges = nonTypeTopics(repoInfo.topics);
+  const promptVersion = kind === 'prompt' ? repoPromptVersion(repoInfo.topics) : null;
   const isSpace = kind === 'space';
   const agentMetrics = isSpace ? await getRepoMetrics(owner, repo) : null;
-  const kindLabel = isSpace ? 'Spaces' : kind === 'dataset' ? 'Datasets' : kind === 'skill' ? 'Skills' : kind === 'mcp' ? 'MCPs' : 'Models';
-  const kindHref = isSpace ? '/spaces' : kind === 'dataset' ? '/datasets' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : '/models';
+  const kindLabel = isSpace ? 'Spaces' : kind === 'dataset' ? 'Datasets' : kind === 'skill' ? 'Skills' : kind === 'mcp' ? 'MCPs' : kind === 'prompt' ? 'Prompts' : 'Models';
+  const kindHref = isSpace ? '/spaces' : kind === 'dataset' ? '/datasets' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : '/models';
   const kindIcon = kind ? KIND_ICON[kind] : 'box';
   const isSpaceApp = isSpace && tab === 'card';
 
@@ -137,6 +140,11 @@ export default async function RepoDetailPage({
           {repoInfo.description && (
             <p className="text-zinc-600 dark:text-zinc-400">{repoInfo.description}</p>
           )}
+          {promptVersion ? (
+            <a href={`${kindHref}?q=${encodeURIComponent(`version-${promptVersion}`)}`} className="mt-3 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 font-mono text-xs font-bold text-orange-800 hover:bg-orange-100">
+              <HfIcon name="prompt" className="h-3 w-3" /> Prompt version {promptVersion}
+            </a>
+          ) : null}
           {topicBadges.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5">
               {topicBadges.map((t) => (
@@ -177,7 +185,7 @@ export default async function RepoDetailPage({
         {tab === 'card' && <aside className="flex flex-col gap-4">
           <div className="rounded-lg border border-zinc-200 bg-white p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              {isSpace ? 'Space actions' : kind === 'dataset' ? 'Dataset actions' : kind === 'skill' ? 'Skill actions' : kind === 'mcp' ? 'MCP actions' : 'Model actions'}
+              {isSpace ? 'Space actions' : kind === 'dataset' ? 'Dataset actions' : kind === 'skill' ? 'Skill actions' : kind === 'mcp' ? 'MCP actions' : kind === 'prompt' ? 'Prompt actions' : 'Model actions'}
             </p>
             <div className="grid gap-2">
               {isSpace ? (
@@ -222,6 +230,17 @@ export default async function RepoDetailPage({
                   <a href={forgejoRepoUrl(owner, repo)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
                     <HfIcon name="code" className="h-3.5 w-3.5" />
                     Configure MCP
+                  </a>
+                </>
+              ) : kind === 'prompt' ? (
+                <>
+                  <a href={`/${owner}/${repo}?tab=files`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-orange-700 px-3 text-sm font-semibold text-white hover:bg-orange-800">
+                    <HfIcon name="prompt" className="h-3.5 w-3.5" />
+                    Inspect prompt source
+                  </a>
+                  <a href={forgejoRepoUrl(owner, repo)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
+                    <HfIcon name="fork" className="h-3.5 w-3.5" />
+                    Fork this prompt
                   </a>
                 </>
               ) : (
@@ -297,9 +316,9 @@ async function CardTabContent({
 
   return (
     <div>
-      <CardBadges frontmatter={frontmatter} basePath={kind === 'dataset' ? '/datasets' : kind === 'space' ? '/spaces' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : '/models'} />
+      <CardBadges frontmatter={frontmatter} basePath={kind === 'dataset' ? '/datasets' : kind === 'space' ? '/spaces' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : '/models'} />
       <div
-        className={kind === 'skill'
+        className={kind === 'skill' || kind === 'prompt'
           ? 'github-markdown-body prose-openface min-w-0 bg-white dark:bg-zinc-900'
           : 'prose-openface min-w-0 rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900'}
         dangerouslySetInnerHTML={{ __html: bodyHtml }}

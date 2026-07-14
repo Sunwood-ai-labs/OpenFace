@@ -20,7 +20,7 @@ function CompactRepoList({
   href: string;
   label: string;
 }) {
-  const kind = label === 'Models' ? 'model' : label === 'Datasets' ? 'dataset' : label === 'Skills' ? 'skill' : label === 'MCPs' ? 'mcp' : 'space';
+  const kind = label === 'Models' ? 'model' : label === 'Datasets' ? 'dataset' : label === 'Skills' ? 'skill' : label === 'MCPs' ? 'mcp' : label === 'Prompts' ? 'prompt' : 'space';
   const theme = {
     model: {
       shell: 'border-zinc-200 bg-white',
@@ -62,6 +62,14 @@ function CompactRepoList({
       browse: 'text-cyan-700 hover:text-cyan-900',
       title: 'text-cyan-800',
     },
+    prompt: {
+      shell: 'border-orange-200/80 bg-gradient-to-b from-orange-50/80 via-white to-white shadow-orange-100/60',
+      icon: 'bg-orange-100 text-orange-700 ring-orange-200',
+      link: 'hover:bg-orange-50/80',
+      dot: 'bg-orange-500',
+      browse: 'text-orange-700 hover:text-orange-900',
+      title: 'text-orange-800',
+    },
   }[kind];
 
   return (
@@ -101,12 +109,13 @@ function CompactRepoList({
 }
 
 export default async function HomePage() {
-  const [models, datasets, spaces, skills, mcps] = await Promise.all([
+  const [models, datasets, spaces, skills, mcps, prompts] = await Promise.all([
     searchRepos({ topic: 'model', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'dataset', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'space', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'skill', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'mcp', sort: 'updated', limit: 8 }),
+    searchRepos({ topic: 'prompt', sort: 'updated', limit: 8 }),
   ]);
 
   return (
@@ -119,7 +128,7 @@ export default async function HomePage() {
           The AI community building locally.
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-zinc-500">
-          The platform where your team collaborates on models, datasets, applications, agent skills, and MCP servers.
+          The platform where your team collaborates on models, datasets, applications, skills, MCP servers, and versioned prompts.
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm">
           <Link href="/spaces" className="inline-flex h-10 items-center rounded-full border border-zinc-300 bg-white px-5 font-semibold text-zinc-950 shadow-sm hover:bg-zinc-50">
@@ -138,9 +147,10 @@ export default async function HomePage() {
           <span>Agent tooling</span>
           <span className="h-px w-24 bg-cyan-200" />
         </div>
-        <div className="grid gap-5 lg:grid-cols-2">
+        <div className="grid gap-5 lg:grid-cols-3">
           <CompactRepoList repos={skills.data} href="/skills" label="Skills" />
           <CompactRepoList repos={mcps.data} href="/mcps" label="MCPs" />
+          <CompactRepoList repos={prompts.data} href="/prompts" label="Prompts" />
         </div>
       </section>
 

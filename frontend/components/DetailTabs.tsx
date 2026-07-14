@@ -26,6 +26,8 @@ export default function DetailTabs({
         ? 'Skill card'
         : kind === 'mcp'
           ? 'MCP card'
+          : kind === 'prompt'
+            ? 'Prompt card'
           : 'Model card';
   const tabClass = (tab: string) =>
     `inline-flex min-h-12 items-center gap-2 border-b-2 px-4 py-2 text-sm font-semibold ${

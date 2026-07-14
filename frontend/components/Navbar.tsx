@@ -8,6 +8,7 @@ const navItems = [
   { href: '/spaces', label: 'Spaces' },
   { href: '/skills', label: 'Skills' },
   { href: '/mcps', label: 'MCPs' },
+  { href: '/prompts', label: 'Prompts' },
   { href: '/git/openface/realtime-voice-space/src/branch/main/README.md', label: 'Docs' },
 ];
 
@@ -45,6 +46,7 @@ export default function Navbar() {
                 <a href="/spaces" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Spaces</a>
                 <a href="/skills" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Skills</a>
                 <a href="/mcps" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">MCPs</a>
+                <a href="/prompts" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Prompts</a>
                 <a href="/git/openface/realtime-voice-space/src/branch/main/README.md" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Docs</a>
               </div>
               <div>

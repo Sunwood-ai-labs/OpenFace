@@ -126,7 +126,7 @@ async function apiFetch(path: string): Promise<{ ok: boolean; status: number; js
 // ---------------------------------------------------------------------------
 // Repo search — topic-classified listing (models / datasets / spaces)
 // ---------------------------------------------------------------------------
-export type RepoKind = 'model' | 'dataset' | 'space' | 'skill' | 'mcp';
+export type RepoKind = 'model' | 'dataset' | 'space' | 'skill' | 'mcp' | 'prompt';
 
 export interface SearchReposParams {
   topic?: RepoKind;
@@ -384,11 +384,19 @@ export function forgejoCommitsUrl(owner: string, repo: string, path = '', branch
   return `${forgejoRepoUrl(owner, repo)}/commits/branch/${branch}${cleanPath ? `/${cleanPath}` : ''}`;
 }
 
-const TYPE_TOPICS = new Set<string>(['model', 'dataset', 'space', 'skill', 'mcp']);
+const TYPE_TOPICS = new Set<string>(['model', 'dataset', 'space', 'skill', 'mcp', 'prompt']);
+
+const VERSION_TOPIC = /^version-(v\d+(?:\.\d+)*)$/i;
 
 export function nonTypeTopics(topics: string[] | undefined): string[] {
   if (!topics) return [];
-  return topics.filter((t) => !TYPE_TOPICS.has(t));
+  return topics.filter((t) => !TYPE_TOPICS.has(t) && !VERSION_TOPIC.test(t));
+}
+
+export function repoPromptVersion(topics: string[] | undefined): string | null {
+  if (!topics) return null;
+  const version = topics.find((topic) => VERSION_TOPIC.test(topic));
+  return version ? version.replace(/^version-/i, '') : null;
 }
 
 export function repoKind(topics: string[] | undefined): RepoKind | null {
@@ -398,5 +406,6 @@ export function repoKind(topics: string[] | undefined): RepoKind | null {
   if (topics.includes('model')) return 'model';
   if (topics.includes('skill')) return 'skill';
   if (topics.includes('mcp')) return 'mcp';
+  if (topics.includes('prompt')) return 'prompt';
   return null;
 }
