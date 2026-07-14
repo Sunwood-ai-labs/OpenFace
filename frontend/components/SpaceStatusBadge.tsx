@@ -7,7 +7,7 @@ import { SpaceStatusContext } from './SpaceStatusProvider';
 const labels: Record<SpaceStatus, string> = {
   building: 'CPU · Building',
   running: 'CPU · Running',
-  stopped: 'CPU · Paused',
+  stopped: 'CPU · On demand',
   error: 'CPU · Error',
 };
 

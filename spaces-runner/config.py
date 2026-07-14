@@ -17,6 +17,7 @@ DOCKER_NETWORK: str = os.environ.get("DOCKER_NETWORK", "openface")
 # 0 disables automatic suspension. CPU-only imported Spaces are intended to
 # remain available like ordinary local services.
 IDLE_TIMEOUT_MINUTES: int = int(os.environ.get("IDLE_TIMEOUT_MINUTES", "0"))
+MAX_RUNNING_SPACES: int = max(1, int(os.environ.get("MAX_RUNNING_SPACES", "24")))
 
 # Derived: forgejo host:port for git clone URLs (http://forgejo:3000/...)
 FORGEJO_GIT_BASE: str = FORGEJO_API.split("/api/")[0].rstrip("/")

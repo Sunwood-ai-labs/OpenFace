@@ -95,6 +95,7 @@ services:
       PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8090}
       DOCKER_NETWORK: openface
       IDLE_TIMEOUT_MINUTES: ${IDLE_TIMEOUT_MINUTES:-0}
+      MAX_RUNNING_SPACES: ${MAX_RUNNING_SPACES:-24}
       AGENT_DATA_DIR: /data/agents
     volumes:
       - shared-token:/shared:ro

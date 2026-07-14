@@ -26,6 +26,7 @@ import forgejo
 
 _docker_client: "docker.DockerClient | None" = None
 _docker_lock = threading.Lock()
+_capacity_lock = threading.Lock()
 
 
 def get_docker_client() -> docker.DockerClient:
@@ -187,28 +188,33 @@ def _build_and_run(owner: str, repo: str, token: str | None) -> None:
         tag = image_tag(owner, repo)
         name = container_name(owner, repo)
 
-        # Remove any stale container with the same name first.
-        try:
-            old = client.containers.get(name)
-            old.remove(force=True)
-        except NotFound:
-            pass
-
         client.images.build(path=clone_target, tag=tag, rm=True, forcerm=True)
 
-        client.containers.run(
-            tag,
-            name=name,
-            detach=True,
-            network=config.DOCKER_NETWORK,
-            labels={
-                config.SPACE_LABEL_KEY: config.SPACE_LABEL_VALUE,
-                config.OWNER_LABEL_KEY: owner,
-                config.REPO_LABEL_KEY: repo,
-            },
-            mem_limit=config.MEMORY_LIMIT,
-            restart_policy={"Name": "unless-stopped"},
-        )
+        # Capacity is enforced only when the new image is ready to launch, so
+        # an existing Space remains available during a potentially slow build.
+        with _capacity_lock:
+            _evict_lru_if_needed(owner, repo)
+
+            # Remove any stale container with the same name first.
+            try:
+                old = client.containers.get(name)
+                old.remove(force=True)
+            except NotFound:
+                pass
+
+            client.containers.run(
+                tag,
+                name=name,
+                detach=True,
+                network=config.DOCKER_NETWORK,
+                labels={
+                    config.SPACE_LABEL_KEY: config.SPACE_LABEL_VALUE,
+                    config.OWNER_LABEL_KEY: owner,
+                    config.REPO_LABEL_KEY: repo,
+                },
+                mem_limit=config.MEMORY_LIMIT,
+                restart_policy={"Name": "unless-stopped"},
+            )
 
         state.status = "running"
         state.error = None
@@ -240,6 +246,25 @@ def start_space(owner: str, repo: str, token: str | None) -> dict:
     state.error = None
     thread.start()
     return {"status": "building"}
+
+
+def _evict_lru_if_needed(starting_owner: str, starting_repo: str) -> list[str]:
+    """Keep the running set below the configured cap by stopping the LRU Space."""
+    evicted: list[str] = []
+    running = [
+        item for item in list_spaces()
+        if item["status"] == "running"
+        and (item["owner"], item["repo"]) != (starting_owner, starting_repo)
+    ]
+    while len(running) >= config.MAX_RUNNING_SPACES:
+        oldest = min(
+            running,
+            key=lambda item: registry.get(item["owner"], item["repo"]).last_access,
+        )
+        stop_space(oldest["owner"], oldest["repo"])
+        evicted.append(f"{oldest['owner']}/{oldest['repo']}")
+        running.remove(oldest)
+    return evicted
 
 
 def probe_container_status(owner: str, repo: str) -> str:

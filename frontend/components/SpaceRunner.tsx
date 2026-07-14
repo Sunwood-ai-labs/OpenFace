@@ -42,27 +42,48 @@ export default function SpaceRunner({
     .map((part) => part.toLowerCase() === 'ocr' ? 'OCR' : part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
 
-  const fetchStatus = useCallback(async () => {
+  const fetchStatus = useCallback(async (): Promise<SpaceStatus> => {
     try {
       const res = await fetch(`${base}/status`, { cache: 'no-store' });
       if (!res.ok) {
         setStatus('unknown');
-        return;
+        return 'unknown';
       }
       const json = (await res.json().catch(() => null)) as StatusResponse | null;
-      setStatus(normalizeStatus(json));
+      const nextStatus = normalizeStatus(json);
+      setStatus(nextStatus);
+      return nextStatus;
     } catch {
       setStatus('unknown');
+      return 'unknown';
     }
   }, [base]);
 
+  const startOnDemand = useCallback(async () => {
+    const current = await fetchStatus();
+    if (current !== 'stopped') return;
+    setBusy(true);
+    setErrorMsg(null);
+    try {
+      const response = await fetch(`${base}/start`, { method: 'POST' });
+      if (!response.ok) {
+        setErrorMsg(`Failed to start this Space (HTTP ${response.status})`);
+      }
+      await fetchStatus();
+    } catch {
+      setErrorMsg('Could not connect to spaces-runner.');
+    } finally {
+      setBusy(false);
+    }
+  }, [base, fetchStatus]);
+
   useEffect(() => {
-    fetchStatus();
+    void startOnDemand();
     pollRef.current = setInterval(fetchStatus, 5000);
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
-  }, [fetchStatus]);
+  }, [fetchStatus, startOnDemand]);
 
   async function start() {
     setBusy(true);
@@ -97,8 +118,8 @@ export default function SpaceRunner({
   }
 
   const statusLabel: Record<SpaceStatus, string> = {
-    unknown: 'Paused',
-    stopped: 'Paused',
+    unknown: 'On demand',
+    stopped: 'On demand',
     starting: 'Starting',
     running: 'Running',
     error: 'Error',
@@ -131,7 +152,7 @@ export default function SpaceRunner({
             className="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-950 px-3 text-sm font-semibold text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-100 dark:text-zinc-950"
           >
             <HfIcon name="play" className="h-3.5 w-3.5" />
-            {status === 'running' ? 'Running' : 'Restart this Space'}
+            {status === 'running' ? 'Running' : 'Start this Space'}
           </button>
           <button
             type="button"
@@ -203,8 +224,8 @@ export default function SpaceRunner({
               type="button"
               onClick={start}
               disabled={busy || status === 'starting'}
-              aria-label="Restart this Space"
-              title="Restart this Space"
+              aria-label="Start this Space"
+              title="Start this Space"
               className="group relative grid h-56 w-56 place-items-center rounded-full border border-violet-300/45 bg-violet-500/20 shadow-[0_0_64px_rgba(111,91,255,0.45),inset_0_0_54px_rgba(168,145,255,0.24)] transition hover:scale-[1.02] disabled:cursor-wait disabled:opacity-70 max-sm:h-44 max-sm:w-44"
             >
               <span className="absolute inset-[-16px] rounded-full border border-violet-300/10" />
@@ -215,7 +236,7 @@ export default function SpaceRunner({
                 Tap to start
               </p>
               <p className="mx-auto max-w-[300px] text-xs leading-5 text-zinc-500">
-                This Space is paused. Restart it to display the live app here.
+                This Space runs on demand and starts automatically when you open it.
               </p>
             </div>
           </div>
