@@ -41,6 +41,19 @@ The runner has one `node20` slot and executes job containers through
 right capture verifies that the Clone command now wraps within its card and
 uses a full-width copy action instead of exposing a horizontal scrollbar.
 
+## Additional Pages examples
+
+| HTML + CSS + JavaScript | `docs/` fallback |
+|---|---|
+| ![Signal Garden static portfolio with externally linked CSS and JavaScript](pages-portfolio-live.png) | ![Notebook Docs site served from main/docs without a gh-pages branch](pages-docs-fallback-live.png) |
+
+- `openface/pages-portfolio` is served from `gh-pages`; its `styles.css` and
+  `app.js` both returned `200` with `text/css` and `text/javascript` MIME
+  types. The button uses the linked JavaScript at runtime.
+- `openface/pages-docs-fallback` deliberately has no `gh-pages` branch. Its
+  `main/docs/index.html` and relative `guide.html` both returned `200`, proving
+  the fallback source and multi-page relative links work.
+
 ## Runtime checks
 
 The final local checks were made against the HTTPS gateway:
