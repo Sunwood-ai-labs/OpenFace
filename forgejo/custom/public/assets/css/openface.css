@@ -3948,6 +3948,56 @@ body[data-openface-community-page="new"] .repository.new.issue button[type="subm
   font-weight: 750 !important;
 }
 
+/* Community actions follow the same compact, tactile behavior as the
+   OpenFace repository controls: a short lift on hover, clear keyboard focus,
+   and no distracting animation for people who prefer reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .repository.issue-list .openface-community-primary,
+  .repository.issue-list .openface-community-secondary,
+  .repository.issue-list .openface-community-tab,
+  .repository.issue-list .openface-community-closed,
+  .repository.issue-list .openface-community-sort,
+  .repository.issue-list #issue-list .flex-item,
+  body[data-openface-community-page="new"] .repository.new.issue button[type="submit"] {
+    transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease, background-color 140ms ease, color 140ms ease !important;
+  }
+
+  .repository.issue-list .openface-community-primary:hover,
+  body[data-openface-community-page="new"] .repository.new.issue button[type="submit"]:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(17, 24, 39, 0.15) !important;
+  }
+
+  .repository.issue-list .openface-community-secondary:hover,
+  .repository.issue-list .openface-community-closed:hover,
+  .repository.issue-list .openface-community-sort:hover {
+    transform: translateY(-1px);
+    border-color: #aeb7c4 !important;
+    box-shadow: 0 3px 10px rgba(17, 24, 39, 0.08) !important;
+  }
+
+  .repository.issue-list #issue-list .flex-item:hover {
+    transform: translateX(2px);
+    background: #fffcf0 !important;
+  }
+}
+
+.repository.issue-list .openface-community-primary:active,
+.repository.issue-list .openface-community-secondary:active,
+body[data-openface-community-page="new"] .repository.new.issue button[type="submit"]:active {
+  transform: translateY(0) scale(0.985);
+  box-shadow: none !important;
+}
+
+.repository.issue-list .openface-community-primary:focus-visible,
+.repository.issue-list .openface-community-secondary:focus-visible,
+.repository.issue-list .openface-community-tab:focus-visible,
+.repository.issue-list .openface-community-filter input:focus-visible,
+body[data-openface-community-page="new"] .repository.new.issue button[type="submit"]:focus-visible {
+  outline: 3px solid rgba(255, 210, 30, 0.5) !important;
+  outline-offset: 2px;
+}
+
 body[data-openface-community-page="new"] overflow-menu.ui.tabular.menu {
   background: #fff !important;
   border-bottom: 1px solid var(--openface-border) !important;
