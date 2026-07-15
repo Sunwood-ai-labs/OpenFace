@@ -239,6 +239,30 @@ put_file() {
 }
 
 # ------------------------------------------------------------------------
+# Helper: create a Pages source branch from the repository's default branch.
+# A 409 means the branch already exists, which is the expected idempotent
+# result when the seed container runs again.
+# ------------------------------------------------------------------------
+ensure_pages_branch() {
+  local name="$1" branch="${2:-gh-pages}"
+  local code
+  code=$(api GET "/repos/${ORG_NAME}/${name}/branches/${branch}")
+  if [ "$code" = "200" ]; then
+    log "Pages branch '${branch}' already exists on '${name}'."
+    return 0
+  fi
+
+  code=$(api POST "/repos/${ORG_NAME}/${name}/branches" "$(jq -n \
+    --arg new_branch "$branch" '{new_branch_name:$new_branch, old_branch_name:"main"}')")
+  if [ "$code" = "201" ]; then
+    log "Created Pages branch '${branch}' on '${name}'."
+  else
+    log "WARNING: creating Pages branch '${branch}' on '${name}' returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+  fi
+}
+
+# ------------------------------------------------------------------------
 # Helper: create a lightweight, idempotent tag for a prompt's imported
 # version. This makes the visible `version-v*` topic traceable through the
 # native Forgejo Git history as well as through the OpenFace directory.
@@ -1359,6 +1383,54 @@ create_dataset_fixture "robot-demo-rollouts" "Robot Demo Rollouts" "Small roboti
 create_dataset_fixture "financial-news-signals" "Financial News Signals" "Financial headline signal classification fixture" "text" "finance"
 create_dataset_fixture "image-edit-prompts" "Image Edit Prompts" "Instruction dataset fixture for image editing tasks" "image" "editing"
 create_dataset_fixture "table-question-answering" "Table Question Answering" "Tabular QA fixture with small CSV splits" "tabular" "qa"
+
+# ------------------------------------------------------------------------
+# OpenFace Pages fixture.  This demonstrates the same convention as GitHub
+# Pages: files from a public repo's `gh-pages` branch are served at
+# /pages/{owner}/{repo}/.  Keeping it in the seed makes a fresh Compose
+# deployment verifiable without any manual Forgejo setup.
+# ------------------------------------------------------------------------
+ensure_repo "pages-starter" "A public static site published with OpenFace Pages"
+set_topics "pages-starter" "pages" "static-site" "html" "openface-pages"
+
+cat > "${WORKDIR}/pages_starter_readme.md" <<'EOF'
+# OpenFace Pages starter
+
+This public repository demonstrates **OpenFace Pages**.
+
+Open the published site at `/pages/openface/pages-starter/`. OpenFace serves
+the `gh-pages` branch when it exists; otherwise it uses `docs/` on `main`.
+EOF
+put_file "pages-starter" "README.md" "${WORKDIR}/pages_starter_readme.md" "Add OpenFace Pages starter README"
+
+cat > "${WORKDIR}/pages_starter_index.html" <<'EOF'
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpenFace Pages starter</title>
+    <style>
+      :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f7f6f2; color: #152238; }
+      main { width: min(680px, calc(100% - 48px)); padding: 48px; border: 1px solid #dfe4ea; border-radius: 20px; background: #fff; box-shadow: 0 22px 70px #15223812; }
+      .eyebrow { color: #52657c; font: 700 12px/1.2 ui-monospace, monospace; letter-spacing: .12em; }
+      h1 { margin: 14px 0; font-size: clamp(2rem, 7vw, 4.4rem); line-height: .95; letter-spacing: -.06em; }
+      p { color: #52657c; font-size: 1.1rem; line-height: 1.7; }
+      code { padding: .2em .4em; border-radius: 6px; background: #eef2f6; color: #254b79; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="eyebrow">OPENFACE PAGES · GH-PAGES BRANCH</div>
+      <h1>Publish the small things.</h1>
+      <p>This static site is served from a public Forgejo repository through OpenFace Pages. Push an <code>index.html</code> to <code>gh-pages</code>, then share its URL.</p>
+    </main>
+  </body>
+</html>
+EOF
+put_file "pages-starter" "index.html" "${WORKDIR}/pages_starter_index.html" "Add OpenFace Pages starter site"
+ensure_pages_branch "pages-starter"
 
 # Real Skill and MCP samples selected from Sunwood-ai-labs on GitHub.
 import_sunwood_catalog
