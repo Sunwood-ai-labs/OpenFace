@@ -121,6 +121,32 @@ fi
 AUTH_HEADER="Authorization: token ${TOKEN}"
 
 # ------------------------------------------------------------------------
+# Forgejo Actions runner registration. The runner is organization-scoped so
+# only repositories under `openface` can receive this local CI capacity.
+# The registration token is shared only with the dedicated runner container.
+# ------------------------------------------------------------------------
+ensure_actions_runner_token() {
+  local runner_token_file="/shared/actions-runner-token"
+  if [ -s "$runner_token_file" ]; then
+    log "Forgejo Actions runner token already exists; reusing it."
+    return 0
+  fi
+
+  local runner_token
+  runner_token="$(docker exec -u git "${FORGEJO_CONTAINER_NAME}" \
+    forgejo forgejo-cli actions generate-runner-token --scope "${ORG_NAME}" 2>/tmp/actions_runner_token.log | tail -n1 | tr -d '[:space:]')"
+  if [ -z "$runner_token" ]; then
+    log "ERROR: failed to generate Forgejo Actions runner token."
+    cat /tmp/actions_runner_token.log
+    exit 1
+  fi
+
+  echo -n "$runner_token" > "$runner_token_file"
+  chmod 600 "$runner_token_file"
+  log "Forgejo Actions runner token written to ${runner_token_file}."
+}
+
+# ------------------------------------------------------------------------
 # API helper: perform a request, treat 409/422 "already exists" as success.
 # ------------------------------------------------------------------------
 api() {
@@ -155,6 +181,8 @@ else
     cat /tmp/api_resp.json
   fi
 fi
+
+ensure_actions_runner_token
 
 # ------------------------------------------------------------------------
 # Helper: create a repo under the org (idempotent), auto_init true.
@@ -1431,6 +1459,16 @@ cat > "${WORKDIR}/pages_starter_index.html" <<'EOF'
 EOF
 put_file "pages-starter" "index.html" "${WORKDIR}/pages_starter_index.html" "Add OpenFace Pages starter site"
 ensure_pages_branch "pages-starter"
+
+# A complete VitePress + Forgejo Actions example.  The workflow pushes the
+# generated `docs/.vitepress/dist` directory to gh-pages, which OpenFace Pages
+# immediately serves at /pages/openface/vitepress-pages-starter/.
+ensure_repo "vitepress-pages-starter" "VitePress documentation published by Forgejo Actions"
+set_topics "vitepress-pages-starter" "pages" "vitepress" "docs" "openface-pages"
+put_file "vitepress-pages-starter" "package.json" "/templates/vitepress-pages-starter/package.json" "Add VitePress package manifest"
+put_file "vitepress-pages-starter" "docs/index.md" "/templates/vitepress-pages-starter/docs/index.md" "Add VitePress home page"
+put_file "vitepress-pages-starter" "docs/.vitepress/config.mts" "/templates/vitepress-pages-starter/docs/.vitepress/config.mts" "Configure VitePress public base"
+put_file "vitepress-pages-starter" ".forgejo/workflows/publish-pages.yml" "/templates/vitepress-pages-starter/.forgejo/workflows/publish-pages.yml" "Automate VitePress Pages publishing"
 
 # Real Skill and MCP samples selected from Sunwood-ai-labs on GitHub.
 import_sunwood_catalog

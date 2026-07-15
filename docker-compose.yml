@@ -11,6 +11,8 @@ volumes:
     name: openface_shared-token
   agent-metrics-data:
     name: openface_agent-metrics-data
+  forgejo-runner-data:
+    name: openface_forgejo-runner-data
 
 services:
   gateway:
@@ -75,6 +77,7 @@ services:
       FORGEJO__webhook__ALLOWED_HOST_LIST: "*"
       FORGEJO__security__INSTALL_LOCK: "true"
       FORGEJO__database__DB_TYPE: sqlite3
+      FORGEJO__actions__ENABLED: "true"
     volumes:
       - forgejo-data:/data
     networks:
@@ -130,4 +133,40 @@ services:
       - openface
     depends_on:
       forgejo:
+        condition: service_healthy
+
+  # Isolated Docker daemon for Forgejo Actions. Workflows can build static
+  # sites but cannot inspect or control OpenFace's host Docker containers.
+  forgejo-actions-dind:
+    image: docker:27-dind
+    container_name: openface-forgejo-actions-dind
+    restart: unless-stopped
+    privileged: true
+    command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
+    networks:
+      - openface
+    healthcheck:
+      test: ["CMD", "docker", "info"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  forgejo-actions-runner:
+    build:
+      context: ./forgejo-actions-runner
+    container_name: openface-forgejo-actions-runner
+    restart: unless-stopped
+    environment:
+      FORGEJO_INSTANCE_URL: http://forgejo:3000
+      FORGEJO_RUNNER_NAME: openface-pages-runner
+      DOCKER_HOST: tcp://forgejo-actions-dind:2375
+    volumes:
+      - forgejo-runner-data:/data
+      - shared-token:/shared:ro
+    networks:
+      - openface
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+      forgejo-actions-dind:
         condition: service_healthy
