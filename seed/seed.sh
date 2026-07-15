@@ -1460,6 +1460,23 @@ EOF
 put_file "pages-starter" "index.html" "${WORKDIR}/pages_starter_index.html" "Add OpenFace Pages starter site"
 ensure_pages_branch "pages-starter"
 
+# Linked asset example: gh-pages serves HTML, CSS, and browser JavaScript from
+# the same public repository path.
+ensure_repo "pages-portfolio" "Static HTML, CSS and JavaScript published with OpenFace Pages"
+set_topics "pages-portfolio" "pages" "static-site" "javascript" "openface-pages"
+put_file "pages-portfolio" "index.html" "/templates/pages-portfolio/index.html" "Add static portfolio page"
+put_file "pages-portfolio" "styles.css" "/templates/pages-portfolio/styles.css" "Add portfolio stylesheet"
+put_file "pages-portfolio" "app.js" "/templates/pages-portfolio/app.js" "Add portfolio browser interaction"
+ensure_pages_branch "pages-portfolio"
+
+# Fallback example: no gh-pages branch is created. OpenFace Pages serves the
+# docs/ directory in main, including relative links and assets.
+ensure_repo "pages-docs-fallback" "Documentation served from docs on the default branch"
+set_topics "pages-docs-fallback" "pages" "docs" "static-site" "openface-pages"
+put_file "pages-docs-fallback" "docs/index.html" "/templates/pages-docs-fallback/docs/index.html" "Add docs fallback home"
+put_file "pages-docs-fallback" "docs/guide.html" "/templates/pages-docs-fallback/docs/guide.html" "Add docs fallback guide"
+put_file "pages-docs-fallback" "docs/styles.css" "/templates/pages-docs-fallback/docs/styles.css" "Add docs fallback stylesheet"
+
 # A complete VitePress + Forgejo Actions example.  The workflow pushes the
 # generated `docs/.vitepress/dist` directory to gh-pages, which OpenFace Pages
 # immediately serves at /pages/openface/vitepress-pages-starter/.
