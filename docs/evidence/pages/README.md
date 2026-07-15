@@ -23,6 +23,24 @@ rendered the **Visit site** button. The right capture is the page rendered at
 `/pages/openface/pages-starter/`; it is a real static HTML document, not a
 Space pause screen or an iframe placeholder.
 
+## VitePress automation evidence
+
+| Forgejo Actions result | Clone UI after layout fix |
+|---|---|
+| ![VitePress output served by OpenFace Pages](vitepress-actions-live.png) | ![Repository detail showing a fully visible Clone command without a horizontal scrollbar](clone-block-fixed.png) |
+
+`openface/vitepress-pages-starter` was seeded with the workflow at
+`.forgejo/workflows/publish-pages.yml`. Its first `main` push ran successfully
+on `openface-pages-runner`, built VitePress, and pushed commit
+`453dff90f67316798e7ca76037fd27c8ed6cb707` to `gh-pages`. The left capture is
+the resulting `200 text/html` page at
+`/pages/openface/vitepress-pages-starter/`.
+
+The runner has one `node20` slot and executes job containers through
+`forgejo-actions-dind`; it does not mount OpenFace's host Docker socket. The
+right capture verifies that the Clone command now wraps within its card and
+uses a full-width copy action instead of exposing a horizontal scrollbar.
+
 ## Runtime checks
 
 The final local checks were made against the HTTPS gateway:
