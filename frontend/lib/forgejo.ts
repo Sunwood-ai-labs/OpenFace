@@ -202,7 +202,11 @@ export async function searchAllReposByTopicAndQuery(
     if (!result.ok) return { ok: false, data: [], total_count: 0 };
     repos.push(...result.data);
     expectedTotal = result.total_count;
-    if (result.data.length === 0 || result.data.length < pageSize) break;
+    // `data` excludes private repositories, while Forgejo's total still
+    // describes the raw result set. Do not stop just because a page became
+    // shorter after that safety filter; otherwise a later public page could
+    // be omitted from the global metric ranking.
+    if (page * pageSize >= expectedTotal || result.data.length === 0 && expectedTotal === 0) break;
     page += 1;
   }
 
