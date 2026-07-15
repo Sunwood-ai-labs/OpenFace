@@ -182,10 +182,24 @@ gradio
 
 | ポート | 用途 |
 |---|---|
-| `8090` | gateway（Web UI・API・Git・Spaces、すべてここ経由） |
+| `8090` | HTTP gateway（HTTPSへリダイレクト） |
+| `8443` | HTTPS gateway（Web UI・API・Git・Spaces、すべてここ経由） |
 | `2222` | Forgejo への直接 SSH（`git clone ssh://git@localhost:2222/...`） |
 
 それ以外のポート（frontend:3000, forgejo:3000, spaces-runner:8000）はコンテナネットワーク内部のみで公開されません。
+
+## HTTPS
+
+`docker compose up -d --build` で gateway が HTTPS を公開します。ローカルでは `https://localhost:8443` を使います。初回起動時は自己署名証明書を `gateway/certs/` に自動作成するため、ブラウザにはローカル証明書の警告が出ます。
+
+実運用では、公開ドメインの証明書を次のファイル名で配置してから再起動してください。証明書が存在する場合は自動生成せず、そのまま利用します。
+
+```
+gateway/certs/cert.pem  # fullchain.pem 相当
+gateway/certs/key.pem   # private key
+```
+
+ドメイン運用では `.env` の `OPENFACE_HTTPS_PORT=443` と `PUBLIC_BASE_URL=https://openface.example.com` を設定してください。証明書の自動取得（ACME）はDNS名と公開到達性が必要なため、このCompose構成では外部の証明書発行手段で取得したものを配置します。
 
 ## ディレクトリ構成
 

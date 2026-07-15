@@ -14,13 +14,16 @@ volumes:
 
 services:
   gateway:
-    image: nginx:alpine
+    build:
+      context: ./gateway
     container_name: openface-gateway
     restart: unless-stopped
     ports:
       - "${OPENFACE_PORT:-8090}:80"
+      - "${OPENFACE_HTTPS_PORT:-8443}:443"
     volumes:
-      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./gateway/nginx.conf:/etc/nginx/templates/nginx.conf.template:ro
+      - ./gateway/certs:/certs
     networks:
       - openface
     depends_on:
@@ -38,7 +41,7 @@ services:
     environment:
       FORGEJO_API: http://forgejo:3000/api/v1
       FORGEJO_TOKEN_FILE: /shared/token
-      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8090}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-https://localhost:8443}
       RUNNER_API: http://spaces-runner:8000/api
       README_CACHE_TTL_SECONDS: ${README_CACHE_TTL_SECONDS:-300}
     volumes:
@@ -62,7 +65,7 @@ services:
       USER_UID: 1000
       USER_GID: 1000
       FORGEJO__DEFAULT__APP_NAME: OpenFace
-      FORGEJO__server__ROOT_URL: ${PUBLIC_BASE_URL:-http://localhost:8090}/git/
+      FORGEJO__server__ROOT_URL: ${PUBLIC_BASE_URL:-https://localhost:8443}/git/
       FORGEJO__server__HTTP_PORT: 3000
       FORGEJO__server__SSH_PORT: 22
       FORGEJO__server__LFS_START_SERVER: "true"
@@ -93,7 +96,7 @@ services:
     environment:
       FORGEJO_API: http://forgejo:3000/api/v1
       FORGEJO_TOKEN_FILE: /shared/token
-      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8090}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-https://localhost:8443}
       DOCKER_NETWORK: openface
       IDLE_TIMEOUT_MINUTES: ${IDLE_TIMEOUT_MINUTES:-0}
       MAX_RUNNING_SPACES: ${MAX_RUNNING_SPACES:-24}

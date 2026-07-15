@@ -33,6 +33,7 @@ venv/
 /forgejo-*.html
 /screenshots/
 /.sync-probe
+/gateway/certs/
 
 # These are independent Git repositories published to the local Forgejo.
 # Keep the publishing helper here, but do not turn the checkouts into nested
