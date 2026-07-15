@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import HfIcon from './HfIcon';
 import SearchForm from './SearchForm';
+import ThemeSelector from './ThemeSelector';
 
 const navItems = [
   { href: '/models', label: 'Models' },
@@ -65,6 +66,10 @@ export default function Navbar() {
           </details>
         </nav>
 
+        <div className="hidden lg:block">
+          <ThemeSelector />
+        </div>
+
         <div className="hidden shrink-0 items-center gap-4 text-sm font-semibold lg:flex">
           <a href="/git/user/login" className="text-zinc-900 hover:text-zinc-600">
             Log In
@@ -80,6 +85,7 @@ export default function Navbar() {
           </summary>
           <div className="absolute right-0 z-40 mt-3 hidden w-[min(88vw,320px)] gap-1 rounded-lg border border-zinc-200 bg-white p-3 text-sm shadow-xl group-open:grid">
             <SearchForm className="mb-1" compact />
+            <div className="mb-1 px-3 pt-1"><ThemeSelector /></div>
             {navItems.map((item) => (
               <Link key={item.href} href={item.href} className="rounded-lg px-3 py-2 text-zinc-700 hover:bg-zinc-50">
                 {item.label}

@@ -11,6 +11,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(() => { try { const theme = localStorage.getItem('openface-theme'); if (theme && theme !== 'standard') document.documentElement.dataset.openfaceTheme = theme; } catch {} })();`,
+          }}
+        />
+      </head>
       <body className="min-h-screen bg-white text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
         <Navbar />
         <main className="mx-auto w-full max-w-[1544px] px-0 py-0">{children}</main>

@@ -10,6 +10,189 @@ body {
   background-color: #fafafa;
 }
 
+/* Theme selector lives in the portal chrome. A native select keeps the
+   control compact and keyboard-accessible even on very narrow screens. */
+.openface-theme-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 8px 0 10px;
+  border: 1px solid #e4e4e7;
+  border-radius: 999px;
+  background: #fff;
+  color: #3f3f46;
+  font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .01em;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+}
+
+.openface-theme-selector select {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* -------------------------------------------------------------------------
+   Solarpunk — warm paper, botanical greens, and sunlit citrus. The rules
+   intentionally recolor existing utility-driven surfaces without requiring
+   every individual card component to know about themes. */
+html[data-openface-theme="solarpunk"] body {
+  color: #173b2c;
+  background:
+    radial-gradient(circle at 92% -8%, rgb(255 201 83 / 42%) 0 15%, transparent 15.2%),
+    radial-gradient(circle at -4% 60%, rgb(118 196 139 / 18%) 0 18%, transparent 18.2%),
+    #f2f4e9;
+}
+
+html[data-openface-theme="solarpunk"] body::before {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  content: '';
+  opacity: .24;
+  background-image: linear-gradient(90deg, transparent 49.5%, rgb(38 91 61 / 12%) 50%, transparent 50.5%);
+  background-size: 48px 48px;
+}
+
+html[data-openface-theme="solarpunk"] header,
+html[data-openface-theme="solarpunk"] .bg-white,
+html[data-openface-theme="solarpunk"] .openface-repo-header,
+html[data-openface-theme="solarpunk"] .openface-space-runner,
+html[data-openface-theme="solarpunk"] .openface-space-runner-toolbar {
+  background-color: #fbfcf5 !important;
+}
+
+html[data-openface-theme="solarpunk"] .bg-zinc-50,
+html[data-openface-theme="solarpunk"] .bg-zinc-100 {
+  background-color: #edf3e7 !important;
+}
+
+html[data-openface-theme="solarpunk"] .border-zinc-100,
+html[data-openface-theme="solarpunk"] .border-zinc-200,
+html[data-openface-theme="solarpunk"] .border-zinc-300 {
+  border-color: #b9cfad !important;
+}
+
+html[data-openface-theme="solarpunk"] .text-zinc-900,
+html[data-openface-theme="solarpunk"] .text-zinc-950,
+html[data-openface-theme="solarpunk"] .text-zinc-800,
+html[data-openface-theme="solarpunk"] .text-zinc-700 {
+  color: #173b2c !important;
+}
+
+html[data-openface-theme="solarpunk"] .text-zinc-600,
+html[data-openface-theme="solarpunk"] .text-zinc-500,
+html[data-openface-theme="solarpunk"] .text-zinc-400 {
+  color: #52715d !important;
+}
+
+html[data-openface-theme="solarpunk"] .bg-zinc-900,
+html[data-openface-theme="solarpunk"] .bg-zinc-950 {
+  background-color: #1f583c !important;
+}
+
+html[data-openface-theme="solarpunk"] .bg-accent {
+  background-color: #ffcb4f !important;
+}
+
+html[data-openface-theme="solarpunk"] .openface-theme-selector {
+  border-color: #94b889;
+  background: #e7f0dc;
+  color: #1f583c;
+}
+
+html[data-openface-theme="solarpunk"] .openface-theme-selector::before {
+  content: 'GROW MODE';
+  color: #6a8539;
+  font-size: 9px;
+  letter-spacing: .08em;
+}
+
+/* -------------------------------------------------------------------------
+   Cyberpunk — ink-black panels over a restrained electric grid. Bright
+   cyan and magenta are reserved for interactive accents and identity. */
+html[data-openface-theme="cyberpunk"] body {
+  color: #e9f8ff;
+  background-color: #080a16;
+  background-image:
+    linear-gradient(rgb(40 226 255 / 8%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(40 226 255 / 8%) 1px, transparent 1px),
+    radial-gradient(circle at 85% 5%, rgb(255 49 164 / 18%), transparent 22%),
+    radial-gradient(circle at 8% 90%, rgb(37 225 201 / 13%), transparent 26%);
+  background-size: 36px 36px, 36px 36px, auto, auto;
+}
+
+html[data-openface-theme="cyberpunk"] header,
+html[data-openface-theme="cyberpunk"] .bg-white,
+html[data-openface-theme="cyberpunk"] .openface-repo-header,
+html[data-openface-theme="cyberpunk"] .openface-space-runner,
+html[data-openface-theme="cyberpunk"] .openface-space-runner-toolbar {
+  background-color: rgb(10 13 29 / 94%) !important;
+}
+
+html[data-openface-theme="cyberpunk"] header {
+  backdrop-filter: blur(14px);
+  border-color: rgb(40 226 255 / 35%) !important;
+}
+
+html[data-openface-theme="cyberpunk"] .bg-zinc-50,
+html[data-openface-theme="cyberpunk"] .bg-zinc-100 {
+  background-color: #11162b !important;
+}
+
+html[data-openface-theme="cyberpunk"] .border-zinc-100,
+html[data-openface-theme="cyberpunk"] .border-zinc-200,
+html[data-openface-theme="cyberpunk"] .border-zinc-300 {
+  border-color: rgb(55 204 237 / 38%) !important;
+}
+
+html[data-openface-theme="cyberpunk"] .text-zinc-900,
+html[data-openface-theme="cyberpunk"] .text-zinc-950,
+html[data-openface-theme="cyberpunk"] .text-zinc-800,
+html[data-openface-theme="cyberpunk"] .text-zinc-700 {
+  color: #e9f8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] .text-zinc-600,
+html[data-openface-theme="cyberpunk"] .text-zinc-500,
+html[data-openface-theme="cyberpunk"] .text-zinc-400 {
+  color: #8fb9cf !important;
+}
+
+html[data-openface-theme="cyberpunk"] .bg-zinc-900,
+html[data-openface-theme="cyberpunk"] .bg-zinc-950 {
+  background-color: #1b1035 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .bg-accent {
+  background-color: #25e1c9 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-theme-selector {
+  border-color: #2ce7ff;
+  background: #101d38;
+  color: #dffbff;
+  box-shadow: 0 0 18px rgb(44 231 255 / 20%);
+}
+
+html[data-openface-theme="cyberpunk"] .openface-theme-selector::before {
+  content: 'NEON LINK';
+  color: #ff5ab4;
+  font-size: 9px;
+  letter-spacing: .08em;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-theme-selector option {
+  background: #101d38;
+  color: #e9f8ff;
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #18181b;
