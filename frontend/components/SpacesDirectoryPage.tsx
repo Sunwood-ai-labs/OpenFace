@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { searchReposByTopicAndQuery, SortOption } from '@/lib/forgejo';
+import { searchAllReposByTopicAndQuery, searchReposByTopicAndQuery, SortOption } from '@/lib/forgejo';
 import { timeAgoEn } from '@/lib/format';
 import { getSpaceTheme } from '@/lib/space-theme';
 import HfIcon, { type HfIconName } from './HfIcon';
@@ -47,7 +47,9 @@ export default async function SpacesDirectoryPage({
   const sort: SortOption = searchParams?.sort === 'stars' ? 'stars' : 'updated';
   const requestedPage = Number.parseInt(searchParams?.page || '1', 10);
   const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
-  const result = await searchReposByTopicAndQuery('space', q, sort, PAGE_SIZE, page);
+  const result = sort === 'stars'
+    ? await searchAllReposByTopicAndQuery('space', q)
+    : await searchReposByTopicAndQuery('space', q, sort, PAGE_SIZE, page);
   const repos = result.ok ? result.data : [];
   const targets = repos.map((repo) => ({
     owner: repo.owner?.login ?? repo.full_name.split('/')[0],
@@ -57,9 +59,15 @@ export default async function SpacesDirectoryPage({
     getRepoMetricsBatch(targets),
     getSpaceStatuses(),
   ]);
-  const visibleRepos = sort === 'stars'
-    ? [...repos].sort((a, b) => (metricsByRepo[b.full_name]?.likes ?? 0) - (metricsByRepo[a.full_name]?.likes ?? 0))
+  const rankedRepos = sort === 'stars'
+    ? [...repos].sort((a, b) => {
+        const likeDelta = (metricsByRepo[b.full_name]?.likes ?? 0) - (metricsByRepo[a.full_name]?.likes ?? 0);
+        return likeDelta || b.updated_at.localeCompare(a.updated_at) || a.full_name.localeCompare(b.full_name);
+      })
     : repos;
+  const visibleRepos = sort === 'stars'
+    ? rankedRepos.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+    : rankedRepos;
   const querySuffix = q ? `&q=${encodeURIComponent(q)}` : '';
   const sortLabel = sort === 'stars' ? 'Most liked' : 'Relevance';
   const totalPages = Math.max(1, Math.ceil(result.total_count / PAGE_SIZE));

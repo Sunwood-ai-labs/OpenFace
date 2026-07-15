@@ -177,8 +177,44 @@ export async function searchRepos(params: SearchReposParams): Promise<SearchRepo
   return {
     ok: true,
     data: topic === 'space' ? await enrichSpaceMetadata(data) : data,
-    total_count: data.length,
+    total_count: Number.isFinite(headerTotal) ? headerTotal : data.length,
   };
+}
+
+/**
+ * Metric-backed rankings (likes/views) must be calculated before pagination.
+ * Forgejo can order repository metadata, but OpenFace likes live in the local
+ * metrics store, so fetch the complete public topic set first and let callers
+ * rank it once. This intentionally stays separate from the normal paged
+ * metadata query used by "recently updated" listings.
+ */
+export async function searchAllReposByTopicAndQuery(
+  topic: RepoKind,
+  q?: string,
+): Promise<SearchReposResult> {
+  const pageSize = 100;
+  let page = 1;
+  let expectedTotal = Number.POSITIVE_INFINITY;
+  const repos: Repo[] = [];
+
+  while ((page - 1) * pageSize < expectedTotal) {
+    const result = await searchRepos({ topic, sort: 'updated', limit: pageSize, page });
+    if (!result.ok) return { ok: false, data: [], total_count: 0 };
+    repos.push(...result.data);
+    expectedTotal = result.total_count;
+    if (result.data.length === 0 || result.data.length < pageSize) break;
+    page += 1;
+  }
+
+  const needle = q?.toLowerCase();
+  const filtered = needle
+    ? repos.filter((repo) =>
+        repo.name.toLowerCase().includes(needle) ||
+        (repo.description || '').toLowerCase().includes(needle) ||
+        repo.full_name.toLowerCase().includes(needle),
+      )
+    : repos;
+  return { ok: true, data: filtered, total_count: filtered.length };
 }
 
 // When both a topic (model/dataset/space) and a free-text query are needed,
