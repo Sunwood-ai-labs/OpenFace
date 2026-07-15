@@ -152,6 +152,7 @@ html[data-openface-theme="cyberpunk"] .bg-zinc-100 {
 html[data-openface-theme="cyberpunk"] article,
 html[data-openface-theme="cyberpunk"] .divide-y {
   background-color: rgb(13 19 39 / 96%) !important;
+  background-image: none !important;
   box-shadow: 0 0 0 1px rgb(40 226 255 / 10%), 0 12px 30px rgb(0 0 0 / 18%);
 }
 
