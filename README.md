@@ -69,6 +69,16 @@ flowchart LR
 |---|---|
 | <img src="docs/images/openface-home.png" alt="モデル、Space、データセットを表示する OpenFace のホーム画面" width="100%"> | <img src="docs/images/openface-files.png" alt="OpenFace の Space リポジトリにある Files 画面" width="100%"> |
 
+### テーマ切替
+
+ヘッダー右上のテーマセレクタから、標準・**Solarpunk**・**Cyberpunk** を即時に切り替えられます。選択はブラウザの `localStorage` に保存され、次回アクセス時も最初の描画から復元されます。スマートフォンではナビゲーションメニュー内に同じセレクタを表示します。
+
+| Standard | Solarpunk | Cyberpunk |
+|---|---|---|
+| <img src="docs/evidence/themes/standard-home.png" alt="Standard テーマの OpenFace ホーム" width="100%"> | <img src="docs/evidence/themes/solarpunk-home.png" alt="Solarpunk テーマの OpenFace ホーム" width="100%"> | <img src="docs/evidence/themes/cyberpunk-home.png" alt="Cyberpunk テーマの OpenFace ホーム" width="100%"> |
+
+テーマセレクタの実操作・永続化・各画面の確認結果は [Theme verification evidence](docs/evidence/themes/README.md) に記録しています。
+
 ### Skills / MCPs
 
 Sunwood AI Labs の公開 GitHub リポジトリから、実ファイルとコミット履歴を含む Skill 10件・MCPサーバー10件を取り込みます。名前だけのダミーではなく、Skill は `SKILL.md`、MCP はサーバー実装と依存定義を検証済みです。
