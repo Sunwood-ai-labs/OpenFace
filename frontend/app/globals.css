@@ -146,6 +146,19 @@ html[data-openface-theme="cyberpunk"] .bg-zinc-100 {
   background-color: #11162b !important;
 }
 
+/* A few homepage collections assemble their surface class dynamically, so
+   Tailwind does not always emit a stable `bg-white` utility for them. Keep
+   their panel treatment explicit to preserve contrast in neon mode. */
+html[data-openface-theme="cyberpunk"] article,
+html[data-openface-theme="cyberpunk"] .divide-y {
+  background-color: rgb(13 19 39 / 96%) !important;
+  box-shadow: 0 0 0 1px rgb(40 226 255 / 10%), 0 12px 30px rgb(0 0 0 / 18%);
+}
+
+html[data-openface-theme="cyberpunk"] .divide-y > * {
+  border-color: rgb(55 204 237 / 22%) !important;
+}
+
 html[data-openface-theme="cyberpunk"] .border-zinc-100,
 html[data-openface-theme="cyberpunk"] .border-zinc-200,
 html[data-openface-theme="cyberpunk"] .border-zinc-300 {
