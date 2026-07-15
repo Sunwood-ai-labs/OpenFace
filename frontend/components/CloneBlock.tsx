@@ -21,16 +21,18 @@ export default function CloneBlock({ cloneUrl }: { cloneUrl: string }) {
       <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
         Clone
       </p>
-      <div className="flex items-center gap-2 rounded-lg bg-zinc-900 px-3 py-2">
-        <code className="flex-1 overflow-x-auto whitespace-nowrap text-xs text-zinc-100">
-          {command}
+      <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-2.5 shadow-sm">
+        <code className="block break-all text-[10px] leading-4 text-zinc-100">
+          <span className="mr-1 select-none text-zinc-500">$</span>
+          <span className="text-emerald-300">git clone</span>{' '}
+          <span className="text-zinc-200">{cloneUrl}</span>
         </code>
         <button
           type="button"
           onClick={copy}
-          className="shrink-0 rounded-md bg-zinc-700 px-2 py-1 text-xs text-zinc-100 hover:bg-zinc-600"
+          className="mt-2 inline-flex min-h-8 w-full items-center justify-center rounded-md bg-zinc-700 px-2 py-1.5 text-xs font-medium text-zinc-100 transition-colors hover:bg-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
         >
-          {copied ? 'Copied' : 'Copy'}
+          {copied ? 'Copied' : 'Copy command'}
         </button>
       </div>
     </div>
