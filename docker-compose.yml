@@ -146,7 +146,7 @@ services:
     networks:
       - openface
     healthcheck:
-      test: ["CMD", "docker", "info"]
+      test: ["CMD-SHELL", "DOCKER_HOST=tcp://localhost:2375 docker info >/dev/null"]
       interval: 10s
       timeout: 5s
       retries: 12
