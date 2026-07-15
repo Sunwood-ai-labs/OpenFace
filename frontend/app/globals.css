@@ -188,6 +188,27 @@ html[data-openface-theme="cyberpunk"] .bg-accent {
   background-color: #25e1c9 !important;
 }
 
+/* Forms appear on repository creation, filters, search, and settings. They
+   need an explicit surface because browsers otherwise keep their light native
+   fill even when the surrounding portal is in neon mode. */
+html[data-openface-theme="cyberpunk"] input:not([type="checkbox"]):not([type="radio"]),
+html[data-openface-theme="cyberpunk"] textarea,
+html[data-openface-theme="cyberpunk"] select {
+  border-color: rgb(55 204 237 / 48%) !important;
+  background-color: #0d1327 !important;
+  color: #e9f8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] input::placeholder,
+html[data-openface-theme="cyberpunk"] textarea::placeholder {
+  color: #6f91aa !important;
+}
+
+html[data-openface-theme="cyberpunk"] input[type="checkbox"],
+html[data-openface-theme="cyberpunk"] input[type="radio"] {
+  accent-color: #25e1c9;
+}
+
 html[data-openface-theme="cyberpunk"] .openface-theme-selector {
   border-color: #2ce7ff;
   background: #101d38;
