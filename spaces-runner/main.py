@@ -13,11 +13,13 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import mimetypes
 import secrets
 from contextlib import asynccontextmanager
+from pathlib import PurePosixPath
 
 from fastapi import FastAPI, Header, HTTPException, Request, WebSocket
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
 import config
@@ -123,6 +125,44 @@ async def api_stop_space(
 @app.get("/api/spaces")
 async def api_list_spaces():
     return await asyncio.to_thread(spaces.list_spaces)
+
+
+# ---------------------------------------------------------------------------
+# OpenFace Pages — static sites sourced from public Forgejo repositories
+# ---------------------------------------------------------------------------
+
+async def serve_pages_asset(owner: str, repo: str, asset_path: str):
+    safe_path = asset_path or "index.html"
+    path = PurePosixPath(safe_path)
+    if path.is_absolute() or ".." in path.parts:
+        raise HTTPException(status_code=404, detail="Pages asset not found")
+    try:
+        source = await forgejo.get_pages_source(owner, repo, config.read_forgejo_token())
+    except forgejo.ForgejoError as exc:
+        raise HTTPException(status_code=404, detail="Pages site not found") from exc
+    if not source:
+        raise HTTPException(status_code=404, detail="Pages site not found")
+    status, content, upstream_type = await forgejo.fetch_pages_asset(
+        owner, repo, source[0], source[1], str(path), config.read_forgejo_token()
+    )
+    if status != 200:
+        raise HTTPException(status_code=404, detail="Pages asset not found")
+    media_type = upstream_type or mimetypes.guess_type(str(path))[0] or "application/octet-stream"
+    return Response(
+        content=content,
+        media_type=media_type,
+        headers={"Cache-Control": "public, max-age=60", "X-OpenFace-Pages": "1"},
+    )
+
+
+@app.get("/api/pages/{owner}/{repo}")
+async def api_pages_index(owner: str, repo: str):
+    return await serve_pages_asset(owner, repo, "index.html")
+
+
+@app.get("/api/pages/{owner}/{repo}/{asset_path:path}")
+async def api_pages_asset(owner: str, repo: str, asset_path: str):
+    return await serve_pages_asset(owner, repo, asset_path)
 
 
 # ---------------------------------------------------------------------------

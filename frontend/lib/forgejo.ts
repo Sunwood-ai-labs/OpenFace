@@ -256,6 +256,15 @@ export async function getRepo(owner: string, repo: string): Promise<Repo | null>
   return res.json as Repo;
 }
 
+export async function getPagesSource(owner: string, repo: string, defaultBranch: string): Promise<'gh-pages' | 'docs' | null> {
+  const branch = await apiFetch(`/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/branches/gh-pages`);
+  if (branch.ok) return 'gh-pages';
+  const docsIndex = await apiFetch(
+    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/docs/index.html?ref=${encodeURIComponent(defaultBranch)}`,
+  );
+  return docsIndex.ok ? 'docs' : null;
+}
+
 // ---------------------------------------------------------------------------
 // Directory / file listing
 // ---------------------------------------------------------------------------

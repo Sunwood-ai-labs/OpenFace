@@ -34,6 +34,47 @@ async def get_repo_topics(owner: str, repo: str, token: str | None) -> list[str]
     return data.get("topics", [])
 
 
+async def get_pages_source(owner: str, repo: str, token: str | None) -> tuple[str, str] | None:
+    """Return the public Pages source as ``(ref, directory_prefix)``.
+
+    The compatible conventions are the same small subset most repositories
+    expect from GitHub Pages: a dedicated ``gh-pages`` branch at its root, or
+    a ``docs/`` directory on the default branch. Private repositories are
+    never exposed through the unauthenticated Pages endpoint.
+    """
+    repo_info = await get_repo_info(owner, repo, token)
+    if repo_info.get("private"):
+        return None
+
+    headers = {"Authorization": f"token {token}"} if token else {}
+    branch_url = f"{config.FORGEJO_API}/repos/{owner}/{repo}/branches/gh-pages"
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        branch_response = await client.get(branch_url, headers=headers)
+    if branch_response.status_code == 200:
+        return ("gh-pages", "")
+    if branch_response.status_code not in (404,):
+        raise ForgejoError(f"could not inspect Pages branch for {owner}/{repo}")
+    return (repo_info.get("default_branch") or "main", "docs")
+
+
+async def fetch_pages_asset(
+    owner: str,
+    repo: str,
+    ref: str,
+    directory_prefix: str,
+    asset_path: str,
+    token: str | None,
+) -> tuple[int, bytes, str | None]:
+    """Load an asset from Forgejo's raw endpoint without touching disk."""
+    path_parts = [part for part in (directory_prefix, asset_path) if part]
+    raw_path = "/".join(path_parts)
+    headers = {"Authorization": f"token {token}"} if token else {}
+    url = f"{config.FORGEJO_API}/repos/{owner}/{repo}/raw/{ref}/{raw_path}"
+    async with httpx.AsyncClient(timeout=30.0, follow_redirects=False) as client:
+        response = await client.get(url, headers=headers)
+    return response.status_code, response.content, response.headers.get("content-type")
+
+
 async def verify_space_repo(owner: str, repo: str, token: str | None) -> None:
     """Raise ForgejoError unless the repo exists and carries the `space` topic."""
     repo_info = await get_repo_info(owner, repo, token)

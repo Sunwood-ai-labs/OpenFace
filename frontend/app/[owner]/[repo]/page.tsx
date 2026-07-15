@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import {
   getRepo,
+  getPagesSource,
   getReadme,
   getContents,
   getCommits,
@@ -82,7 +83,10 @@ export default async function RepoDetailPage({
   const topicBadges = nonTypeTopics(repoInfo.topics);
   const promptVersion = kind === 'prompt' ? repoPromptVersion(repoInfo.topics) : null;
   const isSpace = kind === 'space';
-  const agentMetrics = isSpace ? await getRepoMetrics(owner, repo) : null;
+  const [agentMetrics, pagesSource] = await Promise.all([
+    isSpace ? getRepoMetrics(owner, repo) : Promise.resolve(null),
+    getPagesSource(owner, repo, repoInfo.default_branch || 'main'),
+  ]);
   const kindLabel = isSpace ? 'Spaces' : kind === 'dataset' ? 'Datasets' : kind === 'skill' ? 'Skills' : kind === 'mcp' ? 'MCPs' : kind === 'prompt' ? 'Prompts' : 'Models';
   const kindHref = isSpace ? '/spaces' : kind === 'dataset' ? '/datasets' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : '/models';
   const kindIcon = kind ? KIND_ICON[kind] : 'box';
@@ -261,6 +265,16 @@ export default async function RepoDetailPage({
           <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
             <CloneBlock cloneUrl={cloneUrl(owner, repo)} />
           </div>
+
+          {pagesSource ? (
+            <div className="rounded-lg border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-4 dark:border-indigo-900 dark:from-indigo-950/30 dark:to-zinc-900">
+              <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700 dark:text-indigo-300">OpenFace Pages</p>
+              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">Static site from {pagesSource === 'gh-pages' ? 'the gh-pages branch' : 'docs/ on the default branch'}.</p>
+              <a href={`/pages/${owner}/${repo}/`} target="_blank" rel="noreferrer" className="mt-3 inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-indigo-700 px-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-indigo-800 hover:shadow-md">
+                <HfIcon name="globe" className="h-3.5 w-3.5" /> Visit site
+              </a>
+            </div>
+          ) : null}
 
           <div className="rounded-lg border border-zinc-200 bg-white p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
