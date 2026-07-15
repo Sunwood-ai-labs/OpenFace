@@ -147,7 +147,12 @@ async def serve_pages_asset(owner: str, repo: str, asset_path: str):
     )
     if status != 200:
         raise HTTPException(status_code=404, detail="Pages asset not found")
-    media_type = upstream_type or mimetypes.guess_type(str(path))[0] or "application/octet-stream"
+    guessed_type = mimetypes.guess_type(str(path))[0]
+    # Forgejo's raw endpoint commonly labels static text as text/plain. Pages
+    # must prefer the extension-derived MIME type so browsers execute CSS and
+    # JavaScript and render HTML rather than displaying its source.
+    media_type = guessed_type if upstream_type in (None, "text/plain", "application/octet-stream") else upstream_type
+    media_type = media_type or "application/octet-stream"
     return Response(
         content=content,
         media_type=media_type,
