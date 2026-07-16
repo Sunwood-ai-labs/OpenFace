@@ -2659,6 +2659,82 @@ overflow-menu.ui.tabular.menu .openface-hide-tab {
   background: #fff !important;
 }
 
+/* The native Forgejo clone widget lives in a narrow repository sidebar. A
+   readonly input can otherwise expose its horizontal scrollbar, which steals
+   space from the copy control. Keep the full URL available to the clipboard
+   while presenting a clean, single-line, truncated command surface. */
+html body .repository .clone-panel.ui.action.input {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto auto !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid #27272a !important;
+  border-radius: 8px !important;
+  background: #18181b !important;
+}
+
+html body .repository .clone-panel.ui.action.input .js-clone-url {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 34px !important;
+  padding: 0 9px !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #f4f4f5 !important;
+  font: 11px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  scrollbar-width: none !important;
+}
+
+html body .repository .clone-panel.ui.action.input .js-clone-url::-webkit-scrollbar {
+  display: none !important;
+}
+
+html body .repository .clone-panel.ui.action.input #clipboard-btn,
+html body .repository .clone-panel.ui.action.input .jump.dropdown {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-left: 1px solid #3f3f46 !important;
+  border-radius: 0 !important;
+  background: #3f3f46 !important;
+  color: #fafafa !important;
+}
+
+html body .repository .clone-panel.ui.action.input #repo-clone-https {
+  height: 34px !important;
+  margin: 0 !important;
+  padding: 0 8px !important;
+  border: 0 !important;
+  border-right: 1px solid #3f3f46 !important;
+  border-radius: 0 !important;
+  background: #27272a !important;
+  color: #d4d4d8 !important;
+  font-size: 11px !important;
+}
+
+html body .repository .clone-panel.ui.action.input #clipboard-btn:hover,
+html body .repository .clone-panel.ui.action.input .jump.dropdown:hover {
+  background: #52525b !important;
+}
+
+@media (max-width: 480px) {
+  html body .repository .clone-panel.ui.action.input .jump.dropdown {
+    display: none !important;
+  }
+}
+
 /* Hide Forgejo-specific controls on the repository root so the page reads like
    the Hugging Face tree view: branch/path, go-to-file/history, file list. */
 .repository.file.list .repo-button-row .ui.action.input,
