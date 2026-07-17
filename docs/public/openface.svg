@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">OpenFace</title>
+  <desc id="desc">A yellow rounded square containing the letters OF</desc>
+  <rect width="128" height="128" rx="28" fill="#ffcc21"/>
+  <path d="M35 42c-12 0-20 9-20 22s8 22 20 22 20-9 20-22-8-22-20-22Zm0 11c5 0 8 4 8 11s-3 11-8 11-8-4-8-11 3-11 8-11Zm31-10v42h12V69h20V58H78v-5h23V43H66Z" fill="#111827"/>
+</svg>

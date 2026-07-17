@@ -1,0 +1,28 @@
+# Architecture
+
+OpenFace exposes one HTTP/HTTPS gateway and keeps application services on a private Compose network.
+
+| Service | Responsibility |
+|---|---|
+| `gateway` | nginx routing, TLS termination, WebSocket proxying, and the single public web entrypoint |
+| `frontend` | Next.js discovery portal and repository presentation layer |
+| `forgejo` | Git, LFS, authentication, permissions, issues, pull requests, and Actions metadata |
+| `spaces-runner` | Space validation, clone, Docker build/run, metrics API, proxy, and Pages file serving |
+| `seed` | Idempotent bootstrap of the admin, token, organization, examples, catalogs, and prompt tags |
+| `forgejo-actions-runner` | Executes Pages workflows against an isolated Docker-in-Docker daemon |
+
+## Request routing
+
+- `/`, `/models`, `/datasets`, `/spaces`, `/skills`, `/mcps`, `/prompts`, and repository routes go to the frontend.
+- `/git/` goes to Forgejo.
+- `/run/{owner}/{repo}/` proxies a running Space.
+- `/runner-api/` exposes the runner API through the gateway.
+- `/pages/{owner}/{repo}/` serves public repository Pages.
+
+## State
+
+Forgejo repositories and configuration, the runner registration, shared control tokens, and agent metrics live in named Docker volumes. Application images and build cache live in Docker. The Git checkout itself contains configuration, UI code, templates, and documentation but no production secrets.
+
+## Trust model
+
+Catalog visibility follows Forgejo repository visibility. Space control checks the signed-in Forgejo user's repository permission. The frontend and runner share an internal control token, while agent metrics use separate hashed API credentials. The Actions runner uses a dedicated Docker daemon and does not receive the host Docker socket.
