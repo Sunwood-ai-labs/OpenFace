@@ -59,4 +59,6 @@ The public GitHub view rendered the OpenFace identity, English/Japanese/Docs lin
 - staged payload inspection before every repository-polish commit
 - public repository description, homepage, topics, MIT license, and governance files
 
+The high-severity production dependency audit passes. npm currently reports two moderate PostCSS advisories inherited from the latest stable Next.js 16.2.10; its automatic forced fix would downgrade Next.js to 9.3.3. This incompatible downgrade was not applied, and compatible updates remain monitored by Dependabot.
+
 See [qa-inventory.md](qa-inventory.md) for the claim-to-evidence map used during signoff.

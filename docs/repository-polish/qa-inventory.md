@@ -64,3 +64,34 @@ Updated: 2026-07-17
 | No unintended payload was pushed | payload guard output and clean synchronized Git status |
 
 This inventory is updated during signoff if the final change surface differs from the plan.
+
+## Completed change inventory
+
+| Surface | Completed work |
+|---|---|
+| Skill installation | Compared all 34 installed files with GitHub commit `89e98c1` by SHA-256 |
+| Public project files | Added MIT license, third-party notices, contribution, support, conduct, security, Issue forms, and a PR template |
+| Documentation | Added VitePress config, locked dependencies, English and Japanese homes, six parallel guides per locale, identity assets, and Pages deployment |
+| Repository landing | Rebuilt `README.md` in English, preserved and corrected `README.ja.md`, added language switches, screenshots, Docs links, badges, and security guidance |
+| Application maintenance | Migrated Next.js 14 to supported Next.js 16 and React 19, updated asynchronous route props, and made Docker dependency installation deterministic |
+| Automation | Added CI, Pages, Dependabot, compatible update grouping, and explicit major-version exclusion |
+| GitHub metadata | Set the public description, Docs homepage, eleven repository topics, workflow Pages mode, and public governance links |
+| Browser evidence | Captured GitHub README, English/Japanese Docs, OpenFace home, CPU Spaces, and immutable Prompt v4.2 views |
+
+## Signoff results
+
+- `docker compose config --quiet`: passed.
+- frontend clean install, TypeScript check, Next.js production build, and Docker image build: passed.
+- VitePress clean install and production build: passed with English and Japanese routes.
+- `python -m compileall -q spaces-runner`: passed.
+- GitHub CI on `main`: passed.
+- GitHub Pages build and deployment: passed; English and Japanese URLs returned HTTP 200.
+- GitHub Community Profile: 100%.
+- Local Compose frontend recreated from the final image; home, Spaces, and Prompt v4.2 returned HTTP 200.
+- Browser checks found no horizontal overflow on the tested OpenFace and Docs routes.
+- README local links and images resolved, and GitHub rendered the identity, language links, passing badges, and product screenshot.
+- Every direct polish commit passed the staged payload guard before push.
+
+## Known dependency note
+
+`npm audit --omit=dev --audit-level=high` passes. npm still reports two moderate advisories through the version of PostCSS pinned internally by the latest stable Next.js 16.2.10. npm's suggested forced remediation downgrades Next.js to 9.3.3, so it was rejected as incompatible. Dependabot remains enabled for compatible fixes, while framework majors require an explicit tested migration.
