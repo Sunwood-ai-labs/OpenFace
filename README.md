@@ -261,6 +261,12 @@ The repository CI performs these structural checks and Python syntax compilation
 
 ## 📖 Documentation
 
+| Published English Docs | Published Japanese Docs |
+|---|---|
+| ![Published English VitePress documentation](docs/repository-polish/github-pages-en.png) | ![Published Japanese VitePress documentation](docs/repository-polish/github-pages-ja.png) |
+
+The complete [repository polish verification record](docs/repository-polish/README.md) also includes the post-upgrade OpenFace home, Spaces directory, and immutable Prompt revision screenshots.
+
 - [English documentation](https://sunwood-ai-labs.github.io/OpenFace/)
 - [日本語ドキュメント](https://sunwood-ai-labs.github.io/OpenFace/ja/)
 - [Japanese README](README.ja.md)

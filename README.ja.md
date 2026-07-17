@@ -354,6 +354,16 @@ OpenFace/
 - **セキュリティ上の注意（重要）**: `spaces-runner` はホストの `/var/run/docker.sock` をマウントしており、任意の Docker イメージのビルド・実行が可能な強い権限を持っています。信頼できないユーザーにリポジトリ作成を許可する環境（`DISABLE_REGISTRATION=false`）では、実質的にホスト上で任意コード実行が可能になることを理解した上で運用してください。インターネットに直接公開せず、信頼できるLAN内での利用を強く推奨します。
 - **企業向けのアクセス境界**: カタログは public repo のみ、Space の起動・停止は Forgejo の write 権限を持つメンテナーのみです。private Space は既定で実行不可です。詳細と実ブラウザ検証は [docs/enterprise-access.md](docs/enterprise-access.md) を参照してください。
 
+## 🧪 完全整備の検証
+
+### 公開ドキュメントの実画面
+
+| English | 日本語 |
+|---|---|
+| ![公開済み英語VitePressドキュメント](docs/repository-polish/github-pages-en.png) | ![公開済み日本語VitePressドキュメント](docs/repository-polish/github-pages-ja.png) |
+
+Next.js更新後のOpenFaceホーム、CPU Space一覧、Prompt v4.2固定表示を含む実ブラウザ検証は [Repository polish verification](docs/repository-polish/README.md) に記録しています。
+
 ## 📄 ライセンス
 
 OpenFace固有のコードとドキュメントは [MIT License](LICENSE) で公開します。Forgejo、フォント、依存パッケージ、seedで取り込む公開リポジトリには、それぞれのライセンスが適用されます。詳細は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照してください。
