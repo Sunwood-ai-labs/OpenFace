@@ -22,7 +22,7 @@ OpenFace は次のサービスで構成されています。
 | `forgejo-actions-runner` | VitePressなどの静的サイトをビルドする Forgejo Actions Runner | - |
 | `forgejo-actions-dind` | Actionsジョブ専用の隔離 Docker daemon | 2375（内部のみ） |
 
-リポジトリの種別（モデル / データセット / Space / Skill / MCP / Prompt）は Forgejo の **topics**（`model` / `dataset` / `space` / `skill` / `mcp` / `prompt`）で判定します。Prompt の個別版は `version-v4` や `version-v8` のような追加 topic で管理し、一覧・詳細の専用バッジに表示します。各詳細カードはリポジトリ直下の `README.md` を使い、相対画像もローカル Forgejo の実ファイルから表示します。
+リポジトリの種別（モデル / データセット / Space / Skill / MCP / Prompt）は Forgejo の **topics**（`model` / `dataset` / `space` / `skill` / `mcp` / `prompt`）で判定します。Prompt のリポジトリ名・URLは版に依存しない安定slug（例: `mystic-git-auto-commit`）に固定し、個別版は `version-v4.2` のような追加 topic と同名のGit tagで管理します。版を更新してもリポジトリ名・clone URL・参照先を変更する必要はありません。各詳細カードはリポジトリ直下の `README.md` を使い、相対画像もローカル Forgejo の実ファイルから表示します。
 
 ### アーキテクチャ図
 
@@ -130,11 +130,11 @@ Spaceの「Most liked」は、表示中のカードだけでなく全public Spac
 
 ### Prompts
 
-`/prompts` は、Prompt をそのまま Forgejo リポジトリとして管理するカタログです。`PROMPT.md` に原文、`README.md` に閲覧用カードと出典、`SOURCE.md` に追跡情報を置き、`version-v*` topic と同名のGit tag（例: `v4` / `v4.2` / 将来の `v7` / `v8`）をseed時に作成します。個別に branch・tag・fork・差分比較を行えます。初期 seed は MysticLibrary 由来 10件と、MIT ライセンスの Goal / planning コマンド由来 10件を取り込みます。
+`/prompts` は、Prompt をそのまま Forgejo リポジトリとして管理するカタログです。リポジトリslugには `-v1` などを含めず、`PROMPT.md` に原文、`README.md` に閲覧用カードと出典、`SOURCE.md` に追跡情報を置きます。版は `version-v*` topic と同名のGit tag（例: `v1` / `v4` / `v4.2`）としてseed時に作成され、一覧の版フィルターも実在topicから自動生成されます。個別に branch・tag・fork・差分比較を行えます。初期 seed は MysticLibrary 由来 10件と、MIT ライセンスの Goal / planning コマンド由来 10件を取り込みます。
 
 | Prompt一覧 | 個別版の詳細 |
 |---|---|
-| <img src="docs/evidence/prompts/prompts-directory.png" alt="Goal command と MysticLibrary の20件を表示する OpenFace Prompt一覧" width="100%"> | <img src="docs/evidence/prompts/prompt-detail-version.png" alt="個別Promptの v4 バッジ、出典、原文を表示する OpenFace Prompt詳細" width="100%"> |
+| <img src="docs/evidence/prompts/prompts-directory.png" alt="安定slugの20件と動的なVersion tagsを表示する OpenFace Prompt一覧" width="100%"> | <img src="docs/evidence/prompts/prompt-detail-version.png" alt="安定slugと v4.2 topic・版バッジを表示する OpenFace Prompt詳細" width="100%"> |
 
 出典・ライセンス・再現検証は [Prompt verification evidence](docs/evidence/prompts/README.md) にまとめています。
 
@@ -176,7 +176,7 @@ docker compose up -d --build
 ### モデル / データセット / Skill / MCP / Prompt の公開手順
 
 1. Forgejo の Web UI（`/git/repo/create` 、またはトップページの「新規作成」導線）でリポジトリを作成します。
-2. リポジトリ設定画面から **topic** に `model`、`dataset`、`skill`、`mcp`、`prompt` のいずれかを追加します（これで OpenFace 上での種別が決まります）。Prompt は個別版を表す `version-v1`、`version-v4`、`version-v8` のような topic も追加します。
+2. リポジトリ設定画面から **topic** に `model`、`dataset`、`skill`、`mcp`、`prompt` のいずれかを追加します（これで OpenFace 上での種別が決まります）。Prompt はリポジトリ名を版なしの安定slugにし、個別版を表す `version-v1`、`version-v4.2` のような topic と、同名のGit tag（`v1`、`v4.2`）を追加します。
 3. `README.md` に HuggingFace 互換の YAML frontmatter（`license`, `tags`, `pipeline_tag`, `language` など）を書くと、frontend がバッジとして表示します。
 4. 大きなファイルは Git LFS でpushします。
 
