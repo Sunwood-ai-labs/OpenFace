@@ -1,0 +1,124 @@
+name: Visual QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - 'gateway/**'
+      - 'seed/**'
+      - 'spaces-runner/**'
+      - 'sample-spaces/**'
+      - 'visual-tests/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/visual-qa.yml'
+  pull_request:
+    paths:
+      - 'frontend/**'
+      - 'gateway/**'
+      - 'seed/**'
+      - 'spaces-runner/**'
+      - 'sample-spaces/**'
+      - 'visual-tests/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/visual-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: visual-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: visual-tests/package-lock.json
+
+      - name: Install visual QA dependencies
+        run: npm ci --prefix visual-tests --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npm exec --prefix visual-tests -- playwright install --with-deps chromium
+
+      - name: Start OpenFace
+        run: docker compose up --build -d gateway seed
+
+      - name: Wait for the seed catalog
+        run: docker compose wait seed
+
+      - name: Wait for HTTPS readiness
+        shell: bash
+        run: |
+          for attempt in {1..90}; do
+            if curl --insecure --fail --silent https://localhost:8443/ >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo 'OpenFace did not become ready in time.' >&2
+          exit 1
+
+      - name: Start the visual QA Space
+        shell: bash
+        run: |
+          token="$(docker compose exec -T spaces-runner sh -c 'cat /shared/token')"
+          curl --insecure --fail --silent --show-error \
+            --max-time 300 \
+            --request POST \
+            --header "X-OpenFace-Control-Token: ${token}" \
+            https://localhost:8443/runner-api/spaces/openface/sample-static-html/start
+          for attempt in {1..90}; do
+            status="$(curl --insecure --fail --silent https://localhost:8443/runner-api/spaces/openface/sample-static-html/status)"
+            if grep -q '"status":"running"' <<<"${status}"; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo 'The visual QA Space did not reach running state.' >&2
+          exit 1
+
+      - name: Capture every major screen
+        env:
+          VISUAL_QA_BASE_URL: https://localhost:8443
+        run: npm run capture --prefix visual-tests
+
+      - name: Add capture report to job summary
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f visual-tests/artifacts/AGENT_REVIEW.md ]]; then
+            cat visual-tests/artifacts/AGENT_REVIEW.md >> "${GITHUB_STEP_SUMMARY}"
+          fi
+
+      - name: Collect Compose diagnostics
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p visual-tests/artifacts/diagnostics
+          docker compose ps --all > visual-tests/artifacts/diagnostics/compose-ps.txt
+          docker compose logs --no-color > visual-tests/artifacts/diagnostics/compose.log 2>&1
+
+      - name: Upload agent review packet
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: openface-visual-qa-${{ github.run_id }}
+          path: visual-tests/artifacts/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Stop OpenFace
+        if: always()
+        run: docker compose down --remove-orphans

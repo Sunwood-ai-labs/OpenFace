@@ -18,7 +18,7 @@ export const routes = [
   { id: 'mcp-detail', label: 'MCP detail', path: '/openface/aira-mcp-server', focus: 'Imported MCP README, provenance, clone control, and tabs' },
   { id: 'prompt-detail', label: 'Prompt detail', path: '/openface/mystic-git-auto-commit?revision=v4.2', focus: 'Immutable revision selector, prompt source, and direct-link state' },
   { id: 'repository-files', label: 'Repository files', path: '/openface/mystic-git-auto-commit?tab=files&revision=v4.2', focus: 'Unblurred repository header, file list columns, and tabs' },
-  { id: 'space-app', label: 'Embedded Space app', path: '/openface/qr-code-generator', focus: 'OpenFace navigation, Space header, runtime state, and embedded live application', settleMs: 2000 },
+  { id: 'space-app', label: 'Embedded Space app', path: '/openface/sample-static-html', focus: 'OpenFace navigation, Space header, runtime state, and embedded live application', settleMs: 2000 },
   { id: 'space-files', label: 'Space files', path: '/openface/qr-code-generator?tab=files', focus: 'Space repository file list, header clarity, tabs, and Pages card' },
   { id: 'pages-live', label: 'OpenFace Pages site', path: '/pages/openface/pages-starter/', focus: 'Published static page, asset loading, and gateway routing' },
 ];
