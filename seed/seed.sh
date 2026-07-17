@@ -1502,7 +1502,7 @@ cat > "${WORKDIR}/pages_starter_index.html" <<'EOF'
     <style>
       :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
       body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f7f6f2; color: #152238; }
-      main { width: min(680px, calc(100% - 48px)); padding: 48px; border: 1px solid #dfe4ea; border-radius: 20px; background: #fff; box-shadow: 0 22px 70px #15223812; }
+      main { box-sizing: border-box; width: min(680px, calc(100% - 48px)); padding: 48px; border: 1px solid #dfe4ea; border-radius: 20px; background: #fff; box-shadow: 0 22px 70px #15223812; }
       .eyebrow { color: #52657c; font: 700 12px/1.2 ui-monospace, monospace; letter-spacing: .12em; }
       h1 { margin: 14px 0; font-size: clamp(2rem, 7vw, 4.4rem); line-height: .95; letter-spacing: -.06em; }
       p { color: #52657c; font-size: 1.1rem; line-height: 1.7; }
