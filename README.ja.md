@@ -364,6 +364,20 @@ OpenFace/
 
 Next.js更新後のOpenFaceホーム、CPU Space一覧、Prompt v4.2固定表示を含む実ブラウザ検証は [Repository polish verification](docs/repository-polish/index.md) に記録しています。
 
+### エージェント向け画面撮影テスト
+
+画面に影響するpush／pull requestでは、**Visual QA** workflowが実際のDocker Compose環境を起動し、主要な全ページ種別をデスクトップとモバイルで撮影します。ダウンロードできる `openface-visual-qa-*` artifactには、全画面PNG、エージェント向けの `AGENT_REVIEW.md`、機械可読な `manifest.json`、Compose診断ログが入ります。
+
+ローカルでも同じ撮影を実行できます。
+
+```bash
+npm ci --prefix visual-tests
+npm exec --prefix visual-tests -- playwright install chromium
+npm run capture --prefix visual-tests
+```
+
+`visual-tests/artifacts/AGENT_REVIEW.md` を開き、PASS/FAILだけでなく全画像を確認してください。詳しい取得方法・指摘形式・部分撮影は[Visual QAガイド](https://sunwood-ai-labs.github.io/OpenFace/ja/guide/visual-qa)に記載しています。
+
 ## 📄 ライセンス
 
 OpenFace固有のコードとドキュメントは [MIT License](LICENSE) で公開します。Forgejo、フォント、依存パッケージ、seedで取り込む公開リポジトリには、それぞれのライセンスが適用されます。詳細は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照してください。

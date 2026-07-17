@@ -62,6 +62,7 @@ function enNav() {
     { text: 'Architecture', link: '/guide/architecture' },
     { text: 'Spaces', link: '/guide/spaces' },
     { text: 'Pages', link: '/guide/pages' },
+    { text: 'Visual QA', link: '/guide/visual-qa' },
     { text: 'Operations', link: '/guide/operations' }
   ]
 }
@@ -72,6 +73,7 @@ function jaNav() {
     { text: '構成', link: '/ja/guide/architecture' },
     { text: 'Spaces', link: '/ja/guide/spaces' },
     { text: 'Pages', link: '/ja/guide/pages' },
+    { text: 'Visual QA', link: '/ja/guide/visual-qa' },
     { text: '運用', link: '/ja/guide/operations' }
   ]
 }
@@ -84,6 +86,7 @@ function enSidebar() {
       { text: 'Architecture', link: '/guide/architecture' },
       { text: 'Docker Spaces', link: '/guide/spaces' },
       { text: 'OpenFace Pages', link: '/guide/pages' },
+      { text: 'Visual QA', link: '/guide/visual-qa' },
       { text: 'Operations', link: '/guide/operations' },
       { text: 'Troubleshooting', link: '/guide/troubleshooting' }
     ]
@@ -98,6 +101,7 @@ function jaSidebar() {
       { text: 'アーキテクチャ', link: '/ja/guide/architecture' },
       { text: 'Docker Spaces', link: '/ja/guide/spaces' },
       { text: 'OpenFace Pages', link: '/ja/guide/pages' },
+      { text: 'Visual QA', link: '/ja/guide/visual-qa' },
       { text: '運用', link: '/ja/guide/operations' },
       { text: 'トラブルシューティング', link: '/ja/guide/troubleshooting' }
     ]

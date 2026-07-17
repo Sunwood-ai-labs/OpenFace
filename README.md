@@ -16,6 +16,7 @@
 
 <p align="center">
   <a href="https://github.com/Sunwood-ai-labs/OpenFace/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Sunwood-ai-labs/OpenFace/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/Sunwood-ai-labs/OpenFace/actions/workflows/visual-qa.yml"><img alt="Visual QA" src="https://github.com/Sunwood-ai-labs/OpenFace/actions/workflows/visual-qa.yml/badge.svg"></a>
   <a href="https://github.com/Sunwood-ai-labs/OpenFace/actions/workflows/docs.yml"><img alt="Docs" src="https://github.com/Sunwood-ai-labs/OpenFace/actions/workflows/docs.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
   <img alt="Docker Compose" src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white">
@@ -258,6 +259,25 @@ npm run docs:build
 ```
 
 The repository CI performs these structural checks and Python syntax compilation. User-facing changes should include browser or screenshot evidence when practical.
+
+### Agent-readable visual QA
+
+Every UI-affecting push or pull request runs the real Compose stack and captures each major page type at desktop and mobile sizes. The **Visual QA** workflow uploads an `openface-visual-qa-*` artifact containing:
+
+- `AGENT_REVIEW.md`: a screenshot index and explicit review instructions;
+- `manifest.json`: URLs, viewport sizes, HTTP status, headings, overflow, browser errors, and detected defects;
+- `screenshots/`: full-page PNGs for every catalog, representative detail view, Files tab, live Space, and Pages site;
+- `diagnostics/`: Compose state and logs for failed runs.
+
+Run the same review locally:
+
+```bash
+npm ci --prefix visual-tests
+npm exec --prefix visual-tests -- playwright install chromium
+npm run capture --prefix visual-tests
+```
+
+Open `visual-tests/artifacts/AGENT_REVIEW.md`, then inspect every image rather than relying on the PASS/FAIL table alone. See the [visual QA guide](https://sunwood-ai-labs.github.io/OpenFace/guide/visual-qa) for the agent feedback workflow and focused-capture options.
 
 ## 📖 Documentation
 
