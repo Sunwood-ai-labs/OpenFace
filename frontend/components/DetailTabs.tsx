@@ -9,6 +9,7 @@ export default function DetailTabs({
   isSpace,
   kind,
   communityCount,
+  revision,
 }: {
   owner: string;
   repo: string;
@@ -16,8 +17,14 @@ export default function DetailTabs({
   isSpace?: boolean;
   kind?: RepoKind | null;
   communityCount?: number;
+  revision?: string | null;
 }) {
-  const filesHref = `/git/${owner}/${repo}/src/branch/main`;
+  const filesHref = revision
+    ? `/git/${owner}/${repo}/src/tag/${encodeURIComponent(revision)}`
+    : `/git/${owner}/${repo}/src/branch/main`;
+  const cardHref = revision
+    ? `/${owner}/${repo}?revision=${encodeURIComponent(revision)}`
+    : `/${owner}/${repo}?tab=card`;
   const cardLabel = isSpace
     ? 'App'
     : kind === 'dataset'
@@ -38,7 +45,7 @@ export default function DetailTabs({
 
   return (
     <div className="flex shrink-0 gap-1 max-sm:w-full max-sm:justify-end">
-      <Link href={`/${owner}/${repo}?tab=card`} className={tabClass('card')}>
+      <Link href={cardHref} className={tabClass('card')}>
         <HfIcon name={isSpace ? 'space' : 'file'} className="h-3.5 w-3.5" />
         {cardLabel}
       </Link>

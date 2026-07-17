@@ -5,6 +5,7 @@ import {
   getReadme,
   getContents,
   getCommits,
+  getRepoTags,
   cloneUrl,
   forgejoRepoUrl,
   forgejoTreeUrl,
@@ -26,6 +27,7 @@ import SpaceStatusBadge from '@/components/SpaceStatusBadge';
 import HfIcon, { HfIconName } from '@/components/HfIcon';
 import { getRepoMetrics } from '@/lib/agent-metrics';
 import RepoViewCount from '@/components/RepoViewCount';
+import PromptRevisionSwitcher from '@/components/PromptRevisionSwitcher';
 
 export const dynamic = 'force-dynamic';
 
@@ -58,7 +60,7 @@ export default async function RepoDetailPage({
   searchParams,
 }: {
   params: { owner: string; repo: string };
-  searchParams: { tab?: string; path?: string };
+  searchParams: { tab?: string; path?: string; revision?: string };
 }) {
   const { owner, repo } = params;
   const tab = searchParams.tab === 'files' ? 'files' : 'card';
@@ -83,10 +85,15 @@ export default async function RepoDetailPage({
   const topicBadges = nonTypeTopics(repoInfo.topics);
   const promptVersion = kind === 'prompt' ? repoPromptVersion(repoInfo.topics) : null;
   const isSpace = kind === 'space';
-  const [agentMetrics, pagesSource] = await Promise.all([
+  const [agentMetrics, pagesSource, promptTags] = await Promise.all([
     isSpace ? getRepoMetrics(owner, repo) : Promise.resolve(null),
     getPagesSource(owner, repo, repoInfo.default_branch || 'main'),
+    kind === 'prompt' ? getRepoTags(owner, repo) : Promise.resolve([]),
   ]);
+  const requestedRevision = searchParams.revision?.trim() || null;
+  const selectedRevision = requestedRevision && promptTags.some((tag) => tag.name === requestedRevision)
+    ? requestedRevision
+    : null;
   const kindLabel = isSpace ? 'Spaces' : kind === 'dataset' ? 'Datasets' : kind === 'skill' ? 'Skills' : kind === 'mcp' ? 'MCPs' : kind === 'prompt' ? 'Prompts' : 'Models';
   const kindHref = isSpace ? '/spaces' : kind === 'dataset' ? '/datasets' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : '/models';
   const kindIcon = kind ? KIND_ICON[kind] : 'box';
@@ -135,7 +142,7 @@ export default async function RepoDetailPage({
           ) : null}
         </div>
         <div className={isSpaceApp ? 'max-sm:hidden' : ''}>
-          <DetailTabs owner={owner} repo={repo} active={tab} isSpace={isSpace} kind={kind} communityCount={repoInfo.open_issues_count} />
+          <DetailTabs owner={owner} repo={repo} active={tab} isSpace={isSpace} kind={kind} communityCount={repoInfo.open_issues_count} revision={selectedRevision} />
         </div>
       </div>
 
@@ -146,8 +153,11 @@ export default async function RepoDetailPage({
           )}
           {promptVersion ? (
             <a href={`${kindHref}?q=${encodeURIComponent(`version-${promptVersion}`)}`} className="mt-3 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 font-mono text-xs font-bold text-orange-800 hover:bg-orange-100">
-              <HfIcon name="prompt" className="h-3 w-3" /> Prompt version {promptVersion}
+              <HfIcon name="prompt" className="h-3 w-3" /> Current release {promptVersion}
             </a>
+          ) : null}
+          {kind === 'prompt' && promptTags.length > 0 ? (
+            <PromptRevisionSwitcher owner={owner} repo={repo} tags={promptTags} selectedRevision={selectedRevision} />
           ) : null}
           {topicBadges.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5">
@@ -174,7 +184,7 @@ export default async function RepoDetailPage({
       {!isSpaceApp && <div className={tab === 'files' ? '' : 'grid min-w-0 grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_280px]'}>
         <div className="min-w-0">
           {tab === 'card' ? (
-            <CardTabContent owner={owner} repo={repo} kind={kind} defaultBranch={repoInfo.default_branch || 'main'} />
+            <CardTabContent owner={owner} repo={repo} kind={kind} defaultBranch={repoInfo.default_branch || 'main'} revision={selectedRevision} />
           ) : (
             <FilesTabContent
               owner={owner}
@@ -238,7 +248,7 @@ export default async function RepoDetailPage({
                 </>
               ) : kind === 'prompt' ? (
                 <>
-                  <a href={`/${owner}/${repo}?tab=files`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-orange-700 px-3 text-sm font-semibold text-white hover:bg-orange-800">
+                  <a href={selectedRevision ? forgejoTreeUrl(owner, repo, '', selectedRevision, 'tag') : `/${owner}/${repo}?tab=files`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-orange-700 px-3 text-sm font-semibold text-white hover:bg-orange-800">
                     <HfIcon name="prompt" className="h-3.5 w-3.5" />
                     Inspect prompt source
                   </a>
@@ -308,16 +318,22 @@ async function CardTabContent({
   repo,
   kind,
   defaultBranch,
+  revision,
 }: {
   owner: string;
   repo: string;
   kind: RepoKind | null;
   defaultBranch: string;
+  revision?: string | null;
 }) {
-  const readmeRaw = await getReadme(owner, repo);
+  const ref = revision || defaultBranch;
+  const refKind = revision ? 'tag' : 'branch';
+  const readmeRaw = await getReadme(owner, repo, ref);
   const { frontmatter, bodyHtml } = parseReadme(readmeRaw, {
-    assetBaseUrl: forgejoRawUrl(owner, repo, '', defaultBranch),
-    relativeLinkBaseUrl: `/${owner}/${repo}/blob/`,
+    assetBaseUrl: forgejoRawUrl(owner, repo, '', ref, refKind),
+    relativeLinkBaseUrl: revision
+      ? forgejoTreeUrl(owner, repo, '', revision, 'tag') + '/'
+      : `/${owner}/${repo}/blob/`,
   });
 
   if (!readmeRaw) {

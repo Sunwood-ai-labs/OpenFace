@@ -96,6 +96,15 @@ export interface CommitInfo {
   committer?: RepoOwner | null;
 }
 
+export interface RepoTag {
+  name: string;
+  message?: string;
+  commit?: {
+    sha?: string;
+    created?: string;
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Low-level fetch helper — never throws; callers get {ok:false} on failure so
 // pages can render an empty-state instead of crashing SSR / the build.
@@ -273,16 +282,28 @@ export async function getPagesSource(owner: string, repo: string, defaultBranch:
 export async function getContents(
   owner: string,
   repo: string,
-  path: string = ''
+  path: string = '',
+  ref?: string,
 ): Promise<GetContentsResult> {
   const cleanPath = path.replace(/^\/+/, '');
+  const query = ref ? `?ref=${encodeURIComponent(ref)}` : '';
   const res = await apiFetch(
-    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${cleanPath}`
+    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${cleanPath}${query}`
   );
   if (!res.ok || res.json === null) {
     return { ok: false, data: null };
   }
   return { ok: true, data: res.json };
+}
+
+export async function getRepoTags(owner: string, repo: string): Promise<RepoTag[]> {
+  const res = await apiFetch(
+    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/tags?limit=100`,
+  );
+  if (!res.ok || !Array.isArray(res.json)) return [];
+  return (res.json as RepoTag[]).sort((left, right) =>
+    right.name.localeCompare(left.name, undefined, { numeric: true, sensitivity: 'base' }),
+  );
 }
 
 export async function getCommits(
@@ -328,12 +349,12 @@ export async function getRawFile(
 // ---------------------------------------------------------------------------
 // README (base64 decode via contents API)
 // ---------------------------------------------------------------------------
-export async function getReadme(owner: string, repo: string): Promise<string | null> {
-  const cacheKey = `${owner}/${repo}`;
+export async function getReadme(owner: string, repo: string, ref?: string): Promise<string | null> {
+  const cacheKey = `${owner}/${repo}@${ref || 'default'}`;
   const cached = readmeCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) return cached.value;
 
-  const res = await getContents(owner, repo, 'README.md');
+  const res = await getContents(owner, repo, 'README.md', ref);
   if (!res.ok || !res.data || Array.isArray(res.data)) {
     readmeCache.set(cacheKey, { value: null, expiresAt: Date.now() + README_CACHE_TTL_MS });
     return null;
@@ -425,13 +446,13 @@ export function forgejoRepoUrl(owner: string, repo: string): string {
   return `/git/${owner}/${repo}`;
 }
 
-export function forgejoTreeUrl(owner: string, repo: string, path = '', branch = 'main'): string {
+export function forgejoTreeUrl(owner: string, repo: string, path = '', branch = 'main', refKind: 'branch' | 'tag' = 'branch'): string {
   const cleanPath = path.replace(/^\/+/, '');
-  return `${forgejoRepoUrl(owner, repo)}/src/branch/${branch}${cleanPath ? `/${cleanPath}` : ''}`;
+  return `${forgejoRepoUrl(owner, repo)}/src/${refKind}/${branch}${cleanPath ? `/${cleanPath}` : ''}`;
 }
 
-export function forgejoRawUrl(owner: string, repo: string, path: string, branch = 'main'): string {
-  return `${forgejoRepoUrl(owner, repo)}/raw/branch/${branch}/${path.replace(/^\/+/, '')}`;
+export function forgejoRawUrl(owner: string, repo: string, path: string, branch = 'main', refKind: 'branch' | 'tag' = 'branch'): string {
+  return `${forgejoRepoUrl(owner, repo)}/raw/${refKind}/${branch}/${path.replace(/^\/+/, '')}`;
 }
 
 export function forgejoCommitsUrl(owner: string, repo: string, path = '', branch = 'main'): string {
