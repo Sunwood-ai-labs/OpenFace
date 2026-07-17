@@ -41,6 +41,12 @@ Verified routes:
 - Japanese to English: `/OpenFace/`
 - no horizontal page overflow at the tested desktop viewport
 
+## GitHub repository landing page
+
+![GitHub rendering of the polished OpenFace README](github-readme.png)
+
+The public GitHub view rendered the OpenFace identity, English/Japanese/Docs links, passing CI and Docs badges, license badges, and the primary product screenshot. The repository sidebar also displayed the Docs homepage, topics, MIT license, conduct, contribution, and security links.
+
 ## Mechanical and remote checks
 
 - `docker compose config --quiet`
