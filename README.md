@@ -132,11 +132,19 @@ Spaceの「Most liked」は、表示中のカードだけでなく全public Spac
 
 `/prompts` は、Prompt をそのまま Forgejo リポジトリとして管理するカタログです。リポジトリslugには `-v1` などを含めず、`PROMPT.md` に原文、`README.md` に閲覧用カードと出典、`SOURCE.md` に追跡情報を置きます。版は `version-v*` topic と同名のGit tag（例: `v1` / `v4` / `v4.2`）としてseed時に作成され、一覧の版フィルターも実在topicから自動生成されます。個別に branch・tag・fork・差分比較を行えます。初期 seed は MysticLibrary 由来 10件と、MIT ライセンスの Goal / planning コマンド由来 10件を取り込みます。
 
+Prompt詳細の **Revision history** では、`Latest` と実在するGit tagをその場で切り替えられます。tag選択時はそのtagに固定された `PROMPT.md` 原文を表示し、URLは `?revision=v4.1` のように直接共有できます。存在しないrevisionは実行せず、安全にLatestへ戻ります。
+
 | Prompt一覧 | 個別版の詳細 |
 |---|---|
 | <img src="docs/evidence/prompts/prompts-directory.png" alt="安定slugの20件と動的なVersion tagsを表示する OpenFace Prompt一覧" width="100%"> | <img src="docs/evidence/prompts/prompt-detail-version.png" alt="安定slugと v4.2 topic・版バッジを表示する OpenFace Prompt詳細" width="100%"> |
 
 出典・ライセンス・再現検証は [Prompt verification evidence](docs/evidence/prompts/README.md) にまとめています。
+
+#### Prompt revision switching
+
+| v4.1 tag | v4.2 tag |
+| --- | --- |
+| <img src="docs/evidence/prompts/prompt-revision-v4-1.png" alt="Prompt詳細でv4.1 Git tagを選択しV4.1原文を表示" width="100%"> | <img src="docs/evidence/prompts/prompt-revision-v4-2.png" alt="同じPrompt詳細からv4.2 Git tagへ切り替えV4.2原文を表示" width="100%"> |
 
 ## ⚙️ Spacesのスケーラビリティ
 

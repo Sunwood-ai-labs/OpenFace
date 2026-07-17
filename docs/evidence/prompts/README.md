@@ -30,6 +30,15 @@ certificate is self-signed).
   release number.
 - Prompt details link back to `/prompts`, show the version, source repository,
   source license, prompt body, file tree, and Forgejo fork/clone actions.
+- Prompt details discover the repository's native Forgejo tags and expose them
+  in the **Revision history** control. `Latest`, `v4.1`, and `v4.2` were opened
+  from the same stable repository URL; clicking `v4.2` from the `v4.1` view
+  changed both `aria-current` and the shared URL query to `?revision=v4.2`.
+- A selected revision renders the immutable `PROMPT.md` from that tag. The
+  verified heading changed from `Git Auto Commit Prompt V4.1 Lite` to
+  `Git Auto Commit Prompt V4.2 Lite (Pager Disabled Version)`. An unknown tag
+  is rejected and falls back to `Latest` instead of accepting an arbitrary Git
+  ref.
 - The imported source uses its own front matter only in `PROMPT.md`; the
   rendered `README.md` removes that leading block so the prompt body is
   immediately readable.
@@ -55,3 +64,13 @@ downloads those sources and creates one local Git repository per prompt.
 ### Individual version detail
 
 ![Stable prompt detail URL with v4.2 topic, badge, provenance, and source body](prompt-detail-version.png)
+
+### Revision switching
+
+#### v4.1 selected
+
+![Revision history with v4.1 selected and the immutable V4.1 prompt source](prompt-revision-v4-1.png)
+
+#### Switched to v4.2
+
+![Revision history after clicking v4.2 and rendering the immutable V4.2 prompt source](prompt-revision-v4-2.png)
