@@ -61,6 +61,7 @@ export default function SpaceRunner({
   }, [base]);
 
   useEffect(() => {
+    void fetchStatus();
     pollRef.current = setInterval(fetchStatus, 5000);
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
