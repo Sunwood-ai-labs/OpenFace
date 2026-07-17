@@ -103,7 +103,7 @@ export default async function RepoDetailPage({
 
   return (
     <div className={isSpaceApp ? 'openface-space-app-page' : ''}>
-      <div className={`openface-repo-header flex flex-wrap items-center gap-4 border-b border-zinc-200 dark:border-zinc-800 ${isSpaceApp ? 'openface-space-app-header mb-0' : 'mb-6'}`}>
+      <div className={`openface-repo-header flex flex-wrap items-center gap-4 border-b border-zinc-200 dark:border-zinc-800 ${isSpaceApp ? 'openface-space-app-header mb-0' : 'mb-6 max-sm:block'}`}>
         <div className="flex min-w-0 flex-1 items-center gap-2 py-3 max-sm:flex-wrap">
           <a
             href={kindHref}
