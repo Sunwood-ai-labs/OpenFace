@@ -362,7 +362,7 @@ OpenFace/
 |---|---|
 | ![公開済み英語VitePressドキュメント](docs/repository-polish/github-pages-en.png) | ![公開済み日本語VitePressドキュメント](docs/repository-polish/github-pages-ja.png) |
 
-Next.js更新後のOpenFaceホーム、CPU Space一覧、Prompt v4.2固定表示を含む実ブラウザ検証は [Repository polish verification](docs/repository-polish/README.md) に記録しています。
+Next.js更新後のOpenFaceホーム、CPU Space一覧、Prompt v4.2固定表示を含む実ブラウザ検証は [Repository polish verification](docs/repository-polish/index.md) に記録しています。
 
 ## 📄 ライセンス
 
