@@ -6,6 +6,7 @@ import {
   getContents,
   getCommits,
   getRepoTags,
+  getTextFile,
   cloneUrl,
   forgejoRepoUrl,
   forgejoTreeUrl,
@@ -328,15 +329,19 @@ async function CardTabContent({
 }) {
   const ref = revision || defaultBranch;
   const refKind = revision ? 'tag' : 'branch';
-  const readmeRaw = await getReadme(owner, repo, ref);
-  const { frontmatter, bodyHtml } = parseReadme(readmeRaw, {
+  const [readmeRaw, taggedPromptRaw] = await Promise.all([
+    getReadme(owner, repo, ref),
+    kind === 'prompt' && revision ? getTextFile(owner, repo, 'PROMPT.md', revision) : Promise.resolve(null),
+  ]);
+  const renderedRaw = taggedPromptRaw || readmeRaw;
+  const { frontmatter, bodyHtml } = parseReadme(renderedRaw, {
     assetBaseUrl: forgejoRawUrl(owner, repo, '', ref, refKind),
     relativeLinkBaseUrl: revision
       ? forgejoTreeUrl(owner, repo, '', revision, 'tag') + '/'
       : `/${owner}/${repo}/blob/`,
   });
 
-  if (!readmeRaw) {
+  if (!renderedRaw) {
     return (
       <div className="rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
         README.md was not found.
@@ -346,6 +351,12 @@ async function CardTabContent({
 
   return (
     <div>
+      {kind === 'prompt' && revision ? (
+        <div className="mb-5 flex items-center gap-3 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900 dark:border-orange-950 dark:bg-orange-950/20 dark:text-orange-200">
+          <HfIcon name="prompt" className="h-4 w-4 shrink-0" />
+          <span><strong className="font-mono">{revision}</strong> のGit tagに保存された <code>PROMPT.md</code> 原文を表示しています。</span>
+        </div>
+      ) : null}
       <CardBadges frontmatter={frontmatter} basePath={kind === 'dataset' ? '/datasets' : kind === 'space' ? '/spaces' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : '/models'} />
       <div
         className={kind === 'skill' || kind === 'prompt'

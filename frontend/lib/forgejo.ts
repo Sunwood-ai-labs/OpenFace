@@ -346,6 +346,24 @@ export async function getRawFile(
   }
 }
 
+export async function getTextFile(
+  owner: string,
+  repo: string,
+  path: string,
+  ref?: string,
+): Promise<string | null> {
+  const res = await getContents(owner, repo, path, ref);
+  if (!res.ok || !res.data || Array.isArray(res.data) || !res.data.content) return null;
+  try {
+    return Buffer.from(
+      res.data.content,
+      (res.data.encoding as BufferEncoding) || 'base64',
+    ).toString('utf-8');
+  } catch {
+    return null;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // README (base64 decode via contents API)
 // ---------------------------------------------------------------------------
@@ -354,26 +372,9 @@ export async function getReadme(owner: string, repo: string, ref?: string): Prom
   const cached = readmeCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) return cached.value;
 
-  const res = await getContents(owner, repo, 'README.md', ref);
-  if (!res.ok || !res.data || Array.isArray(res.data)) {
-    readmeCache.set(cacheKey, { value: null, expiresAt: Date.now() + README_CACHE_TTL_MS });
-    return null;
-  }
-  const entry = res.data;
-  if (!entry.content) {
-    readmeCache.set(cacheKey, { value: null, expiresAt: Date.now() + README_CACHE_TTL_MS });
-    return null;
-  }
-  try {
-    const value = Buffer.from(entry.content, (entry.encoding as BufferEncoding) || 'base64').toString(
-      'utf-8'
-    );
-    readmeCache.set(cacheKey, { value, expiresAt: Date.now() + README_CACHE_TTL_MS });
-    return value;
-  } catch {
-    readmeCache.set(cacheKey, { value: null, expiresAt: Date.now() + README_CACHE_TTL_MS });
-    return null;
-  }
+  const value = await getTextFile(owner, repo, 'README.md', ref);
+  readmeCache.set(cacheKey, { value, expiresAt: Date.now() + README_CACHE_TTL_MS });
+  return value;
 }
 
 function normalizeEmoji(value: unknown): string | undefined {
