@@ -78,9 +78,9 @@ jobs:
             --max-time 300 \
             --request POST \
             --header "X-OpenFace-Control-Token: ${token}" \
-            https://localhost:8443/runner-api/spaces/openface/sample-static-html/start
+            https://localhost:8443/runner-api/spaces/openface/qr-code-generator/start
           for attempt in {1..90}; do
-            status="$(curl --insecure --fail --silent https://localhost:8443/runner-api/spaces/openface/sample-static-html/status)"
+            status="$(curl --insecure --fail --silent https://localhost:8443/runner-api/spaces/openface/qr-code-generator/status)"
             if grep -q '"status":"running"' <<<"${status}"; then
               exit 0
             fi
