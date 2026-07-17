@@ -8,6 +8,7 @@ updates:
     groups:
       frontend:
         patterns: ['*']
+        update-types: [minor, patch]
 
   - package-ecosystem: npm
     directory: /docs
@@ -17,6 +18,7 @@ updates:
     groups:
       documentation:
         patterns: ['*']
+        update-types: [minor, patch]
 
   - package-ecosystem: github-actions
     directory: /
@@ -26,3 +28,4 @@ updates:
     groups:
       actions:
         patterns: ['*']
+        update-types: [minor, patch]
