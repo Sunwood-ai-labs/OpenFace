@@ -53,13 +53,21 @@ try {
       const startedAt = Date.now();
       let response = null;
       let navigationError = null;
-      try {
-        response = await page.goto(`${baseUrl}${route.path}`, { waitUntil: 'networkidle', timeout: 45_000 });
-        if (route.settleMs) await page.waitForTimeout(route.settleMs);
-        await page.evaluate(() => document.fonts?.ready);
-      } catch (error) {
-        navigationError = error instanceof Error ? error.message : String(error);
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        try {
+          response = await page.goto(`${baseUrl}${route.path}`, { waitUntil: 'networkidle', timeout: 45_000 });
+          navigationError = null;
+          break;
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          const transientNetworkChange = message.includes('ERR_NETWORK_CHANGED') || message.includes('ERR_CONNECTION_RESET');
+          navigationError = message;
+          if (!transientNetworkChange || attempt === 1) break;
+          await page.waitForTimeout(750);
+        }
       }
+      if (route.settleMs) await page.waitForTimeout(route.settleMs);
+      await page.evaluate(() => document.fonts?.ready).catch(() => undefined);
 
       const screenshotName = `${viewport.id}--${route.id}.png`;
       const screenshotPath = join(outputDir, 'screenshots', screenshotName);
