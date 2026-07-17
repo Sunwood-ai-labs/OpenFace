@@ -3,7 +3,7 @@ import type { RepoKind } from '@/lib/forgejo';
 
 interface FilterGroup {
   title: string;
-  items: Array<{ label: string; icon?: HfIconName; tone?: string }>;
+  items: Array<{ label: string; query?: string; icon?: HfIconName; tone?: string }>;
   range?: { start: string; middle?: string[]; end: string };
 }
 
@@ -133,7 +133,7 @@ const mcpFilters: FilterGroup[] = [
   },
 ];
 
-const promptFilters: FilterGroup[] = [
+const promptFamilyFilters: FilterGroup[] = [
   {
     title: 'Prompt families',
     items: [
@@ -144,16 +144,21 @@ const promptFilters: FilterGroup[] = [
       { label: 'Documentation', icon: 'file', tone: 'text-emerald-600' },
     ],
   },
-  {
-    title: 'Prompt version',
-    items: [
-      { label: 'version-v7', icon: 'prompt', tone: 'text-orange-500' },
-      { label: 'version-v8', icon: 'prompt', tone: 'text-orange-700' },
-    ],
-  },
 ];
 
-export default function FilterRail({ topic }: { topic: Exclude<RepoKind, 'space'> }) {
+export default function FilterRail({ topic, promptVersionTopics = [] }: { topic: Exclude<RepoKind, 'space'>; promptVersionTopics?: string[] }) {
+  const promptFilters: FilterGroup[] = [
+    ...promptFamilyFilters,
+    ...(promptVersionTopics.length > 0 ? [{
+      title: 'Version tags',
+      items: promptVersionTopics.map((versionTopic) => ({
+        label: versionTopic.replace(/^version-/, ''),
+        query: versionTopic,
+        icon: 'prompt' as HfIconName,
+        tone: 'text-orange-600',
+      })),
+    }] : []),
+  ];
   const groups = topic === 'dataset' ? datasetFilters : topic === 'skill' ? skillFilters : topic === 'mcp' ? mcpFilters : topic === 'prompt' ? promptFilters : modelFilters;
   const basePath = topic === 'dataset' ? '/datasets' : topic === 'skill' ? '/skills' : topic === 'mcp' ? '/mcps' : topic === 'prompt' ? '/prompts' : '/models';
   const filterHref = (label: string) => `${basePath}?q=${encodeURIComponent(label.toLowerCase())}`;
@@ -218,7 +223,7 @@ export default function FilterRail({ topic }: { topic: Exclude<RepoKind, 'space'
                   {group.items.map((item) => (
                     <a
                       key={item.label}
-                      href={filterHref(item.label)}
+                      href={filterHref(item.query || item.label)}
                     className="inline-flex h-7 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 text-sm text-zinc-700 shadow-sm hover:border-zinc-300 hover:bg-zinc-50"
                     >
                       {item.icon && <HfIcon name={item.icon} className={`h-3.5 w-3.5 ${item.tone || 'text-zinc-400'}`} />}

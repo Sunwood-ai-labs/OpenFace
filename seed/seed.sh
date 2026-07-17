@@ -1097,16 +1097,54 @@ import_prompt_catalog_entry() {
   log "Imported prompt '${name}' (${version}, ${collection})."
 }
 
+# Preserve repository history when moving from the old versioned slug to the
+# stable prompt slug. Future versions only update the version topic and Git tag.
+migrate_prompt_repository() {
+  local legacy_name="$1" name="$2"
+  local legacy_code current_code code
+
+  if [ -z "$legacy_name" ] || [ "$legacy_name" = "$name" ]; then
+    return 0
+  fi
+
+  legacy_code=$(api GET "/repos/${ORG_NAME}/${legacy_name}")
+  if [ "$legacy_code" != "200" ]; then
+    return 0
+  fi
+
+  current_code=$(api GET "/repos/${ORG_NAME}/${name}")
+  if [ "$current_code" = "200" ]; then
+    code=$(api DELETE "/repos/${ORG_NAME}/${legacy_name}")
+    if [ "$code" = "204" ]; then
+      log "Removed duplicate legacy prompt repository '${legacy_name}'."
+    else
+      log "ERROR: deleting duplicate prompt '${legacy_name}' returned HTTP ${code}:"
+      cat /tmp/api_resp.json
+      exit 1
+    fi
+    return 0
+  fi
+
+  code=$(api PATCH "/repos/${ORG_NAME}/${legacy_name}" "$(jq -n --arg name "$name" '{name:$name}')")
+  if [ "$code" != "200" ]; then
+    log "ERROR: renaming prompt '${legacy_name}' to '${name}' returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+    exit 1
+  fi
+  log "Renamed prompt repository '${legacy_name}' to stable slug '${name}'."
+}
+
 import_prompt_catalog() {
   if [ ! -f "$PROMPT_CATALOG" ]; then
     log "ERROR: prompt catalog not found at '${PROMPT_CATALOG}'."
     exit 1
   fi
 
-  local encoded entry name description version collection family license source_url source_repo
+  local encoded entry name legacy_name description version collection family license source_url source_repo
   while IFS= read -r encoded; do
     entry=$(printf '%s' "$encoded" | base64 -d)
     name=$(printf '%s' "$entry" | jq -r '.name')
+    legacy_name=$(printf '%s' "$entry" | jq -r '.legacyName // empty')
     description=$(printf '%s' "$entry" | jq -r '.description')
     version=$(printf '%s' "$entry" | jq -r '.version')
     collection=$(printf '%s' "$entry" | jq -r '.collection')
@@ -1114,6 +1152,7 @@ import_prompt_catalog() {
     license=$(printf '%s' "$entry" | jq -r '.license')
     source_url=$(printf '%s' "$entry" | jq -r '.sourceUrl')
     source_repo=$(printf '%s' "$entry" | jq -r '.sourceRepo')
+    migrate_prompt_repository "$legacy_name" "$name"
     import_prompt_catalog_entry "$name" "$description" "$version" "$collection" "$family" "$license" "$source_url" "$source_repo"
   done < <(jq -r '.entries[] | @base64' "$PROMPT_CATALOG")
 }

@@ -215,7 +215,8 @@ export async function searchAllReposByTopicAndQuery(
     ? repos.filter((repo) =>
         repo.name.toLowerCase().includes(needle) ||
         (repo.description || '').toLowerCase().includes(needle) ||
-        repo.full_name.toLowerCase().includes(needle),
+        repo.full_name.toLowerCase().includes(needle) ||
+        (repo.topics || []).some((repoTopic) => repoTopic.toLowerCase().includes(needle)),
       )
     : repos;
   return { ok: true, data: filtered, total_count: filtered.length };
@@ -241,7 +242,8 @@ export async function searchReposByTopicAndQuery(
     return (
       r.name.toLowerCase().includes(needle) ||
       (r.description || '').toLowerCase().includes(needle) ||
-      r.full_name.toLowerCase().includes(needle)
+      r.full_name.toLowerCase().includes(needle) ||
+      (r.topics || []).some((repoTopic) => repoTopic.toLowerCase().includes(needle))
     );
   });
   return { ok: res.ok, data: filtered, total_count: filtered.length };

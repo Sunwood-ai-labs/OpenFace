@@ -25,21 +25,28 @@ export default async function ListingPage({
   const filterHref = (term: string) => `${basePath}?q=${encodeURIComponent(term)}&sort=${sort}`;
 
   const result = await searchReposByTopicAndQuery(topic, q, sort, 50);
+  const promptVersionTopics = topic === 'prompt' && result.ok
+    ? Array.from(new Set(result.data.flatMap((repo) => (repo.topics || []).filter((repoTopic) => /^version-v\d+(?:\.\d+)*$/i.test(repoTopic)))))
+      .sort((left, right) => left.localeCompare(right, undefined, { numeric: true, sensitivity: 'base' }))
+    : [];
   const iconTone = topic === 'dataset' ? 'text-emerald-600' : topic === 'skill' ? 'text-violet-600' : topic === 'mcp' ? 'text-cyan-600' : topic === 'prompt' ? 'text-orange-600' : 'text-amber-600';
   const createLabel = topic === 'dataset' ? 'Dataset' : topic === 'space' ? 'Space' : topic === 'skill' ? 'Skill' : topic === 'mcp' ? 'MCP server' : topic === 'prompt' ? 'Prompt' : 'Model';
-  const mobileFilters = topic === 'dataset'
-    ? ['Audio', 'Image', 'Text', 'Tabular', 'parquet', 'Benchmark']
+  const mobileFilters: Array<{ label: string; query?: string }> = topic === 'dataset'
+    ? ['Audio', 'Image', 'Text', 'Tabular', 'parquet', 'Benchmark'].map((label) => ({ label }))
     : topic === 'skill'
-      ? ['Codex', 'Automation', 'Design', 'Developer tools', 'Workflow']
+      ? ['Codex', 'Automation', 'Design', 'Developer tools', 'Workflow'].map((label) => ({ label }))
       : topic === 'mcp'
-        ? ['TypeScript', 'Python', 'API', 'Search', 'Developer tools']
+        ? ['TypeScript', 'Python', 'API', 'Search', 'Developer tools'].map((label) => ({ label }))
         : topic === 'prompt'
-          ? ['Goal command', 'Coding agent', 'Workflow', 'version-v7', 'version-v8']
-        : ['Text Generation', 'Image-to-Text', 'Safetensors', 'Transformers', 'GGUF', 'vLLM'];
+          ? [
+              ...['Goal command', 'Coding agent', 'Workflow'].map((label) => ({ label })),
+              ...promptVersionTopics.map((versionTopic) => ({ label: versionTopic.replace(/^version-/, ''), query: versionTopic })),
+            ]
+        : ['Text Generation', 'Image-to-Text', 'Safetensors', 'Transformers', 'GGUF', 'vLLM'].map((label) => ({ label }));
 
   return (
     <div className="mx-auto grid min-w-0 max-w-[1536px] gap-8 px-4 lg:grid-cols-[422px_minmax(0,1fr)]">
-      <FilterRail topic={topic === 'space' ? 'model' : topic} />
+      <FilterRail topic={topic === 'space' ? 'model' : topic} promptVersionTopics={promptVersionTopics} />
       <div className="min-w-0 lg:pt-[34px]">
         <div className="mb-6 flex min-w-0 flex-wrap items-center gap-3">
           <h1 className="flex items-center gap-2 text-xl font-semibold">
@@ -85,9 +92,9 @@ export default async function ListingPage({
                 Add filters
               </summary>
               <div className="absolute left-0 right-auto z-20 mt-2 hidden w-full rounded-lg border border-zinc-200 bg-white p-2 text-sm shadow-lg group-open:grid sm:left-auto sm:right-0 sm:w-56">
-                {mobileFilters.map((term) => (
-                  <a key={term} href={filterHref(term)} className="rounded-lg px-3 py-2 text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900">
-                    {term}
+                {mobileFilters.map((item) => (
+                  <a key={item.query || item.label} href={filterHref(item.query || item.label)} className="rounded-lg px-3 py-2 text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900">
+                    {item.label}
                   </a>
                 ))}
               </div>
