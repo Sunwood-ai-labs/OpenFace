@@ -30,10 +30,10 @@ function isProbablyText(name: string): boolean {
 export default async function FileViewPage({
   params,
 }: {
-  params: { owner: string; repo: string; path: string[] };
+  params: Promise<{ owner: string; repo: string; path: string[] }>;
 }) {
-  const { owner, repo } = params;
-  const path = params.path.map(decodeURIComponent).join('/');
+  const { owner, repo, path: pathSegments } = await params;
+  const path = pathSegments.map(decodeURIComponent).join('/');
 
   const contentsRes = await getContents(owner, repo, path);
   if (!contentsRes.ok || !contentsRes.data || Array.isArray(contentsRes.data)) {

@@ -53,20 +53,21 @@ async function canControlSpace(request: NextRequest, owner: string, repo: string
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { owner: string; repo: string; action: string } },
+  { params }: { params: Promise<{ owner: string; repo: string; action: string }> },
 ) {
-  if (params.action !== 'start' && params.action !== 'stop') {
+  const resolvedParams = await params;
+  if (resolvedParams.action !== 'start' && resolvedParams.action !== 'stop') {
     return NextResponse.json({ error: 'Unsupported Space action.' }, { status: 404 });
   }
 
-  const denied = await canControlSpace(request, params.owner, params.repo);
+  const denied = await canControlSpace(request, resolvedParams.owner, resolvedParams.repo);
   if (denied) return denied;
 
   const token = controlToken();
   if (!token) return NextResponse.json({ error: 'Space control is not configured.' }, { status: 503 });
 
   const response = await fetch(
-    `${RUNNER_API}/spaces/${encodeURIComponent(params.owner)}/${encodeURIComponent(params.repo)}/${params.action}`,
+    `${RUNNER_API}/spaces/${encodeURIComponent(resolvedParams.owner)}/${encodeURIComponent(resolvedParams.repo)}/${resolvedParams.action}`,
     {
       method: 'POST',
       headers: { 'X-OpenFace-Control-Token': token },

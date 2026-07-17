@@ -7,14 +7,15 @@ export const metadata = {
   description: 'Browse reusable agent skills hosted on OpenFace.',
 };
 
-export default function SkillsPage({ searchParams }: { searchParams?: { q?: string; sort?: string } }) {
+export default async function SkillsPage({ searchParams }: { searchParams?: Promise<{ q?: string; sort?: string }> }) {
+  const resolvedSearchParams = await searchParams;
   return (
     <ListingPage
       topic="skill"
       title="Skills"
       icon="skill"
       placeholder="Search skills"
-      searchParams={searchParams}
+      searchParams={resolvedSearchParams}
     />
   );
 }

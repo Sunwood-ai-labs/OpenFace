@@ -10,15 +10,16 @@ export const metadata = {
 export default async function DatasetsPage({
   searchParams,
 }: {
-  searchParams: { q?: string; sort?: string };
+  searchParams: Promise<{ q?: string; sort?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   return (
     <ListingPage
       topic="dataset"
       title="Datasets"
       icon="dataset"
       placeholder="Filter by name"
-      searchParams={searchParams}
+      searchParams={resolvedSearchParams}
     />
   );
 }

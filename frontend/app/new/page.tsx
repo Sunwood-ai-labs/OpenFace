@@ -70,16 +70,17 @@ const typeConfig: Record<string, { title: string; repoPlaceholder: string; cance
   prompt: { title: 'Create a new Prompt', repoPlaceholder: 'my-agent-prompt', cancelHref: '/prompts' },
 };
 
-export default function NewRepoGuidePage({
+export default async function NewRepoGuidePage({
   searchParams,
 }: {
-  searchParams?: { type?: string; template?: string };
+  searchParams?: Promise<{ type?: string; template?: string }>;
 }) {
-  const requestedType = searchParams?.type === 'model' || searchParams?.type === 'dataset' || searchParams?.type === 'space' || searchParams?.type === 'skill' || searchParams?.type === 'mcp' || searchParams?.type === 'prompt'
-    ? searchParams.type
+  const resolvedSearchParams = await searchParams;
+  const requestedType = resolvedSearchParams?.type === 'model' || resolvedSearchParams?.type === 'dataset' || resolvedSearchParams?.type === 'space' || resolvedSearchParams?.type === 'skill' || resolvedSearchParams?.type === 'mcp' || resolvedSearchParams?.type === 'prompt'
+    ? resolvedSearchParams.type
     : 'space';
   const config = typeConfig[requestedType];
-  const rawTemplate = searchParams?.template?.trim() || '';
+  const rawTemplate = resolvedSearchParams?.template?.trim() || '';
   const selectedTemplate = templates.find((template) => template.slug === rawTemplate) || null;
   const duplicateSource = rawTemplate && rawTemplate.includes('/') ? rawTemplate : '';
   const effectiveType = selectedTemplate?.topic || requestedType;

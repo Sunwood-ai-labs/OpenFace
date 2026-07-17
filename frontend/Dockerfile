@@ -5,8 +5,8 @@
 # ---------------------------------------------------------------------------
 FROM node:20-alpine AS deps
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
 
 # ---------------------------------------------------------------------------
 # 2. builder — build the Next.js app (standalone output).

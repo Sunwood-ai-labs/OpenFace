@@ -7,14 +7,15 @@ export const metadata = {
   description: 'Browse versioned agent and workflow prompts hosted on OpenFace.',
 };
 
-export default function PromptsPage({ searchParams }: { searchParams?: { q?: string; sort?: string } }) {
+export default async function PromptsPage({ searchParams }: { searchParams?: Promise<{ q?: string; sort?: string }> }) {
+  const resolvedSearchParams = await searchParams;
   return (
     <ListingPage
       topic="prompt"
       title="Prompts"
       icon="prompt"
       placeholder="Search prompts"
-      searchParams={searchParams}
+      searchParams={resolvedSearchParams}
     />
   );
 }

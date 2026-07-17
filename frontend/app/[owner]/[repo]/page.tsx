@@ -35,12 +35,13 @@ export const dynamic = 'force-dynamic';
 export async function generateMetadata({
   params,
 }: {
-  params: { owner: string; repo: string };
+  params: Promise<{ owner: string; repo: string }>;
 }) {
-  const repoInfo = await getRepo(params.owner, params.repo);
+  const { owner, repo } = await params;
+  const repoInfo = await getRepo(owner, repo);
   const kind = repoInfo ? repoKind(repoInfo.topics) : null;
   const label = kind === 'space' ? 'Space' : kind === 'dataset' ? 'Dataset' : kind === 'skill' ? 'Skill' : kind === 'mcp' ? 'MCP server' : kind === 'prompt' ? 'Prompt' : 'Model';
-  const repoName = repoInfo?.full_name || `${params.owner}/${params.repo}`;
+  const repoName = repoInfo?.full_name || `${owner}/${repo}`;
   return {
     title: `${repoName} - ${label} - OpenFace`,
     description: repoInfo?.description || `${repoName} on OpenFace.`,
@@ -60,12 +61,12 @@ export default async function RepoDetailPage({
   params,
   searchParams,
 }: {
-  params: { owner: string; repo: string };
-  searchParams: { tab?: string; path?: string; revision?: string };
+  params: Promise<{ owner: string; repo: string }>;
+  searchParams: Promise<{ tab?: string; path?: string; revision?: string }>;
 }) {
-  const { owner, repo } = params;
-  const tab = searchParams.tab === 'files' ? 'files' : 'card';
-  const path = searchParams.path || '';
+  const [{ owner, repo }, resolvedSearchParams] = await Promise.all([params, searchParams]);
+  const tab = resolvedSearchParams.tab === 'files' ? 'files' : 'card';
+  const path = resolvedSearchParams.path || '';
 
   const repoInfo = await getRepo(owner, repo);
 
@@ -91,7 +92,7 @@ export default async function RepoDetailPage({
     getPagesSource(owner, repo, repoInfo.default_branch || 'main'),
     kind === 'prompt' ? getRepoTags(owner, repo) : Promise.resolve([]),
   ]);
-  const requestedRevision = searchParams.revision?.trim() || null;
+  const requestedRevision = resolvedSearchParams.revision?.trim() || null;
   const selectedRevision = requestedRevision && promptTags.some((tag) => tag.name === requestedRevision)
     ? requestedRevision
     : null;

@@ -10,9 +10,10 @@ export const metadata = {
 export default async function SpacesPage({
   searchParams,
 }: {
-  searchParams: { q?: string; sort?: string; page?: string };
+  searchParams: Promise<{ q?: string; sort?: string; page?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   return (
-    <SpacesDirectoryPage searchParams={searchParams} />
+    <SpacesDirectoryPage searchParams={resolvedSearchParams} />
   );
 }

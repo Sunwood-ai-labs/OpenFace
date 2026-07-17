@@ -7,14 +7,15 @@ export const metadata = {
   description: 'Browse Model Context Protocol servers hosted on OpenFace.',
 };
 
-export default function McpsPage({ searchParams }: { searchParams?: { q?: string; sort?: string } }) {
+export default async function McpsPage({ searchParams }: { searchParams?: Promise<{ q?: string; sort?: string }> }) {
+  const resolvedSearchParams = await searchParams;
   return (
     <ListingPage
       topic="mcp"
       title="MCPs"
       icon="mcp"
       placeholder="Search MCP servers"
-      searchParams={searchParams}
+      searchParams={resolvedSearchParams}
     />
   );
 }
