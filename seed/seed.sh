@@ -313,6 +313,13 @@ ensure_tag() {
   fi
 }
 
+repo_has_tag() {
+  local name="$1" tag="$2"
+  local code
+  code=$(api GET "/repos/${ORG_NAME}/${name}/tags?limit=100")
+  [ "$code" = "200" ] && jq -e --arg tag "$tag" '.[] | select(.name == $tag)' /tmp/api_resp.json >/dev/null
+}
+
 # ------------------------------------------------------------------------
 # Helper: create an issue/discussion sample only when the title is absent.
 # This keeps the Community page useful for HF-style visual comparison while
@@ -1074,6 +1081,7 @@ import_prompt_catalog_entry() {
   fi
 
   ensure_repo "$name" "$description"
+  api PATCH "/repos/${ORG_NAME}/${name}" "$(jq -n --arg desc "$description" '{description:$desc}')" >/dev/null
   set_topics "$name" "prompt" "$collection" "$family" "version-${version}" "github-import"
 
   printf -- '---\nlicense: %s\ntags:\n  - prompt\n  - %s\n  - %s\n  - %s\n---\n\n# %s\n\n%s\n\n> **Prompt version: %s** — this repository is ready to branch, tag, compare, and fork in Forgejo.\n\n## Provenance\n\nImported verbatim from [%s](%s). The original project license is `%s`.\n\n## Prompt source\n\n' \
@@ -1141,6 +1149,7 @@ import_prompt_catalog() {
   fi
 
   local encoded entry name legacy_name description version collection family license source_url source_repo
+  local revision_encoded revision revision_version revision_description revision_source_url
   while IFS= read -r encoded; do
     entry=$(printf '%s' "$encoded" | base64 -d)
     name=$(printf '%s' "$entry" | jq -r '.name')
@@ -1153,6 +1162,19 @@ import_prompt_catalog() {
     source_url=$(printf '%s' "$entry" | jq -r '.sourceUrl')
     source_repo=$(printf '%s' "$entry" | jq -r '.sourceRepo')
     migrate_prompt_repository "$legacy_name" "$name"
+
+    while IFS= read -r revision_encoded; do
+      revision=$(printf '%s' "$revision_encoded" | base64 -d)
+      revision_version=$(printf '%s' "$revision" | jq -r '.version')
+      revision_description=$(printf '%s' "$revision" | jq -r '.description // empty')
+      revision_source_url=$(printf '%s' "$revision" | jq -r '.sourceUrl')
+      if repo_has_tag "$name" "$revision_version"; then
+        log "Historical prompt tag '${revision_version}' already exists on '${name}'."
+        continue
+      fi
+      import_prompt_catalog_entry "$name" "${revision_description:-$description}" "$revision_version" "$collection" "$family" "$license" "$revision_source_url" "$source_repo"
+    done < <(printf '%s' "$entry" | jq -r '.revisions[]? | @base64')
+
     import_prompt_catalog_entry "$name" "$description" "$version" "$collection" "$family" "$license" "$source_url" "$source_repo"
   done < <(jq -r '.entries[] | @base64' "$PROMPT_CATALOG")
 }
