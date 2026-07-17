@@ -1,6 +1,6 @@
 # OpenFace visual QA
 
-This directory creates a screenshot packet that a human or development agent can review after a UI change. It captures every major page type at desktop and mobile sizes, then records navigation status, headings, horizontal overflow, console errors, failed requests, and full-page screenshots.
+This directory creates a screenshot packet that a human or development agent can review after a UI change. It captures every major page type at desktop and mobile sizes, then records navigation status, headings, horizontal overflow, console errors, failed requests, HTTP resource errors, and full-page screenshots.
 
 ```bash
 npm ci --prefix visual-tests

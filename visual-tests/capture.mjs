@@ -37,6 +37,7 @@ try {
       const consoleErrors = [];
       const pageErrors = [];
       const failedRequests = [];
+      const httpErrors = [];
       page.on('console', (message) => {
         if (message.type() === 'error') consoleErrors.push(message.text());
       });
@@ -44,6 +45,9 @@ try {
       page.on('requestfailed', (request) => {
         const failure = request.failure()?.errorText || 'unknown failure';
         if (!failure.includes('ERR_ABORTED')) failedRequests.push(`${request.method()} ${request.url()}: ${failure}`);
+      });
+      page.on('response', (networkResponse) => {
+        if (networkResponse.status() >= 400) httpErrors.push(`${networkResponse.status()} ${networkResponse.url()}`);
       });
 
       const startedAt = Date.now();
@@ -100,6 +104,7 @@ try {
       if (pageState.applicationUnavailable) defects.push('Embedded application is unavailable');
       if (pageState.runningBadgeVisible && pageState.onDemandStageVisible) defects.push('Runtime badge says Running while the on-demand placeholder is visible');
       if (pageErrors.length) defects.push(`${pageErrors.length} uncaught page error(s)`);
+      if (httpErrors.length) defects.push(`${httpErrors.length} HTTP resource error(s)`);
 
       const result = {
         id: route.id,
@@ -116,6 +121,7 @@ try {
         consoleErrors,
         pageErrors,
         failedRequests,
+        httpErrors,
         defects,
         passed: defects.length === 0,
       };
@@ -174,7 +180,7 @@ const markdown = [
     `- Route: \`${result.path}\``,
     `- Review focus: ${result.focus}`,
     `- Automated defects: ${result.defects.length ? result.defects.join('; ') : 'none'}`,
-    `- Browser observations: ${result.consoleErrors.length} console error(s), ${result.failedRequests.length} failed request(s)`,
+    `- Browser observations: ${result.consoleErrors.length} console error(s), ${result.failedRequests.length} failed request(s), ${result.httpErrors.length} HTTP resource error(s)`,
     '',
     `![${result.viewport.id} ${result.label}](${result.screenshot})`,
     '',
