@@ -33,6 +33,7 @@ venv/
 *.log
 /forgejo-*.html
 /screenshots/
+/visual-tests/artifacts/
 /.sync-probe
 /gateway/certs/
 
