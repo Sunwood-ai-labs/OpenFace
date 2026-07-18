@@ -46,6 +46,43 @@ header details[open] > .openface-mobile-menu-toggle {
   box-shadow: 0 0 0 3px rgb(24 24 27 / 13%);
 }
 
+/* Mobile navigation uses an explicit current-page treatment instead of a
+   sticky touch-hover. This avoids iOS leaving a white hover rectangle behind
+   after navigation, especially when the cyberpunk palette is active. */
+.openface-mobile-nav-link {
+  display: block;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #3f3f46;
+  text-decoration: none;
+  transition: color 140ms ease, background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+
+@media (hover: hover) {
+  .openface-mobile-nav-link:hover {
+    background: #f4f4f5;
+    color: #18181b;
+  }
+}
+
+.openface-mobile-nav-link:active {
+  transform: translateX(1px);
+}
+
+.openface-mobile-nav-link:focus-visible {
+  outline: 2px solid #18181b;
+  outline-offset: 2px;
+}
+
+.openface-mobile-nav-link[aria-current="page"] {
+  border-color: #27272a;
+  background: #18181b;
+  color: #fff;
+  box-shadow: inset 3px 0 0 #f5b800;
+  font-weight: 650;
+}
+
 /* A single icon cycles through the three portal themes. Keeping this control
    square leaves the dense navigation room to breathe on every viewport. */
 .openface-theme-selector {
@@ -165,6 +202,17 @@ html[data-openface-theme="solarpunk"] header details[open] > .openface-mobile-me
   box-shadow: 0 0 0 3px rgb(79 124 80 / 18%);
 }
 
+html[data-openface-theme="solarpunk"] .openface-mobile-nav-link {
+  color: #315b43;
+}
+
+html[data-openface-theme="solarpunk"] .openface-mobile-nav-link[aria-current="page"] {
+  border-color: #527f55;
+  background: #24583b;
+  color: #f7ffe9 !important;
+  box-shadow: inset 3px 0 0 #ffcb4f;
+}
+
 html[data-openface-theme="solarpunk"] .openface-theme-selector {
   border-color: #94b889;
   background: #e7f0dc;
@@ -267,6 +315,17 @@ html[data-openface-theme="cyberpunk"] header details[open] > .openface-mobile-me
   background: #102342 !important;
   color: #7cecff !important;
   box-shadow: 0 0 0 3px rgb(44 231 255 / 14%), 0 0 18px rgb(44 231 255 / 22%);
+}
+
+html[data-openface-theme="cyberpunk"] .openface-mobile-nav-link {
+  color: #c2d9e7 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-mobile-nav-link[aria-current="page"] {
+  border-color: rgb(67 234 255 / 58%);
+  background: #102342 !important;
+  color: #9ff4ff !important;
+  box-shadow: inset 3px 0 0 #ff4eaa, 0 0 16px rgb(44 231 255 / 10%);
 }
 
 /* Forms appear on repository creation, filters, search, and settings. They

@@ -31,8 +31,9 @@ for (const testCase of cases) {
   page.setDefaultTimeout(8_000);
   const defects = [];
 
-  let response = await page.goto(`${baseUrl}/`, { waitUntil: 'load' });
-  if (response?.status() !== 200) defects.push(`Home returned HTTP ${response?.status() ?? 'none'}`);
+  const initialUrl = testCase.id === 'mobile' ? `${baseUrl}/spaces` : `${baseUrl}/`;
+  let response = await page.goto(initialUrl, { waitUntil: 'load' });
+  if (response?.status() !== 200) defects.push(`Initial page returned HTTP ${response?.status() ?? 'none'}`);
   await page.evaluate(() => {
     localStorage.setItem('openface-theme-v2', 'standard');
     localStorage.removeItem('openface-theme');
@@ -82,6 +83,34 @@ for (const testCase of cases) {
           };
         });
         if (state.menuHighlight.contrast < 4.5) defects.push(`Mobile menu highlight contrast is ${state.menuHighlight.contrast}:1`);
+      }
+      if (testCase.id === 'mobile') {
+        const activeNavigation = page.locator('.openface-mobile-nav-link[aria-current="page"]');
+        if (await activeNavigation.count() !== 1) {
+          defects.push(`Expected one current mobile navigation item, found ${await activeNavigation.count()}`);
+        } else {
+          state.activeNavigation = await activeNavigation.evaluate((element) => {
+            const style = getComputedStyle(element);
+            const luminance = (value) => {
+              const channels = value.match(/[\d.]+/g)?.slice(0, 3).map(Number) || [0, 0, 0];
+              const linear = channels.map((channel) => {
+                const normalized = channel / 255;
+                return normalized <= 0.03928 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+              });
+              return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+            };
+            const foreground = luminance(style.color);
+            const background = luminance(style.backgroundColor);
+            return {
+              label: element.textContent?.trim(),
+              color: style.color,
+              background: style.backgroundColor,
+              contrast: Math.round(((Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05)) * 100) / 100,
+            };
+          });
+          if (state.activeNavigation.label !== 'Spaces') defects.push(`Current mobile navigation label is ${state.activeNavigation.label}`);
+          if (state.activeNavigation.contrast < 4.5) defects.push(`Current mobile navigation contrast is ${state.activeNavigation.contrast}:1`);
+        }
       }
       states.push(state);
       if (state.active !== expected.active) defects.push(`Expected ${expected.active}, received ${state.active}`);

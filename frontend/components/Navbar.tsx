@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import BrandMark from './BrandMark';
 import HfIcon from './HfIcon';
 import SearchForm from './SearchForm';
@@ -15,6 +18,9 @@ const navItems = [
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isCurrent = (href: string) => href.startsWith('/') && (pathname === href || pathname.startsWith(`${href}/`));
+
   return (
     <header className="sticky top-0 z-30 border-b border-zinc-100 bg-white dark:border-zinc-800 dark:bg-zinc-950">
       <div className="mx-auto flex max-w-[1536px] items-center gap-4 px-4 py-3.5">
@@ -86,12 +92,25 @@ export default function Navbar() {
             <SearchForm className="mb-1" compact />
             <div className="mb-1 px-3 pt-1"><ThemeSelector /></div>
             {navItems.map((item) => (
-              <Link key={item.href} href={item.href} className="rounded-lg px-3 py-2 text-zinc-700 hover:bg-zinc-50">
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={isCurrent(item.href) ? 'page' : undefined}
+                className="openface-mobile-nav-link"
+              >
                 {item.label}
               </Link>
             ))}
-            <a href="/git/explore/repos" className="rounded-lg px-3 py-2 text-zinc-700 hover:bg-zinc-50">Repositories</a>
-            <a href="/git/explore/users" className="rounded-lg px-3 py-2 text-zinc-700 hover:bg-zinc-50">Users</a>
+            <a
+              href="/git/explore/repos"
+              aria-current={isCurrent('/git/explore/repos') ? 'page' : undefined}
+              className="openface-mobile-nav-link"
+            >Repositories</a>
+            <a
+              href="/git/explore/users"
+              aria-current={isCurrent('/git/explore/users') ? 'page' : undefined}
+              className="openface-mobile-nav-link"
+            >Users</a>
           </div>
         </details>
       </div>
