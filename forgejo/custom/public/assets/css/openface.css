@@ -18109,3 +18109,65 @@ html[data-openface-theme="cyberpunk"] body[data-openface-auth="signup"] .ui.atta
 html[data-openface-theme="cyberpunk"] body[data-openface-auth="signup"] .ui.attached.segment.header + .ui.attached.segment p {
   color: #374151 !important;
 }
+
+/* org-mobile1: remove decorative fake members, cover the mobile viewport, and
+   keep every repository interaction state legible in Cyberpunk. */
+.openface-member-cloud {
+  display: flex;
+  grid-template-columns: none;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.openface-member-cloud a {
+  color: #374151 !important;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-member-cloud a {
+  color: #c8ebf8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-paper-row span {
+  border-color: rgba(55, 204, 237, 0.36) !important;
+  background: linear-gradient(145deg, #17213d, #0d1327) !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-card:hover,
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-card:active,
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-card:focus-within,
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-card.active,
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-card.selected {
+  border-color: #38e8ff !important;
+  background: #16213f !important;
+  color: #f3fbff !important;
+  box-shadow: inset 3px 0 0 #ff5ab4 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-card:focus-within a,
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-card:hover a,
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-card:active a,
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-card.active a,
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-card.selected a {
+  color: #7cecff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-card a:focus-visible {
+  border-radius: 3px;
+  outline: 2px solid #38e8ff !important;
+  outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+  body[data-openface-org] .page-content,
+  body[data-openface-org] .page-content.organization {
+    box-sizing: border-box !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding: 22px 24px 48px !important;
+  }
+}
