@@ -214,22 +214,22 @@ ensure_agent_avatar() {
 }
 
 ensure_org_member() {
-  local username="$1" code team_id
-  code=$(api GET "/orgs/${ORG_NAME}/teams")
+  local org_name="$1" username="$2" code team_id
+  code=$(api GET "/orgs/${org_name}/teams")
   if [ "$code" != "200" ]; then
-    log "WARNING: listing teams for '${ORG_NAME}' returned HTTP ${code}."
+    log "WARNING: listing teams for '${org_name}' returned HTTP ${code}."
     return 0
   fi
   team_id=$(jq -r 'map(select(.name == "Owners"))[0].id // .[0].id // empty' /tmp/api_resp.json)
   if [ -z "$team_id" ]; then
-    log "WARNING: no organization team found for '${ORG_NAME}'."
+    log "WARNING: no organization team found for '${org_name}'."
     return 0
   fi
   code=$(api PUT "/teams/${team_id}/members/${username}")
   if [ "$code" = "204" ] || [ "$code" = "201" ]; then
-    log "Added '${username}' to organization '${ORG_NAME}'."
+    log "Added '${username}' to organization '${org_name}'."
     local public_code
-    public_code=$(api PUT "/orgs/${ORG_NAME}/public_members/${username}?sudo=${username}")
+    public_code=$(api PUT "/orgs/${org_name}/public_members/${username}?sudo=${username}")
     if [ "$public_code" = "204" ]; then
       log "Published '${username}' as an organization member."
     else
@@ -237,7 +237,7 @@ ensure_org_member() {
       cat /tmp/api_resp.json
     fi
   else
-    log "WARNING: adding '${username}' to '${ORG_NAME}' returned HTTP ${code}:"
+    log "WARNING: adding '${username}' to '${org_name}' returned HTTP ${code}:"
     cat /tmp/api_resp.json
   fi
 }
@@ -247,22 +247,57 @@ b64() {
   base64 -w0 2>/dev/null || base64
 }
 
+ensure_organization() {
+  local org_name="$1" full_name="$2" description="$3" website="$4" location="$5" code payload
+  code=$(api GET "/orgs/${org_name}")
+  if [ "$code" != "200" ]; then
+    code=$(api POST "/orgs" "$(jq -n --arg name "$org_name" '{username:$name, visibility:"public"}')")
+    if [ "$code" != "201" ]; then
+      log "WARNING: creating organization '${org_name}' returned HTTP ${code}:"
+      cat /tmp/api_resp.json
+      return 0
+    fi
+    log "Created organization '${org_name}'."
+  fi
+  payload=$(jq -n --arg full_name "$full_name" --arg description "$description" \
+    --arg website "$website" --arg location "$location" \
+    '{full_name:$full_name,description:$description,website:$website,location:$location,visibility:"public"}')
+  code=$(api PATCH "/orgs/${org_name}" "$payload")
+  if [ "$code" = "200" ]; then
+    log "Updated editable organization profile '${org_name}'."
+  else
+    log "WARNING: updating organization '${org_name}' returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+  fi
+}
+
+ensure_org_avatar() {
+  local org_name="$1" image_file="$2" code payload_file
+  payload_file="/tmp/org-avatar-${org_name}.json"
+  if [ ! -s "$image_file" ]; then
+    log "WARNING: organization avatar '${image_file}' is missing."
+    return 0
+  fi
+  b64 < "$image_file" | jq -Rs '{image:.}' > "$payload_file"
+  code=$(curl -s -o /tmp/api_resp.json -w '%{http_code}' -X POST \
+    -H "$AUTH_HEADER" -H "Content-Type: application/json" --data-binary "@${payload_file}" \
+    "${FORGEJO_API}/orgs/${org_name}/avatar")
+  rm -f "$payload_file"
+  if [ "$code" = "204" ]; then
+    log "Set organization avatar for '${org_name}'."
+  else
+    log "WARNING: setting avatar for '${org_name}' returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+  fi
+}
+
 # ------------------------------------------------------------------------
 # 3. Create the `openface` organization (idempotent).
 # ------------------------------------------------------------------------
-log "Ensuring organization '${ORG_NAME}' exists..."
-code=$(api GET "/orgs/${ORG_NAME}")
-if [ "$code" = "200" ]; then
-  log "Org '${ORG_NAME}' already exists."
-else
-  code=$(api POST "/orgs" "$(jq -n --arg name "$ORG_NAME" '{username:$name, visibility:"public"}')")
-  if [ "$code" = "201" ]; then
-    log "Org '${ORG_NAME}' created."
-  else
-    log "WARNING: org create returned HTTP ${code} (may already exist):"
-    cat /tmp/api_resp.json
-  fi
-fi
+ensure_organization "openface" "OpenFace" "Open-source models, datasets, Spaces, and agent tooling backed by Forgejo." "https://github.com/Sunwood-ai-labs/OpenFace" "Local-first"
+ensure_organization "seraphim-labs" "Seraphim Labs" "An angel-inspired AI safety collective building calm, accountable systems." "https://madesk.tail8be30.ts.net/git/seraphim-labs" "The Upper Layer"
+ensure_org_avatar "openface" "/assets/organization-avatars/openface.png"
+ensure_org_avatar "seraphim-labs" "/assets/organization-avatars/seraphim-labs.png"
 
 ensure_agent_user "luna-scout" "Luna Scout" "luna-scout@agents.openface.local"
 ensure_agent_user "patch-orbit" "Patch Orbit" "patch-orbit@agents.openface.local"
@@ -276,9 +311,13 @@ ensure_agent_avatar "mikan-reviewer" "/assets/agent-avatars/mikan-reviewer.png"
 ensure_agent_avatar "aiko-mesh" "/assets/agent-avatars/aiko-mesh.png"
 ensure_agent_avatar "ren-vector" "/assets/agent-avatars/ren-vector.png"
 ensure_agent_avatar "mira-signal" "/assets/agent-avatars/mira-signal.png"
-ensure_org_member "aiko-mesh"
-ensure_org_member "ren-vector"
-ensure_org_member "mira-signal"
+ensure_org_member "openface" "aiko-mesh"
+ensure_org_member "openface" "ren-vector"
+ensure_org_member "openface" "mira-signal"
+ensure_org_member "seraphim-labs" "openface-admin"
+ensure_org_member "seraphim-labs" "aiko-mesh"
+ensure_org_member "seraphim-labs" "ren-vector"
+ensure_org_member "seraphim-labs" "mira-signal"
 
 ensure_actions_runner_token
 
@@ -303,6 +342,25 @@ ensure_repo() {
     cat /tmp/api_resp.json
   fi
 }
+
+ensure_repo_for_org() {
+  local org_name="$1" name="$2" desc="$3" code
+  code=$(api GET "/repos/${org_name}/${name}")
+  if [ "$code" = "200" ]; then
+    log "Repo '${org_name}/${name}' already exists."
+    return 0
+  fi
+  code=$(api POST "/orgs/${org_name}/repos" "$(jq -n --arg name "$name" --arg desc "$desc" \
+    '{name:$name,description:$desc,auto_init:true,private:false,default_branch:"main"}')")
+  if [ "$code" = "201" ]; then
+    log "Created repository '${org_name}/${name}'."
+  else
+    log "WARNING: creating '${org_name}/${name}' returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+  fi
+}
+
+ensure_repo_for_org "seraphim-labs" "halo-observatory" "Transparent evaluation notes for calm and accountable AI systems"
 
 # ------------------------------------------------------------------------
 # Helper: set topics on a repo (idempotent — PUT replaces the full set).
