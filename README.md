@@ -119,11 +119,13 @@ The seed creates two real Forgejo organizations rather than static profile fixtu
 - [`openface`](https://localhost:8443/git/openface) uses a compact aperture mark for the main local AI community.
 - [`seraphim-labs`](https://localhost:8443/git/seraphim-labs) is an angel-inspired AI safety collective with its own repositories and visual identity.
 
-`openface-admin`, `aiko-mesh`, `ren-vector`, and `mira-signal` belong to the Owners team. Owners can use **Edit organization** to update the profile, avatar, members, teams, and repository settings; the public profile description is read back from the Forgejo organization API.
+OpenFace keeps `openface-admin`, `aiko-mesh`, `ren-vector`, and `mira-signal` in its Owners team. Seraphim Labs has its own fictional angel-themed team—`aurelia-vale`, `cassian-reed`, `ilyana-noor`, and `lucien-sol`—with distinct photorealistic generated avatars. Owners can use **Edit organization** to update the profile, avatar, members, teams, and repository settings; the public profile description is read back from the Forgejo organization API. The complete avatar prompt set is preserved in [docs/evidence/organization/seraphim-avatar-prompts.md](docs/evidence/organization/seraphim-avatar-prompts.md).
 
 | OpenFace | Seraphim Labs | Owner settings |
 |---|---|---|
 | <img src="docs/images/openface-organization-mobile.png" alt="OpenFace organization page with the compact aperture logo" width="240"> | <img src="docs/images/seraphim-labs-organization-mobile.png" alt="Seraphim Labs organization page with the halo and wing logo" width="240"> | <img src="docs/images/seraphim-labs-owner-settings-mobile.png" alt="Editable Seraphim Labs organization settings" width="240"> |
+
+<img src="docs/images/seraphim-labs-team-mobile.png" alt="Seraphim Labs team with four distinct photorealistic fictional member avatars" width="390">
 
 ## 🗂️ Repository types, topics, and tags
 
