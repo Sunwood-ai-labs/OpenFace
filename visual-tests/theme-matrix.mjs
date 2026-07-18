@@ -105,6 +105,10 @@ const inspectPage = () => {
         : 0,
       memberPlaceholders: document.querySelectorAll('.openface-member-cloud > span').length,
       memberAvatars: document.querySelectorAll('.openface-member-cloud > img, .openface-member-cloud > a > img').length,
+      memberHrefs: Array.from(document.querySelectorAll('.openface-member-cloud > a'))
+        .map((element) => new URL(element.href).pathname.replace(/^\/git\//, '')),
+      unloadedMemberAvatars: Array.from(document.querySelectorAll('.openface-member-cloud img'))
+        .filter((image) => !image.complete || image.naturalWidth < 1).length,
       declaredMembers: Number.parseInt(memberCountText, 10) || 0,
     } : null,
   };
@@ -203,6 +207,16 @@ const captureRoute = async ({ context, route, theme, viewport }) => {
   if (state.organizationAudit?.memberPlaceholders) defects.push(`Organization has ${state.organizationAudit.memberPlaceholders} fake member placeholder(s)`);
   if (state.organizationAudit && state.organizationAudit.memberAvatars !== state.organizationAudit.declaredMembers) {
     defects.push(`Organization declares ${state.organizationAudit.declaredMembers} member(s) but renders ${state.organizationAudit.memberAvatars} avatar(s)`);
+  }
+  if (state.organizationAudit?.unloadedMemberAvatars) {
+    defects.push(`Organization has ${state.organizationAudit.unloadedMemberAvatars} unloaded member avatar(s)`);
+  }
+  if (route.id === 'organization-seraphim') {
+    const expectedMembers = ['aurelia-vale', 'cassian-reed', 'ilyana-noor', 'lucien-sol'];
+    const actualMembers = [...(state.organizationAudit?.memberHrefs || [])].sort();
+    if (JSON.stringify(actualMembers) !== JSON.stringify(expectedMembers)) {
+      defects.push(`Seraphim member identities mismatch: ${actualMembers.join(', ') || 'none'}`);
+    }
   }
   if (shouldOpenDisclosure && disclosureOpen !== true) defects.push('Disclosure did not open');
   if (pageErrors.length) defects.push(`${pageErrors.length} uncaught page error(s)`);
