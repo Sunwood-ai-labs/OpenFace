@@ -4842,16 +4842,23 @@ body[data-openface-notfound] .page-content > .ui.container {
 
 .openface-org-avatar {
   display: inline-flex;
+  flex: 0 0 76px;
   align-items: center;
   justify-content: center;
-  width: 76px;
-  height: 76px;
+  width: 76px !important;
+  min-width: 76px !important;
+  max-width: 76px !important;
+  height: 76px !important;
+  min-height: 76px !important;
+  max-height: 76px !important;
   border-radius: 16px;
   background: var(--openface-accent);
   color: #111827;
   font-weight: 900;
   font-size: 16px;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  contain: layout paint;
+  isolation: isolate;
 }
 
 .openface-org-hero h1 {
@@ -11159,7 +11166,11 @@ body[data-openface-file-tool="raw"] {
   body[data-openface-org] .openface-org-avatar {
     flex: 0 0 64px;
     width: 64px !important;
+    min-width: 64px !important;
+    max-width: 64px !important;
     height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
     border-radius: 14px;
     font-size: 12px;
   }
@@ -18236,10 +18247,84 @@ html[data-openface-theme="cyberpunk"] body[data-openface-model-landing] .openfac
 }
 
 .openface-org-avatar img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  display: block !important;
+  flex: none !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+body[data-openface-org-variant="seraphim"] .openface-org-avatar {
+  background: #080b12 !important;
+  border: 1px solid rgba(216, 180, 106, 0.44);
+}
+
+body[data-openface-org-variant="seraphim"] .openface-org-badges span,
+body[data-openface-org-variant="seraphim"] .openface-org-actions a,
+body[data-openface-org-variant="seraphim"] .openface-org-edit {
+  border-color: rgba(176, 133, 52, 0.38) !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-org-variant="seraphim"] .openface-org-badges span,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-variant="seraphim"] .openface-org-actions a,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-variant="seraphim"] .openface-org-edit {
+  color: #f2cf86 !important;
+}
+
+/* Keep authenticated organization editing inside the selected dark palette.
+   These pages use Forgejo's settings DOM, so explicit surface colors avoid
+   light-theme variables producing low-contrast white-on-white fields. */
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .page-content {
+  background: #070b18 !important;
+  color: #b9d8e8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.segment,
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.attached.segment,
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.vertical.menu,
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.secondary.vertical.menu {
+  border-color: rgba(55, 204, 237, 0.28) !important;
+  background: #0d1327 !important;
+  color: #c8ebf8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.attached.header {
+  border-color: rgba(55, 204, 237, 0.34) !important;
+  background: #111936 !important;
+  color: #eefbff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.form label,
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.form .field > label,
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.form .help,
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.form .description {
+  color: #afd2e2 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.form input,
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.form textarea,
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.form .selection.dropdown {
+  border-color: rgba(55, 204, 237, 0.32) !important;
+  background: #080f21 !important;
+  color: #f3fbff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.vertical.menu .item,
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.secondary.vertical.menu .item {
+  border-color: rgba(55, 204, 237, 0.28) !important;
+  background: #0d1327 !important;
+  color: #9fc4d7 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.vertical.menu .active.item,
+html[data-openface-theme="cyberpunk"] body[data-openface-settings] .ui.secondary.vertical.menu .active.item {
+  background: #111936 !important;
+  color: #38e8ff !important;
 }
 
 .openface-member-cloud a img {
