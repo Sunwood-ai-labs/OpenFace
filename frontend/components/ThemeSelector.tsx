@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
-const STORAGE_KEY = 'openface-theme';
+const STORAGE_KEY = 'openface-theme-v2';
+const LEGACY_STORAGE_KEY = 'openface-theme';
 
 const themes = [
   { value: 'standard', label: 'Standard', mark: 'OF' },
@@ -20,6 +21,7 @@ function applyTheme(theme: ThemeName) {
     root.dataset.openfaceTheme = theme;
   }
   localStorage.setItem(STORAGE_KEY, theme);
+  document.cookie = `openface-theme=${theme}; Path=/; Max-Age=31536000; SameSite=Lax`;
 }
 
 export default function ThemeSelector() {
@@ -27,7 +29,14 @@ export default function ThemeSelector() {
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY) as ThemeName | null;
-    const initial = themes.some(({ value }) => value === saved) ? saved! : 'standard';
+    const legacy = localStorage.getItem(LEGACY_STORAGE_KEY) as ThemeName | null;
+    const initial = themes.some(({ value }) => value === saved)
+      ? saved!
+      : legacy && legacy !== 'standard' && themes.some(({ value }) => value === legacy)
+        ? legacy
+        : window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'cyberpunk'
+          : 'standard';
     setTheme(initial);
     applyTheme(initial);
   }, []);

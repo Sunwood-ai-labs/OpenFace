@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(() => { try { const theme = localStorage.getItem('openface-theme'); if (theme && theme !== 'standard') document.documentElement.dataset.openfaceTheme = theme; } catch {} })();`,
+            __html: `(() => { try { const valid = ['standard', 'solarpunk', 'cyberpunk']; const saved = localStorage.getItem('openface-theme-v2'); const legacy = localStorage.getItem('openface-theme'); const theme = valid.includes(saved) ? saved : (legacy && legacy !== 'standard' && valid.includes(legacy) ? legacy : (matchMedia('(prefers-color-scheme: dark)').matches ? 'cyberpunk' : 'standard')); if (theme === 'standard') delete document.documentElement.dataset.openfaceTheme; else document.documentElement.dataset.openfaceTheme = theme; document.cookie = 'openface-theme=' + theme + '; Path=/; Max-Age=31536000; SameSite=Lax'; } catch {} })();`,
           }}
         />
       </head>

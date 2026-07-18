@@ -66,6 +66,159 @@
   }
 }
 
+/* cyberpunk1: share the portal's neon theme with Forgejo-backed screens. */
+html[data-openface-theme="cyberpunk"] {
+  color-scheme: dark;
+  --openface-ink: #e9f8ff;
+  --openface-muted: #8fb9cf;
+  --openface-border: rgba(55, 204, 237, 0.34);
+  --color-body: #080a16 !important;
+  --color-box-header: #11162b !important;
+  --color-box-body: #0d1327 !important;
+  --color-border: rgba(55, 204, 237, 0.34) !important;
+  --color-secondary: #11162b !important;
+  --color-secondary-dark-1: #17203a !important;
+  --color-text: #e9f8ff !important;
+  --color-text-light: #8fb9cf !important;
+  --color-text-light-2: #6f91aa !important;
+  --color-primary: #25e1c9 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body,
+html[data-openface-theme="cyberpunk"] .full.height,
+html[data-openface-theme="cyberpunk"] .page-content,
+html[data-openface-theme="cyberpunk"] .page-content.repository {
+  color: #e9f8ff !important;
+  background-color: #080a16 !important;
+  background-image:
+    linear-gradient(rgba(40, 226, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(40, 226, 255, 0.06) 1px, transparent 1px),
+    radial-gradient(circle at 86% 4%, rgba(255, 49, 164, 0.18), transparent 24%) !important;
+  background-size: 36px 36px, 36px 36px, auto !important;
+}
+
+html[data-openface-theme="cyberpunk"] #navbar,
+html[data-openface-theme="cyberpunk"] .repo-header,
+html[data-openface-theme="cyberpunk"] .secondary-nav,
+html[data-openface-theme="cyberpunk"] .secondary-nav > .ui.container {
+  border-color: rgba(40, 226, 255, 0.34) !important;
+  background: rgba(10, 13, 29, 0.95) !important;
+  backdrop-filter: blur(14px);
+}
+
+html[data-openface-theme="cyberpunk"] .ui.segment,
+html[data-openface-theme="cyberpunk"] .ui.segments,
+html[data-openface-theme="cyberpunk"] .comment-container,
+html[data-openface-theme="cyberpunk"] .timeline-item.comment .content,
+html[data-openface-theme="cyberpunk"] .issue-content,
+html[data-openface-theme="cyberpunk"] .markdown,
+html[data-openface-theme="cyberpunk"] .markdown-block {
+  border-color: rgba(55, 204, 237, 0.34) !important;
+  background: rgba(13, 19, 39, 0.96) !important;
+  color: #e9f8ff !important;
+  box-shadow: 0 0 0 1px rgba(40, 226, 255, 0.08), 0 14px 34px rgba(0, 0, 0, 0.22) !important;
+}
+
+html[data-openface-theme="cyberpunk"] .comment-header,
+html[data-openface-theme="cyberpunk"] .ui.attached.header,
+html[data-openface-theme="cyberpunk"] .ui.top.attached.header {
+  border-color: rgba(55, 204, 237, 0.34) !important;
+  background: #11162b !important;
+  color: #e9f8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] a,
+html[data-openface-theme="cyberpunk"] .ui.breadcrumb a,
+html[data-openface-theme="cyberpunk"] .markdown a {
+  color: #2ce7ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] h1,
+html[data-openface-theme="cyberpunk"] h2,
+html[data-openface-theme="cyberpunk"] h3,
+html[data-openface-theme="cyberpunk"] h4,
+html[data-openface-theme="cyberpunk"] strong,
+html[data-openface-theme="cyberpunk"] .issue-title,
+html[data-openface-theme="cyberpunk"] .repo-title {
+  color: #f3fbff !important;
+}
+
+html[data-openface-theme="cyberpunk"] input,
+html[data-openface-theme="cyberpunk"] textarea,
+html[data-openface-theme="cyberpunk"] select,
+html[data-openface-theme="cyberpunk"] .ui.input > input {
+  border-color: rgba(55, 204, 237, 0.45) !important;
+  background: #0d1327 !important;
+  color: #e9f8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] code,
+html[data-openface-theme="cyberpunk"] pre,
+html[data-openface-theme="cyberpunk"] .markdown code,
+html[data-openface-theme="cyberpunk"] .markdown pre {
+  border-color: rgba(255, 90, 180, 0.3) !important;
+  background: #090d1d !important;
+  color: #ff8dce !important;
+}
+
+html[data-openface-theme="cyberpunk"] table,
+html[data-openface-theme="cyberpunk"] th,
+html[data-openface-theme="cyberpunk"] td,
+html[data-openface-theme="cyberpunk"] blockquote {
+  border-color: rgba(55, 204, 237, 0.28) !important;
+  color: #d8f5ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] .page-footer {
+  border-color: rgba(55, 204, 237, 0.24) !important;
+  background: #080a16 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .page-content.repository.view.issue,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .issue-title-header,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .timeline-item.comment,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .timeline-item.comment .comment-body {
+  border-color: rgba(55, 204, 237, 0.34) !important;
+  background: rgba(13, 19, 39, 0.96) !important;
+  color: #e9f8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .timeline-item.comment .comment-header {
+  border-color: rgba(55, 204, 237, 0.34) !important;
+  background: #11162b !important;
+  color: #d8f5ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .timeline-item.comment .comment-body :not(code):not(pre):not(a),
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .issue-meta,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] relative-time,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .text.grey {
+  color: #c8ebf8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-mobile-repo-tabs a,
+html[data-openface-theme="cyberpunk"] .repo-header .openface-app-tab,
+html[data-openface-theme="cyberpunk"] .repo-header .item {
+  color: #8fb9cf !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-mobile-repo-tabs a.active,
+html[data-openface-theme="cyberpunk"] .repo-header .openface-app-tab.active,
+html[data-openface-theme="cyberpunk"] .repo-header .item.active {
+  border-color: #ff5ab4 !important;
+  color: #f3fbff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .comment-body details {
+  border: 1px solid rgba(55, 204, 237, 0.34) !important;
+  border-radius: 8px;
+  background: #090d1d !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .comment-body summary {
+  color: #2ce7ff !important;
+}
+
 /* layout370: mobile Forgejo header should match HF's compact header; hide stray desktop nav items. */
 @media (max-width: 767px) {
   html body #navbar .navbar-left > a.item:not(#navbar-logo):not(.openface-nav-menu-toggle),
@@ -17547,4 +17700,49 @@ body[data-openface-auth="login"] .openface-auth-resume a {
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
+}
+
+/* cyberpunk3: final specificity guard for late legacy surface rules. */
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .page-content.repository.view.issue,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .repository.view.issue .issue-title-header,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .repository.view.issue .timeline-item.comment,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .repository.view.issue .comment-body,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .repository.view.issue .ui.attached.segment.comment-body {
+  border-color: rgba(55, 204, 237, 0.34) !important;
+  background: rgba(13, 19, 39, 0.96) !important;
+  color: #e9f8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .repository.view.issue .comment-header,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .repository.view.issue .ui.top.attached.header.comment-header {
+  border-color: rgba(55, 204, 237, 0.34) !important;
+  background: #11162b !important;
+  color: #d8f5ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .repository.view.issue .comment-body :not(code):not(pre):not(a) {
+  color: #c8ebf8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .repository.view.issue .issue-title h1,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .repository.view.issue .issue-title-header h1 {
+  color: #f3fbff !important;
+}
+
+html[data-openface-theme="cyberpunk"] .secondary-nav overflow-menu .overflow-menu-items > a.item {
+  color: #8fb9cf !important;
+}
+
+html[data-openface-theme="cyberpunk"] .secondary-nav overflow-menu .overflow-menu-items > a.item.active {
+  border-color: #ff5ab4 !important;
+  color: #f3fbff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page] .repository .openface-mobile-repo-tabs > a {
+  color: #8fb9cf !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page] .repository .openface-mobile-repo-tabs > a.active {
+  border-color: #ff5ab4 !important;
+  color: #f3fbff !important;
 }

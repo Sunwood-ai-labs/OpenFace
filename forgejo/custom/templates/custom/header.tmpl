@@ -3,7 +3,23 @@
   Keep this hook intentionally light: global styling lives in openface.css.
   The custom CSS turns Forgejo into the canonical OpenFace Git/file UI.
 */}}
-<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260707-layout443">
+<script>
+(() => {
+  try {
+    const valid = ["standard", "solarpunk", "cyberpunk"];
+    const cookieTheme = document.cookie.match(/(?:^|;\s*)openface-theme=([^;]+)/)?.[1];
+    const saved = localStorage.getItem("openface-theme-v2");
+    const legacy = localStorage.getItem("openface-theme");
+    const theme = valid.includes(cookieTheme) ? cookieTheme
+      : valid.includes(saved) ? saved
+      : legacy && legacy !== "standard" && valid.includes(legacy) ? legacy
+      : matchMedia("(prefers-color-scheme: dark)").matches ? "cyberpunk" : "standard";
+    if (theme === "standard") delete document.documentElement.dataset.openfaceTheme;
+    else document.documentElement.dataset.openfaceTheme = theme;
+  } catch {}
+})();
+</script>
+<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260718-cyberpunk5">
 <style>
 @media (max-width: 767px) {
   html body nav#navbar .navbar-left.ui.secondary.menu > a.item:not(#navbar-logo),
