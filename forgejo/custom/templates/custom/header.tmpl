@@ -1091,9 +1091,9 @@
       item.dataset.openfaceIssueEnhanced = "true";
       if (title) title.textContent = title.textContent.trim();
       const issueNumber = index?.textContent.trim() || "";
-      const issueId = Number(issueNumber.replace(/\D/g, "")) || 0;
       const isPullLike = location.pathname.includes("/pulls");
-      const commentCount = issueId === 1 ? 4 : issueId === 2 ? 0 : issueId === 3 ? 0 : 1;
+      const nativeCommentLink = item.querySelector('a[href*="#comments"], .issue-comment-count a, .comments a');
+      const commentCount = Number(nativeCommentLink?.textContent.match(/[0-9]+/)?.[0] || 0);
       if (icon) {
         icon.classList.toggle("openface-community-pr-icon", isPullLike);
         icon.classList.toggle("openface-community-discussion-icon", !isPullLike);
@@ -2072,8 +2072,13 @@
       const data = await response.json();
       const topics = Array.isArray(data?.topics) ? data.topics : [];
       const label = labelFromTopics(topics);
+      const kindClass = repoKindClass(label);
       kind.textContent = label;
-      kind.closest(".repo-header")?.setAttribute("data-openface-kind", repoKindClass(label));
+      kind.closest(".repo-header")?.setAttribute("data-openface-kind", kindClass);
+      const appLabel = kindClass === "model" ? "Model card" : kindClass === "dataset" ? "Dataset card" : "App";
+      for (const appTab of document.querySelectorAll(".openface-app-tab")) {
+        appTab.textContent = appLabel;
+      }
       normalizeRepoControls();
     } catch {
       // Keep the DOM-derived fallback.
@@ -3065,7 +3070,7 @@
         tabs.className = "openface-mobile-repo-tabs";
         tabs.setAttribute("aria-label", "Repository sections");
         tabs.innerHTML = `
-          <a class="${isRepoRoot ? "active" : ""}" href="/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}">${escapeHtml(appLabel)}</a>
+          <a class="openface-app-tab ${isRepoRoot ? "active" : ""}" href="/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}">${escapeHtml(appLabel)}</a>
           <a class="${isFiles ? "active" : ""}" href="/git/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/src/branch/main">Files</a>
           <a class="${isCommunity ? "active" : ""}" href="/git/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/issues">Community</a>
         `;

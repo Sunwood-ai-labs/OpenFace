@@ -12781,8 +12781,8 @@ html body[data-openface-community-page="detail"] .repository.view.issue .ui.info
   }
 
   html body[data-openface-community-page="list"] .repository.issue-list .repo-header {
-    min-height: 68px !important;
-    height: 68px !important;
+    min-height: 99px !important;
+    height: 99px !important;
     margin-bottom: 0 !important;
   }
 

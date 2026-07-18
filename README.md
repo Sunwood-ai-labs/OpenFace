@@ -180,6 +180,16 @@ The initial seed includes a one-file page, an HTML/CSS/JavaScript portfolio, a m
 
 See [OpenFace Pages](https://sunwood-ai-labs.github.io/OpenFace/guide/pages) and the [browser verification record](docs/evidence/pages/README.md).
 
+## 💬 Community and Issues
+
+Every repository keeps Forgejo-backed Issues and Pull Requests behind the OpenFace **Community** tab. The initial seed adds real discussion records to the QR Code Generator Space so list, detail, filtering, and authenticated creation routes can be verified after a fresh rebuild.
+
+| Discussion list | Discussion detail |
+|---|---|
+| ![OpenFace Community list](docs/evidence/community-ui/issues-list-desktop.png) | ![OpenFace Community detail](docs/evidence/community-ui/issue-detail-desktop.png) |
+
+Desktop and mobile evidence, route checks, and responsive results are recorded in the [Community / Issue verification](docs/evidence/community-ui/README.md).
+
 ## 🧠 Skills, MCPs, and versioned Prompts
 
 The seed imports pinned public repositories rather than label-only fixtures. Skill entries contain `SKILL.md`; MCP entries contain an implementation and dependency definition. Source selection and verification are recorded in [docs/research/skill-mcp-sources.md](docs/research/skill-mcp-sources.md).

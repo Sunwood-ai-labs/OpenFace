@@ -1214,6 +1214,15 @@ import_hf_space "nakas/360_metadata_image_injector" \
   "panorama-metadata-injector" "Inject 360-degree panorama metadata into images"
 import_hf_space "meebox/qrcode" \
   "qr-code-generator" "Generate QR codes locally"
+ensure_issue "qr-code-generator" \
+  "How do I run this Space entirely offline?" \
+  "This OpenFace community thread collects the local Docker startup steps and confirms that QR generation works without an external API."
+ensure_issue "qr-code-generator" \
+  "Add SVG download alongside PNG" \
+  "Track an optional vector export for workflows that need sharp QR codes in print and documentation."
+ensure_issue "qr-code-generator" \
+  "Document QR error-correction settings" \
+  "Explain the available error-correction levels and when to choose each one in the mirrored CPU Space."
 import_hf_space "umuth/image-metadata-editor" \
   "image-metadata-editor" "View and edit common image metadata"
 import_hf_space "NeuralFalcon/Remove-Silence-From-Audio" \

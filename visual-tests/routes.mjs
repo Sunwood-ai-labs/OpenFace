@@ -20,5 +20,7 @@ export const routes = [
   { id: 'repository-files', label: 'Repository files', path: '/openface/mystic-git-auto-commit?tab=files&revision=v4.2', focus: 'Unblurred repository header, file list columns, and tabs' },
   { id: 'space-app', label: 'Embedded Space app', path: '/openface/qr-code-generator', focus: 'OpenFace navigation, Space header, runtime state, and embedded live application', settleMs: 2000 },
   { id: 'space-files', label: 'Space files', path: '/openface/qr-code-generator?tab=files', focus: 'Space repository file list, header clarity, tabs, and Pages card' },
+  { id: 'community-list', label: 'Community discussions', path: '/git/openface/qr-code-generator/issues', focus: 'Seeded issue rows, filters, repository tabs, and responsive Community layout' },
+  { id: 'community-detail', label: 'Community discussion detail', path: '/git/openface/qr-code-generator/issues/1', focus: 'Issue title, status, author, body, repository navigation, and responsive reading width' },
   { id: 'pages-live', label: 'OpenFace Pages site', path: '/pages/openface/pages-starter/', focus: 'Published static page, asset loading, and gateway routing' },
 ];

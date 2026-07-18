@@ -78,6 +78,10 @@ try {
         const heading = document.querySelector('h1')?.textContent?.trim() || null;
         const viewportWidth = document.documentElement.clientWidth;
         const scrollWidth = Math.max(document.documentElement.scrollWidth, document.body?.scrollWidth || 0);
+        const visibleAppTabLabels = Array.from(document.querySelectorAll('.openface-app-tab'))
+          .filter((element) => element.getBoundingClientRect().width > 0)
+          .map((element) => element.textContent?.trim() || '')
+          .filter(Boolean);
         return {
           title: document.title,
           heading,
@@ -88,6 +92,9 @@ try {
           applicationUnavailable: bodyText.includes('Application unavailable'),
           runningBadgeVisible: bodyText.includes('CPU · Running'),
           onDemandStageVisible: bodyText.includes('This Space runs on demand'),
+          communityPage: document.body?.getAttribute('data-openface-community-page') || null,
+          issueRowCount: document.querySelectorAll('#issue-list .flex-item').length,
+          visibleAppTabLabels,
           bodyPreview: bodyText.replace(/\s+/g, ' ').trim().slice(0, 240),
         };
       }).catch(() => ({
@@ -100,6 +107,9 @@ try {
         applicationUnavailable: false,
         runningBadgeVisible: false,
         onDemandStageVisible: false,
+        communityPage: null,
+        issueRowCount: 0,
+        visibleAppTabLabels: [],
         bodyPreview: '',
       }));
 
@@ -111,6 +121,10 @@ try {
       if (pageState.repositoryNotFound) defects.push('Repository not found empty state is visible');
       if (pageState.applicationUnavailable) defects.push('Embedded application is unavailable');
       if (pageState.runningBadgeVisible && pageState.onDemandStageVisible) defects.push('Runtime badge says Running while the on-demand placeholder is visible');
+      if (route.id === 'community-list' && pageState.communityPage !== 'list') defects.push('Community list marker is missing');
+      if (route.id === 'community-list' && pageState.issueRowCount < 1) defects.push('Community list has no seeded issue rows');
+      if (route.id === 'community-detail' && pageState.communityPage !== 'detail') defects.push('Community detail marker is missing');
+      if (route.id.startsWith('community-') && !pageState.visibleAppTabLabels.includes('App')) defects.push('Space repository tab is not labeled App');
       if (pageErrors.length) defects.push(`${pageErrors.length} uncaught page error(s)`);
       if (httpErrors.length) defects.push(`${httpErrors.length} HTTP resource error(s)`);
 
