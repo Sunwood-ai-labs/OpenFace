@@ -1,59 +1,59 @@
 # Seraphim Labs member avatar prompts
 
-These four fictional identities were generated with the built-in image generation tool. Each final image uses a plain studio background, a square circular-avatar-safe composition, and clearly visible halo-and-wing angel styling.
+These four fictional identities were generated with the built-in image generation tool. The final set uses a unified high-end anime/game-character style, plain backgrounds, circular-avatar-safe composition, and clearly visible halos and wings.
 
 ## Aurelia Vale
 
 ```text
-Use case: photorealistic-natural
-Asset type: square organization member avatar for a professional AI safety platform
-Primary request: Create a photorealistic head-and-shoulders portrait of Aurelia Vale, a fictional Japanese-British woman in her early 30s, portrayed unmistakably as a refined modern guardian angel and lead AI safety researcher.
-Scene/backdrop: perfectly plain warm ivory studio background, no texture, no scenery.
-Style/medium: premium editorial corporate photography with subtle cinematic celestial realism, realistic skin and hair.
-Composition/framing: centered face and shoulders, direct warm gaze, square crop with generous circular-avatar-safe margin. A thin elegant warm-white luminous halo is clearly visible above and behind her head, and the upper curves of two realistic white feathered wings are visible symmetrically behind her shoulders without dominating the face.
-Lighting/mood: soft diffused studio light with a restrained golden rim light, calm, intelligent, protective.
-Wardrobe/details: minimal cream blazer over a charcoal top; one very small matte-gold halo-ring lapel pin as a subtle angel motif.
-Constraints: one person only; professional, sophisticated, believable; clear angel identity; no text, logo, watermark, fantasy armor, costume, crown, religious iconography, clouds, background gradient, frame, or border; wings must remain behind the shoulders and halo must not intersect the face.
+Use case: stylized-concept
+Asset type: square organization member avatar for a premium angel-themed AI safety platform
+Primary request: Create Aurelia Vale, a fictional Japanese-British woman in her early 30s and lead AI safety researcher, as a sophisticated modern guardian-angel character.
+Scene/backdrop: perfectly plain warm ivory background, no scenery or texture.
+Style/medium: polished high-end anime and contemporary game character illustration; clean confident linework, soft cel shading, subtly painterly facial rendering; clearly illustrated, not photorealistic and not a photo.
+Composition/framing: centered bust portrait, warm intelligent gaze, square circular-avatar-safe crop. A crisp thin gold-white halo is fully visible above her head; two stylized white feather wings rise behind her shoulders and remain readable at small icon size.
+Wardrobe/details: tailored cream blazer over charcoal, geometric gold halo pin, restrained celestial accents.
+Color palette: ivory, charcoal, warm gold, subtle cyan accent.
+Constraints: one character only, professional adult design, distinctive silhouette, tasteful and modern, no text, logo, watermark, chibi proportions, childlike face, fantasy armor, crown, religious symbol, clouds, gradient, frame, or border.
 ```
 
 ## Cassian Reed
 
 ```text
-Use case: photorealistic-natural
-Asset type: square organization member avatar for a professional AI safety platform
-Primary request: Create a photorealistic head-and-shoulders portrait of Cassian Reed, a fictional Black British man in his late 30s, portrayed unmistakably as a formidable but humane modern guardian angel and red-team security lead.
-Scene/backdrop: perfectly plain cool light-gray studio background, no texture, no scenery.
-Style/medium: premium editorial corporate photography with restrained cinematic celestial realism, realistic skin and hair.
-Composition/framing: centered face and shoulders, confident thoughtful gaze, square crop with generous circular-avatar-safe margin. A thin elegant pale-gold luminous halo is clearly visible above and behind his head, and the upper curves of two realistic white feathered wings are visible symmetrically behind his shoulders without dominating the face.
-Lighting/mood: soft diffused studio light with a subtle silver rim light, incisive, protective, trustworthy.
-Wardrobe/details: minimal navy jacket over an ivory shirt; one very small matte-gold wing lapel pin as a subtle angel motif.
-Constraints: one person only; professional, sophisticated, believable; clear angel identity; no text, logo, watermark, fantasy armor, costume, crown, religious iconography, clouds, background gradient, frame, or border; wings behind shoulders and halo not intersecting face.
+Use case: stylized-concept
+Asset type: square organization member avatar for a premium angel-themed AI safety platform
+Primary request: Create Cassian Reed, a fictional Black British man in his late 30s and red-team security lead, as a formidable but humane modern guardian-angel character.
+Scene/backdrop: perfectly plain cool light-gray background, no scenery or texture.
+Style/medium: polished high-end anime and contemporary game character illustration; clean confident linework, soft cel shading, subtly painterly facial rendering; clearly illustrated, not photorealistic and not a photo.
+Composition/framing: centered bust portrait, focused confident gaze, square circular-avatar-safe crop. A crisp thin pale-gold halo is fully visible above his head; two stylized white feather wings rise behind his shoulders and remain readable at small icon size.
+Wardrobe/details: structured navy tactical-business jacket over ivory shirt, small gold wing insignia, restrained security-tech details.
+Color palette: navy, ivory, pale gold, subtle amber accent.
+Constraints: one character only, professional adult design, distinctive silhouette, tasteful and modern, no text, logo, watermark, chibi proportions, childlike face, fantasy armor, crown, religious symbol, clouds, gradient, frame, or border.
 ```
 
 ## Ilyana Noor
 
 ```text
-Use case: photorealistic-natural
-Asset type: square organization member avatar for a professional AI safety platform
-Primary request: Create a photorealistic head-and-shoulders portrait of Ilyana Noor, a fictional South Asian woman in her mid 30s, portrayed unmistakably as a serene modern guardian angel and evaluation scientist.
-Scene/backdrop: perfectly plain sand-beige studio background, no texture, no scenery.
-Style/medium: premium editorial corporate photography with restrained cinematic celestial realism, realistic skin and hair.
-Composition/framing: centered face and shoulders, clear analytical gaze with a slight smile, square crop with generous circular-avatar-safe margin. A thin elegant pearl-white luminous halo is clearly visible above and behind her head, and the upper curves of two realistic white feathered wings are visible symmetrically behind her shoulders without dominating the face.
-Lighting/mood: soft diffused studio light with a gentle warm rim light, precise, serene, approachable.
-Wardrobe/details: minimal charcoal blouse with an ivory jacket; one very small matte-gold feather brooch as a subtle angel motif.
-Constraints: one person only; professional, sophisticated, believable; clear angel identity; no text, logo, watermark, fantasy armor, costume, crown, religious iconography, clouds, background gradient, frame, or border; wings behind shoulders and halo not intersecting face.
+Use case: stylized-concept
+Asset type: square organization member avatar for a premium angel-themed AI safety platform
+Primary request: Create Ilyana Noor, a fictional South Asian woman in her mid 30s and evaluation scientist, as a serene analytical modern guardian-angel character.
+Scene/backdrop: perfectly plain sand-beige background, no scenery or texture.
+Style/medium: polished high-end anime and contemporary game character illustration; clean confident linework, soft cel shading, subtly painterly facial rendering; clearly illustrated, not photorealistic and not a photo.
+Composition/framing: centered bust portrait, composed analytical gaze with a slight smile, square circular-avatar-safe crop. A crisp thin pearl-white halo is fully visible above her head; two stylized white feather wings rise behind her shoulders and remain readable at small icon size.
+Wardrobe/details: ivory research jacket over charcoal high-neck blouse, elegant gold feather brooch, subtle evaluation-interface motif in the tailoring only.
+Color palette: sand, ivory, charcoal, pearl white, subtle teal accent.
+Constraints: one character only, professional adult design, distinctive silhouette, tasteful and modern, no text, logo, watermark, chibi proportions, childlike face, fantasy armor, crown, religious symbol, clouds, gradient, frame, or border.
 ```
 
 ## Lucien Sol
 
 ```text
-Use case: photorealistic-natural
-Asset type: square organization member avatar for a professional AI safety platform
-Primary request: Create a photorealistic head-and-shoulders portrait of Lucien Sol, a fictional Latino man in his late 20s, portrayed unmistakably as an optimistic modern guardian angel and responsible infrastructure engineer.
-Scene/backdrop: perfectly plain pale blue-gray studio background, no texture, no scenery.
-Style/medium: premium editorial corporate photography with restrained cinematic celestial realism, realistic skin and hair.
-Composition/framing: centered face and shoulders, relaxed attentive gaze, square crop with generous circular-avatar-safe margin. A thin elegant cool-white luminous halo is clearly visible above and behind his head, and the upper curves of two realistic white feathered wings are visible symmetrically behind his shoulders without dominating the face.
-Lighting/mood: soft diffused studio light with a subtle sunrise-gold rim light, capable, calm, optimistic.
-Wardrobe/details: minimal soft-gray overshirt over a navy crewneck; one very small matte-gold sun-halo pin as a subtle angel motif.
-Constraints: one person only; professional, sophisticated, believable; clear angel identity; no text, logo, watermark, fantasy armor, costume, crown, religious iconography, clouds, background gradient, frame, or border; wings behind shoulders and halo not intersecting face.
+Use case: stylized-concept
+Asset type: square organization member avatar for a premium angel-themed AI safety platform
+Primary request: Create Lucien Sol, a fictional Latino man in his late 20s and responsible infrastructure engineer, as an optimistic modern guardian-angel character.
+Scene/backdrop: perfectly plain pale blue-gray background, no scenery or texture.
+Style/medium: polished high-end anime and contemporary game character illustration; clean confident linework, soft cel shading, subtly painterly facial rendering; clearly illustrated, not photorealistic and not a photo.
+Composition/framing: centered bust portrait, relaxed attentive gaze, square circular-avatar-safe crop. A crisp thin cool-white halo is fully visible above his head; two stylized white feather wings rise behind his shoulders and remain readable at small icon size.
+Wardrobe/details: streamlined soft-gray tech overshirt over navy crewneck, small gold sun-halo pin, subtle infrastructure circuit accents in seams only.
+Color palette: pale blue-gray, navy, white, gold, subtle electric-blue accent.
+Constraints: one character only, professional adult design, distinctive silhouette, tasteful and modern, no text, logo, watermark, chibi proportions, childlike face, fantasy armor, crown, religious symbol, clouds, gradient, frame, or border.
 ```
