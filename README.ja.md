@@ -99,6 +99,8 @@ flowchart LR
 
 Sunwood AI Labs の公開 GitHub リポジトリから、実ファイルとコミット履歴を含む Skill 10件・MCPサーバー10件を取り込みます。名前だけのダミーではなく、Skill は `SKILL.md`、MCP はサーバー実装と依存定義を検証済みです。
 
+各Skillリポジトリのルートにある編集可能な `openface.skill.json` で、Skill間の必須／推奨依存関係を指定できます。OpenFaceは逆方向の **Referenced by** も自動算出し、宣言がないSkillは **Standalone** と表示します。形式と編集手順は [Skill relationship metadata](docs/skill-relationships.md) を参照してください。
+
 | Skills | MCPs |
 |---|---|
 | <img src="docs/evidence/skills-mcps/skills-directory.png" alt="実在するSkill 10件を表示するOpenFace Skills一覧" width="100%"> | <img src="docs/evidence/skills-mcps/mcps-directory.png" alt="実在するMCPサーバー10件を表示するOpenFace MCP一覧" width="100%"> |
