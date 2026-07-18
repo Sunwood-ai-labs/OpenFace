@@ -3,10 +3,16 @@ export const viewports = [
   { id: 'mobile', width: 390, height: 844 },
 ];
 
+export const themes = [
+  { id: 'standard', label: 'Standard', colorScheme: 'light' },
+  { id: 'solarpunk', label: 'Solarpunk', colorScheme: 'light' },
+  { id: 'cyberpunk', label: 'Cyberpunk', colorScheme: 'dark' },
+];
+
 export const routes = [
   { id: 'home', label: 'Home', path: '/', focus: 'Hero, navigation, discovery sections, and card density' },
   { id: 'models', label: 'Models directory', path: '/models', focus: 'Filters, model cards, metadata, and pagination' },
-  { id: 'models-cyberpunk-controls', label: 'Cyberpunk model controls', path: '/models', theme: 'cyberpunk', openDisclosureSelector: 'details[name="model-add-filter-menu"] > summary', openDisclosureViewport: 'mobile', focus: 'Cyberpunk contrast plus a visibly opened mobile filter menu' },
+  { id: 'models-filter-controls', label: 'Model filter controls', path: '/models', openDisclosureSelector: 'details[name="model-add-filter-menu"] > summary', openDisclosureViewport: 'mobile', focus: 'A visibly opened mobile filter menu in every theme' },
   { id: 'datasets', label: 'Datasets directory', path: '/datasets', focus: 'Filters, dataset cards, metadata, and pagination' },
   { id: 'spaces', label: 'Spaces directory', path: '/spaces', focus: 'Colorful Space cards, runtime badges, metrics, and pagination' },
   { id: 'skills', label: 'Skills directory', path: '/skills', focus: 'Skill repository cards, source labels, and filters' },
@@ -24,6 +30,11 @@ export const routes = [
   { id: 'community-list', label: 'Community discussions', path: '/git/openface/qr-code-generator/issues', focus: 'Seeded issue rows, filters, repository tabs, and responsive Community layout' },
   { id: 'community-detail', label: 'Community discussion detail', path: '/git/openface/qr-code-generator/issues/1', focus: 'Issue title, status, author, body, repository navigation, and responsive reading width' },
   { id: 'community-markdown', label: 'Community Markdown discussion', path: '/git/openface/qr-code-generator/issues/4', focus: 'Natural agent discussion with quote, lists, task items, code blocks, table, link, and disclosure rendering' },
-  { id: 'community-markdown-cyberpunk', label: 'Cyberpunk Markdown disclosure', path: '/git/openface/qr-code-generator/issues/4', theme: 'cyberpunk', openDisclosureSelector: '.comment-body details > summary', focus: 'Shared cyberpunk theme, Markdown contrast, and an opened disclosure on mobile WebViews' },
-  { id: 'pages-live', label: 'OpenFace Pages site', path: '/pages/openface/pages-starter/', focus: 'Published static page, asset loading, and gateway routing' },
+  { id: 'community-markdown-disclosure', label: 'Community Markdown disclosure', path: '/git/openface/qr-code-generator/issues/4', openDisclosureSelector: '.comment-body details > summary', focus: 'Markdown contrast and an opened disclosure in every theme' },
+  { id: 'forgejo-home', label: 'Forgejo home', path: '/git/', focus: 'Hub hero, catalog links, navigation, and theme surface consistency' },
+  { id: 'organization', label: 'Organization profile', path: '/git/openface', focus: 'Organization hero, interests, featured repositories, members, and theme contrast' },
+  { id: 'user-profile', label: 'User profile', path: '/git/luna-scout', focus: 'Agent profile, repository list, cards, and theme contrast' },
+  { id: 'login', label: 'Log in', path: '/git/user/login', focus: 'Authentication card, form controls, links, and themed background' },
+  { id: 'signup', label: 'Sign up', path: '/git/user/sign_up', focus: 'Registration card, form controls, validation labels, and themed background' },
+  { id: 'pages-live', label: 'OpenFace Pages site', path: '/pages/openface/pages-starter/', themeAware: false, focus: 'Published static page, asset loading, and gateway routing' },
 ];

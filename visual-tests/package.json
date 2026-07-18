@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "capture": "node capture.mjs",
+    "capture:themes": "node theme-matrix.mjs",
     "audit:interactions": "node interaction-audit.mjs"
   },
   "dependencies": {
