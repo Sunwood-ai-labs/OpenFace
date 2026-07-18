@@ -18054,6 +18054,43 @@ html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] 
   color: #e9f8ff !important;
 }
 
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository.issue-list .openface-community-shell,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository.issue-list .openface-community-main,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository.issue-list #issue-list,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository.issue-list #issue-list.flex-list,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository.issue-list #issue-list .flex-item {
+  border-color: rgba(55, 204, 237, 0.34) !important;
+  background: #0d1327 !important;
+  color: #e9f8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .page-content.repository.issue-list,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .page-content.repository.issue-list > .ui.container {
+  background: #080a16 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository.issue-list #issue-list .issue-title,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository.issue-list #issue-list a.issue-title.tw-no-underline {
+  color: #f3fbff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository.issue-list #issue-list .flex-item-body,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository.issue-list #issue-list .openface-issue-meta {
+  color: #8fb9cf !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository.issue-list .openface-community-primary,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository.issue-list .openface-community-secondary,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository.issue-list details.openface-community-sort summary {
+  border-color: rgba(55, 204, 237, 0.4) !important;
+  background: #10172d !important;
+  color: #c8ebf8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository.issue-list .openface-community-aside a {
+  color: #38e8ff !important;
+}
+
 html[data-openface-theme="cyberpunk"] body[data-openface-auth] .page-content a:not(.ui.button),
 html[data-openface-theme="cyberpunk"] body[data-openface-auth] .openface-auth-footer a,
 html[data-openface-theme="cyberpunk"] body[data-openface-auth] .ui.secondary.pointing.menu a.item.active,
