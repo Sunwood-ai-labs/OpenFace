@@ -133,6 +133,7 @@ try {
         ))
           .map((element) => Number(element.textContent?.match(/[0-9]+/)?.[0] || 0));
         const markdownSurface = document.querySelector('.issue-content-left, .ui.timeline');
+        const skillRelationshipMap = document.querySelector('[data-skill-relationship-map]');
         return {
           title: document.title,
           openFaceTheme: document.documentElement.getAttribute('data-openface-theme') || 'standard',
@@ -157,6 +158,9 @@ try {
           markdownLinks: markdownSurface?.querySelectorAll('.comment-body a[href]').length || 0,
           markdownDetails: markdownSurface?.querySelectorAll('.comment-body details').length || 0,
           visibleAppTabLabels,
+          skillRelationshipMapVisible: Boolean(skillRelationshipMap),
+          skillRelationshipLinks: skillRelationshipMap?.querySelectorAll('[data-skill-relationship-link]').length || 0,
+          skillDependencyBadges: document.querySelectorAll('[data-skill-dependency-count]').length,
           bodyPreview: bodyText.replace(/\s+/g, ' ').trim().slice(0, 240),
         };
       }).catch(() => ({
@@ -183,6 +187,9 @@ try {
         markdownLinks: 0,
         markdownDetails: 0,
         visibleAppTabLabels: [],
+        skillRelationshipMapVisible: false,
+        skillRelationshipLinks: 0,
+        skillDependencyBadges: 0,
         bodyPreview: '',
       }));
 
@@ -214,6 +221,9 @@ try {
       if (route.id.startsWith('community-markdown') && pageState.markdownLinks < 2) defects.push('Markdown links or mention are missing');
       if (route.id.startsWith('community-markdown') && pageState.markdownDetails < 1) defects.push('Markdown disclosure is missing');
       if (route.id.startsWith('community-') && !pageState.visibleAppTabLabels.includes('App')) defects.push('Space repository tab is not labeled App');
+      if (route.id === 'skills' && pageState.skillDependencyBadges < 10) defects.push('Skills directory does not expose dependency status for every seeded Skill');
+      if (route.id === 'skill-detail' && !pageState.skillRelationshipMapVisible) defects.push('Skill relationship map is missing');
+      if (route.id === 'skill-detail' && pageState.skillRelationshipLinks < 3) defects.push('Skill relationship map does not contain the seeded dependency links');
       if (pageErrors.length) defects.push(`${pageErrors.length} uncaught page error(s)`);
       if (httpErrors.length) defects.push(`${httpErrors.length} HTTP resource error(s)`);
 
