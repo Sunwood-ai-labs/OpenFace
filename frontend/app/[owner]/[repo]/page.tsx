@@ -6,6 +6,7 @@ import {
   getContents,
   getCommits,
   getRepoTags,
+  searchRepos,
   getTextFile,
   cloneUrl,
   forgejoRepoUrl,
@@ -29,6 +30,7 @@ import HfIcon, { HfIconName } from '@/components/HfIcon';
 import { getRepoMetrics } from '@/lib/agent-metrics';
 import RepoViewCount from '@/components/RepoViewCount';
 import PromptRevisionSwitcher from '@/components/PromptRevisionSwitcher';
+import SkillRelationshipMap from '@/components/SkillRelationshipMap';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,10 +89,11 @@ export default async function RepoDetailPage({
   const topicBadges = nonTypeTopics(repoInfo.topics);
   const promptVersion = kind === 'prompt' ? repoPromptVersion(repoInfo.topics) : null;
   const isSpace = kind === 'space';
-  const [agentMetrics, pagesSource, promptTags] = await Promise.all([
+  const [agentMetrics, pagesSource, promptTags, skillCatalog] = await Promise.all([
     isSpace ? getRepoMetrics(owner, repo) : Promise.resolve(null),
     getPagesSource(owner, repo, repoInfo.default_branch || 'main'),
     kind === 'prompt' ? getRepoTags(owner, repo) : Promise.resolve([]),
+    kind === 'skill' ? searchRepos({ topic: 'skill', limit: 100 }) : Promise.resolve(null),
   ]);
   const requestedRevision = resolvedSearchParams.revision?.trim() || null;
   const selectedRevision = requestedRevision && promptTags.some((tag) => tag.name === requestedRevision)
@@ -186,7 +189,15 @@ export default async function RepoDetailPage({
       {!isSpaceApp && <div className={tab === 'files' ? '' : 'grid min-w-0 grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_280px]'}>
         <div className="min-w-0">
           {tab === 'card' ? (
-            <CardTabContent owner={owner} repo={repo} kind={kind} defaultBranch={repoInfo.default_branch || 'main'} revision={selectedRevision} />
+            <CardTabContent
+              owner={owner}
+              repo={repo}
+              kind={kind}
+              defaultBranch={repoInfo.default_branch || 'main'}
+              revision={selectedRevision}
+              skillRepo={kind === 'skill' ? repoInfo : null}
+              skillCatalog={skillCatalog?.data || []}
+            />
           ) : (
             <FilesTabContent
               owner={owner}
@@ -321,12 +332,16 @@ async function CardTabContent({
   kind,
   defaultBranch,
   revision,
+  skillRepo,
+  skillCatalog,
 }: {
   owner: string;
   repo: string;
   kind: RepoKind | null;
   defaultBranch: string;
   revision?: string | null;
+  skillRepo: import('@/lib/forgejo').Repo | null;
+  skillCatalog: import('@/lib/forgejo').Repo[];
 }) {
   const ref = revision || defaultBranch;
   const refKind = revision ? 'tag' : 'branch';
@@ -359,6 +374,7 @@ async function CardTabContent({
         </div>
       ) : null}
       <CardBadges frontmatter={frontmatter} basePath={kind === 'dataset' ? '/datasets' : kind === 'space' ? '/spaces' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : '/models'} />
+      {kind === 'skill' && skillRepo ? <SkillRelationshipMap repo={skillRepo} catalog={skillCatalog} /> : null}
       <div
         className={kind === 'skill' || kind === 'prompt'
           ? 'github-markdown-body prose-openface min-w-0 bg-white dark:bg-zinc-900'

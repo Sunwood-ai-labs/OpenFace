@@ -27,6 +27,7 @@ export default function RepoSearchList({
         const owner = repo.owner?.login ?? repo.full_name.split('/')[0];
         const badges = nonTypeTopics(repo.topics).slice(0, 2);
         const promptVersion = kind === 'prompt' ? repoPromptVersion(repo.topics) : null;
+        const dependencyCount = kind === 'skill' ? repo.skill_relationships?.dependencies.length || 0 : 0;
         const basePath = kind === 'dataset' ? '/datasets' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : '/models';
         const primaryBadge = badges[0] || (kind === 'dataset' ? 'Viewer' : kind === 'skill' ? 'Codex skill' : kind === 'mcp' ? 'MCP server' : kind === 'prompt' ? 'Prompt' : 'Text Generation');
         const secondaryBadge = badges[1];
@@ -52,6 +53,16 @@ export default function RepoSearchList({
                 {repo.full_name}
               </Link>
               {promptVersion ? <span className="shrink-0 rounded-full bg-orange-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-orange-800">{promptVersion}</span> : null}
+              {kind === 'skill' ? (
+                <span
+                  data-skill-dependency-count
+                  className={`inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${dependencyCount ? 'bg-violet-100 text-violet-700' : 'bg-zinc-100 text-zinc-500'}`}
+                  title={dependencyCount ? `${dependencyCount} declared Skill dependencies` : 'No declared Skill dependencies'}
+                >
+                  <HfIcon name="link" className="h-2.5 w-2.5" />
+                  {dependencyCount ? `${dependencyCount} deps` : 'Standalone'}
+                </span>
+              ) : null}
             </div>
             <div className="mt-1 flex min-w-0 items-center gap-2 text-sm text-zinc-400">
               <p className="min-w-0 flex-1 truncate">
