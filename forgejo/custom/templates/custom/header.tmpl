@@ -2638,8 +2638,20 @@
         `;
         const likePill = overlay.querySelector(".openface-title-like");
         const likeButton = header.querySelector('.repo-buttons form[action*="/action/watch"] button, .repo-buttons .openface-like-action button');
-        if (likePill && likeButton) {
-          likePill.setAttribute("aria-label", "Like this repository");
+        if (likePill) {
+          if (likeButton && !likeButton.disabled) {
+            likePill.setAttribute("aria-label", "Like this repository");
+          } else {
+            const redirectTo = encodeURIComponent(`${location.pathname}${location.search}`);
+            likePill.disabled = false;
+            likePill.type = "button";
+            likePill.removeAttribute("form");
+            likePill.setAttribute("aria-label", "Log in to like this repository");
+            likePill.setAttribute("title", "Log in to like this repository");
+            likePill.addEventListener("click", () => {
+              location.href = `/git/user/login?redirect_to=${redirectTo}`;
+            });
+          }
         }
       }
     }
