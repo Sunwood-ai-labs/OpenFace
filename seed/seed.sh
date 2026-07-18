@@ -435,7 +435,11 @@ put_file() {
   local get_code
   get_code=$(api GET "/repos/${ORG_NAME}/${name}/contents/${path}")
 
-  if [ "$get_code" = "200" ]; then
+  # Forgejo can briefly answer a missing exact path with the repository root
+  # directory listing (HTTP 200) immediately after an imported branch lands.
+  # Only treat a response as an existing file when it is an object with a SHA;
+  # otherwise create the requested path instead of sending a SHA-less update.
+  if [ "$get_code" = "200" ] && jq -e 'type == "object" and (.sha | type == "string" and length > 0)' /tmp/api_resp.json >/dev/null 2>&1; then
     local sha
     sha=$(jq -r '.sha' /tmp/api_resp.json)
     local current_b64
@@ -456,6 +460,9 @@ put_file() {
       cat /tmp/api_resp.json
     fi
   else
+    if [ "$get_code" = "200" ]; then
+      log "Contents lookup for ${name}/${path} returned a directory listing; creating the exact file path."
+    fi
     local payload
     payload=$(jq -n --arg msg "$message" --arg content "$content_b64" \
       '{message:$msg, content:$content, branch:"main"}')
