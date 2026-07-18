@@ -9,7 +9,8 @@
     "capture:scroll": "node scroll-audit.mjs",
     "audit:organization": "node organization-audit.mjs",
     "audit:organization-edit": "node organization-edit-audit.mjs",
-    "audit:interactions": "node interaction-audit.mjs"
+    "audit:interactions": "node interaction-audit.mjs",
+    "audit:theme-selector": "node theme-selector-audit.mjs"
   },
   "dependencies": {
     "playwright": "1.61.1"
