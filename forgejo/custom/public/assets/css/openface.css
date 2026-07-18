@@ -17766,3 +17766,20 @@ html body .ui.button:active {
   transform: translateY(1px);
   filter: brightness(0.92);
 }
+
+html[data-openface-theme="cyberpunk"] {
+  background: #080a16 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .repository.view.issue .ui.warning.message {
+  border: 1px solid rgba(55, 204, 237, 0.34) !important;
+  background: rgba(13, 19, 39, 0.96) !important;
+  color: #c8ebf8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .repository.view.issue .comment-body pre,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .repository.view.issue .comment-body pre.code-block {
+  border-color: rgba(255, 90, 180, 0.3) !important;
+  background: #090d1d !important;
+  color: #ff8dce !important;
+}

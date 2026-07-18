@@ -6,6 +6,7 @@ export const viewports = [
 export const routes = [
   { id: 'home', label: 'Home', path: '/', focus: 'Hero, navigation, discovery sections, and card density' },
   { id: 'models', label: 'Models directory', path: '/models', focus: 'Filters, model cards, metadata, and pagination' },
+  { id: 'models-cyberpunk-controls', label: 'Cyberpunk model controls', path: '/models', theme: 'cyberpunk', openDisclosureSelector: 'details[name="model-add-filter-menu"] > summary', openDisclosureViewport: 'mobile', focus: 'Cyberpunk contrast plus a visibly opened mobile filter menu' },
   { id: 'datasets', label: 'Datasets directory', path: '/datasets', focus: 'Filters, dataset cards, metadata, and pagination' },
   { id: 'spaces', label: 'Spaces directory', path: '/spaces', focus: 'Colorful Space cards, runtime badges, metrics, and pagination' },
   { id: 'skills', label: 'Skills directory', path: '/skills', focus: 'Skill repository cards, source labels, and filters' },
@@ -23,5 +24,6 @@ export const routes = [
   { id: 'community-list', label: 'Community discussions', path: '/git/openface/qr-code-generator/issues', focus: 'Seeded issue rows, filters, repository tabs, and responsive Community layout' },
   { id: 'community-detail', label: 'Community discussion detail', path: '/git/openface/qr-code-generator/issues/1', focus: 'Issue title, status, author, body, repository navigation, and responsive reading width' },
   { id: 'community-markdown', label: 'Community Markdown discussion', path: '/git/openface/qr-code-generator/issues/4', focus: 'Natural agent discussion with quote, lists, task items, code blocks, table, link, and disclosure rendering' },
+  { id: 'community-markdown-cyberpunk', label: 'Cyberpunk Markdown disclosure', path: '/git/openface/qr-code-generator/issues/4', theme: 'cyberpunk', openDisclosureSelector: '.comment-body details > summary', focus: 'Shared cyberpunk theme, Markdown contrast, and an opened disclosure on mobile WebViews' },
   { id: 'pages-live', label: 'OpenFace Pages site', path: '/pages/openface/pages-starter/', focus: 'Published static page, asset loading, and gateway routing' },
 ];

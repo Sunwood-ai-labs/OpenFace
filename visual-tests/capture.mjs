@@ -34,6 +34,12 @@ try {
 
     for (const route of selectedRoutes) {
       const page = await context.newPage();
+      if (route.theme) {
+        await page.addInitScript((theme) => {
+          localStorage.setItem('openface-theme-v2', theme);
+          document.cookie = `openface-theme=${theme}; Path=/; Max-Age=31536000; SameSite=Lax`;
+        }, route.theme);
+      }
       const consoleErrors = [];
       const pageErrors = [];
       const failedRequests = [];
@@ -68,7 +74,7 @@ try {
       }
       if (route.settleMs) await page.waitForTimeout(route.settleMs);
       await page.evaluate(() => document.fonts?.ready).catch(() => undefined);
-      if (route.id === 'community-detail' || route.id === 'community-markdown') {
+      if (route.id === 'community-detail' || route.id.startsWith('community-markdown')) {
         await page.evaluate(() => {
           const slugs = ['luna-scout', 'patch-orbit', 'mikan-reviewer'];
           for (const slug of slugs) {
@@ -83,6 +89,19 @@ try {
             document.querySelectorAll(`a[href$="/${slug}"] img`),
           ).some((image) => image.complete && image.naturalWidth > 0));
         }, undefined, { timeout: 5_000 }).catch(() => undefined);
+      }
+
+      let disclosureOpen = null;
+      let disclosureCount = null;
+      const shouldOpenDisclosure = route.openDisclosureSelector &&
+        (!route.openDisclosureViewport || route.openDisclosureViewport === viewport.id);
+      if (shouldOpenDisclosure) {
+        const summary = page.locator(route.openDisclosureSelector);
+        disclosureCount = await summary.count();
+        if (disclosureCount === 1) {
+          await summary.click();
+          disclosureOpen = await summary.evaluate((element) => element.parentElement?.hasAttribute('open') || false);
+        }
       }
 
       const screenshotName = `${viewport.id}--${route.id}.png`;
@@ -113,6 +132,7 @@ try {
         const markdownSurface = document.querySelector('.issue-content-left, .ui.timeline');
         return {
           title: document.title,
+          openFaceTheme: document.documentElement.getAttribute('data-openface-theme') || 'standard',
           heading,
           viewportWidth,
           scrollWidth,
@@ -138,6 +158,7 @@ try {
         };
       }).catch(() => ({
         title: null,
+        openFaceTheme: 'standard',
         heading: null,
         viewportWidth: viewport.width,
         scrollWidth: viewport.width,
@@ -167,6 +188,9 @@ try {
       if (navigationError) defects.push(`Navigation failed: ${navigationError}`);
       if (status === null || status >= 400) defects.push(`Unexpected HTTP status: ${status ?? 'none'}`);
       if (pageState.horizontalOverflow > 2) defects.push(`Horizontal overflow: ${pageState.horizontalOverflow}px`);
+      if (route.theme && pageState.openFaceTheme !== route.theme) defects.push(`Expected ${route.theme} theme but found ${pageState.openFaceTheme}`);
+      if (shouldOpenDisclosure && disclosureCount !== 1) defects.push(`Expected one disclosure control but found ${disclosureCount}`);
+      if (shouldOpenDisclosure && disclosureOpen !== true) defects.push('Disclosure control did not open after click');
       if (pageState.repositoryNotFound) defects.push('Repository not found empty state is visible');
       if (pageState.applicationUnavailable) defects.push('Embedded application is unavailable');
       if (pageState.runningBadgeVisible && pageState.onDemandStageVisible) defects.push('Runtime badge says Running while the on-demand placeholder is visible');
@@ -177,15 +201,15 @@ try {
       if (route.id === 'community-detail' && pageState.virtualAgentAuthors.length !== 3) defects.push('All three virtual-agent participants are not visible');
       if (route.id === 'community-detail' && new Set(pageState.virtualAgentAvatars.map(({ src }) => src)).size !== 3) defects.push('Virtual-agent avatars are not distinct');
       if (route.id === 'community-detail' && pageState.virtualAgentAvatars.some(({ loaded }) => !loaded)) defects.push('A virtual-agent avatar failed to load');
-      if (route.id === 'community-markdown' && pageState.communityPage !== 'detail') defects.push('Markdown discussion detail marker is missing');
-      if (route.id === 'community-markdown' && pageState.virtualAgentAuthors.length !== 3) defects.push('Markdown discussion does not show all three agent participants');
-      if (route.id === 'community-markdown' && pageState.markdownBlockquotes < 1) defects.push('Markdown blockquote is missing');
-      if (route.id === 'community-markdown' && pageState.markdownLists < 3) defects.push('Markdown list variants are missing');
-      if (route.id === 'community-markdown' && pageState.markdownTaskItems < 3) defects.push('Markdown task list is missing');
-      if (route.id === 'community-markdown' && pageState.markdownCodeBlocks < 2) defects.push('Markdown code block variants are missing');
-      if (route.id === 'community-markdown' && pageState.markdownTables < 1) defects.push('Markdown table is missing');
-      if (route.id === 'community-markdown' && pageState.markdownLinks < 2) defects.push('Markdown links or mention are missing');
-      if (route.id === 'community-markdown' && pageState.markdownDetails < 1) defects.push('Markdown disclosure is missing');
+      if (route.id.startsWith('community-markdown') && pageState.communityPage !== 'detail') defects.push('Markdown discussion detail marker is missing');
+      if (route.id.startsWith('community-markdown') && pageState.virtualAgentAuthors.length !== 3) defects.push('Markdown discussion does not show all three agent participants');
+      if (route.id.startsWith('community-markdown') && pageState.markdownBlockquotes < 1) defects.push('Markdown blockquote is missing');
+      if (route.id.startsWith('community-markdown') && pageState.markdownLists < 3) defects.push('Markdown list variants are missing');
+      if (route.id.startsWith('community-markdown') && pageState.markdownTaskItems < 3) defects.push('Markdown task list is missing');
+      if (route.id.startsWith('community-markdown') && pageState.markdownCodeBlocks < 2) defects.push('Markdown code block variants are missing');
+      if (route.id.startsWith('community-markdown') && pageState.markdownTables < 1) defects.push('Markdown table is missing');
+      if (route.id.startsWith('community-markdown') && pageState.markdownLinks < 2) defects.push('Markdown links or mention are missing');
+      if (route.id.startsWith('community-markdown') && pageState.markdownDetails < 1) defects.push('Markdown disclosure is missing');
       if (route.id.startsWith('community-') && !pageState.visibleAppTabLabels.includes('App')) defects.push('Space repository tab is not labeled App');
       if (pageErrors.length) defects.push(`${pageErrors.length} uncaught page error(s)`);
       if (httpErrors.length) defects.push(`${httpErrors.length} HTTP resource error(s)`);
@@ -198,6 +222,8 @@ try {
         finalUrl: page.url(),
         viewport,
         focus: route.focus,
+        disclosureCount,
+        disclosureOpen,
         status,
         durationMs: Date.now() - startedAt,
         screenshot: relative(outputDir, screenshotPath).replaceAll('\\', '/'),
