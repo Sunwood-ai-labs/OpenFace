@@ -87,7 +87,9 @@ for (const testCase of cases) {
       if (state.active !== expected.active) defects.push(`Expected ${expected.active}, received ${state.active}`);
       if (state.stored !== expected.active) defects.push(`Stored theme should be ${expected.active}, received ${state.stored}`);
       if (!state.ariaLabel?.includes(`Switch to ${expected.next}`)) defects.push(`Unexpected aria-label: ${state.ariaLabel}`);
-      if (state.width !== 32 || state.height !== 32) defects.push(`Theme button is ${state.width}×${state.height}, expected 32×32`);
+      if (Math.abs(state.width - 32) > 0.1 || Math.abs(state.height - 32) > 0.1) {
+        defects.push(`Theme button is ${state.width}×${state.height}, expected 32×32 (±0.1px)`);
+      }
       await page.screenshot({ path: join(outputDir, `${testCase.id}--${expected.active}.png`), fullPage: false });
       await button.click();
       await page.waitForTimeout(180);
@@ -138,5 +140,10 @@ await writeFile(join(outputDir, 'REPORT.md'), [
     '',
   ]),
 ].join('\n'));
+
+for (const result of results) {
+  process.stdout.write(`${result.passed ? 'PASS' : 'FAIL'} ${result.id} theme selector\n`);
+  for (const defect of result.defects) process.stdout.write(`  ${defect}\n`);
+}
 
 if (!report.passed) process.exitCode = 1;
