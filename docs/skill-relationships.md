@@ -9,12 +9,13 @@ and revert relationship changes through the normal Forgejo workflow.
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "dependencies": [
     {
       "repo": "frontend-design-skill",
       "type": "recommended",
-      "reason": "Refine product-facing documentation and Pages surfaces."
+      "reason": "Refine product-facing documentation and Pages surfaces.",
+      "evidence": "repository-polish SKILL.md: QA Workflow §3; frontend-design SKILL.md: Design Thinking"
     },
     {
       "repo": "openface/security-review-skill",
@@ -27,10 +28,17 @@ and revert relationship changes through the normal Forgejo workflow.
 
 | Field | Meaning |
 | --- | --- |
-| `schemaVersion` | Metadata contract version. Use `1`. |
+| `schemaVersion` | Metadata contract version. Use `2` for evidence-backed links (`1` remains readable). |
 | `dependencies[].repo` | Repository slug in the same organization, or a full `owner/repo` reference. |
 | `dependencies[].type` | `required` for a hard workflow requirement; `recommended` for an optional pairing. |
 | `dependencies[].reason` | Short explanation shown on the relationship card. |
+| `dependencies[].evidence` | Exact `SKILL.md` section(s) that justify the relationship. |
+
+`required` means the source Skill cannot complete its documented workflow
+without the target Skill. `recommended` is a curated workflow connection, not
+a package dependency. Do not create either type from repository descriptions
+alone: inspect both `SKILL.md` files and record the supporting sections in
+`evidence`.
 
 OpenFace automatically derives **Referenced by** links from every public Skill
 in the catalog. No reverse list needs to be maintained manually. Missing or
@@ -45,3 +53,5 @@ the Skill directory.
 4. Reload the Skill page. OpenFace caches relationship files briefly, then
    rebuilds both dependency and reverse-reference views automatically.
 
+The current ten-Skill content audit is recorded in
+[Skill content relationship audit](./research/skill-relationship-audit.md).

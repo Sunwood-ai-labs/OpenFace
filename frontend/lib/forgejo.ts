@@ -62,10 +62,11 @@ export interface SkillDependency {
   repo: string;
   type: SkillDependencyType;
   reason?: string;
+  evidence?: string;
 }
 
 export interface SkillRelationships {
-  schemaVersion: 1;
+  schemaVersion: 1 | 2;
   dependencies: SkillDependency[];
 }
 
@@ -409,7 +410,8 @@ function normalizeSkillDependency(value: unknown): SkillDependency | null {
   if (!repo) return null;
   const type: SkillDependencyType = candidate.type === 'required' ? 'required' : 'recommended';
   const reason = typeof candidate.reason === 'string' ? candidate.reason.trim() : '';
-  return { repo, type, ...(reason ? { reason } : {}) };
+  const evidence = typeof candidate.evidence === 'string' ? candidate.evidence.trim() : '';
+  return { repo, type, ...(reason ? { reason } : {}), ...(evidence ? { evidence } : {}) };
 }
 
 export async function getSkillRelationships(owner: string, repo: string): Promise<SkillRelationships> {
@@ -418,16 +420,16 @@ export async function getSkillRelationships(owner: string, repo: string): Promis
   if (cached && cached.expiresAt > Date.now()) return cached.value;
 
   const raw = await getTextFile(owner, repo, 'openface.skill.json');
-  let value: SkillRelationships = { schemaVersion: 1, dependencies: [] };
+  let value: SkillRelationships = { schemaVersion: 2, dependencies: [] };
   if (raw) {
     try {
       const parsed = JSON.parse(raw) as Record<string, unknown>;
       const dependencies = Array.isArray(parsed.dependencies)
         ? parsed.dependencies.map(normalizeSkillDependency).filter((item): item is SkillDependency => item !== null)
         : [];
-      value = { schemaVersion: 1, dependencies };
+      value = { schemaVersion: parsed.schemaVersion === 1 ? 1 : 2, dependencies };
     } catch {
-      value = { schemaVersion: 1, dependencies: [] };
+      value = { schemaVersion: 2, dependencies: [] };
     }
   }
   skillRelationshipCache.set(cacheKey, { value, expiresAt: Date.now() + README_CACHE_TTL_MS });

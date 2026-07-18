@@ -1315,7 +1315,7 @@ import_sunwood_catalog() {
     import_github_catalog_repo "$source" "$name" "$kind" "$branch" "$description"
     if [ "$kind" = "skill" ]; then
       metadata_file="${WORKDIR}/${name}-openface.skill.json"
-      printf '%s' "$entry" | jq '{schemaVersion: 1, dependencies: (.dependencies // [])}' > "$metadata_file"
+      printf '%s' "$entry" | jq '{schemaVersion: 2, dependencies: (.dependencies // [])}' > "$metadata_file"
       put_file "$name" "openface.skill.json" "$metadata_file" "Describe OpenFace skill relationships"
     fi
   done < <(jq -r '.entries[] | @base64' "$SUNWOOD_CATALOG")
