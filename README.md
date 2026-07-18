@@ -294,13 +294,20 @@ npm ci --prefix visual-tests
 npm exec --prefix visual-tests -- playwright install chromium
 npm run capture --prefix visual-tests
 npm run capture:themes --prefix visual-tests
+npm run capture:scroll --prefix visual-tests
 ```
 
-`capture:themes` is the exhaustive theme matrix: **Standard, Solarpunk, and Cyberpunk × desktop and mobile × 27 major screens = 162 full-page screenshots**. It also checks the applied theme, HTTP status, blank pages, horizontal overflow, severe text-contrast risks, unavailable repositories/apps, disclosure interaction, and uncaught page errors. Filter a local investigation with `VISUAL_QA_THEMES`, `VISUAL_QA_VIEWPORTS`, or `VISUAL_QA_ROUTES` (comma-separated IDs).
+`capture:themes` is the exhaustive theme matrix: **Standard, Solarpunk, and Cyberpunk × desktop and mobile × 29 major screens = 174 full-page screenshots**. `capture:scroll` adds **540 viewport screenshots** across the top, middle, and bottom of every page, plus direct checkpoints for Dataset Viewer, Inference Providers, and Team members. It detects light-theme surfaces leaking into Cyberpunk even when they only appear after scrolling. Both commands accept `VISUAL_QA_THEMES`, `VISUAL_QA_VIEWPORTS`, or `VISUAL_QA_ROUTES` filters (comma-separated IDs).
 
 `npm run audit:organization --prefix visual-tests` adds focused desktop/mobile evidence for the organization profile. It fails on exposed mobile side gutters, decorative fake members, member-count mismatches, or unreadable repository focus states.
 
-Open `visual-tests/artifacts/AGENT_REVIEW.md`, `visual-tests/artifacts/theme-matrix/THEME_MATRIX.md`, and `visual-tests/artifacts/theme-matrix/CONTACT_SHEETS.md`, then inspect every image rather than relying on the PASS/FAIL table alone. The exhaustive run also generates 18 contact sheets (three themes × two viewport sizes × three parts) so all 162 full-page screenshots can be reviewed systematically. See the [visual QA guide](https://sunwood-ai-labs.github.io/OpenFace/guide/visual-qa) for the agent feedback workflow and focused-capture options.
+Open the generated reports and contact sheets, then inspect the images rather than relying on PASS/FAIL alone. The current matrix produces 24 full-page contact sheets; the scroll audit produces 60 more.
+
+| Cyberpunk Dataset Viewer | Cyberpunk Inference Providers | Generated organization identity and team |
+|---|---|---|
+| ![Cyberpunk Dataset Viewer on mobile](docs/evidence/themes/cyberpunk-dataset-viewer-mobile.png) | ![Cyberpunk Inference Providers on mobile](docs/evidence/themes/cyberpunk-inference-providers-mobile.png) | ![OpenFace generated organization identity and team members](docs/evidence/themes/cyberpunk-organization-team-mobile.png) |
+
+See the [visual QA guide](https://sunwood-ai-labs.github.io/OpenFace/guide/visual-qa) for the agent feedback workflow and focused-capture options.
 
 ## 📖 Documentation
 

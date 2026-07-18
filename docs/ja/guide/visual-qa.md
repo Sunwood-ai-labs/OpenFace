@@ -40,7 +40,11 @@ OpenFaceを起動してから実行します。
 npm ci --prefix visual-tests
 npm exec --prefix visual-tests -- playwright install chromium
 npm run capture --prefix visual-tests
+npm run capture:themes --prefix visual-tests
+npm run capture:scroll --prefix visual-tests
 ```
+
+`capture:themes` は29ルートを3テーマ・PC／モバイルで描画し、174枚の全ページ画像を作ります。`capture:scroll` は同じルートの上・中・下に加え、遅れて描画される Dataset Viewer、Inference Providers、Team members へ直接スクロールし、540枚のviewport画像と60枚のcontact sheetを作ります。
 
 出力先は `visual-tests/artifacts/` です。部分実行もできます。
 
@@ -54,4 +58,4 @@ npm run capture --prefix visual-tests
 
 新しいuser-facing route、または見た目が大きく異なる状態を追加したら、`visual-tests/routes.mjs` に登録します。詳細画面には安定したシードrepositoryを使い、次のエージェントが画像の目的を判断できる具体的な `focus` を書いてください。
 
-撮影は、遷移失敗、HTTP error、repository not found、未処理page error、横はみ出し、埋め込みapp停止、Space runtime表示の矛盾をFAILにします。console errorと失敗requestは、単独でFAILにしない場合も確認情報として保存します。
+撮影は、遷移失敗、HTTP error、repository not found、未処理page error、横はみ出し、埋め込みapp停止、Space runtime表示の矛盾、Cyberpunk内に残った大きな明色surfaceをFAILにします。console errorと失敗requestは、単独でFAILにしない場合も確認情報として保存します。

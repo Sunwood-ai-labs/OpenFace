@@ -2,6 +2,14 @@
 
 実行環境: `https://localhost:8443/`（Docker Compose の gateway 経由）
 
+## スクロール途中のCyberpunk回帰確認
+
+全登録ページを上・中・下で撮影し、遅れて表示される Dataset Viewer、Inference Providers、Team members には直接スクロールする監査を追加しました。以下は修正後のモバイル原寸証跡です。
+
+| Dataset Viewer | Inference Providers | Organization team | Authentication form |
+|---|---|---|---|
+| ![Cyberpunk Dataset Viewer](cyberpunk-dataset-viewer-mobile.png) | ![Cyberpunk Inference Providers](cyberpunk-inference-providers-mobile.png) | ![Generated OpenFace organization identity and team](cyberpunk-organization-team-mobile.png) | ![Cyberpunk login form](cyberpunk-login-mobile.png) |
+
 ## 操作確認
 
 ヘッダー右上の `OpenFace theme` セレクタを実際に操作して、各状態で次の値が一致することを確認しました。

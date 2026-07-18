@@ -40,7 +40,11 @@ Start OpenFace first, then run:
 npm ci --prefix visual-tests
 npm exec --prefix visual-tests -- playwright install chromium
 npm run capture --prefix visual-tests
+npm run capture:themes --prefix visual-tests
+npm run capture:scroll --prefix visual-tests
 ```
+
+`capture:themes` renders 29 routes in three themes at desktop and mobile sizes (174 full-page screenshots). `capture:scroll` visits those same routes at top, middle, and bottom positions and directly scrolls to late-rendered Dataset Viewer, Inference Providers, and Team members sections (540 viewport screenshots and 60 contact sheets).
 
 The output is written to `visual-tests/artifacts/`. A focused run can reduce iteration time:
 
@@ -60,4 +64,4 @@ npm run capture --prefix visual-tests
 
 When adding a new user-facing route or materially different page state, add it to `visual-tests/routes.mjs`. Use a stable seeded repository for detail pages. Give the entry a concrete `focus` description so the next agent knows what the screenshot is meant to prove.
 
-The capture fails on navigation errors, HTTP errors, repository-not-found states, uncaught page errors, horizontal overflow, unavailable embedded applications, and contradictory Space runtime state. Console errors and failed requests are retained as review observations even when they do not independently fail the run.
+The capture fails on navigation errors, HTTP errors, repository-not-found states, uncaught page errors, horizontal overflow, unavailable embedded applications, contradictory Space runtime state, and large light surfaces leaked into Cyberpunk. Console errors and failed requests are retained as review observations even when they do not independently fail the run.
