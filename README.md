@@ -321,6 +321,8 @@ npm run capture:scroll --prefix visual-tests
 
 Open the generated reports and contact sheets, then inspect the images rather than relying on PASS/FAIL alone. The current matrix produces 24 full-page contact sheets; the scroll audit produces 66 more.
 
+The latest committed manual review is the [2026-07-18 three-theme character-art audit](docs/evidence/visual-qa/2026-07-18-three-theme-character-audit.md): 180 full-page and 564 scroll screenshots across all three themes, both viewports, and all 30 routes.
+
 | Cyberpunk Dataset Viewer | Cyberpunk Inference Providers | Generated organization identity and team |
 |---|---|---|
 | ![Cyberpunk Dataset Viewer on mobile](docs/evidence/themes/cyberpunk-dataset-viewer-mobile.png) | ![Cyberpunk Inference Providers on mobile](docs/evidence/themes/cyberpunk-inference-providers-mobile.png) | ![OpenFace generated organization identity and team members](docs/evidence/themes/cyberpunk-organization-team-mobile.png) |

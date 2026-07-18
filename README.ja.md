@@ -408,7 +408,7 @@ npm exec --prefix visual-tests -- playwright install chromium
 npm run capture --prefix visual-tests
 ```
 
-`visual-tests/artifacts/AGENT_REVIEW.md` を開き、PASS/FAILだけでなく全画像を確認してください。詳しい取得方法・指摘形式・部分撮影は[Visual QAガイド](https://sunwood-ai-labs.github.io/OpenFace/ja/guide/visual-qa)に記載しています。
+`visual-tests/artifacts/AGENT_REVIEW.md` を開き、PASS/FAILだけでなく全画像を確認してください。最新の手動確認結果は [2026-07-18 3テーマ・キャラクターアート監査](docs/evidence/visual-qa/2026-07-18-three-theme-character-audit.md) に保存しています。標準・Solarpunk・Cyberpunk × PC・モバイル × 全30ルートの180枚と、スクロール途中を含む564枚を確認済みです。詳しい取得方法・指摘形式・部分撮影は[Visual QAガイド](https://sunwood-ai-labs.github.io/OpenFace/ja/guide/visual-qa)に記載しています。
 
 ## 📄 ライセンス
 
