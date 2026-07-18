@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "capture": "node capture.mjs"
+    "capture": "node capture.mjs",
+    "audit:interactions": "node interaction-audit.mjs"
   },
   "dependencies": {
     "playwright": "1.61.1"

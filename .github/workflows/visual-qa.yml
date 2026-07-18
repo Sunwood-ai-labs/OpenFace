@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'frontend/**'
+      - 'forgejo/**'
       - 'gateway/**'
       - 'seed/**'
       - 'spaces-runner/**'
@@ -15,6 +16,7 @@ on:
   pull_request:
     paths:
       - 'frontend/**'
+      - 'forgejo/**'
       - 'gateway/**'
       - 'seed/**'
       - 'spaces-runner/**'
@@ -49,8 +51,8 @@ jobs:
       - name: Install visual QA dependencies
         run: npm ci --prefix visual-tests --no-audit --no-fund
 
-      - name: Install Chromium
-        run: npm exec --prefix visual-tests -- playwright install --with-deps chromium
+      - name: Install Chromium and WebKit
+        run: npm exec --prefix visual-tests -- playwright install --with-deps chromium webkit
 
       - name: Start OpenFace
         run: docker compose up --build -d gateway seed
@@ -93,6 +95,11 @@ jobs:
         env:
           VISUAL_QA_BASE_URL: https://localhost:8443
         run: npm run capture --prefix visual-tests
+
+      - name: Audit issue interactions in Chromium and WebKit
+        env:
+          VISUAL_QA_BASE_URL: https://localhost:8443
+        run: npm run audit:interactions --prefix visual-tests
 
       - name: Add capture report to job summary
         if: always()
