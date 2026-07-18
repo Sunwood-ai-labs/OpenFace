@@ -18067,3 +18067,7 @@ html[data-openface-theme="cyberpunk"] body #navbar a.item.active {
   background: #111936 !important;
   color: #67e8f9 !important;
 }
+
+html[data-openface-theme="cyberpunk"] body[data-openface-auth="signup"] .user.signup .ui.attached.header + .ui.attached.segment p {
+  color: #374151 !important;
+}
