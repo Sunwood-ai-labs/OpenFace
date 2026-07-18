@@ -148,8 +148,20 @@ html[data-openface-theme="cyberpunk"] header {
 }
 
 html[data-openface-theme="cyberpunk"] .bg-zinc-50,
-html[data-openface-theme="cyberpunk"] .bg-zinc-100 {
+html[data-openface-theme="cyberpunk"] .bg-zinc-100,
+html[data-openface-theme="cyberpunk"] .bg-rose-50 {
   background-color: #11162b !important;
+}
+
+html[data-openface-theme="cyberpunk"] .border-rose-100 {
+  border-color: rgb(255 90 180 / 38%) !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-space-app-header,
+html[data-openface-theme="cyberpunk"] .openface-space-app-header h1,
+html[data-openface-theme="cyberpunk"] .openface-space-app-header nav,
+html[data-openface-theme="cyberpunk"] .openface-space-app-header [class*="min-h-12"] {
+  background-color: #0a0d1d !important;
 }
 
 /* A few homepage collections assemble their surface class dynamically, so

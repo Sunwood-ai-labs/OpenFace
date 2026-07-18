@@ -17866,3 +17866,204 @@ html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"
   background: #090d1d !important;
   color: #ff8dce !important;
 }
+
+/* theme-matrix1: final theme layer for Forgejo pages that define light
+   surfaces later in this stylesheet (home, organization, profiles, auth). */
+html[data-openface-theme="solarpunk"] body,
+html[data-openface-theme="solarpunk"] .full.height,
+html[data-openface-theme="solarpunk"] .page-content {
+  background-color: #f2f4e9 !important;
+  color: #173b2c !important;
+}
+
+html[data-openface-theme="solarpunk"] body {
+  background-image:
+    radial-gradient(circle at 92% -8%, rgba(255, 201, 83, 0.42) 0 15%, transparent 15.2%),
+    radial-gradient(circle at -4% 60%, rgba(118, 196, 139, 0.18) 0 18%, transparent 18.2%) !important;
+}
+
+html[data-openface-theme="solarpunk"] #navbar,
+html[data-openface-theme="solarpunk"] .repo-header,
+html[data-openface-theme="solarpunk"] .secondary-nav,
+html[data-openface-theme="solarpunk"] .ui.segment,
+html[data-openface-theme="solarpunk"] .ui.segments,
+html[data-openface-theme="solarpunk"] .openface-forge-panel,
+html[data-openface-theme="solarpunk"] .openface-org-card-main,
+html[data-openface-theme="solarpunk"] .openface-org-profile-card,
+html[data-openface-theme="solarpunk"] .openface-user-profile-card,
+html[data-openface-theme="solarpunk"] .timeline-item.comment .content {
+  border-color: #b9cfad !important;
+  background: #fbfcf5 !important;
+  color: #173b2c !important;
+}
+
+html[data-openface-theme="solarpunk"] h1,
+html[data-openface-theme="solarpunk"] h2,
+html[data-openface-theme="solarpunk"] h3,
+html[data-openface-theme="solarpunk"] h4,
+html[data-openface-theme="solarpunk"] strong,
+html[data-openface-theme="solarpunk"] .ui.header,
+html[data-openface-theme="solarpunk"] .openface-forge-home h1,
+html[data-openface-theme="solarpunk"] .openface-org-hero h1,
+html[data-openface-theme="solarpunk"] .openface-org-hf-sidebar h2,
+html[data-openface-theme="solarpunk"] .openface-org-card-main h2,
+html[data-openface-theme="solarpunk"] .openface-org-card-main h3,
+html[data-openface-theme="solarpunk"] .openface-org-card-main h4 {
+  color: #173b2c !important;
+}
+
+html[data-openface-theme="solarpunk"] p,
+html[data-openface-theme="solarpunk"] li,
+html[data-openface-theme="solarpunk"] .text.grey,
+html[data-openface-theme="solarpunk"] .openface-forge-kicker,
+html[data-openface-theme="solarpunk"] .openface-forge-home-copy > p,
+html[data-openface-theme="solarpunk"] .openface-org-hero p,
+html[data-openface-theme="solarpunk"] .openface-org-hf-sidebar p,
+html[data-openface-theme="solarpunk"] .openface-org-card-main p,
+html[data-openface-theme="solarpunk"] .openface-org-card-main li {
+  color: #52715d !important;
+}
+
+html[data-openface-theme="solarpunk"] a:not(.ui.primary.button) {
+  color: #1f6b45 !important;
+}
+
+html[data-openface-theme="solarpunk"] input,
+html[data-openface-theme="solarpunk"] textarea,
+html[data-openface-theme="solarpunk"] select,
+html[data-openface-theme="solarpunk"] .ui.input > input {
+  border-color: #94b889 !important;
+  background: #fbfcf5 !important;
+  color: #173b2c !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-forge-home] .page-content.home,
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .page-content.organization,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .page-content.organization,
+html[data-openface-theme="cyberpunk"] body[data-openface-user-profile] .page-content.user,
+html[data-openface-theme="cyberpunk"] body[data-openface-dashboard] .page-content.dashboard,
+html[data-openface-theme="cyberpunk"] body[data-openface-peripheral] .page-content,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .page-content {
+  background: #080a16 !important;
+  color: #e9f8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-forge-panel,
+html[data-openface-theme="cyberpunk"] .openface-org-card-main,
+html[data-openface-theme="cyberpunk"] .openface-org-profile-card,
+html[data-openface-theme="cyberpunk"] .openface-user-profile-card,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .organization.profile,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .ui.segment,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .ui.attached.segment,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .member.list,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .team.list,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .flex-list {
+  border-color: rgba(55, 204, 237, 0.34) !important;
+  background: #0d1327 !important;
+  color: #e9f8ff !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-forge-home h1,
+html[data-openface-theme="cyberpunk"] .openface-org-hero h1,
+html[data-openface-theme="cyberpunk"] .openface-org-hf-sidebar h2,
+html[data-openface-theme="cyberpunk"] .openface-org-card-main h2,
+html[data-openface-theme="cyberpunk"] .openface-org-card-main h3,
+html[data-openface-theme="cyberpunk"] .openface-org-card-main h4,
+html[data-openface-theme="cyberpunk"] .openface-org-profile-card h2,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] h1,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .ui.header {
+  color: #f3fbff !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-forge-kicker,
+html[data-openface-theme="cyberpunk"] .openface-forge-home-copy > p,
+html[data-openface-theme="cyberpunk"] .openface-org-hero p,
+html[data-openface-theme="cyberpunk"] .openface-org-hf-sidebar,
+html[data-openface-theme="cyberpunk"] .openface-org-hf-sidebar p,
+html[data-openface-theme="cyberpunk"] .openface-org-card-main p,
+html[data-openface-theme="cyberpunk"] .openface-org-card-main li,
+html[data-openface-theme="cyberpunk"] .openface-org-profile-card p {
+  color: #9fc4d7 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-forge-panel a,
+html[data-openface-theme="cyberpunk"] .openface-org-card-main a,
+html[data-openface-theme="cyberpunk"] .openface-org-hf-sidebar a,
+html[data-openface-theme="cyberpunk"] .openface-org-actions a,
+html[data-openface-theme="cyberpunk"] .openface-org-links-card a {
+  border-color: rgba(55, 204, 237, 0.4) !important;
+  background: #10172d !important;
+  color: #38e8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-org-badges span,
+html[data-openface-theme="cyberpunk"] .openface-forge-panel span,
+html[data-openface-theme="cyberpunk"] .openface-org-card-tabs span {
+  border-color: rgba(55, 204, 237, 0.32) !important;
+  background: #111936 !important;
+  color: #c8ebf8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-list,
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-card,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .repository.list,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .repository.list > .item,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .repo-list,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .repo-list > .item,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .flex-list,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .flex-list > .flex-item {
+  border-color: rgba(55, 204, 237, 0.24) !important;
+  background: #0d1327 !important;
+  color: #e9f8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .repository.list > .item:hover,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .repo-list > .item:hover,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .flex-list > .flex-item:hover {
+  background: #121b35 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .repository.list a,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .repo-list a,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .flex-list a {
+  color: #38e8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .ui.dropdown.item,
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .ui.dropdown.item .text,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .ui.dropdown.item,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .ui.dropdown.item .text,
+html[data-openface-theme="cyberpunk"] .ui.small.dropdown.type.jump.item,
+html[data-openface-theme="cyberpunk"] .ui.small.dropdown.type.jump.item .text {
+  color: #c8ebf8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .comment-header a,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .comment-header .author,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .comment-header .muted,
+html[data-openface-theme="cyberpunk"] .timeline-item.comment a.author.text.black,
+html[data-openface-theme="cyberpunk"] .timeline-item.comment .comment-header a {
+  color: #a8d9eb !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .openface-community-side-card,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .openface-community-side-card h3,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] h3 {
+  background: #0d1327 !important;
+  color: #e9f8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .page-content a:not(.ui.button),
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .openface-auth-footer a,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .ui.secondary.pointing.menu a.item.active,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] a.item.active,
+html[data-openface-theme="cyberpunk"] .ui.secondary.pointing.menu a.item.active {
+  background: #0d1327 !important;
+  color: #25bcd3 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body #navbar a.item.active {
+  background: #111936 !important;
+  color: #67e8f9 !important;
+}
