@@ -438,6 +438,12 @@ put_file() {
   if [ "$get_code" = "200" ]; then
     local sha
     sha=$(jq -r '.sha' /tmp/api_resp.json)
+    local current_b64
+    current_b64=$(jq -r '.content // ""' /tmp/api_resp.json | tr -d '\r\n')
+    if [ "$current_b64" = "$content_b64" ]; then
+      log "Unchanged ${name}/${path}; skipping commit."
+      return 0
+    fi
     local payload
     payload=$(jq -n --arg msg "$message" --arg content "$content_b64" --arg sha "$sha" \
       '{message:$msg, content:$content, sha:$sha, branch:"main"}')
@@ -1298,7 +1304,7 @@ import_sunwood_catalog() {
     exit 1
   fi
 
-  local encoded entry source name kind branch description
+  local encoded entry source name kind branch description metadata_file
   while IFS= read -r encoded; do
     entry=$(printf '%s' "$encoded" | base64 -d)
     source=$(printf '%s' "$entry" | jq -r '.source')
@@ -1307,6 +1313,11 @@ import_sunwood_catalog() {
     branch=$(printf '%s' "$entry" | jq -r '.branch')
     description=$(printf '%s' "$entry" | jq -r '.description')
     import_github_catalog_repo "$source" "$name" "$kind" "$branch" "$description"
+    if [ "$kind" = "skill" ]; then
+      metadata_file="${WORKDIR}/${name}-openface.skill.json"
+      printf '%s' "$entry" | jq '{schemaVersion: 1, dependencies: (.dependencies // [])}' > "$metadata_file"
+      put_file "$name" "openface.skill.json" "$metadata_file" "Describe OpenFace skill relationships"
+    fi
   done < <(jq -r '.entries[] | @base64' "$SUNWOOD_CATALOG")
 }
 
