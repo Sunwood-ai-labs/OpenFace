@@ -18250,3 +18250,54 @@ html[data-openface-theme="cyberpunk"] body[data-openface-model-landing] .openfac
   border-radius: 50%;
   object-fit: cover;
 }
+
+/* auth-cyberpunk1: keep the complete authentication card inside the selected
+   dark theme instead of mixing a dark heading with Forgejo's light segments. */
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .ui.attached.header + .ui.attached.segment,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .ui.attached.segment.header + .ui.attached.segment,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .ui.attached.segment.header.top {
+  border-color: rgba(55, 204, 237, 0.34) !important;
+  background: #0d1327 !important;
+  color: #c8ebf8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .ui.form .field > label,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .ui.checkbox label,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .ui.attached.segment p,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .ui.attached.segment.header.top {
+  color: #c8ebf8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] input,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .ui.input > input {
+  border-color: rgba(55, 204, 237, 0.42) !important;
+  background: #080f20 !important;
+  color: #f3fbff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] input::placeholder {
+  color: #6f9bb2 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .openface-auth-resume {
+  border-color: rgba(55, 204, 237, 0.28) !important;
+  background: #10172d !important;
+  color: #9fc4d7 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .page-content.user .ui.attached.segment.header.top,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .page-content .ui.attached.segment.header.top {
+  border-color: rgba(55, 204, 237, 0.34) !important;
+  background: #0d1327 !important;
+  background-color: #0d1327 !important;
+  color: #9fc4d7 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .page-content input:focus,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .page-content .ui.input > input:focus {
+  border-color: #38e8ff !important;
+  background: #080f20 !important;
+  background-color: #080f20 !important;
+  color: #f3fbff !important;
+  box-shadow: 0 0 0 2px rgba(56, 232, 255, 0.14) !important;
+}
