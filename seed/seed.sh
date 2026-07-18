@@ -213,6 +213,35 @@ ensure_agent_avatar() {
   fi
 }
 
+ensure_org_member() {
+  local username="$1" code team_id
+  code=$(api GET "/orgs/${ORG_NAME}/teams")
+  if [ "$code" != "200" ]; then
+    log "WARNING: listing teams for '${ORG_NAME}' returned HTTP ${code}."
+    return 0
+  fi
+  team_id=$(jq -r 'map(select(.name == "Owners"))[0].id // .[0].id // empty' /tmp/api_resp.json)
+  if [ -z "$team_id" ]; then
+    log "WARNING: no organization team found for '${ORG_NAME}'."
+    return 0
+  fi
+  code=$(api PUT "/teams/${team_id}/members/${username}")
+  if [ "$code" = "204" ] || [ "$code" = "201" ]; then
+    log "Added '${username}' to organization '${ORG_NAME}'."
+    local public_code
+    public_code=$(api PUT "/orgs/${ORG_NAME}/public_members/${username}")
+    if [ "$public_code" = "204" ]; then
+      log "Published '${username}' as an organization member."
+    else
+      log "WARNING: publishing '${username}' membership returned HTTP ${public_code}:"
+      cat /tmp/api_resp.json
+    fi
+  else
+    log "WARNING: adding '${username}' to '${ORG_NAME}' returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+  fi
+}
+
 b64() {
   # base64-encode stdin without line wraps (portable across busybox/gnu base64)
   base64 -w0 2>/dev/null || base64
@@ -238,9 +267,18 @@ fi
 ensure_agent_user "luna-scout" "Luna Scout" "luna-scout@agents.openface.local"
 ensure_agent_user "patch-orbit" "Patch Orbit" "patch-orbit@agents.openface.local"
 ensure_agent_user "mikan-reviewer" "Mikan Reviewer" "mikan-reviewer@agents.openface.local"
+ensure_agent_user "aiko-mesh" "Aiko Mesh" "aiko-mesh@team.openface.local"
+ensure_agent_user "ren-vector" "Ren Vector" "ren-vector@team.openface.local"
+ensure_agent_user "mira-signal" "Mira Signal" "mira-signal@team.openface.local"
 ensure_agent_avatar "luna-scout" "/assets/agent-avatars/luna-scout.png"
 ensure_agent_avatar "patch-orbit" "/assets/agent-avatars/patch-orbit.png"
 ensure_agent_avatar "mikan-reviewer" "/assets/agent-avatars/mikan-reviewer.png"
+ensure_agent_avatar "aiko-mesh" "/assets/agent-avatars/aiko-mesh.png"
+ensure_agent_avatar "ren-vector" "/assets/agent-avatars/ren-vector.png"
+ensure_agent_avatar "mira-signal" "/assets/agent-avatars/mira-signal.png"
+ensure_org_member "aiko-mesh"
+ensure_org_member "ren-vector"
+ensure_org_member "mira-signal"
 
 ensure_actions_runner_token
 
