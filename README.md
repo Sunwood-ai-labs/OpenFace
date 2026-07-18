@@ -298,7 +298,7 @@ npm run capture:themes --prefix visual-tests
 
 `capture:themes` is the exhaustive theme matrix: **Standard, Solarpunk, and Cyberpunk × desktop and mobile × 27 major screens = 162 full-page screenshots**. It also checks the applied theme, HTTP status, blank pages, horizontal overflow, severe text-contrast risks, unavailable repositories/apps, disclosure interaction, and uncaught page errors. Filter a local investigation with `VISUAL_QA_THEMES`, `VISUAL_QA_VIEWPORTS`, or `VISUAL_QA_ROUTES` (comma-separated IDs).
 
-Open `visual-tests/artifacts/AGENT_REVIEW.md` and `visual-tests/artifacts/theme-matrix/THEME_MATRIX.md`, then inspect every image rather than relying on the PASS/FAIL table alone. See the [visual QA guide](https://sunwood-ai-labs.github.io/OpenFace/guide/visual-qa) for the agent feedback workflow and focused-capture options.
+Open `visual-tests/artifacts/AGENT_REVIEW.md`, `visual-tests/artifacts/theme-matrix/THEME_MATRIX.md`, and `visual-tests/artifacts/theme-matrix/CONTACT_SHEETS.md`, then inspect every image rather than relying on the PASS/FAIL table alone. The exhaustive run also generates 18 contact sheets (three themes × two viewport sizes × three parts) so all 162 full-page screenshots can be reviewed systematically. See the [visual QA guide](https://sunwood-ai-labs.github.io/OpenFace/guide/visual-qa) for the agent feedback workflow and focused-capture options.
 
 ## 📖 Documentation
 

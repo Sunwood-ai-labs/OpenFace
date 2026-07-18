@@ -3,6 +3,7 @@ import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { routes, themes, viewports } from './routes.mjs';
+import { generateContactSheets } from './contact-sheets.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const baseUrl = (process.env.VISUAL_QA_BASE_URL || 'https://localhost:8443').replace(/\/$/, '');
@@ -132,6 +133,18 @@ const captureRoute = async ({ context, route, theme, viewport }) => {
   }
   await page.waitForTimeout(route.settleMs || 450);
   await page.evaluate(() => document.fonts?.ready).catch(() => undefined);
+
+  const transientRuntimeFailure =
+    pageErrors.some((message) => /preload|502|bad gateway/i.test(message)) ||
+    consoleErrors.some((message) => /502|bad gateway/i.test(message));
+  if (transientRuntimeFailure) {
+    pageErrors.length = 0;
+    consoleErrors.length = 0;
+    failedRequests.length = 0;
+    response = await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(Math.max(route.settleMs || 450, 1_500));
+    await page.evaluate(() => document.fonts?.ready).catch(() => undefined);
+  }
 
   let disclosureOpen = null;
   const shouldOpenDisclosure = route.openDisclosureSelector &&
@@ -271,7 +284,9 @@ const markdown = [
   ]),
 ];
 await writeFile(join(outputDir, 'THEME_MATRIX.md'), `${markdown.join('\n')}\n`);
+const contactSheets = await generateContactSheets({ manifest, outputDir });
 
 process.stdout.write(`\nTheme matrix: ${selectedThemes.length} × ${selectedViewports.length} × ${selectedRoutes.length} = ${results.length} screenshots\n`);
+process.stdout.write(`Contact sheets: ${contactSheets.length}\n`);
 process.stdout.write(`Report: ${join(outputDir, 'THEME_MATRIX.md')}\n`);
 if (manifest.summary.failed > 0) process.exitCode = 1;
