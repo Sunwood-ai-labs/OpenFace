@@ -39,24 +39,24 @@ function RelationshipCard({ dependency, reverse = false }: { dependency: Resolve
     <Link
       href={`/${dependency.owner}/${dependency.name}`}
       data-skill-relationship-link
-      className="group block rounded-xl border border-violet-100 bg-white/90 p-2.5 shadow-sm transition hover:border-violet-300 hover:shadow-md dark:border-violet-900/70 dark:bg-zinc-950/70"
+      className="skill-relationship-card group block rounded-xl border border-violet-100 bg-white/90 p-2.5 shadow-sm transition hover:border-violet-300 hover:shadow-md dark:border-violet-900/70 dark:bg-zinc-950/70"
     >
       <span className="flex min-w-0 items-center gap-2">
         <span className="grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-violet-100 text-violet-700 ring-1 ring-violet-200 dark:bg-violet-950 dark:text-violet-300 dark:ring-violet-800">
           <HfIcon name={reverse ? 'fork' : 'skill'} className="h-3 w-3" />
         </span>
-        <span className="min-w-0 flex-1 truncate font-mono text-[11px] font-bold text-zinc-900 group-hover:text-violet-800 dark:text-zinc-100 dark:group-hover:text-violet-300">
+        <span className="skill-relationship-name min-w-0 flex-1 truncate font-mono text-[11px] font-bold text-zinc-900 group-hover:text-violet-800 dark:text-zinc-100 dark:group-hover:text-violet-300">
           {dependency.name}
         </span>
-        <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide ${dependency.type === 'required' ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' : 'bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300'}`}>
+        <span className={`skill-relationship-badge shrink-0 rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide ${dependency.type === 'required' ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' : 'bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300'}`}>
           {dependency.type === 'required' ? 'Required' : 'Workflow'}
         </span>
       </span>
-      <span className="mt-2 block text-[11px] leading-4 text-zinc-600 dark:text-zinc-400">
+      <span className="skill-relationship-reason mt-2 block text-[11px] leading-4 text-zinc-600 dark:text-zinc-400">
         {dependency.reason || dependency.description || 'Related Skill workflow'}
       </span>
       {dependency.evidence ? (
-        <span className="mt-1.5 block border-l-2 border-violet-200 pl-2 text-[10px] leading-4 text-zinc-500 dark:border-violet-800 dark:text-zinc-500">
+        <span className="skill-relationship-evidence mt-1.5 block border-l-2 border-violet-200 pl-2 text-[10px] leading-4 text-zinc-500 dark:border-violet-800 dark:text-zinc-500">
           <strong className="font-semibold text-zinc-600 dark:text-zinc-400">SKILL.md basis:</strong> {dependency.evidence}
         </span>
       ) : null}
@@ -99,10 +99,10 @@ export default function SkillRelationshipMap({
     <section
       data-skill-relationship-map
       data-relationship-placement={placement}
-      className="overflow-hidden rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50/60 shadow-sm dark:border-violet-900 dark:from-violet-950/35 dark:via-zinc-950 dark:to-fuchsia-950/20"
+      className="skill-relationship-panel overflow-hidden rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50/60 shadow-sm dark:border-violet-900 dark:from-violet-950/35 dark:via-zinc-950 dark:to-fuchsia-950/20"
       aria-labelledby={titleId}
     >
-      <div className="flex items-center gap-2.5 border-b border-violet-100 px-3.5 py-3 dark:border-violet-900/70">
+      <div className="skill-relationship-header flex items-center gap-2.5 border-b border-violet-100 px-3.5 py-3 dark:border-violet-900/70">
         <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-violet-700 text-white shadow-md shadow-violet-200 dark:shadow-violet-950">
           <HfIcon name="link" className="h-3.5 w-3.5" />
         </span>
@@ -112,7 +112,7 @@ export default function SkillRelationshipMap({
         </div>
         <Link
           href={`/${owner}/${repo.name}?tab=files&path=openface.skill.json`}
-          className="rounded-lg border border-violet-200 bg-white px-2 py-1 font-mono text-[9px] font-semibold text-violet-700 hover:border-violet-400 dark:border-violet-800 dark:bg-zinc-950 dark:text-violet-300"
+          className="skill-relationship-metadata rounded-lg border border-violet-200 bg-white px-2 py-1 font-mono text-[9px] font-semibold text-violet-700 hover:border-violet-400 dark:border-violet-800 dark:bg-zinc-950 dark:text-violet-300"
         >
           metadata
         </Link>
@@ -121,14 +121,14 @@ export default function SkillRelationshipMap({
       <div className={`grid gap-4 p-3.5 ${placement === 'mobile' ? 'sm:grid-cols-2' : ''}`}>
         <div className="min-w-0">
           <div className="mb-2 flex items-center justify-between gap-2">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.14em] text-violet-700 dark:text-violet-300">Uses / works with</h3>
+            <h3 className="skill-relationship-section-title text-[10px] font-bold uppercase tracking-[0.14em] text-violet-700 dark:text-violet-300">Uses / works with</h3>
             <span className="text-[9px] text-zinc-400">{requiredCount} required · {workflowCount} workflow</span>
           </div>
           <div className="grid gap-2">
             {dependencies.length ? dependencies.map((dependency) => (
               <RelationshipCard key={`${dependency.fullName}-${dependency.type}`} dependency={dependency} />
             )) : (
-              <div className="rounded-xl border border-dashed border-violet-200 bg-white/60 px-3 py-4 text-center dark:border-violet-900 dark:bg-zinc-950/40">
+              <div className="skill-relationship-empty rounded-xl border border-dashed border-violet-200 bg-white/60 px-3 py-4 text-center dark:border-violet-900 dark:bg-zinc-950/40">
                 <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Self-contained</p>
                 <p className="mt-1 text-[10px] text-zinc-500">No required or curated workflow link</p>
               </div>
@@ -138,14 +138,14 @@ export default function SkillRelationshipMap({
 
         <div className="min-w-0">
           <div className="mb-2 flex items-center justify-between gap-2">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.14em] text-fuchsia-700 dark:text-fuchsia-300">Referenced by</h3>
+            <h3 className="skill-relationship-section-title text-[10px] font-bold uppercase tracking-[0.14em] text-fuchsia-700 dark:text-fuchsia-300">Referenced by</h3>
             <span className="text-[9px] text-zinc-400">reverse links</span>
           </div>
           <div className="grid gap-2">
             {incoming.length ? incoming.map((dependency) => (
               <RelationshipCard key={`${dependency.fullName}-${dependency.type}`} dependency={dependency} reverse />
             )) : (
-              <div className="rounded-xl border border-dashed border-fuchsia-200 bg-white/60 px-3 py-4 text-center dark:border-fuchsia-900 dark:bg-zinc-950/40">
+              <div className="skill-relationship-empty rounded-xl border border-dashed border-fuchsia-200 bg-white/60 px-3 py-4 text-center dark:border-fuchsia-900 dark:bg-zinc-950/40">
                 <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">No reverse links</p>
                 <p className="mt-1 text-[10px] text-zinc-500">No catalog Skill points here yet</p>
               </div>

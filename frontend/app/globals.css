@@ -631,6 +631,184 @@ html[data-openface-theme="cyberpunk"] .openface-theme-selector:hover {
   }
 }
 
+/* Explicit portal themes must remain legible regardless of the device's OS
+   color preference. The previous README colors relied on prefers-color-scheme,
+   so Cyberpunk on a light-mode iPhone rendered dark GitHub text on a dark
+   panel, while Solarpunk on a dark-mode device did the inverse. */
+html[data-openface-theme="solarpunk"] .github-markdown-body,
+html[data-openface-theme="solarpunk"] .prose-openface {
+  color: #173b2c;
+}
+
+html[data-openface-theme="solarpunk"] .github-markdown-body h1,
+html[data-openface-theme="solarpunk"] .github-markdown-body h2,
+html[data-openface-theme="solarpunk"] .github-markdown-body h3,
+html[data-openface-theme="solarpunk"] .github-markdown-body h4,
+html[data-openface-theme="solarpunk"] .github-markdown-body h5,
+html[data-openface-theme="solarpunk"] .github-markdown-body h6,
+html[data-openface-theme="solarpunk"] .prose-openface h1,
+html[data-openface-theme="solarpunk"] .prose-openface h2,
+html[data-openface-theme="solarpunk"] .prose-openface h3 {
+  color: #123523;
+  border-color: #94b889;
+}
+
+html[data-openface-theme="solarpunk"] .github-markdown-body a,
+html[data-openface-theme="solarpunk"] .prose-openface a {
+  color: #1e633d;
+}
+
+html[data-openface-theme="solarpunk"] .github-markdown-body code,
+html[data-openface-theme="solarpunk"] .prose-openface code,
+html[data-openface-theme="solarpunk"] .github-markdown-body th {
+  color: #173b2c;
+  background: #dfead8;
+}
+
+html[data-openface-theme="solarpunk"] .github-markdown-body pre,
+html[data-openface-theme="solarpunk"] .prose-openface pre {
+  color: #f7ffe9;
+  background: #173b2c;
+}
+
+html[data-openface-theme="solarpunk"] .github-markdown-body pre code,
+html[data-openface-theme="solarpunk"] .prose-openface pre code {
+  color: inherit;
+  background: transparent;
+}
+
+html[data-openface-theme="solarpunk"] .skill-relationship-panel {
+  color: #173b2c;
+  border-color: #94b889 !important;
+  background: #f8fbf1 !important;
+}
+
+html[data-openface-theme="solarpunk"] .skill-relationship-header {
+  border-color: #b9cfad !important;
+  background: #edf3e7;
+}
+
+html[data-openface-theme="solarpunk"] .skill-relationship-card,
+html[data-openface-theme="solarpunk"] .skill-relationship-empty {
+  border-color: #b9cfad !important;
+  background: #fff !important;
+}
+
+html[data-openface-theme="solarpunk"] .skill-relationship-name {
+  color: #173b2c !important;
+}
+
+html[data-openface-theme="solarpunk"] .skill-relationship-reason,
+html[data-openface-theme="solarpunk"] .skill-relationship-evidence {
+  color: #466652 !important;
+}
+
+html[data-openface-theme="solarpunk"] .skill-relationship-section-title,
+html[data-openface-theme="solarpunk"] .skill-relationship-metadata {
+  color: #553382 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .github-markdown-body,
+html[data-openface-theme="cyberpunk"] .prose-openface {
+  color: #c9e2ee;
+  background-color: #0a0d1d !important;
+}
+
+html[data-openface-theme="cyberpunk"] .github-markdown-body h1,
+html[data-openface-theme="cyberpunk"] .github-markdown-body h2,
+html[data-openface-theme="cyberpunk"] .github-markdown-body h3,
+html[data-openface-theme="cyberpunk"] .github-markdown-body h4,
+html[data-openface-theme="cyberpunk"] .github-markdown-body h5,
+html[data-openface-theme="cyberpunk"] .github-markdown-body h6,
+html[data-openface-theme="cyberpunk"] .prose-openface h1,
+html[data-openface-theme="cyberpunk"] .prose-openface h2,
+html[data-openface-theme="cyberpunk"] .prose-openface h3 {
+  color: #f2fbff;
+  border-color: #31536b;
+}
+
+html[data-openface-theme="cyberpunk"] .github-markdown-body a,
+html[data-openface-theme="cyberpunk"] .prose-openface a {
+  color: #69e9ff;
+}
+
+html[data-openface-theme="cyberpunk"] .github-markdown-body code,
+html[data-openface-theme="cyberpunk"] .prose-openface code,
+html[data-openface-theme="cyberpunk"] .github-markdown-body th {
+  color: #dff7ff;
+  background: #1b2945;
+}
+
+html[data-openface-theme="cyberpunk"] .github-markdown-body pre,
+html[data-openface-theme="cyberpunk"] .prose-openface pre {
+  color: #e9f8ff;
+  background: #050814;
+}
+
+html[data-openface-theme="cyberpunk"] .github-markdown-body pre code,
+html[data-openface-theme="cyberpunk"] .prose-openface pre code {
+  color: inherit;
+  background: transparent;
+}
+
+html[data-openface-theme="cyberpunk"] .github-markdown-body blockquote,
+html[data-openface-theme="cyberpunk"] .prose-openface blockquote {
+  color: #a9c8d8;
+  border-color: #ff5caf;
+}
+
+html[data-openface-theme="cyberpunk"] .github-markdown-body th,
+html[data-openface-theme="cyberpunk"] .github-markdown-body td,
+html[data-openface-theme="cyberpunk"] .prose-openface th,
+html[data-openface-theme="cyberpunk"] .prose-openface td {
+  border-color: #31536b;
+}
+
+html[data-openface-theme="cyberpunk"] .skill-relationship-panel {
+  color: #e9f8ff;
+  border-color: #3b5b8f !important;
+  background: #0d1327 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .skill-relationship-header {
+  border-color: #29476a !important;
+  background: #111a33;
+}
+
+html[data-openface-theme="cyberpunk"] .skill-relationship-card,
+html[data-openface-theme="cyberpunk"] .skill-relationship-empty {
+  border-color: #31536b !important;
+  background: #111a33 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .skill-relationship-name {
+  color: #f2fbff !important;
+}
+
+html[data-openface-theme="cyberpunk"] .skill-relationship-reason {
+  color: #b9d4e2 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .skill-relationship-evidence {
+  color: #9fbed0 !important;
+  border-color: #7045a6 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .skill-relationship-section-title {
+  color: #d8c1ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] .skill-relationship-metadata {
+  color: #e1d4ff !important;
+  border-color: #7652a8 !important;
+  background: #080b19 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .skill-relationship-badge {
+  color: #eadfff !important;
+  background: #37205f !important;
+}
+
 body:has(.openface-space-app-page) {
   background: #fff;
 }
