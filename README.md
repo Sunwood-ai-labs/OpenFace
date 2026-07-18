@@ -226,6 +226,12 @@ Skill repositories can also declare typed Skill-to-Skill relationships in an edi
 |---|---|
 | ![Skills directory](docs/evidence/skills-mcps/skills-directory.png) | ![MCP directory](docs/evidence/skills-mcps/mcps-directory.png) |
 
+| Workflow-link status in the directory | Evidence-backed sidebar |
+|---|---|
+| ![Skill workflow-link counts](docs/evidence/skill-relationships/skills-desktop.png) | ![Skill relationship sidebar](docs/evidence/skill-relationships/graph-desktop.png) |
+
+The [screenshot-backed relationship verification](docs/evidence/skill-relationships/README.md) also covers mobile layouts, link navigation, and repositories without a `README.md`.
+
 Prompts use a stable repository slug. Versions are represented by `version-v*` topics and matching immutable Git tags. The detail page can switch among existing tags, and `?revision=v4.2` creates a directly shareable revision URL.
 
 | Prompt v4.1 | Prompt v4.2 |
