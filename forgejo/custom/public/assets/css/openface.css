@@ -14946,6 +14946,72 @@ html body .markup pre.code-block .code-copy:focus-visible {
   outline-offset: 2px !important;
 }
 
+html[data-openface-theme="cyberpunk"] body #navbar a.item,
+html[data-openface-theme="cyberpunk"] body #navbar .item,
+html[data-openface-theme="cyberpunk"] body .repo-header .repo-menu a.item,
+html[data-openface-theme="cyberpunk"] body .repo-header .repo-menu .item {
+  color: #cbd5e1 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body #navbar a.item:hover,
+html[data-openface-theme="cyberpunk"] body #navbar a.item:focus-visible,
+html[data-openface-theme="cyberpunk"] body .repo-header .repo-menu a.item:hover,
+html[data-openface-theme="cyberpunk"] body .repo-header .repo-menu a.item:focus-visible {
+  color: #67e8f9 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body .repo-header .repo-menu a.item.active,
+html[data-openface-theme="cyberpunk"] body .repo-header .repo-menu .item.active {
+  color: #f9a8d4 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body .openface-mobile-repo-tabs a {
+  color: #cbd5e1 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body .openface-mobile-repo-tabs a:hover,
+html[data-openface-theme="cyberpunk"] body .openface-mobile-repo-tabs a:focus-visible {
+  color: #67e8f9 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body .openface-mobile-repo-tabs a.active {
+  color: #f9a8d4 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body .secondary-nav .overflow-menu-items > a.item {
+  color: #cbd5e1 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body .secondary-nav .overflow-menu-items > a.item:hover,
+html[data-openface-theme="cyberpunk"] body .secondary-nav .overflow-menu-items > a.item:focus-visible {
+  color: #67e8f9 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body .secondary-nav .overflow-menu-items > a.item.active {
+  color: #f9a8d4 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body a.openface-app-tab,
+html[data-openface-theme="cyberpunk"] body a.openface-files-tab,
+html[data-openface-theme="cyberpunk"] body a.openface-community-tab {
+  color: #cbd5e1 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body a.openface-app-tab:hover,
+html[data-openface-theme="cyberpunk"] body a.openface-files-tab:hover,
+html[data-openface-theme="cyberpunk"] body a.openface-community-tab:hover,
+html[data-openface-theme="cyberpunk"] body a.openface-app-tab:focus-visible,
+html[data-openface-theme="cyberpunk"] body a.openface-files-tab:focus-visible,
+html[data-openface-theme="cyberpunk"] body a.openface-community-tab:focus-visible {
+  color: #67e8f9 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body a.openface-app-tab.active,
+html[data-openface-theme="cyberpunk"] body a.openface-files-tab.active,
+html[data-openface-theme="cyberpunk"] body a.openface-community-tab.active {
+  color: #f9a8d4 !important;
+}
+
 html body .repository.file .file-header .openface-blob-copy-fallback {
   grid-column: 1 / -1 !important;
   display: flex !important;

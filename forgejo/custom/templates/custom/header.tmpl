@@ -33,7 +33,7 @@
   }, { passive: true });
 })();
 </script>
-<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260718-interactions4">
+<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260718-interactions8">
 <style>
 @media (max-width: 767px) {
   html body nav#navbar .navbar-left.ui.secondary.menu > a.item:not(#navbar-logo),
@@ -154,6 +154,56 @@
     height: 16px;
     flex-basis: 16px;
   }
+
+  html[data-openface-theme="cyberpunk"] body .openface-mobile-menu-sheet {
+    border-color: #164e63;
+    background: #070b1b;
+  }
+
+  html[data-openface-theme="cyberpunk"] body .openface-mobile-menu-sheet h2,
+  html[data-openface-theme="cyberpunk"] body .openface-mobile-menu-sheet section:nth-child(3) h2,
+  html[data-openface-theme="cyberpunk"] body .openface-mobile-menu-sheet section:nth-child(4) h2 {
+    color: #67e8f9;
+    background: linear-gradient(90deg, #111936, #17112f);
+    border-block: 1px solid #164e63;
+  }
+
+  html[data-openface-theme="cyberpunk"] body .openface-mobile-menu-sheet section:nth-child(3) h2 {
+    color: #f9a8d4;
+  }
+
+  html[data-openface-theme="cyberpunk"] body .openface-mobile-menu-sheet section:nth-child(4) h2 {
+    color: #86efac;
+  }
+
+  html[data-openface-theme="cyberpunk"] body .openface-mobile-menu-sheet a {
+    border-color: #155e75;
+    background: #10172d;
+    color: #e0f2fe;
+  }
+
+  html[data-openface-theme="cyberpunk"] body .openface-mobile-menu-sheet a:hover,
+  html[data-openface-theme="cyberpunk"] body .openface-mobile-menu-sheet a:focus-visible {
+    border-color: #22d3ee;
+    background: #16213e;
+    color: #67e8f9;
+  }
+
+  html[data-openface-theme="cyberpunk"] body .openface-mobile-menu-sheet a .openface-title-icon {
+    color: #22d3ee;
+  }
+}
+
+html[data-openface-theme="cyberpunk"] body a.openface-app-tab,
+html[data-openface-theme="cyberpunk"] body a.openface-files-tab,
+html[data-openface-theme="cyberpunk"] body a.openface-community-tab {
+  color: #cbd5e1 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body a.openface-app-tab.active,
+html[data-openface-theme="cyberpunk"] body a.openface-files-tab.active,
+html[data-openface-theme="cyberpunk"] body a.openface-community-tab.active {
+  color: #f9a8d4 !important;
 }
 </style>
 <script>
@@ -170,12 +220,12 @@
     if (!el) return;
     for (const node of el.childNodes) {
       if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
-        node.textContent = text;
+        if (node.textContent !== text) node.textContent = text;
         return;
       }
     }
     const span = el.querySelector("span.text, span");
-    if (span) span.textContent = text;
+    if (span && span.textContent !== text) span.textContent = text;
   };
 
   const escapeHtml = (value) => String(value)
@@ -2334,37 +2384,8 @@
   const normalizeRepoControls = () => {
     for (const button of document.querySelectorAll(".markup pre.code-block .code-copy")) {
       button.setAttribute("type", "button");
-      if (button.dataset.openfaceCopyBound === "true") continue;
-      button.dataset.openfaceCopyBound = "true";
       button.setAttribute("aria-label", "Copy code");
       button.setAttribute("title", "Copy code");
-      button.addEventListener("click", async () => {
-        const text = button.dataset.clipboardText || "";
-        let copied = false;
-        try {
-          await navigator.clipboard.writeText(text);
-          copied = true;
-        } catch {
-          const textarea = document.createElement("textarea");
-          textarea.value = text;
-          textarea.setAttribute("readonly", "");
-          textarea.style.position = "fixed";
-          textarea.style.opacity = "0";
-          document.body.appendChild(textarea);
-          textarea.select();
-          copied = document.execCommand("copy");
-          textarea.remove();
-        }
-        if (!copied) return;
-        button.setAttribute("aria-label", "Copied code");
-        button.setAttribute("title", "Copied!");
-        button.setAttribute("data-tooltip-content", "Copied!");
-        window.setTimeout(() => {
-          button.setAttribute("aria-label", "Copy code");
-          button.setAttribute("title", "Copy code");
-          button.setAttribute("data-tooltip-content", "Copy code");
-        }, 1600);
-      });
     }
 
     for (const reaction of document.querySelectorAll(".select-reaction, .reactions-menu, .add-reaction, .comment-header-right .select-reaction")) {
@@ -2427,6 +2448,7 @@
     ]);
 
     for (const el of document.querySelectorAll("a, button, span, th, h1, h2, h3, h4, div.header, div.item, input")) {
+      if (el.closest(".repo-header .repo-buttons")) continue;
       if (el instanceof HTMLInputElement) {
         const replacement = exactText.get(el.getAttribute("placeholder") || "");
         if (replacement) el.setAttribute("placeholder", replacement);
@@ -2444,6 +2466,7 @@
     const textNodes = [];
     while (walker.nextNode()) textNodes.push(walker.currentNode);
     for (const node of textNodes) {
+      if (node.parentElement?.closest(".repo-header .repo-buttons")) continue;
       const text = node.nodeValue || "";
       const trimmed = text.trim();
       const replacement = replacements.get(trimmed);
@@ -2461,21 +2484,8 @@
       if (allCount) node.nodeValue = text.replace(trimmed, `${allCount[1]} All`);
     }
 
-    const labels = [
-      ["action/watch", "Watch"],
-      ["action/star", "Star"],
-      ["action/fork", "Fork"],
-    ];
-    for (const [needle, text] of labels) {
-      for (const el of document.querySelectorAll(`form[action*="${needle}"] button`)) {
-        setText(el, text);
-      }
-    }
-
     for (const form of document.querySelectorAll('.repo-header form[action*="/action/watch"]')) {
       form.classList.add("openface-like-action");
-      const button = form.querySelector("button");
-      if (button) setText(button, "like");
     }
     for (const form of document.querySelectorAll('.repo-header form[action*="/action/star"], .repo-header form[action*="/action/fork"]')) {
       form.classList.add("openface-secondary-action");
@@ -2627,18 +2637,31 @@
           overlay.className = "openface-repo-title-overlay";
           header.appendChild(overlay);
         }
-        overlay.innerHTML = `
-          ${repoKindIcon(kindClass)}
-          <span class="openface-title-kind">${escapeHtml(label)}</span>
-          <a class="openface-title-owner" href="/git/${encodeURIComponent(owner)}">${escapeHtml(owner)}</a>
-          <span class="openface-title-slash">/</span>
-          <a class="openface-title-name" href="/git/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}">${escapeHtml(repo)}</a>
-          <button class="openface-title-like" type="submit" ${likeFormId ? `form="${escapeHtml(likeFormId)}"` : 'disabled'} title="Like this repository" aria-label="Like this repository">like ${escapeHtml(likeCount)}</button>
-          ${kindClass === "space" ? '<span class="openface-title-status">Running</span>' : ""}
-        `;
+        if (overlay.dataset.openfaceInitialized !== "true") {
+          overlay.dataset.openfaceInitialized = "true";
+          overlay.innerHTML = `
+            ${repoKindIcon(kindClass)}
+            <span class="openface-title-kind">${escapeHtml(label)}</span>
+            <a class="openface-title-owner" href="/git/${encodeURIComponent(owner)}">${escapeHtml(owner)}</a>
+            <span class="openface-title-slash">/</span>
+            <a class="openface-title-name" href="/git/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}">${escapeHtml(repo)}</a>
+            <button class="openface-title-like" type="submit" ${likeFormId ? `form="${escapeHtml(likeFormId)}"` : 'disabled'} title="Like this repository" aria-label="Like this repository">like ${escapeHtml(likeCount)}</button>
+            ${kindClass === "space" ? '<span class="openface-title-status">Running</span>' : ""}
+          `;
+        }
         const likePill = overlay.querySelector(".openface-title-like");
         const likeButton = header.querySelector('.repo-buttons form[action*="/action/watch"] button, .repo-buttons .openface-like-action button');
+        const overlayKind = overlay.querySelector(".openface-title-kind");
+        if (overlayKind && overlayKind.textContent !== label) overlayKind.textContent = label;
+        if (overlay.dataset.openfaceKindClass !== kindClass) {
+          const currentIcon = overlay.querySelector(".openface-title-icon");
+          currentIcon?.insertAdjacentHTML("afterend", repoKindIcon(kindClass));
+          currentIcon?.remove();
+          overlay.dataset.openfaceKindClass = kindClass;
+        }
         if (likePill) {
+          const nextLikeText = `like ${likeCount}`;
+          if (likePill.textContent !== nextLikeText) likePill.textContent = nextLikeText;
           if (likeButton && !likeButton.disabled) {
             likePill.setAttribute("aria-label", "Like this repository");
           } else {
@@ -2648,9 +2671,12 @@
             likePill.removeAttribute("form");
             likePill.setAttribute("aria-label", "Log in to like this repository");
             likePill.setAttribute("title", "Log in to like this repository");
-            likePill.addEventListener("click", () => {
-              location.href = `/git/user/login?redirect_to=${redirectTo}`;
-            });
+            if (likePill.dataset.openfaceLoginBound !== "true") {
+              likePill.dataset.openfaceLoginBound = "true";
+              likePill.addEventListener("click", () => {
+                location.href = `/git/user/login?redirect_to=${redirectTo}`;
+              });
+            }
           }
         }
       }
@@ -2897,7 +2923,7 @@
     }
     const mobileMenu = document.querySelector("#navbar .navbar-mobile-right.only-mobile");
     const mobileMenuToggle = document.querySelector("#navbar-expand-toggle");
-    if (mobileMenu && mobileMenuToggle) {
+    if (mobileMenu && mobileMenuToggle && matchMedia("(max-width: 767px)").matches) {
       const setImportant = (el, name, value) => el.style.setProperty(name, value, "important");
       const mobileMenuIcons = {
         cube: fontAwesomeIcon("cube", 512, 512, "M224.3-2.5c19.8-11.4 44.2-11.4 64 0L464.2 99c19.8 11.4 32 32.6 32 55.4l0 203c0 22.9-12.2 44-32 55.4L288.3 514.5c-19.8 11.4-44.2 11.4-64 0L48.5 413c-19.8-11.4-32-32.6-32-55.4l0-203c0-22.9 12.2-44 32-55.4L224.3-2.5zm207.8 360l0-166.1-143.8 83 0 166.1 143.8-83z"),
@@ -3157,6 +3183,11 @@
       appTab.classList.toggle("active", isRepoRoot);
       filesTab.classList.toggle("active", !isRepoRoot && isRepoFilesSurface);
       communityTab.classList.toggle("active", !isRepoRoot && isRepoCommunitySurface);
+      if (document.documentElement.getAttribute("data-openface-theme") === "cyberpunk") {
+        for (const tab of [appTab, filesTab, communityTab]) {
+          tab.style.setProperty("color", tab.classList.contains("active") ? "#f9a8d4" : "#cbd5e1", "important");
+        }
+      }
     }
 
     if (repoMatch && !document.querySelector(".openface-mobile-repo-tabs")) {
