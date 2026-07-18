@@ -68,7 +68,7 @@ try {
       }
       if (route.settleMs) await page.waitForTimeout(route.settleMs);
       await page.evaluate(() => document.fonts?.ready).catch(() => undefined);
-      if (route.id === 'community-detail') {
+      if (route.id === 'community-detail' || route.id === 'community-markdown') {
         await page.evaluate(() => {
           const slugs = ['luna-scout', 'patch-orbit', 'mikan-reviewer'];
           for (const slug of slugs) {
@@ -110,6 +110,7 @@ try {
           '#issue-list .openface-community-comment-count, #issue-list a.flex-text-block',
         ))
           .map((element) => Number(element.textContent?.match(/[0-9]+/)?.[0] || 0));
+        const markdownSurface = document.querySelector('.issue-content-left, .ui.timeline');
         return {
           title: document.title,
           heading,
@@ -125,6 +126,13 @@ try {
           issueCommentCounts,
           virtualAgentAuthors,
           virtualAgentAvatars,
+          markdownBlockquotes: markdownSurface?.querySelectorAll('.comment-body blockquote').length || 0,
+          markdownLists: markdownSurface?.querySelectorAll('.comment-body ul, .comment-body ol').length || 0,
+          markdownTaskItems: markdownSurface?.querySelectorAll('.comment-body input[type="checkbox"]').length || 0,
+          markdownCodeBlocks: markdownSurface?.querySelectorAll('.comment-body pre').length || 0,
+          markdownTables: markdownSurface?.querySelectorAll('.comment-body table').length || 0,
+          markdownLinks: markdownSurface?.querySelectorAll('.comment-body a[href]').length || 0,
+          markdownDetails: markdownSurface?.querySelectorAll('.comment-body details').length || 0,
           visibleAppTabLabels,
           bodyPreview: bodyText.replace(/\s+/g, ' ').trim().slice(0, 240),
         };
@@ -143,6 +151,13 @@ try {
         issueCommentCounts: [],
         virtualAgentAuthors: [],
         virtualAgentAvatars: [],
+        markdownBlockquotes: 0,
+        markdownLists: 0,
+        markdownTaskItems: 0,
+        markdownCodeBlocks: 0,
+        markdownTables: 0,
+        markdownLinks: 0,
+        markdownDetails: 0,
         visibleAppTabLabels: [],
         bodyPreview: '',
       }));
@@ -162,6 +177,15 @@ try {
       if (route.id === 'community-detail' && pageState.virtualAgentAuthors.length !== 3) defects.push('All three virtual-agent participants are not visible');
       if (route.id === 'community-detail' && new Set(pageState.virtualAgentAvatars.map(({ src }) => src)).size !== 3) defects.push('Virtual-agent avatars are not distinct');
       if (route.id === 'community-detail' && pageState.virtualAgentAvatars.some(({ loaded }) => !loaded)) defects.push('A virtual-agent avatar failed to load');
+      if (route.id === 'community-markdown' && pageState.communityPage !== 'detail') defects.push('Markdown discussion detail marker is missing');
+      if (route.id === 'community-markdown' && pageState.virtualAgentAuthors.length !== 3) defects.push('Markdown discussion does not show all three agent participants');
+      if (route.id === 'community-markdown' && pageState.markdownBlockquotes < 1) defects.push('Markdown blockquote is missing');
+      if (route.id === 'community-markdown' && pageState.markdownLists < 3) defects.push('Markdown list variants are missing');
+      if (route.id === 'community-markdown' && pageState.markdownTaskItems < 3) defects.push('Markdown task list is missing');
+      if (route.id === 'community-markdown' && pageState.markdownCodeBlocks < 2) defects.push('Markdown code block variants are missing');
+      if (route.id === 'community-markdown' && pageState.markdownTables < 1) defects.push('Markdown table is missing');
+      if (route.id === 'community-markdown' && pageState.markdownLinks < 2) defects.push('Markdown links or mention are missing');
+      if (route.id === 'community-markdown' && pageState.markdownDetails < 1) defects.push('Markdown disclosure is missing');
       if (route.id.startsWith('community-') && !pageState.visibleAppTabLabels.includes('App')) defects.push('Space repository tab is not labeled App');
       if (pageErrors.length) defects.push(`${pageErrors.length} uncaught page error(s)`);
       if (httpErrors.length) defects.push(`${httpErrors.length} HTTP resource error(s)`);
