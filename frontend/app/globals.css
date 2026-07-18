@@ -16,31 +16,52 @@ body {
   background-color: #fafafa;
 }
 
-/* Theme selector lives in the portal chrome. A native select keeps the
-   control compact and keyboard-accessible even on very narrow screens. */
+/* A single icon cycles through the three portal themes. Keeping this control
+   square leaves the dense navigation room to breathe on every viewport. */
 .openface-theme-selector {
-  display: inline-flex;
+  position: relative;
+  display: inline-grid;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
   align-items: center;
-  gap: 6px;
-  height: 34px;
-  padding: 0 8px 0 10px;
+  justify-items: center;
+  padding: 0;
   border: 1px solid #e4e4e7;
-  border-radius: 999px;
+  border-radius: 9px;
   background: #fff;
-  color: #3f3f46;
-  font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
-  letter-spacing: .01em;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+  color: #52525b;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease, color 160ms ease, transform 160ms ease;
 }
 
-.openface-theme-selector select {
-  min-width: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
+.openface-theme-selector:hover {
+  border-color: #a1a1aa;
+  color: #18181b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 9%);
+}
+
+.openface-theme-selector:focus-visible {
+  outline: 2px solid #18181b;
+  outline-offset: 2px;
+}
+
+.openface-theme-selector svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.openface-theme-selector .openface-theme-icon-fill {
+  fill: currentColor;
+  stroke: none;
+  opacity: .18;
 }
 
 /* -------------------------------------------------------------------------
@@ -113,11 +134,9 @@ html[data-openface-theme="solarpunk"] .openface-theme-selector {
   color: #1f583c;
 }
 
-html[data-openface-theme="solarpunk"] .openface-theme-selector::before {
-  content: 'GROW MODE';
-  color: #6a8539;
-  font-size: 9px;
-  letter-spacing: .08em;
+html[data-openface-theme="solarpunk"] .openface-theme-selector:hover {
+  border-color: #527f55;
+  box-shadow: 0 4px 14px rgb(66 111 70 / 18%);
 }
 
 /* -------------------------------------------------------------------------
@@ -234,16 +253,9 @@ html[data-openface-theme="cyberpunk"] .openface-theme-selector {
   box-shadow: 0 0 18px rgb(44 231 255 / 20%);
 }
 
-html[data-openface-theme="cyberpunk"] .openface-theme-selector::before {
-  content: 'NEON LINK';
-  color: #ff5ab4;
-  font-size: 9px;
-  letter-spacing: .08em;
-}
-
-html[data-openface-theme="cyberpunk"] .openface-theme-selector option {
-  background: #101d38;
-  color: #e9f8ff;
+html[data-openface-theme="cyberpunk"] .openface-theme-selector:hover {
+  color: #ff7ac3;
+  box-shadow: 0 0 22px rgb(44 231 255 / 34%);
 }
 
 @media (prefers-color-scheme: dark) {

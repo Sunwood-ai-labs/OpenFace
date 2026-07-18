@@ -6,9 +6,9 @@ const STORAGE_KEY = 'openface-theme-v2';
 const LEGACY_STORAGE_KEY = 'openface-theme';
 
 const themes = [
-  { value: 'standard', label: 'Standard', mark: 'OF' },
-  { value: 'solarpunk', label: 'Solarpunk', mark: '☀' },
-  { value: 'cyberpunk', label: 'Cyberpunk', mark: '◈' },
+  { value: 'standard', label: 'Standard' },
+  { value: 'solarpunk', label: 'Solarpunk' },
+  { value: 'cyberpunk', label: 'Cyberpunk' },
 ] as const;
 
 type ThemeName = (typeof themes)[number]['value'];
@@ -22,6 +22,34 @@ function applyTheme(theme: ThemeName) {
   }
   localStorage.setItem(STORAGE_KEY, theme);
   document.cookie = `openface-theme=${theme}; Path=/; Max-Age=31536000; SameSite=Lax`;
+}
+
+function ThemeIcon({ theme }: { theme: ThemeName }) {
+  if (theme === 'solarpunk') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="3.25" />
+        <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4" />
+      </svg>
+    );
+  }
+
+  if (theme === 'cyberpunk') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m12 3 7 9-7 9-7-9 7-9Z" />
+        <path d="m12 8 3 4-3 4-3-4 3-4Z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M3.5 12h17" />
+      <path d="M12 3.5a8.5 8.5 0 0 0 0 17Z" className="openface-theme-icon-fill" />
+    </svg>
+  );
 }
 
 export default function ThemeSelector() {
@@ -41,21 +69,22 @@ export default function ThemeSelector() {
     applyTheme(initial);
   }, []);
 
+  const currentIndex = themes.findIndex(({ value }) => value === theme);
+  const nextTheme = themes[(currentIndex + 1) % themes.length];
+
   return (
-    <label className="openface-theme-selector" title="Change OpenFace theme">
-      <span aria-hidden="true">{themes.find(({ value }) => value === theme)?.mark}</span>
-      <span className="sr-only">Theme</span>
-      <select
-        aria-label="OpenFace theme"
-        value={theme}
-        onChange={(event) => {
-          const nextTheme = event.target.value as ThemeName;
-          setTheme(nextTheme);
-          applyTheme(nextTheme);
-        }}
-      >
-        {themes.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
-      </select>
-    </label>
+    <button
+      type="button"
+      className="openface-theme-selector"
+      data-theme={theme}
+      aria-label={`${themes[currentIndex].label} theme. Switch to ${nextTheme.label}.`}
+      title={`${themes[currentIndex].label} · switch to ${nextTheme.label}`}
+      onClick={() => {
+        setTheme(nextTheme.value);
+        applyTheme(nextTheme.value);
+      }}
+    >
+      <ThemeIcon theme={theme} />
+    </button>
   );
 }
