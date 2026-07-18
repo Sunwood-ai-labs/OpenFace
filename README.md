@@ -127,6 +127,8 @@ OpenFace keeps `openface-admin`, `aiko-mesh`, `ren-vector`, and `mira-signal` in
 
 <img src="docs/images/seraphim-labs-team-mobile.png" alt="Seraphim Labs team with four distinct photorealistic fictional member avatars" width="390">
 
+<img src="docs/images/seraphim-angel-team-portraits.png" alt="Photorealistic Aurelia Vale, Cassian Reed, Ilyana Noor, and Lucien Sol angel portraits with halos and white wings" width="640">
+
 ## 🗂️ Repository types, topics, and tags
 
 OpenFace chooses the catalog from a **Forgejo topic**:

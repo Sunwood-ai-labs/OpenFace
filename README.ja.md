@@ -36,6 +36,8 @@ OpenFace は次のサービスで構成されています。
 
 <img src="docs/images/seraphim-labs-team-mobile.png" alt="4名の異なるフォトリアル調架空メンバーを表示したSeraphim Labsチーム" width="390">
 
+<img src="docs/images/seraphim-angel-team-portraits.png" alt="光輪と白い翼を持つAurelia Vale、Cassian Reed、Ilyana Noor、Lucien Solのフォトリアル調天使ポートレート" width="640">
+
 リポジトリの種別（モデル / データセット / Space / Skill / MCP / Prompt）は Forgejo の **topics**（`model` / `dataset` / `space` / `skill` / `mcp` / `prompt`）で判定します。Prompt のリポジトリ名・URLは版に依存しない安定slug（例: `mystic-git-auto-commit`）に固定し、個別版は `version-v4.2` のような追加 topic と同名のGit tagで管理します。版を更新してもリポジトリ名・clone URL・参照先を変更する必要はありません。各詳細カードはリポジトリ直下の `README.md` を使い、相対画像もローカル Forgejo の実ファイルから表示します。
 
 ### アーキテクチャ図
