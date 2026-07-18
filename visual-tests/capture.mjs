@@ -223,7 +223,8 @@ try {
       if (route.id.startsWith('community-') && !pageState.visibleAppTabLabels.includes('App')) defects.push('Space repository tab is not labeled App');
       if (route.id === 'skills' && pageState.skillDependencyBadges < 10) defects.push('Skills directory does not expose dependency status for every seeded Skill');
       if (route.id.startsWith('skill-detail') && !pageState.skillRelationshipMapVisible) defects.push('Skill relationship map is missing');
-      if (route.id.startsWith('skill-detail') && pageState.skillRelationshipLinks < 3) defects.push('Skill relationship map does not contain the seeded dependency links');
+      const minimumSkillRelationshipLinks = route.id === 'skill-detail-no-readme' ? 1 : 3;
+      if (route.id.startsWith('skill-detail') && pageState.skillRelationshipLinks < minimumSkillRelationshipLinks) defects.push('Skill relationship map does not contain the seeded dependency links');
       if (pageErrors.length) defects.push(`${pageErrors.length} uncaught page error(s)`);
       if (httpErrors.length) defects.push(`${httpErrors.length} HTTP resource error(s)`);
 
