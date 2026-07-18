@@ -44,7 +44,7 @@ npm run capture:themes --prefix visual-tests
 npm run capture:scroll --prefix visual-tests
 ```
 
-`capture:themes` は29ルートを3テーマ・PC／モバイルで描画し、174枚の全ページ画像を作ります。`capture:scroll` は同じルートの上・中・下に加え、遅れて描画される Dataset Viewer、Inference Providers、Team members へ直接スクロールし、540枚のviewport画像と60枚のcontact sheetを作ります。
+`capture:themes` は30ルートを3テーマ・PC／モバイルで描画し、180枚の全ページ画像を作ります。`capture:scroll` は同じルートの上・中・下に加え、遅れて描画される Dataset Viewer、Inference Providers、両組織の Team members へ直接スクロールし、564枚のviewport画像と66枚のcontact sheetを作ります。
 
 出力先は `visual-tests/artifacts/` です。部分実行もできます。
 

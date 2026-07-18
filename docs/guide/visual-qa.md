@@ -44,7 +44,7 @@ npm run capture:themes --prefix visual-tests
 npm run capture:scroll --prefix visual-tests
 ```
 
-`capture:themes` renders 29 routes in three themes at desktop and mobile sizes (174 full-page screenshots). `capture:scroll` visits those same routes at top, middle, and bottom positions and directly scrolls to late-rendered Dataset Viewer, Inference Providers, and Team members sections (540 viewport screenshots and 60 contact sheets).
+`capture:themes` renders 30 routes in three themes at desktop and mobile sizes (180 full-page screenshots). `capture:scroll` visits those same routes at top, middle, and bottom positions and directly scrolls to late-rendered Dataset Viewer, Inference Providers, and both organizations' Team members sections (564 viewport screenshots and 66 contact sheets).
 
 The output is written to `visual-tests/artifacts/`. A focused run can reduce iteration time:
 

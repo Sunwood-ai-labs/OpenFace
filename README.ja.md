@@ -26,6 +26,14 @@ OpenFace は次のサービスで構成されています。
 | `forgejo-actions-runner` | VitePressなどの静的サイトをビルドする Forgejo Actions Runner | - |
 | `forgejo-actions-dind` | Actionsジョブ専用の隔離 Docker daemon | 2375（内部のみ） |
 
+### 編集可能な組織アカウント
+
+初期seedは、静的な見本ではなく実在するForgejo組織 `openface` と、天使をテーマにした架空のAI Safety組織 `seraphim-labs` を作成します。`openface-admin`、`aiko-mesh`、`ren-vector`、`mira-signal` はOwnerチームに所属し、**Edit organization** から組織名・説明・アバター・メンバー・チーム・リポジトリ設定を編集できます。公開プロフィールの説明はForgejo Organization APIの値を読み直して表示します。
+
+| OpenFace | Seraphim Labs | Owner設定 |
+|---|---|---|
+| <img src="docs/images/openface-organization-mobile.png" alt="新しいシンプルなロゴを使ったOpenFace組織ページ" width="240"> | <img src="docs/images/seraphim-labs-organization-mobile.png" alt="天使の翼と光輪を使ったSeraphim Labs組織ページ" width="240"> | <img src="docs/images/seraphim-labs-owner-settings-mobile.png" alt="編集可能なSeraphim Labs組織設定" width="240"> |
+
 リポジトリの種別（モデル / データセット / Space / Skill / MCP / Prompt）は Forgejo の **topics**（`model` / `dataset` / `space` / `skill` / `mcp` / `prompt`）で判定します。Prompt のリポジトリ名・URLは版に依存しない安定slug（例: `mystic-git-auto-commit`）に固定し、個別版は `version-v4.2` のような追加 topic と同名のGit tagで管理します。版を更新してもリポジトリ名・clone URL・参照先を変更する必要はありません。各詳細カードはリポジトリ直下の `README.md` を使い、相対画像もローカル Forgejo の実ファイルから表示します。
 
 ### アーキテクチャ図
