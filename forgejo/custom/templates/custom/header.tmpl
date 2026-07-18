@@ -2154,6 +2154,11 @@ html[data-openface-theme="cyberpunk"] body a.openface-community-tab.active {
           }
         })
         .catch(() => {});
+      const repoList = document.querySelector(".flex-list, .repository.list, .repo-list, .ui.repository.list");
+      if (repoList && !repoList.classList.contains("openface-org-repo-list")) {
+        repoList.classList.add("openface-org-repo-list");
+        for (const item of repoList.querySelectorAll(".flex-item, .item")) item.classList.add("openface-org-repo-card");
+      }
     }
     if (path === "/git/openface-admin") {
       document.body.setAttribute("data-openface-user-profile", "true");
