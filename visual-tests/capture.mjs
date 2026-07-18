@@ -61,7 +61,10 @@ try {
       let navigationError = null;
       for (let attempt = 0; attempt < 2; attempt += 1) {
         try {
-          response = await page.goto(`${baseUrl}${route.path}`, { waitUntil: 'networkidle', timeout: 45_000 });
+          response = await page.goto(`${baseUrl}${route.path}`, {
+            waitUntil: route.waitUntil || 'networkidle',
+            timeout: 45_000,
+          });
           navigationError = null;
           break;
         } catch (error) {
