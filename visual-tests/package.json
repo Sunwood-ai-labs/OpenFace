@@ -6,6 +6,7 @@
   "scripts": {
     "capture": "node capture.mjs",
     "capture:themes": "node theme-matrix.mjs",
+    "capture:scroll": "node scroll-audit.mjs",
     "audit:organization": "node organization-audit.mjs",
     "audit:interactions": "node interaction-audit.mjs"
   },

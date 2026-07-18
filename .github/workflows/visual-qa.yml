@@ -101,6 +101,11 @@ jobs:
           VISUAL_QA_BASE_URL: https://localhost:8443
         run: npm run capture:themes --prefix visual-tests
 
+      - name: Capture top, middle, and bottom scroll slices
+        env:
+          VISUAL_QA_BASE_URL: https://localhost:8443
+        run: npm run capture:scroll --prefix visual-tests
+
       - name: Audit organization layout and focus states
         env:
           VISUAL_QA_BASE_URL: https://localhost:8443
