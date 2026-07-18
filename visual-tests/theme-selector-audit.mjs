@@ -62,6 +62,27 @@ for (const testCase of cases) {
           stored: localStorage.getItem('openface-theme-v2'),
         };
       });
+      if (testCase.id === 'mobile' && expected.active === 'cyberpunk') {
+        state.menuHighlight = await page.locator('header details[open] > .openface-mobile-menu-toggle').evaluate((element) => {
+          const style = getComputedStyle(element);
+          const luminance = (value) => {
+            const channels = value.match(/[\d.]+/g)?.slice(0, 3).map(Number) || [0, 0, 0];
+            const linear = channels.map((channel) => {
+              const normalized = channel / 255;
+              return normalized <= 0.03928 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+            });
+            return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+          };
+          const foreground = luminance(style.color);
+          const background = luminance(style.backgroundColor);
+          return {
+            color: style.color,
+            background: style.backgroundColor,
+            contrast: Math.round(((Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05)) * 100) / 100,
+          };
+        });
+        if (state.menuHighlight.contrast < 4.5) defects.push(`Mobile menu highlight contrast is ${state.menuHighlight.contrast}:1`);
+      }
       states.push(state);
       if (state.active !== expected.active) defects.push(`Expected ${expected.active}, received ${state.active}`);
       if (state.stored !== expected.active) defects.push(`Stored theme should be ${expected.active}, received ${state.stored}`);
@@ -69,6 +90,7 @@ for (const testCase of cases) {
       if (state.width !== 32 || state.height !== 32) defects.push(`Theme button is ${state.width}×${state.height}, expected 32×32`);
       await page.screenshot({ path: join(outputDir, `${testCase.id}--${expected.active}.png`), fullPage: false });
       await button.click();
+      await page.waitForTimeout(180);
     }
 
     await button.click();
