@@ -24,6 +24,7 @@ export const routes = [
   { id: 'dataset-detail', label: 'Dataset detail', path: '/openface/multilingual-text-dataset', focus: 'Dataset README, tags, clone control, and tabs' },
   { id: 'dataset-detail-sample', label: 'Sample dataset detail', path: '/git/openface/sample-dataset', settleMs: 1400, scrollSelectors: [{ id: 'dataset-viewer', selector: '.openface-dataset-viewer' }], focus: 'Generated Dataset Viewer, table readability, mobile overflow, and theme contrast' },
   { id: 'skill-detail', label: 'Skill detail', path: '/openface/repository-polish-skill', focus: 'Skill dependency graph, reverse links, imported README, provenance, clone control, and tabs' },
+  { id: 'skill-detail-no-readme', label: 'Skill detail without README', path: '/openface/frontend-design-skill', focus: 'Dependency and reverse-link graph remains available when the repository only provides SKILL.md' },
   { id: 'mcp-detail', label: 'MCP detail', path: '/openface/aira-mcp-server', focus: 'Imported MCP README, provenance, clone control, and tabs' },
   { id: 'prompt-detail', label: 'Prompt detail', path: '/openface/mystic-git-auto-commit?revision=v4.2', focus: 'Immutable revision selector, prompt source, and direct-link state' },
   { id: 'repository-files', label: 'Repository files', path: '/openface/mystic-git-auto-commit?tab=files&revision=v4.2', focus: 'Unblurred repository header, file list columns, and tabs' },
