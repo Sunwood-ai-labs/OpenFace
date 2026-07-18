@@ -101,6 +101,11 @@ jobs:
           VISUAL_QA_BASE_URL: https://localhost:8443
         run: npm run capture:themes --prefix visual-tests
 
+      - name: Audit organization layout and focus states
+        env:
+          VISUAL_QA_BASE_URL: https://localhost:8443
+        run: npm run audit:organization --prefix visual-tests
+
       - name: Audit issue interactions in Chromium and WebKit
         env:
           VISUAL_QA_BASE_URL: https://localhost:8443

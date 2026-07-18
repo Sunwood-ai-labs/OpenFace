@@ -1,0 +1,87 @@
+import { chromium } from 'playwright';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = dirname(fileURLToPath(import.meta.url));
+const baseUrl = (process.env.VISUAL_QA_BASE_URL || 'https://localhost:8443').replace(/\/$/, '');
+const outputDir = resolve(process.env.ORGANIZATION_QA_OUTPUT_DIR || join(root, 'artifacts', 'organization'));
+const viewports = [
+  { id: 'desktop', width: 1440, height: 1000 },
+  { id: 'mobile', width: 390, height: 844 },
+];
+
+await mkdir(outputDir, { recursive: true });
+const browser = await chromium.launch({ headless: true });
+const results = [];
+
+const channel = (value) => {
+  const normalized = value / 255;
+  return normalized <= 0.03928 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+};
+
+const luminance = ([r, g, b]) => 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+const contrast = (a, b) => (Math.max(luminance(a), luminance(b)) + 0.05) / (Math.min(luminance(a), luminance(b)) + 0.05);
+const rgb = (value) => value.match(/[\d.]+/g)?.slice(0, 3).map(Number) || [0, 0, 0];
+
+try {
+  for (const viewport of viewports) {
+    const context = await browser.newContext({
+      ignoreHTTPSErrors: true,
+      viewport: { width: viewport.width, height: viewport.height },
+      colorScheme: 'dark',
+      reducedMotion: 'reduce',
+    });
+    await context.addInitScript(() => {
+      localStorage.setItem('openface-theme-v2', 'cyberpunk');
+      localStorage.setItem('openface-theme', 'cyberpunk');
+      document.cookie = 'openface-theme=cyberpunk; Path=/; Max-Age=31536000; SameSite=Lax';
+    });
+    const page = await context.newPage();
+    const response = await page.goto(`${baseUrl}/git/openface`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(700);
+    const memberAudit = await page.evaluate(() => {
+      const content = document.querySelector('.page-content.organization, .page-content');
+      const rect = content?.getBoundingClientRect();
+      const declared = Number.parseInt(document.querySelector('.openface-org-hf-sidebar h2 span')?.textContent || '0', 10) || 0;
+      return {
+        left: rect ? Math.round(rect.left) : null,
+        right: rect ? Math.round(document.documentElement.clientWidth - rect.right) : null,
+        placeholders: document.querySelectorAll('.openface-member-cloud > span').length,
+        avatars: document.querySelectorAll('.openface-member-cloud > img').length,
+        declared,
+      };
+    });
+    await page.screenshot({ path: join(outputDir, `${viewport.id}--organization-top.png`) });
+
+    const repoLink = page.locator('.openface-org-repo-card a').first();
+    await repoLink.focus();
+    await repoLink.scrollIntoViewIfNeeded();
+    const focusAudit = await repoLink.evaluate((link) => {
+      const card = link.closest('.openface-org-repo-card');
+      const linkStyle = getComputedStyle(link);
+      const cardStyle = getComputedStyle(card);
+      return { foreground: linkStyle.color, background: cardStyle.backgroundColor };
+    });
+    await page.screenshot({ path: join(outputDir, `${viewport.id}--repository-focus.png`) });
+
+    const defects = [];
+    if (!response || response.status() >= 400) defects.push(`HTTP ${response?.status() ?? 'none'}`);
+    if (viewport.id === 'mobile' && (memberAudit.left !== 0 || memberAudit.right !== 0)) {
+      defects.push(`mobile side gutters are ${memberAudit.left}px/${memberAudit.right}px`);
+    }
+    if (memberAudit.placeholders !== 0) defects.push(`${memberAudit.placeholders} fake member placeholders`);
+    if (memberAudit.avatars !== memberAudit.declared) defects.push(`${memberAudit.declared} declared members but ${memberAudit.avatars} avatars`);
+    const focusContrast = contrast(rgb(focusAudit.foreground), rgb(focusAudit.background));
+    if (focusContrast < 4.5) defects.push(`focused repository contrast is ${focusContrast.toFixed(2)}:1`);
+
+    results.push({ viewport, memberAudit, focusAudit: { ...focusAudit, contrast: Number(focusContrast.toFixed(2)) }, defects });
+    process.stdout.write(`${defects.length ? 'FAIL' : 'PASS'} ${viewport.id} organization layout and focus state\n`);
+    await context.close();
+  }
+} finally {
+  await browser.close();
+}
+
+await writeFile(join(outputDir, 'report.json'), `${JSON.stringify(results, null, 2)}\n`);
+if (results.some(({ defects }) => defects.length)) process.exitCode = 1;

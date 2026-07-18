@@ -84,6 +84,10 @@ const inspectPage = () => {
   const bodyText = document.body?.innerText?.replace(/\s+/g, ' ').trim() || '';
   const viewportWidth = document.documentElement.clientWidth;
   const scrollWidth = Math.max(document.documentElement.scrollWidth, document.body?.scrollWidth || 0);
+  const organizationPage = document.body?.hasAttribute('data-openface-org');
+  const organizationContent = organizationPage ? document.querySelector('.page-content.organization, .page-content') : null;
+  const organizationRect = organizationContent?.getBoundingClientRect();
+  const memberCountText = document.querySelector('.openface-org-hf-sidebar h2 span')?.textContent?.trim() || '';
   return {
     title: document.title,
     theme: document.documentElement.getAttribute('data-openface-theme') || 'standard',
@@ -95,6 +99,14 @@ const inspectPage = () => {
     contrastRisks: contrastRisks.slice(0, 12),
     repositoryNotFound: bodyText.includes('Repository not found'),
     applicationUnavailable: bodyText.includes('Application unavailable'),
+    organizationAudit: organizationPage ? {
+      mobileSideGutter: viewportWidth <= 767 && organizationRect
+        ? Math.round(Math.max(Math.abs(organizationRect.left), Math.abs(viewportWidth - organizationRect.right)))
+        : 0,
+      memberPlaceholders: document.querySelectorAll('.openface-member-cloud > span').length,
+      memberAvatars: document.querySelectorAll('.openface-member-cloud > img').length,
+      declaredMembers: Number.parseInt(memberCountText, 10) || 0,
+    } : null,
   };
 };
 
@@ -157,6 +169,11 @@ const captureRoute = async ({ context, route, theme, viewport }) => {
     }
   }
 
+  if (route.focusSelector) {
+    const focusTargets = page.locator(route.focusSelector);
+    if (await focusTargets.count() > 0) await focusTargets.first().focus();
+  }
+
   const screenshotName = `${theme.id}--${viewport.id}--${route.id}.png`;
   const screenshotPath = join(outputDir, 'screenshots', screenshotName);
   await page.screenshot({ path: screenshotPath, fullPage: true });
@@ -182,6 +199,11 @@ const captureRoute = async ({ context, route, theme, viewport }) => {
   if (state.contrastRisks.length) defects.push(`${state.contrastRisks.length} severe text contrast risk(s)`);
   if (state.repositoryNotFound) defects.push('Repository not found state is visible');
   if (state.applicationUnavailable) defects.push('Application unavailable state is visible');
+  if (state.organizationAudit?.mobileSideGutter > 1) defects.push(`Organization mobile side gutter: ${state.organizationAudit.mobileSideGutter}px`);
+  if (state.organizationAudit?.memberPlaceholders) defects.push(`Organization has ${state.organizationAudit.memberPlaceholders} fake member placeholder(s)`);
+  if (state.organizationAudit && state.organizationAudit.memberAvatars !== state.organizationAudit.declaredMembers) {
+    defects.push(`Organization declares ${state.organizationAudit.declaredMembers} member(s) but renders ${state.organizationAudit.memberAvatars} avatar(s)`);
+  }
   if (shouldOpenDisclosure && disclosureOpen !== true) defects.push('Disclosure did not open');
   if (pageErrors.length) defects.push(`${pageErrors.length} uncaught page error(s)`);
 
