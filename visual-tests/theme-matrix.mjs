@@ -16,9 +16,13 @@ const select = (values, envName) => {
 const selectedThemes = select(themes, 'VISUAL_QA_THEMES');
 const selectedViewports = select(viewports, 'VISUAL_QA_VIEWPORTS');
 const selectedRoutes = select(routes, 'VISUAL_QA_ROUTES');
+const selectedColorSchemes = select([
+  { id: 'light', label: 'Light OS' },
+  { id: 'dark', label: 'Dark OS' },
+], 'VISUAL_QA_COLOR_SCHEMES');
 
-if (!selectedThemes.length || !selectedViewports.length || !selectedRoutes.length) {
-  throw new Error('Theme QA selection produced an empty theme, viewport, or route list.');
+if (!selectedThemes.length || !selectedViewports.length || !selectedRoutes.length || !selectedColorSchemes.length) {
+  throw new Error('Theme QA selection produced an empty theme, OS color scheme, viewport, or route list.');
 }
 
 await rm(outputDir, { recursive: true, force: true });
@@ -45,32 +49,59 @@ const inspectPage = () => {
     const dark = Math.min(luminance(foreground), luminance(background));
     return (light + 0.05) / (dark + 0.05);
   };
+  const composite = (foreground, background) => {
+    const alpha = foreground.a + background.a * (1 - foreground.a);
+    if (alpha <= 0) return { r: 255, g: 255, b: 255, a: 1 };
+    return {
+      r: (foreground.r * foreground.a + background.r * background.a * (1 - foreground.a)) / alpha,
+      g: (foreground.g * foreground.a + background.g * background.a * (1 - foreground.a)) / alpha,
+      b: (foreground.b * foreground.a + background.b * background.a * (1 - foreground.a)) / alpha,
+      a: alpha,
+    };
+  };
   const effectiveBackground = (element) => {
+    const ancestors = [];
     let current = element;
     while (current) {
-      const style = getComputedStyle(current);
-      if (style.backgroundImage !== 'none') return null;
-      const color = parseColor(style.backgroundColor);
-      if (color && color.a >= 0.95) return color;
+      ancestors.unshift(current);
       current = current.parentElement;
     }
-    return parseColor(getComputedStyle(document.body).backgroundColor);
+    let result = { r: 255, g: 255, b: 255, a: 1 };
+    for (const ancestor of ancestors) {
+      const color = parseColor(getComputedStyle(ancestor).backgroundColor);
+      if (color && color.a > 0) result = composite(color, result);
+    }
+    return result;
   };
-  const candidates = Array.from(document.querySelectorAll(
-    'h1, h2, h3, h4, p, a, button, summary, label, .item, .label, td, th',
-  ));
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode: (node) => node.textContent?.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT,
+  });
+  const candidateSet = new Set();
+  while (walker.nextNode()) {
+    const parent = walker.currentNode.parentElement;
+    if (parent && !['SCRIPT', 'STYLE', 'NOSCRIPT', 'SVG'].includes(parent.tagName)) candidateSet.add(parent);
+  }
+  const candidates = Array.from(candidateSet);
   const contrastRisks = [];
+  const auditedContrasts = [];
   for (const element of candidates) {
     const rect = element.getBoundingClientRect();
     const style = getComputedStyle(element);
     const text = (element.innerText || element.textContent || '').replace(/\s+/g, ' ').trim();
-    if (!text || text.length > 180 || rect.width < 2 || rect.height < 2) continue;
+    if (!text || text.length > 240 || rect.width < 2 || rect.height < 2) continue;
     if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) < 0.5) continue;
+    if (element.matches(':disabled, [aria-disabled="true"]')) continue;
     const foreground = parseColor(style.color);
     const background = effectiveBackground(element);
-    if (!foreground || !background || foreground.a < 0.95) continue;
-    const ratio = contrast(foreground, background);
-    if (ratio < 1.45) {
+    if (!foreground || !background) continue;
+    const effectiveForeground = composite(foreground, background);
+    const ratio = contrast(effectiveForeground, background);
+    const fontSize = Number.parseFloat(style.fontSize) || 16;
+    const fontWeight = Number.parseInt(style.fontWeight, 10) || (style.fontWeight === 'bold' ? 700 : 400);
+    const largeText = fontSize >= 24 || (fontSize >= 18.66 && fontWeight >= 700);
+    const requiredRatio = largeText ? 3 : 4.5;
+    auditedContrasts.push({ ratio, requiredRatio });
+    if (ratio + 0.01 < requiredRatio) {
       contrastRisks.push({
         tag: element.tagName.toLowerCase(),
         className: String(element.className || '').slice(0, 100),
@@ -78,6 +109,9 @@ const inspectPage = () => {
         foreground: style.color,
         background: `rgb(${background.r}, ${background.g}, ${background.b})`,
         ratio: Number(ratio.toFixed(2)),
+        requiredRatio,
+        fontSize,
+        fontWeight,
       });
     }
   }
@@ -96,7 +130,16 @@ const inspectPage = () => {
     viewportWidth,
     scrollWidth,
     horizontalOverflow: Math.max(0, scrollWidth - viewportWidth),
-    contrastRisks: contrastRisks.slice(0, 12),
+    contrastRiskCount: contrastRisks.length,
+    auditedTextCount: auditedContrasts.length,
+    minimumContrast: auditedContrasts.length
+      ? Number(Math.min(...auditedContrasts.map(({ ratio }) => ratio)).toFixed(2))
+      : null,
+    minimumContrastMargin: auditedContrasts.length
+      ? Number(Math.min(...auditedContrasts.map(({ ratio, requiredRatio }) => ratio / requiredRatio)).toFixed(2))
+      : null,
+    lowestContrast: contrastRisks.length ? Math.min(...contrastRisks.map(({ ratio }) => ratio)) : null,
+    contrastRisks: contrastRisks.slice(0, 50),
     repositoryNotFound: bodyText.includes('Repository not found'),
     applicationUnavailable: bodyText.includes('Application unavailable'),
     organizationAudit: organizationPage ? {
@@ -114,7 +157,7 @@ const inspectPage = () => {
   };
 };
 
-const captureRoute = async ({ context, route, theme, viewport }) => {
+const captureRoute = async ({ context, route, theme, colorScheme, viewport }) => {
   const page = await context.newPage();
   page.setDefaultTimeout(8_000);
   page.setDefaultNavigationTimeout(30_000);
@@ -178,7 +221,7 @@ const captureRoute = async ({ context, route, theme, viewport }) => {
     if (await focusTargets.count() > 0) await focusTargets.first().focus();
   }
 
-  const screenshotName = `${theme.id}--${viewport.id}--${route.id}.png`;
+  const screenshotName = `${theme.id}--${colorScheme.id}--${viewport.id}--${route.id}.png`;
   const screenshotPath = join(outputDir, 'screenshots', screenshotName);
   await page.screenshot({ path: screenshotPath, fullPage: true });
   const state = await page.evaluate(inspectPage).catch(() => ({
@@ -190,6 +233,11 @@ const captureRoute = async ({ context, route, theme, viewport }) => {
     scrollWidth: viewport.width,
     horizontalOverflow: 0,
     contrastRisks: [],
+    contrastRiskCount: 0,
+    auditedTextCount: 0,
+    minimumContrast: null,
+    minimumContrastMargin: null,
+    lowestContrast: null,
     repositoryNotFound: false,
     applicationUnavailable: false,
   }));
@@ -200,7 +248,7 @@ const captureRoute = async ({ context, route, theme, viewport }) => {
   if (route.themeAware !== false && state.theme !== theme.id) defects.push(`Expected ${theme.id} theme but found ${state.theme}`);
   if (state.bodyTextLength < 20) defects.push('Page is blank or nearly blank');
   if (state.horizontalOverflow > 2) defects.push(`Horizontal overflow: ${state.horizontalOverflow}px`);
-  if (state.contrastRisks.length) defects.push(`${state.contrastRisks.length} severe text contrast risk(s)`);
+  if (state.contrastRiskCount) defects.push(`${state.contrastRiskCount} WCAG text contrast failure(s)`);
   if (state.repositoryNotFound) defects.push('Repository not found state is visible');
   if (state.applicationUnavailable) defects.push('Application unavailable state is visible');
   if (state.organizationAudit?.mobileSideGutter > 1) defects.push(`Organization mobile side gutter: ${state.organizationAudit.mobileSideGutter}px`);
@@ -231,6 +279,7 @@ const captureRoute = async ({ context, route, theme, viewport }) => {
     screenshot: relative(outputDir, screenshotPath).replaceAll('\\', '/'),
     ...state,
     theme,
+    colorScheme,
     viewport,
     consoleErrors,
     pageErrors,
@@ -238,35 +287,37 @@ const captureRoute = async ({ context, route, theme, viewport }) => {
     defects,
     passed: defects.length === 0,
   };
-  process.stdout.write(`${result.passed ? 'PASS' : 'FAIL'} ${theme.id.padEnd(10)} ${viewport.id.padEnd(7)} ${route.id}\n`);
+  process.stdout.write(`${result.passed ? 'PASS' : 'FAIL'} ${theme.id.padEnd(10)} ${colorScheme.id.padEnd(5)} ${viewport.id.padEnd(7)} ${route.id}\n`);
   await page.close();
   return result;
 };
 
 try {
   for (const theme of selectedThemes) {
-    for (const viewport of selectedViewports) {
-      const context = await browser.newContext({
-        ignoreHTTPSErrors: true,
-        viewport: { width: viewport.width, height: viewport.height },
-        colorScheme: theme.colorScheme,
-        reducedMotion: 'reduce',
-      });
-      await context.addInitScript((themeId) => {
-        localStorage.setItem('openface-theme-v2', themeId);
-        localStorage.setItem('openface-theme', themeId);
-        document.cookie = `openface-theme=${themeId}; Path=/; Max-Age=31536000; SameSite=Lax`;
-      }, theme.id);
-      let nextIndex = 0;
-      const workers = Array.from({ length: Math.min(concurrency, selectedRoutes.length) }, async () => {
-        while (nextIndex < selectedRoutes.length) {
-          const route = selectedRoutes[nextIndex];
-          nextIndex += 1;
-          results.push(await captureRoute({ context, route, theme, viewport }));
-        }
-      });
-      await Promise.all(workers);
-      await context.close();
+    for (const colorScheme of selectedColorSchemes) {
+      for (const viewport of selectedViewports) {
+        const context = await browser.newContext({
+          ignoreHTTPSErrors: true,
+          viewport: { width: viewport.width, height: viewport.height },
+          colorScheme: colorScheme.id,
+          reducedMotion: 'reduce',
+        });
+        await context.addInitScript((themeId) => {
+          localStorage.setItem('openface-theme-v2', themeId);
+          localStorage.setItem('openface-theme', themeId);
+          document.cookie = `openface-theme=${themeId}; Path=/; Max-Age=31536000; SameSite=Lax`;
+        }, theme.id);
+        let nextIndex = 0;
+        const workers = Array.from({ length: Math.min(concurrency, selectedRoutes.length) }, async () => {
+          while (nextIndex < selectedRoutes.length) {
+            const route = selectedRoutes[nextIndex];
+            nextIndex += 1;
+            results.push(await captureRoute({ context, route, theme, colorScheme, viewport }));
+          }
+        });
+        await Promise.all(workers);
+        await context.close();
+      }
     }
   }
 } finally {
@@ -275,15 +326,17 @@ try {
 
 results.sort((a, b) =>
   a.theme.id.localeCompare(b.theme.id) ||
+  a.colorScheme.id.localeCompare(b.colorScheme.id) ||
   a.viewport.id.localeCompare(b.viewport.id) ||
   a.route.id.localeCompare(b.route.id));
 
 const manifest = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   generatedAt: new Date().toISOString(),
   baseUrl,
   dimensions: {
     themes: selectedThemes.map(({ id }) => id),
+    colorSchemes: selectedColorSchemes.map(({ id }) => id),
     viewports: selectedViewports.map(({ id, width, height }) => ({ id, width, height })),
     routes: selectedRoutes.map(({ id, path }) => ({ id, path })),
   },
@@ -292,6 +345,8 @@ const manifest = {
     passed: results.filter(({ passed }) => passed).length,
     failed: results.filter(({ passed }) => !passed).length,
     screenshots: results.length,
+    auditedTextNodes: results.reduce((sum, result) => sum + result.auditedTextCount, 0),
+    minimumContrastMargin: Math.min(...results.map(({ minimumContrastMargin }) => minimumContrastMargin ?? Infinity)),
   },
   results,
 };
@@ -301,16 +356,17 @@ const markdown = [
   '# OpenFace theme matrix',
   '',
   `Result: **${manifest.summary.passed}/${manifest.summary.total} passed**  `,
-  `Coverage: **${selectedThemes.length} themes × ${selectedViewports.length} viewports × ${selectedRoutes.length} routes = ${results.length} screenshots**`,
+  `Coverage: **${selectedThemes.length} themes × ${selectedColorSchemes.length} OS color schemes × ${selectedViewports.length} viewports × ${selectedRoutes.length} routes = ${results.length} screenshots**`,
+  `Audited text nodes: **${manifest.summary.auditedTextNodes}** · Minimum WCAG margin: **${manifest.summary.minimumContrastMargin}× required ratio**`,
   '',
-  '| Result | Theme | Viewport | Route | Overflow | Contrast risks | Screenshot |',
-  '|---|---|---|---|---:|---:|---|',
-  ...results.map((result) => `| ${result.passed ? 'PASS' : 'FAIL'} | ${result.theme.label} | ${result.viewport.id} | ${result.route.label} | ${result.horizontalOverflow}px | ${result.contrastRisks.length} | [view](${result.screenshot}) |`),
+  '| Result | Theme | OS scheme | Viewport | Route | Overflow | Contrast risks | Screenshot |',
+  '|---|---|---|---|---|---:|---:|---|',
+  ...results.map((result) => `| ${result.passed ? 'PASS' : 'FAIL'} | ${result.theme.label} | ${result.colorScheme.label} | ${result.viewport.id} | ${result.route.label} | ${result.horizontalOverflow}px | ${result.contrastRiskCount} | [view](${result.screenshot}) |`),
   '',
   '## Failures',
   '',
   ...results.filter(({ passed }) => !passed).flatMap((result) => [
-    `### ${result.theme.label} / ${result.viewport.id} / ${result.route.label}`,
+    `### ${result.theme.label} / ${result.colorScheme.label} / ${result.viewport.id} / ${result.route.label}`,
     '',
     `- Defects: ${result.defects.join('; ')}`,
     `- Contrast evidence: ${result.contrastRisks.length ? `\`${JSON.stringify(result.contrastRisks)}\`` : 'none'}`,
@@ -322,7 +378,7 @@ const markdown = [
 await writeFile(join(outputDir, 'THEME_MATRIX.md'), `${markdown.join('\n')}\n`);
 const contactSheets = await generateContactSheets({ manifest, outputDir });
 
-process.stdout.write(`\nTheme matrix: ${selectedThemes.length} × ${selectedViewports.length} × ${selectedRoutes.length} = ${results.length} screenshots\n`);
+process.stdout.write(`\nTheme matrix: ${selectedThemes.length} × ${selectedColorSchemes.length} × ${selectedViewports.length} × ${selectedRoutes.length} = ${results.length} screenshots\n`);
 process.stdout.write(`Contact sheets: ${contactSheets.length}\n`);
 process.stdout.write(`Report: ${join(outputDir, 'THEME_MATRIX.md')}\n`);
 if (manifest.summary.failed > 0) process.exitCode = 1;

@@ -23,13 +23,14 @@ export async function generateContactSheets({ manifest, outputDir }) {
 
   try {
     for (const themeId of manifest.dimensions.themes) {
-      for (const viewport of manifest.dimensions.viewports) {
+      for (const colorScheme of manifest.dimensions.colorSchemes || ['default']) {
+        for (const viewport of manifest.dimensions.viewports) {
         const results = manifest.results.filter((result) =>
-          result.theme.id === themeId && result.viewport.id === viewport.id);
+          result.theme.id === themeId && (result.colorScheme?.id || 'default') === colorScheme && result.viewport.id === viewport.id);
         const chunks = chunksOf(results, 9);
         for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex += 1) {
           const chunk = chunks[chunkIndex];
-          const sheetName = `${themeId}--${viewport.id}--${chunkIndex + 1}.png`;
+          const sheetName = `${themeId}--${colorScheme}--${viewport.id}--${chunkIndex + 1}.png`;
           const sheetPath = join(sheetsDir, sheetName);
           const cards = chunk.map((result) => {
             const imageUrl = pathToFileURL(resolve(outputDir, result.screenshot)).href;
@@ -51,7 +52,7 @@ export async function generateContactSheets({ manifest, outputDir }) {
             img{display:block;width:100%;height:100%;min-width:0;min-height:0;object-fit:contain;box-shadow:0 0 0 1px #172033}
             footer{min-height:42px;padding:10px 12px;color:#a9bad0;border-top:1px solid #31415f}
           </style></head><body>
-            <h1 class="title">OpenFace visual audit · ${escapeHtml(themeId)} · ${escapeHtml(viewport.id)} · ${chunkIndex + 1}/${chunks.length}</h1>
+            <h1 class="title">OpenFace visual audit · ${escapeHtml(themeId)} · ${escapeHtml(colorScheme)} OS · ${escapeHtml(viewport.id)} · ${chunkIndex + 1}/${chunks.length}</h1>
             <p class="meta">Full-page screenshots scaled to fit. Open the source PNG for pixel-level review.</p>
             <main class="grid">${cards}</main>
           </body></html>`;
@@ -68,11 +69,13 @@ export async function generateContactSheets({ manifest, outputDir }) {
           await page.close();
           generated.push({
             theme: themeId,
+            colorScheme,
             viewport: viewport.id,
             part: chunkIndex + 1,
             routes: chunk.map((result) => result.route.id),
             file: relative(outputDir, sheetPath).replaceAll('\\', '/'),
           });
+        }
         }
       }
     }
@@ -85,10 +88,10 @@ export async function generateContactSheets({ manifest, outputDir }) {
     '',
     `Coverage: **${manifest.summary.total} full-page screenshots** grouped into **${generated.length} review sheets**.`,
     '',
-    '| Theme | Viewport | Part | Routes | Sheet |',
-    '|---|---|---:|---|---|',
+    '| Theme | OS scheme | Viewport | Part | Routes | Sheet |',
+    '|---|---|---|---:|---|---|',
     ...generated.map((sheet) =>
-      `| ${sheet.theme} | ${sheet.viewport} | ${sheet.part} | ${sheet.routes.join(', ')} | [open](${sheet.file}) |`),
+      `| ${sheet.theme} | ${sheet.colorScheme} | ${sheet.viewport} | ${sheet.part} | ${sheet.routes.join(', ')} | [open](${sheet.file}) |`),
     '',
   ];
   await writeFile(join(outputDir, 'CONTACT_SHEETS.md'), `${markdown.join('\n')}\n`);
