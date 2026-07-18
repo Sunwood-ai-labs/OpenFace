@@ -33,7 +33,7 @@
   }, { passive: true });
 })();
 </script>
-<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260718-interactions3">
+<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260718-interactions4">
 <style>
 @media (max-width: 767px) {
   html body nav#navbar .navbar-left.ui.secondary.menu > a.item:not(#navbar-logo),
@@ -2332,6 +2332,41 @@
   };
 
   const normalizeRepoControls = () => {
+    for (const button of document.querySelectorAll(".markup pre.code-block .code-copy")) {
+      button.setAttribute("type", "button");
+      if (button.dataset.openfaceCopyBound === "true") continue;
+      button.dataset.openfaceCopyBound = "true";
+      button.setAttribute("aria-label", "Copy code");
+      button.setAttribute("title", "Copy code");
+      button.addEventListener("click", async () => {
+        const text = button.dataset.clipboardText || "";
+        let copied = false;
+        try {
+          await navigator.clipboard.writeText(text);
+          copied = true;
+        } catch {
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "fixed";
+          textarea.style.opacity = "0";
+          document.body.appendChild(textarea);
+          textarea.select();
+          copied = document.execCommand("copy");
+          textarea.remove();
+        }
+        if (!copied) return;
+        button.setAttribute("aria-label", "Copied code");
+        button.setAttribute("title", "Copied!");
+        button.setAttribute("data-tooltip-content", "Copied!");
+        window.setTimeout(() => {
+          button.setAttribute("aria-label", "Copy code");
+          button.setAttribute("title", "Copy code");
+          button.setAttribute("data-tooltip-content", "Copy code");
+        }, 1600);
+      });
+    }
+
     for (const reaction of document.querySelectorAll(".select-reaction, .reactions-menu, .add-reaction, .comment-header-right .select-reaction")) {
       reaction.remove();
     }
@@ -2958,6 +2993,7 @@
       setImportant(mobileMenu, "padding", "0");
       setImportant(mobileMenu, "align-items", "center");
       setImportant(mobileMenu, "justify-content", "center");
+      setImportant(mobileMenu, "z-index", "40");
       setImportant(mobileMenuToggle, "display", "flex");
       setImportant(mobileMenuToggle, "visibility", "visible");
       setImportant(mobileMenuToggle, "width", "36px");
@@ -2968,8 +3004,23 @@
       setImportant(mobileMenuToggle, "padding", "0");
       setImportant(mobileMenuToggle, "align-items", "center");
       setImportant(mobileMenuToggle, "justify-content", "center");
+      setImportant(mobileMenuToggle, "position", "relative");
+      setImportant(mobileMenuToggle, "z-index", "41");
+      mobileMenuToggle.setAttribute("type", "button");
+      mobileMenuToggle.setAttribute("aria-expanded", "false");
       syncMobileNavMenu();
-      mobileMenuToggle.addEventListener("click", () => window.setTimeout(syncMobileNavMenu, 0));
+      mobileMenuToggle.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        const navbar = document.querySelector("#navbar");
+        if (!navbar) return;
+        navbar.classList.toggle("navbar-menu-open");
+        mobileMenuToggle.setAttribute(
+          "aria-expanded",
+          String(navbar.classList.contains("navbar-menu-open")),
+        );
+        syncMobileNavMenu();
+      }, true);
     }
 
     const navIcon = {

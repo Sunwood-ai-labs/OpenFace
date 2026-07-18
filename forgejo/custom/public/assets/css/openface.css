@@ -14929,6 +14929,23 @@ html body[data-openface-file-list] .repository.file.list .js-branch-tag-selector
 }
 
 /* layout306: persistent manual copy fallback when clipboard APIs are blocked. */
+html body .markup pre.code-block {
+  padding-right: 48px !important;
+}
+
+html body .markup pre.code-block .code-copy {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+html body .markup pre.code-block .code-copy:focus-visible {
+  outline: 2px solid var(--color-primary, #7c3aed) !important;
+  outline-offset: 2px !important;
+}
+
 html body .repository.file .file-header .openface-blob-copy-fallback {
   grid-column: 1 / -1 !important;
   display: flex !important;
