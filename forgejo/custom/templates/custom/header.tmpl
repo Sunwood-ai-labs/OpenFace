@@ -243,7 +243,17 @@
   };
 
   const normalizeAvatars = () => {
+    const generatedAgentProfiles = new Set([
+      "/git/luna-scout",
+      "/git/patch-orbit",
+      "/git/mikan-reviewer",
+    ]);
     for (const img of document.querySelectorAll("img.ui.avatar, img.avatar, .repo-header img")) {
+      const profileHref = img.closest("a")?.getAttribute("href") || "";
+      if (generatedAgentProfiles.has(profileHref) && img.getAttribute("src")?.startsWith("/git/avatars/")) {
+        img.classList.add("openface-avatar-image");
+        continue;
+      }
       const alt = img.getAttribute("alt") || img.getAttribute("title") || img.closest("a")?.textContent || "openface-admin";
       img.src = avatarForName(alt);
       img.srcset = "";

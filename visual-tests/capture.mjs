@@ -68,6 +68,22 @@ try {
       }
       if (route.settleMs) await page.waitForTimeout(route.settleMs);
       await page.evaluate(() => document.fonts?.ready).catch(() => undefined);
+      if (route.id === 'community-detail') {
+        await page.evaluate(() => {
+          const slugs = ['luna-scout', 'patch-orbit', 'mikan-reviewer'];
+          for (const slug of slugs) {
+            for (const image of document.querySelectorAll(`a[href$="/${slug}"] img`)) {
+              image.loading = 'eager';
+            }
+          }
+        });
+        await page.waitForFunction(() => {
+          const slugs = ['luna-scout', 'patch-orbit', 'mikan-reviewer'];
+          return slugs.every((slug) => Array.from(
+            document.querySelectorAll(`a[href$="/${slug}"] img`),
+          ).some((image) => image.complete && image.naturalWidth > 0));
+        }, undefined, { timeout: 5_000 }).catch(() => undefined);
+      }
 
       const screenshotName = `${viewport.id}--${route.id}.png`;
       const screenshotPath = join(outputDir, 'screenshots', screenshotName);
@@ -82,6 +98,18 @@ try {
           .filter((element) => element.getBoundingClientRect().width > 0)
           .map((element) => element.textContent?.trim() || '')
           .filter(Boolean);
+        const virtualAgentSlugs = ['luna-scout', 'patch-orbit', 'mikan-reviewer'];
+        const virtualAgentAuthors = virtualAgentSlugs.filter((slug) =>
+          document.querySelector(`.timeline-item.comment .author[href$="/${slug}"]`),
+        );
+        const virtualAgentAvatars = virtualAgentSlugs.map((slug) => {
+          const image = document.querySelector(`a[href$="/${slug}"] img`);
+          return image ? { slug, src: image.getAttribute('src'), loaded: image.complete && image.naturalWidth > 0 } : null;
+        }).filter(Boolean);
+        const issueCommentCounts = Array.from(document.querySelectorAll(
+          '#issue-list .openface-community-comment-count, #issue-list a.flex-text-block',
+        ))
+          .map((element) => Number(element.textContent?.match(/[0-9]+/)?.[0] || 0));
         return {
           title: document.title,
           heading,
@@ -94,6 +122,9 @@ try {
           onDemandStageVisible: bodyText.includes('This Space runs on demand'),
           communityPage: document.body?.getAttribute('data-openface-community-page') || null,
           issueRowCount: document.querySelectorAll('#issue-list .flex-item').length,
+          issueCommentCounts,
+          virtualAgentAuthors,
+          virtualAgentAvatars,
           visibleAppTabLabels,
           bodyPreview: bodyText.replace(/\s+/g, ' ').trim().slice(0, 240),
         };
@@ -109,6 +140,9 @@ try {
         onDemandStageVisible: false,
         communityPage: null,
         issueRowCount: 0,
+        issueCommentCounts: [],
+        virtualAgentAuthors: [],
+        virtualAgentAvatars: [],
         visibleAppTabLabels: [],
         bodyPreview: '',
       }));
@@ -123,7 +157,11 @@ try {
       if (pageState.runningBadgeVisible && pageState.onDemandStageVisible) defects.push('Runtime badge says Running while the on-demand placeholder is visible');
       if (route.id === 'community-list' && pageState.communityPage !== 'list') defects.push('Community list marker is missing');
       if (route.id === 'community-list' && pageState.issueRowCount < 1) defects.push('Community list has no seeded issue rows');
+      if (route.id === 'community-list' && !pageState.issueCommentCounts.includes(3)) defects.push('Seeded three-reply discussion count is missing');
       if (route.id === 'community-detail' && pageState.communityPage !== 'detail') defects.push('Community detail marker is missing');
+      if (route.id === 'community-detail' && pageState.virtualAgentAuthors.length !== 3) defects.push('All three virtual-agent participants are not visible');
+      if (route.id === 'community-detail' && new Set(pageState.virtualAgentAvatars.map(({ src }) => src)).size !== 3) defects.push('Virtual-agent avatars are not distinct');
+      if (route.id === 'community-detail' && pageState.virtualAgentAvatars.some(({ loaded }) => !loaded)) defects.push('A virtual-agent avatar failed to load');
       if (route.id.startsWith('community-') && !pageState.visibleAppTabLabels.includes('App')) defects.push('Space repository tab is not labeled App');
       if (pageErrors.length) defects.push(`${pageErrors.length} uncaught page error(s)`);
       if (httpErrors.length) defects.push(`${httpErrors.length} HTTP resource error(s)`);

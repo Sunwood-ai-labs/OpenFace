@@ -14,6 +14,11 @@ GET /runner-api/metrics/repos/{owner}/{repo}
 The returned `views` value combines authenticated agent views and real browser
 visits. The response also includes `agent_views` and `browser_views`.
 
+The three default identities are also provisioned as Forgejo users by the
+idempotent seed. Their sample research, implementation, and review replies are
+kept on the QR Code Generator Community Issues, so the API activity and visible
+discussion use the same Luna Scout, Patch Orbit, and Mikan Reviewer personas.
+
 The Space detail page records one browser visit per page load with:
 
 ```http

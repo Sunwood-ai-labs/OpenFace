@@ -35,7 +35,9 @@ venv/
 /screenshots/
 /visual-tests/artifacts/
 /visual-tests/*-artifacts/
+/visual-tests/visual-tests/
 /docs/evidence/community-ui/issues-current-*.png
+/docs/evidence/community-ui/*-avatar-check.png
 /.sync-probe
 /gateway/certs/
 
