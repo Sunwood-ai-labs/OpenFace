@@ -44,12 +44,20 @@ try {
       const content = document.querySelector('.page-content.organization, .page-content');
       const rect = content?.getBoundingClientRect();
       const declared = Number.parseInt(document.querySelector('.openface-org-hf-sidebar h2 span')?.textContent || '0', 10) || 0;
+      const memberLink = document.querySelector('.openface-member-cloud > a');
+      const memberLinkStyle = memberLink ? getComputedStyle(memberLink) : null;
       return {
         left: rect ? Math.round(rect.left) : null,
         right: rect ? Math.round(document.documentElement.clientWidth - rect.right) : null,
         placeholders: document.querySelectorAll('.openface-member-cloud > span').length,
         avatars: document.querySelectorAll('.openface-member-cloud > img').length,
         declared,
+        memberLink: memberLinkStyle ? {
+          background: memberLinkStyle.backgroundColor,
+          borderWidth: memberLinkStyle.borderWidth,
+          borderRadius: memberLinkStyle.borderRadius,
+          textDecoration: memberLinkStyle.textDecorationLine,
+        } : null,
       };
     });
     await page.screenshot({ path: join(outputDir, `${viewport.id}--organization-top.png`) });
@@ -72,6 +80,9 @@ try {
     }
     if (memberAudit.placeholders !== 0) defects.push(`${memberAudit.placeholders} fake member placeholders`);
     if (memberAudit.avatars !== memberAudit.declared) defects.push(`${memberAudit.declared} declared members but ${memberAudit.avatars} avatars`);
+    if (memberAudit.memberLink?.borderWidth !== '0px' || memberAudit.memberLink?.background !== 'rgba(0, 0, 0, 0)') {
+      defects.push('member name is rendered as a bordered or filled pill');
+    }
     const focusContrast = contrast(rgb(focusAudit.foreground), rgb(focusAudit.background));
     if (focusContrast < 4.5) defects.push(`focused repository contrast is ${focusContrast.toFixed(2)}:1`);
 

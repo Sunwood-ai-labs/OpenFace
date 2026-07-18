@@ -18121,6 +18121,11 @@ html[data-openface-theme="cyberpunk"] body[data-openface-auth="signup"] .ui.atta
 }
 
 .openface-member-cloud a {
+  min-height: 0;
+  padding: 0;
+  border: 0 !important;
+  border-radius: 0;
+  background: transparent !important;
   color: #374151 !important;
   font-size: 13px;
   font-weight: 700;
@@ -18128,6 +18133,8 @@ html[data-openface-theme="cyberpunk"] body[data-openface-auth="signup"] .ui.atta
 }
 
 html[data-openface-theme="cyberpunk"] .openface-member-cloud a {
+  border: 0 !important;
+  background: transparent !important;
   color: #c8ebf8 !important;
 }
 
@@ -18155,10 +18162,8 @@ html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo
   color: #7cecff !important;
 }
 
-html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-card a:focus-visible {
-  border-radius: 3px;
-  outline: 2px solid #38e8ff !important;
-  outline-offset: 2px;
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-card a:focus {
+  outline: none !important;
 }
 
 @media (max-width: 767px) {
