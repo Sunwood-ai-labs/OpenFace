@@ -60,7 +60,15 @@ On Windows PowerShell, use `Copy-Item .env.example .env` instead of `cp`.
 Before sharing the deployment, change `OPENFACE_ADMIN_PASSWORD` in `.env`. Then open:
 
 - HTTPS portal: [https://localhost:8443](https://localhost:8443)
-- HTTP redirect: [http://localhost:8090](http://localhost:8090)
+- Certificate-free HTTP endpoint: [http://localhost:8090](http://localhost:8090)
+
+For private access from phones or remote devices without managing a local CA, install Tailscale on the host and client, sign both into the same tailnet, then run:
+
+```powershell
+.\scripts\enable-tailscale-serve.ps1
+```
+
+The script sets `PUBLIC_BASE_URL` to the device's MagicDNS HTTPS URL, recreates the affected Compose services, and enables Tailscale Serve. For direct LAN access, set `PUBLIC_BASE_URL=http://<host-lan-ip>:8090`; if Docker Desktop is not already allowed through Windows Defender Firewall, run `.\scripts\allow-lan-firewall.ps1` once from an administrator PowerShell.
 - Forgejo SSH: `ssh://git@localhost:2222/OWNER/REPOSITORY.git`
 
 The local gateway generates a self-signed development certificate on first start. Replace it with a trusted certificate for a shared deployment.
@@ -227,7 +235,7 @@ Copy `.env.example` to `.env`. Important values include:
 | Variable | Default | Purpose |
 |---|---|---|
 | `PUBLIC_BASE_URL` | `https://localhost:8443` | Canonical gateway URL |
-| `OPENFACE_PORT` | `8090` | HTTP redirect port |
+| `OPENFACE_PORT` | `8090` | Certificate-free HTTP gateway port |
 | `OPENFACE_HTTPS_PORT` | `8443` | HTTPS port |
 | `DISABLE_REGISTRATION` | `true` | Keep public self-registration closed |
 | `MAX_RUNNING_SPACES` | `24` | Maximum simultaneous Space containers |

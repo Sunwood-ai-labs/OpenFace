@@ -184,7 +184,21 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-起動後、ブラウザで [https://localhost:8443](https://localhost:8443) を開いてください。`http://localhost:8090` はHTTPSへリダイレクトします。
+起動後、ブラウザで [https://localhost:8443](https://localhost:8443) を開いてください。自己署名証明書を受け付けないモバイルのアプリ内ブラウザでは、証明書不要の [http://localhost:8090](http://localhost:8090) も利用できます。
+
+### LAN・Tailscaleから開く
+
+同じLANの端末からは、`.env` の `PUBLIC_BASE_URL` を `http://<PCのLAN IP>:8090` に変更してComposeを再起動します。Windows Defender FirewallでDocker DesktopのPrivateネットワーク受信が許可されていない環境では、管理者PowerShellで次を一度実行します。
+
+```powershell
+.\scripts\allow-lan-firewall.ps1
+```
+
+自己署名証明書やルーターの端末分離を避ける場合は、PCと閲覧端末を同じTailnetへ参加させます。Windows版Tailscaleをインストールしてログイン後、次のスクリプトがMagicDNSのHTTPS URL設定、Compose再起動、Tailscale Serve公開までを一括実行します。
+
+```powershell
+.\scripts\enable-tailscale-serve.ps1
+```
 
 - 初期 admin ユーザーの資格情報は `.env` の `OPENFACE_ADMIN_USER` / `OPENFACE_ADMIN_PASSWORD`（デフォルト: `openface-admin` / `openface1234`。※`admin`はForgejoの予約名のため使用不可）です。初回ログイン後にパスワードを変更することを推奨します。
 - `seed` サービスがサンプルリポジトリと、`seed/catalog/sunwood-ai-labs.json` に固定した実在 Skill 10件・MCP 10件、`seed/catalog/prompts.json` に固定した Prompt 20件を冪等に取り込みます。トップページや `/models` `/datasets` `/spaces` `/skills` `/mcps` `/prompts` で確認できます。
@@ -317,7 +331,7 @@ jobs:
 
 | ポート | 用途 |
 |---|---|
-| `8090` | HTTP gateway（HTTPSへリダイレクト） |
+| `8090` | HTTP gateway（LAN・ローカル証明書非対応WebView向け） |
 | `8443` | HTTPS gateway（Web UI・API・Git・Spaces、すべてここ経由） |
 | `2222` | Forgejo への直接 SSH（`git clone ssh://git@localhost:2222/...`） |
 
