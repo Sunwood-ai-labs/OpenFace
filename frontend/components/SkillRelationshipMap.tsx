@@ -76,7 +76,7 @@ export default function SkillRelationshipMap({ repo, catalog }: { repo: Repo; ca
         name: candidate.name,
         fullName: candidate.full_name,
         description: dependency.reason || candidate.description,
-        reason: dependency.reason ? `${candidate.name}: ${dependency.reason}` : candidate.description || undefined,
+        reason: dependency.reason || candidate.description || undefined,
       }));
   });
   const requiredCount = dependencies.filter(({ type }) => type === 'required').length;
@@ -94,7 +94,12 @@ export default function SkillRelationshipMap({ repo, catalog }: { repo: Repo; ca
         </span>
         <div className="min-w-0 flex-1">
           <h2 id="skill-relationship-title" className="font-semibold text-zinc-950 dark:text-zinc-100">Skill relationships</h2>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">Declared in <code>openface.skill.json</code></p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Declared in{' '}
+            <Link href={`/${owner}/${repo.name}?tab=files&path=openface.skill.json`} className="font-mono underline decoration-violet-300 underline-offset-2 hover:text-violet-700 dark:hover:text-violet-300">
+              openface.skill.json
+            </Link>
+          </p>
         </div>
         <span className="rounded-full border border-violet-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-violet-700 dark:border-violet-800 dark:bg-zinc-950 dark:text-violet-300">
           {connectionCount} connection{connectionCount === 1 ? '' : 's'}
