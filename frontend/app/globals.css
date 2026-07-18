@@ -6,6 +6,12 @@ html {
   scroll-behavior: smooth;
 }
 
+details > summary {
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   background-color: #fafafa;
 }

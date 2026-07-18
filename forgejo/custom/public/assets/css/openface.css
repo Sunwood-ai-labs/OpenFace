@@ -17746,3 +17746,23 @@ html[data-openface-theme="cyberpunk"] body[data-openface-community-page] .reposi
   border-color: #ff5ab4 !important;
   color: #f3fbff !important;
 }
+
+/* interactions1: reliable tap targets in mobile and embedded webviews. */
+html body details > summary {
+  cursor: pointer !important;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html body .comment-body details > summary {
+  min-height: 44px;
+  padding: 10px 12px;
+  line-height: 24px;
+}
+
+html body .comment-body details > summary:active,
+html body button:active,
+html body .ui.button:active {
+  transform: translateY(1px);
+  filter: brightness(0.92);
+}

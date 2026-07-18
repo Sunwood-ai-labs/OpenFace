@@ -19,7 +19,21 @@
   } catch {}
 })();
 </script>
-<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260718-cyberpunk5">
+<script>
+(() => {
+  document.addEventListener("click", (event) => {
+    if (event.defaultPrevented || event.button !== 0 || !(event.target instanceof Element)) return;
+    const summary = event.target.closest("summary");
+    const details = summary?.parentElement;
+    if (!summary || details?.tagName !== "DETAILS") return;
+    const wasOpen = details.hasAttribute("open");
+    requestAnimationFrame(() => {
+      if (details.hasAttribute("open") === wasOpen) details.open = !wasOpen;
+    });
+  }, { passive: true });
+})();
+</script>
+<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260718-interactions1">
 <style>
 @media (max-width: 767px) {
   html body nav#navbar .navbar-left.ui.secondary.menu > a.item:not(#navbar-logo),
