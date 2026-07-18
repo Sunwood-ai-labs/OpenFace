@@ -242,6 +242,35 @@ ensure_org_member() {
   fi
 }
 
+ensure_org_member_private() {
+  local org_name="$1" username="$2" code
+  code=$(api DELETE "/orgs/${org_name}/public_members/${username}?sudo=${username}")
+  if [ "$code" = "204" ] || [ "$code" = "404" ]; then
+    log "Kept '${username}' as a private organization owner in '${org_name}'."
+  else
+    log "WARNING: hiding '${username}' membership in '${org_name}' returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+  fi
+}
+
+ensure_org_not_member() {
+  local org_name="$1" username="$2" code team_id
+  code=$(api GET "/orgs/${org_name}/teams")
+  if [ "$code" != "200" ]; then
+    log "WARNING: listing teams for '${org_name}' returned HTTP ${code}."
+    return 0
+  fi
+  team_id=$(jq -r 'map(select(.name == "Owners"))[0].id // .[0].id // empty' /tmp/api_resp.json)
+  [ -n "$team_id" ] || return 0
+  code=$(api DELETE "/teams/${team_id}/members/${username}")
+  if [ "$code" = "204" ] || [ "$code" = "404" ]; then
+    log "Removed legacy member '${username}' from organization '${org_name}'."
+  else
+    log "WARNING: removing '${username}' from '${org_name}' returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+  fi
+}
+
 b64() {
   # base64-encode stdin without line wraps (portable across busybox/gnu base64)
   base64 -w0 2>/dev/null || base64
@@ -305,19 +334,32 @@ ensure_agent_user "mikan-reviewer" "Mikan Reviewer" "mikan-reviewer@agents.openf
 ensure_agent_user "aiko-mesh" "Aiko Mesh" "aiko-mesh@team.openface.local"
 ensure_agent_user "ren-vector" "Ren Vector" "ren-vector@team.openface.local"
 ensure_agent_user "mira-signal" "Mira Signal" "mira-signal@team.openface.local"
+ensure_agent_user "aurelia-vale" "Aurelia Vale" "aurelia-vale@seraphim.openface.local"
+ensure_agent_user "cassian-reed" "Cassian Reed" "cassian-reed@seraphim.openface.local"
+ensure_agent_user "ilyana-noor" "Ilyana Noor" "ilyana-noor@seraphim.openface.local"
+ensure_agent_user "lucien-sol" "Lucien Sol" "lucien-sol@seraphim.openface.local"
 ensure_agent_avatar "luna-scout" "/assets/agent-avatars/luna-scout.png"
 ensure_agent_avatar "patch-orbit" "/assets/agent-avatars/patch-orbit.png"
 ensure_agent_avatar "mikan-reviewer" "/assets/agent-avatars/mikan-reviewer.png"
 ensure_agent_avatar "aiko-mesh" "/assets/agent-avatars/aiko-mesh.png"
 ensure_agent_avatar "ren-vector" "/assets/agent-avatars/ren-vector.png"
 ensure_agent_avatar "mira-signal" "/assets/agent-avatars/mira-signal.png"
+ensure_agent_avatar "aurelia-vale" "/assets/agent-avatars/aurelia-vale.png"
+ensure_agent_avatar "cassian-reed" "/assets/agent-avatars/cassian-reed.png"
+ensure_agent_avatar "ilyana-noor" "/assets/agent-avatars/ilyana-noor.png"
+ensure_agent_avatar "lucien-sol" "/assets/agent-avatars/lucien-sol.png"
 ensure_org_member "openface" "aiko-mesh"
 ensure_org_member "openface" "ren-vector"
 ensure_org_member "openface" "mira-signal"
 ensure_org_member "seraphim-labs" "openface-admin"
-ensure_org_member "seraphim-labs" "aiko-mesh"
-ensure_org_member "seraphim-labs" "ren-vector"
-ensure_org_member "seraphim-labs" "mira-signal"
+ensure_org_member_private "seraphim-labs" "openface-admin"
+ensure_org_not_member "seraphim-labs" "aiko-mesh"
+ensure_org_not_member "seraphim-labs" "ren-vector"
+ensure_org_not_member "seraphim-labs" "mira-signal"
+ensure_org_member "seraphim-labs" "aurelia-vale"
+ensure_org_member "seraphim-labs" "cassian-reed"
+ensure_org_member "seraphim-labs" "ilyana-noor"
+ensure_org_member "seraphim-labs" "lucien-sol"
 
 ensure_actions_runner_token
 
