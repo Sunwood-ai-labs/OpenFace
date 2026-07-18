@@ -16,29 +16,22 @@ body {
   background-color: #fafafa;
 }
 
-/* OpenFace's cat mark is deliberately geometric: warm enough to feel
-   approachable, sharp enough to remain a product identity at favicon size. */
+/* The image-generated cat identity is shared by the navbar, hero, footer,
+   favicon, and touch icon. The wrapper only supplies crisp UI framing. */
 .openface-brand-mark {
-  display: inline-grid;
+  display: inline-block;
   flex: 0 0 auto;
-  place-items: center;
   overflow: hidden;
-  border: 1px solid #e7a80d;
-  background: linear-gradient(145deg, #ffe36e 0%, #ffc126 72%, #f3a714 100%);
-  color: #172033;
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 72%),
-    0 2px 8px rgb(98 64 0 / 13%);
+  border: 1px solid rgb(20 222 225 / 34%);
+  background: #06132e;
+  box-shadow: 0 2px 9px rgb(3 15 42 / 18%);
 }
 
-.openface-brand-mark svg {
-  width: 74%;
-  height: 74%;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 3.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.openface-brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .openface-mobile-menu-toggle {
@@ -165,13 +158,6 @@ html[data-openface-theme="solarpunk"] .bg-accent {
   background-color: #ffcb4f !important;
 }
 
-html[data-openface-theme="solarpunk"] .openface-brand-mark {
-  border-color: #769452;
-  background: linear-gradient(145deg, #ffe176 0%, #d2d95c 58%, #91bd65 100%);
-  color: #173b2c !important;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 72%), 0 3px 10px rgb(63 97 53 / 16%);
-}
-
 html[data-openface-theme="solarpunk"] header details[open] > .openface-mobile-menu-toggle {
   border-color: #2f6b47 !important;
   background: #24583b !important;
@@ -274,13 +260,6 @@ html[data-openface-theme="cyberpunk"] .bg-zinc-950 {
 
 html[data-openface-theme="cyberpunk"] .bg-accent {
   background-color: #25e1c9 !important;
-}
-
-html[data-openface-theme="cyberpunk"] .openface-brand-mark {
-  border-color: #78fff0;
-  background: linear-gradient(145deg, #64ffe4 0%, #22d8ce 52%, #1fb0d2 100%);
-  color: #07101d !important;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 58%), 0 0 16px rgb(37 225 201 / 22%);
 }
 
 html[data-openface-theme="cyberpunk"] header details[open] > .openface-mobile-menu-toggle {
