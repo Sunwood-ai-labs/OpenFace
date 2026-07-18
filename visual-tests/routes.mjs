@@ -35,6 +35,7 @@ export const routes = [
   { id: 'community-markdown-disclosure', label: 'Community Markdown disclosure', path: '/git/openface/qr-code-generator/issues/4', openDisclosureSelector: '.comment-body details > summary', focus: 'Markdown contrast and an opened disclosure in every theme' },
   { id: 'forgejo-home', label: 'Forgejo home', path: '/git/', focus: 'Hub hero, catalog links, navigation, and theme surface consistency' },
   { id: 'organization', label: 'Organization profile', path: '/git/openface', focusSelector: '.openface-org-repo-card a', scrollSelectors: [{ id: 'team-members', selector: '.openface-member-cloud' }], focus: 'Organization hero, edge-to-edge mobile surface, real members, repository focus state, and theme contrast' },
+  { id: 'organization-seraphim', label: 'Seraphim Labs organization', path: '/git/seraphim-labs', focusSelector: '.openface-org-edit', scrollSelectors: [{ id: 'team-members', selector: '.openface-member-cloud' }], focus: 'Angel-themed organization branding, editable settings action, real members, and mobile theme contrast' },
   { id: 'user-profile', label: 'User profile', path: '/git/luna-scout', focus: 'Agent profile, repository list, cards, and theme contrast' },
   { id: 'login', label: 'Log in', path: '/git/user/login', focus: 'Authentication card, form controls, links, and themed background' },
   { id: 'signup', label: 'Sign up', path: '/git/user/sign_up', focus: 'Registration card, form controls, validation labels, and themed background' },
