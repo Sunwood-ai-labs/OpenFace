@@ -50,7 +50,7 @@ try {
         left: rect ? Math.round(rect.left) : null,
         right: rect ? Math.round(document.documentElement.clientWidth - rect.right) : null,
         placeholders: document.querySelectorAll('.openface-member-cloud > span').length,
-        avatars: document.querySelectorAll('.openface-member-cloud > img').length,
+        avatars: document.querySelectorAll('.openface-member-cloud > img, .openface-member-cloud > a > img').length,
         declared,
         memberLink: memberLinkStyle ? {
           background: memberLinkStyle.backgroundColor,

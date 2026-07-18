@@ -104,7 +104,7 @@ const inspectPage = () => {
         ? Math.round(Math.max(Math.abs(organizationRect.left), Math.abs(viewportWidth - organizationRect.right)))
         : 0,
       memberPlaceholders: document.querySelectorAll('.openface-member-cloud > span').length,
-      memberAvatars: document.querySelectorAll('.openface-member-cloud > img').length,
+      memberAvatars: document.querySelectorAll('.openface-member-cloud > img, .openface-member-cloud > a > img').length,
       declaredMembers: Number.parseInt(memberCountText, 10) || 0,
     } : null,
   };
