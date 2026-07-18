@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import BrandMark from '@/components/BrandMark';
 import { searchRepos } from '@/lib/forgejo';
 import HfIcon from '@/components/HfIcon';
 import RepoGrid from '@/components/RepoGrid';
@@ -121,9 +122,7 @@ export default async function HomePage() {
   return (
     <div>
       <section className="mx-auto max-w-5xl pb-8 pt-8 text-center sm:pt-10">
-        <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-lg border border-amber-200 bg-accent text-xl font-black text-zinc-950 shadow-sm">
-          OF
-        </div>
+        <BrandMark className="mx-auto mb-5 h-14 w-14 rounded-[15px]" />
         <h1 className="mx-auto max-w-3xl text-3xl font-extrabold leading-tight tracking-normal text-zinc-950 sm:text-4xl">
           The AI community building locally.
         </h1>

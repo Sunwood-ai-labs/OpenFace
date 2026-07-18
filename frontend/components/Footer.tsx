@@ -1,12 +1,11 @@
 import HfIcon from './HfIcon';
+import BrandMark from './BrandMark';
 
 export default function Footer() {
   return (
     <footer className="mt-16 border-t border-zinc-200 py-8 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
       <p className="inline-flex items-center gap-2">
-        <span className="flex h-6 w-6 items-center justify-center rounded-md border border-amber-200 bg-accent text-[10px] font-black text-zinc-950">
-          OF
-        </span>
+        <BrandMark className="h-6 w-6 rounded-md" />
         OpenFace - AI community hub
       </p>
       <p className="mt-1">

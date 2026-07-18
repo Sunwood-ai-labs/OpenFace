@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import BrandMark from './BrandMark';
 import HfIcon from './HfIcon';
 import SearchForm from './SearchForm';
 import ThemeSelector from './ThemeSelector';
@@ -21,9 +22,7 @@ export default function Navbar() {
           href="/"
           className="flex shrink-0 items-center gap-2 text-lg font-bold text-zinc-900 dark:text-zinc-100"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-md border border-amber-200 bg-accent text-sm text-zinc-950 shadow-sm">
-            OF
-          </span>
+          <BrandMark className="h-8 w-8 rounded-lg" />
           <span>OpenFace</span>
         </Link>
 
@@ -80,7 +79,7 @@ export default function Navbar() {
         </div>
 
         <details className="group relative ml-auto lg:hidden">
-          <summary className="flex h-9 w-9 shrink-0 cursor-pointer list-none items-center justify-center rounded-lg text-zinc-700 hover:bg-zinc-100 marker:hidden dark:text-zinc-300 dark:hover:bg-zinc-800 [&::-webkit-details-marker]:hidden">
+          <summary className="openface-mobile-menu-toggle flex h-9 w-9 shrink-0 cursor-pointer list-none items-center justify-center rounded-lg border border-transparent text-zinc-700 hover:bg-zinc-100 marker:hidden dark:text-zinc-300 dark:hover:bg-zinc-800 [&::-webkit-details-marker]:hidden">
             <HfIcon name="bars" className="h-4 w-4" />
           </summary>
           <div className="absolute right-0 z-40 mt-3 hidden w-[min(88vw,320px)] gap-1 rounded-lg border border-zinc-200 bg-white p-3 text-sm shadow-xl group-open:grid">

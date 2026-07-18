@@ -1,6 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
   <title id="title">OpenFace</title>
-  <desc id="desc">A yellow rounded square containing the letters OF</desc>
-  <rect width="128" height="128" rx="28" fill="#ffcc21"/>
-  <path d="M35 42c-12 0-20 9-20 22s8 22 20 22 20-9 20-22-8-22-20-22Zm0 11c5 0 8 4 8 11s-3 11-8 11-8-4-8-11 3-11 8-11Zm31-10v42h12V69h20V58H78v-5h23V43H66Z" fill="#111827"/>
+  <desc id="desc">A geometric open-faced cat symbol on a golden square</desc>
+  <defs>
+    <linearGradient id="tile" x1="18" y1="8" x2="110" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE36E"/>
+      <stop offset=".72" stop-color="#FFC126"/>
+      <stop offset="1" stop-color="#F3A714"/>
+    </linearGradient>
+  </defs>
+  <rect x="3" y="3" width="122" height="122" rx="29" fill="url(#tile)" stroke="#E7A80D" stroke-width="6"/>
+  <g fill="none" stroke="#172033" stroke-width="6.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m31 47-7-29 26 14a48 48 0 0 1 14-2 48 48 0 0 1 14 2l26-14-7 29a44 44 0 0 1 9 27c0 22-19 36-42 36S22 96 22 74a44 44 0 0 1 9-27Z"/>
+    <path d="M43 65c4-5 12-5 16 0M69 65c5-5 12-5 16 0M58 78l6 5 6-5M64 83v5M64 88c-5 0-8 2-10 5M64 88c5 0 8 2 10 5"/>
+  </g>
 </svg>
