@@ -210,6 +210,11 @@ export default async function RepoDetailPage({
         </div>
 
         {tab === 'card' && <aside className="flex flex-col gap-4">
+          {kind === 'skill' ? (
+            <div className="hidden lg:block">
+              <SkillRelationshipMap repo={repoInfo} catalog={skillCatalog?.data || []} placement="sidebar" />
+            </div>
+          ) : null}
           <div className="rounded-lg border border-zinc-200 bg-white p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
               {isSpace ? 'Space actions' : kind === 'dataset' ? 'Dataset actions' : kind === 'skill' ? 'Skill actions' : kind === 'mcp' ? 'MCP actions' : kind === 'prompt' ? 'Prompt actions' : 'Model actions'}
@@ -360,7 +365,11 @@ async function CardTabContent({
   if (!renderedRaw) {
     return (
       <div>
-        {kind === 'skill' && skillRepo ? <SkillRelationshipMap repo={skillRepo} catalog={skillCatalog} /> : null}
+        {kind === 'skill' && skillRepo ? (
+          <div className="mb-7 lg:hidden">
+            <SkillRelationshipMap repo={skillRepo} catalog={skillCatalog} placement="mobile" />
+          </div>
+        ) : null}
         <div className="rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
           README.md was not found. Skill relationships remain available from <code>openface.skill.json</code>.
         </div>
@@ -377,7 +386,11 @@ async function CardTabContent({
         </div>
       ) : null}
       <CardBadges frontmatter={frontmatter} basePath={kind === 'dataset' ? '/datasets' : kind === 'space' ? '/spaces' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : '/models'} />
-      {kind === 'skill' && skillRepo ? <SkillRelationshipMap repo={skillRepo} catalog={skillCatalog} /> : null}
+      {kind === 'skill' && skillRepo ? (
+        <div className="mb-7 lg:hidden">
+          <SkillRelationshipMap repo={skillRepo} catalog={skillCatalog} placement="mobile" />
+        </div>
+      ) : null}
       <div
         className={kind === 'skill' || kind === 'prompt'
           ? 'github-markdown-body prose-openface min-w-0 bg-white dark:bg-zinc-900'

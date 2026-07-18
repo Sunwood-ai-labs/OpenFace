@@ -57,10 +57,10 @@ export default function RepoSearchList({
                 <span
                   data-skill-dependency-count
                   className={`inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${dependencyCount ? 'bg-violet-100 text-violet-700' : 'bg-zinc-100 text-zinc-500'}`}
-                  title={dependencyCount ? `${dependencyCount} declared Skill dependencies` : 'No declared Skill dependencies'}
+                  title={dependencyCount ? `${dependencyCount} evidence-backed Skill workflow links` : 'No Skill workflow links declared'}
                 >
                   <HfIcon name="link" className="h-2.5 w-2.5" />
-                  {dependencyCount ? `${dependencyCount} deps` : 'Standalone'}
+                  {dependencyCount ? `${dependencyCount} links` : 'Standalone'}
                 </span>
               ) : null}
             </div>
