@@ -15,6 +15,7 @@ export const PUBLIC_BASE_URL =
 
 let cachedToken: string | null | undefined;
 const readmeCache = new Map<string, { value: string | null; expiresAt: number }>();
+const skillRelationshipCache = new Map<string, { value: SkillRelationships; expiresAt: number }>();
 
 function getToken(): string | null {
   if (cachedToken !== undefined) return cachedToken;
@@ -51,7 +52,21 @@ export interface Repo {
   html_url?: string;
   default_branch?: string;
   space_emoji?: string;
+  skill_relationships?: SkillRelationships;
   private?: boolean;
+}
+
+export type SkillDependencyType = 'required' | 'recommended';
+
+export interface SkillDependency {
+  repo: string;
+  type: SkillDependencyType;
+  reason?: string;
+}
+
+export interface SkillRelationships {
+  schemaVersion: 1;
+  dependencies: SkillDependency[];
 }
 
 export interface SearchReposResult {
@@ -182,10 +197,15 @@ export async function searchRepos(params: SearchReposParams): Promise<SearchRepo
   // metadata. Never let that privileged token turn private Forgejo assets into
   // public OpenFace catalog entries.
   const data = (Array.isArray(res.json.data) ? res.json.data as Repo[] : []).filter((repo) => !repo.private);
+  const enrichedData = topic === 'space'
+    ? await enrichSpaceMetadata(data)
+    : topic === 'skill'
+      ? await enrichSkillMetadata(data)
+      : data;
   const headerTotal = Number.parseInt(res.headers?.get('x-total-count') || '', 10);
   return {
     ok: true,
-    data: topic === 'space' ? await enrichSpaceMetadata(data) : data,
+    data: enrichedData,
     total_count: Number.isFinite(headerTotal) ? headerTotal : data.length,
   };
 }
@@ -264,7 +284,8 @@ export async function searchReposByTopicAndQuery(
 export async function getRepo(owner: string, repo: string): Promise<Repo | null> {
   const res = await apiFetch(`/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`);
   if (!res.ok || !res.json || res.json.private) return null;
-  return res.json as Repo;
+  const repoInfo = res.json as Repo;
+  return repoKind(repoInfo.topics) === 'skill' ? (await enrichSkillMetadata([repoInfo]))[0] : repoInfo;
 }
 
 export async function getPagesSource(owner: string, repo: string, defaultBranch: string): Promise<'gh-pages' | 'docs' | null> {
@@ -377,6 +398,42 @@ export async function getReadme(owner: string, repo: string, ref?: string): Prom
   return value;
 }
 
+function normalizeSkillDependency(value: unknown): SkillDependency | null {
+  if (typeof value === 'string') {
+    const repo = value.trim();
+    return repo ? { repo, type: 'recommended' } : null;
+  }
+  if (!value || typeof value !== 'object') return null;
+  const candidate = value as Record<string, unknown>;
+  const repo = typeof candidate.repo === 'string' ? candidate.repo.trim() : '';
+  if (!repo) return null;
+  const type: SkillDependencyType = candidate.type === 'required' ? 'required' : 'recommended';
+  const reason = typeof candidate.reason === 'string' ? candidate.reason.trim() : '';
+  return { repo, type, ...(reason ? { reason } : {}) };
+}
+
+export async function getSkillRelationships(owner: string, repo: string): Promise<SkillRelationships> {
+  const cacheKey = `${owner}/${repo}`;
+  const cached = skillRelationshipCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) return cached.value;
+
+  const raw = await getTextFile(owner, repo, 'openface.skill.json');
+  let value: SkillRelationships = { schemaVersion: 1, dependencies: [] };
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      const dependencies = Array.isArray(parsed.dependencies)
+        ? parsed.dependencies.map(normalizeSkillDependency).filter((item): item is SkillDependency => item !== null)
+        : [];
+      value = { schemaVersion: 1, dependencies };
+    } catch {
+      value = { schemaVersion: 1, dependencies: [] };
+    }
+  }
+  skillRelationshipCache.set(cacheKey, { value, expiresAt: Date.now() + README_CACHE_TTL_MS });
+  return value;
+}
+
 function normalizeEmoji(value: unknown): string | undefined {
   if (typeof value !== 'string') return undefined;
   const trimmed = value.trim();
@@ -420,6 +477,13 @@ async function enrichSpaceMetadata(repos: Repo[]): Promise<Repo[]> {
       }
     }
     return { ...repo, space_emoji: configuredEmoji || inferredSpaceEmoji(repo) };
+  }));
+}
+
+async function enrichSkillMetadata(repos: Repo[]): Promise<Repo[]> {
+  return Promise.all(repos.map(async (repo) => {
+    const owner = repo.owner?.login ?? repo.full_name.split('/')[0];
+    return { ...repo, skill_relationships: await getSkillRelationships(owner, repo.name) };
   }));
 }
 
