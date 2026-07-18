@@ -229,7 +229,7 @@ ensure_org_member() {
   if [ "$code" = "204" ] || [ "$code" = "201" ]; then
     log "Added '${username}' to organization '${ORG_NAME}'."
     local public_code
-    public_code=$(api PUT "/orgs/${ORG_NAME}/public_members/${username}")
+    public_code=$(api PUT "/orgs/${ORG_NAME}/public_members/${username}?sudo=${username}")
     if [ "$public_code" = "204" ]; then
       log "Published '${username}' as an organization member."
     else
