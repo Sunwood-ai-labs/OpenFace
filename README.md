@@ -34,7 +34,7 @@ OpenFace turns one Docker host into a self-contained AI collaboration platform. 
 - **Always-on CPU mode:** `IDLE_TIMEOUT_MINUTES=0` keeps CPU Spaces running; a least-recently-used cap prevents unbounded growth.
 - **OpenFace Pages:** serve `gh-pages` or default-branch `docs/`, with a seeded VitePress workflow on an isolated Forgejo Actions runner.
 - **Agent operations API:** browser views, likes, and agent actions use a persisted metrics service with hashed agent credentials.
-- **Claude Code goal maintenance:** a signed Issue webhook runs Claude Code's built-in `/goal` command with Z.AI-hosted `glm-5.2`, then opens a human-reviewed Pull Request.
+- **Claude Code goal maintenance:** a signed Issue webhook runs Claude Code's built-in `/goal` command with Z.AI-hosted `glm-5.2`, opens a human-reviewed Pull Request, and accepts `/goal` follow-up comments on the Issue or agent-created PR.
 - **Versioned Prompts:** stable repository slugs point to immutable Git tags that can be switched directly in the Prompt view.
 - **Three visual themes:** Standard, Solarpunk, and Cyberpunk persist across visits.
 - **Editable organizations:** Forgejo Owners can update organization metadata, avatars, membership, teams, and repositories from the real organization settings UI.
@@ -341,11 +341,13 @@ See the [visual QA guide](https://sunwood-ai-labs.github.io/OpenFace/guide/visua
 
 ## Automated Claude Code `/goal` maintenance
 
-Point `ZAI_AGENT_CONFIG` in the untracked `.env` file to a protected env file containing `ZAI_API_KEY`, then start `maintenance-agent`. A newly opened Issue under the `openface` organization is passed to Claude Code 2.1.205 as a real `/goal` completion condition. Claude Code connects directly to Z.AI's Anthropic-compatible endpoint with `glm-5.2`, freely inspects and edits the cloned repository, runs relevant repository verification, and publishes the result as an `agent/issue-N` Pull Request. Add the `agent:skip` label or `<!-- openface-maintenance:skip -->` to opt out.
+Point `ZAI_AGENT_CONFIG` in the untracked `.env` file to a protected env file containing `ZAI_API_KEY`, then start `maintenance-agent`. A newly opened Issue under the `openface` organization is passed to Claude Code 2.1.205 as a real `/goal` completion condition. Claude Code connects directly to Z.AI's Anthropic-compatible endpoint with `glm-5.2`, freely inspects and edits the cloned repository, runs relevant repository verification, and publishes the result as an `agent/issue-N` Pull Request. Agent prompts, completion summaries, PR bodies, and status replies are written in Japanese. Add the `agent:skip` label or `<!-- openface-maintenance:skip -->` to opt out.
+
+After the PR exists, post a comment beginning with `/goal`, for example `/goal 見出しも日本語にしてください。`. The agent checks out the existing `agent/issue-N` branch, applies and verifies the additional instruction, pushes another commit to the same PR, and replies in Japanese. Ordinary comments do not run the agent. The trigger works on the source Issue and on its agent-created PR.
 
 The service validates the Forgejo HMAC signature and deduplicates deliveries in SQLite. Claude Code runs as an unprivileged user inside the maintenance container: it has no host Docker socket and cannot read the Forgejo bot token, while retaining normal repository-level tools and test execution. The root wrapper alone commits and pushes after `git diff --check`; it never merges its own PR. See [Automated Claude Code maintenance](https://sunwood-ai-labs.github.io/OpenFace/guide/automated-maintenance).
 
-The retained end-to-end proof is [Issue #10](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/10) → [PR #11](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/11): Claude Code `/goal` used `glm-4.7`, changed `README.md` and `index.html`, posted the Issue backlink as `glm-maintainer`, and produced a mergeable PR.
+The retained follow-up proof is [Issue #12](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/12) → [PR #15](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/15): a Japanese `/goal` comment produced commit `1a505ce` on the existing PR, changed only the requested file, returned a Japanese completion summary, and kept the PR mergeable.
 
 ## 📖 Documentation
 

@@ -4,7 +4,7 @@ OpenFace can turn a newly opened Forgejo Issue into a human-reviewed Pull Reques
 
 ## Flow
 
-1. Forgejo signs and sends the organization `issues` webhook.
+1. Forgejo signs and sends the organization `issues` or `issue_comment` webhook.
 2. `maintenance-agent` validates the HMAC signature and records the delivery in SQLite.
 3. The service clones the repository and creates `agent/issue-N`.
 4. Claude Code 2.1.205 receives `/goal` followed by the Issue and explicit completion conditions.
@@ -47,6 +47,16 @@ Every newly opened Issue in the configured owner triggers maintenance by default
 
 Repeated deliveries produce one job and one PR per Issue. The stable branch is `agent/issue-N`.
 
+### Continue editing from a comment
+
+On the source Issue or its agent-created PR, start a comment with `/goal` followed by the additional instruction:
+
+```text
+/goal 見出しも日本語にしてください。ほかのファイルは変更しないでください。
+```
+
+The agent checks out the existing `agent/issue-N` branch, runs the Japanese completion prompt, verifies the new diff, and pushes a new commit to the same PR. Ordinary discussion comments do not trigger a model run. A currently queued or running Issue cannot be queued again; edit or post the follow-up after the active run finishes.
+
 Up to `MAINTENANCE_MAX_WORKERS` Issues run concurrently. Each job has its own clone and `agent/issue-N` branch; overlapping edits can still produce normal Git conflicts between the resulting PRs. Values are bounded to 1–4 to avoid exhausting the host or the model provider.
 
 ## Freedom and isolation
@@ -74,11 +84,12 @@ Interrupted `queued` or `running` jobs are marked `interrupted` on service resta
 
 ## Verified end-to-end example
 
-[Issue #10](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/10) produced [PR #11](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/11). The retained evidence confirms:
+[Issue #12](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/12) updated existing [PR #15](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/15) from a Japanese `/goal` comment. The retained evidence confirms:
 
-- job detail: `Running Claude Code /goal with glm-4.7`;
+- job detail and Claude completion summary are Japanese and use `glm-5.2`;
 - author: `glm-maintainer`;
-- branch: `agent/issue-10` into `main`;
-- changed files: `README.md` and `index.html`;
-- Issue comment links back to PR #11;
+- branch: `agent/issue-12` into `main`;
+- the existing PR received commit `1a505ce` rather than a duplicate PR;
+- only `docs/concurrency-probe-a.md` changed in the follow-up commit;
+- the Japanese Issue reply links back to PR #15;
 - Forgejo reports the PR as mergeable.

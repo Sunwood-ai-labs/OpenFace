@@ -4,7 +4,7 @@ OpenFaceはForgejoで新規作成されたIssueを、Claude Code組み込みの 
 
 ## 処理の流れ
 
-1. Forgejoが組織の `issues` webhookへHMAC署名を付けて送信します。
+1. Forgejoが組織の `issues` または `issue_comment` webhookへHMAC署名を付けて送信します。
 2. `maintenance-agent` が署名を検証し、配送IDをSQLiteへ記録します。
 3. 対象リポジトリをcloneし、`agent/issue-N` ブランチを作ります。
 4. Claude Code 2.1.205へ、Issueと完了条件を含む本物の `/goal` を渡します。
@@ -43,6 +43,16 @@ seedは非管理者 `glm-maintainer`、write専用組織team、専用Forgejo tok
 
 同じ配送が再送されてもIssueごとにジョブとPRは一つです。ブランチ名は `agent/issue-N` です。
 
+### コメントから追加編集する
+
+元Issueまたはエージェントが作成したPRへ、追加指示を `/goal` から始めて投稿します。
+
+```text
+/goal 見出しも日本語にしてください。ほかのファイルは変更しないでください。
+```
+
+エージェントは既存の `agent/issue-N` ブランチをcheckoutし、日本語の完了プロンプトで追加編集と検証を行い、同じPRへ新しいcommitをpushします。通常の議論コメントはモデルを起動しません。同じIssueが `queued` または `running` の間は再投入せず、完了後のコメントだけを受け付けます。
+
 最大 `MAINTENANCE_MAX_WORKERS` 件のIssueを並列処理します。ジョブごとにcloneと `agent/issue-N` ブランチを分離しますが、同じ箇所を編集したPR同士では通常のGit競合が発生し得ます。ホストやモデルproviderの過負荷を避けるため、設定値は1〜4に制限されます。
 
 ## 自由度と隔離境界
@@ -70,11 +80,12 @@ docker compose exec maintenance-agent python -c "import urllib.request; print(ur
 
 ## 確認済み実E2E
 
-[Issue #10](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/10) から [PR #11](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/11) が作成されました。次をAPIとログで照合済みです。
+[Issue #12](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/12) の日本語 `/goal` コメントから既存の [PR #15](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/15) を更新しました。次をAPIとログで照合済みです。
 
-- job detail: `Running Claude Code /goal with glm-4.7`
+- job detailとClaudeの完了summary: 日本語、モデル `glm-5.2`
 - author: `glm-maintainer`
-- branch: `agent/issue-10` → `main`
-- 変更ファイル: `README.md`、`index.html`
-- IssueコメントからPR #11への逆リンク
+- branch: `agent/issue-12` → `main`
+- 重複PRではなく、既存PRへcommit `1a505ce` を追加
+- 追加commitの変更: `docs/concurrency-probe-a.md` の1ファイルだけ
+- 日本語のIssue返信からPR #15への逆リンク
 - Forgejoのmergeable判定: `true`
