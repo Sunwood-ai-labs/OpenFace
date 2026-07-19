@@ -18699,6 +18699,208 @@ html[data-openface-theme="solarpunk"] body[data-openface-forge-home] .openface-f
   color: #f7ffe9 !important;
 }
 
+/* files-contrast1: Files is one continuous repository surface. Keep the
+   latest-commit band, tree and controls in the selected palette so filenames
+   remain measurable instead of inheriting black text over the Cyberpunk grid. */
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .repository.file.list .repo-button-row :is(
+  .branch-dropdown-button,
+  button.ui.dropdown.basic.compact.jump.button,
+  .openface-go-to-file,
+  .openface-history-pill
+) {
+  border-color: rgba(56, 232, 255, 0.34) !important;
+  background: #111a32 !important;
+  color: #d9f7ff !important;
+  box-shadow: none !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .repository.file.list .repo-button-row :is(
+  .branch-dropdown-button,
+  button.ui.dropdown.basic.compact.jump.button,
+  .openface-go-to-file,
+  .openface-history-pill
+) :is(span, strong, svg) {
+  color: #d9f7ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .repository.file.list .repo-button-row :is(
+  .branch-dropdown-button,
+  button.ui.dropdown.basic.compact.jump.button,
+  .openface-go-to-file,
+  .openface-history-pill
+):is(:hover, :focus-visible, [aria-expanded="true"]) {
+  border-color: #38e8ff !important;
+  background: #172442 !important;
+  color: #f3fcff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .repository.file.list .repo-button-row .openface-contributors,
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .repository.file.list .repo-button-row .openface-contributors :is(span, svg) {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .page-content.repository.file.list .openface-file-summary-bar.openface-latest-commit-bar {
+  margin-bottom: 0 !important;
+  border-color: rgba(56, 232, 255, 0.3) !important;
+  border-bottom: 1px solid rgba(56, 232, 255, 0.2) !important;
+  border-radius: 10px 10px 0 0 !important;
+  background: linear-gradient(180deg, #141d36 0%, #10172c 100%) !important;
+  color: #e9f9ff !important;
+  box-shadow: none !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .page-content.repository.file.list :is(
+  .openface-latest-commit-author,
+  .openface-latest-commit-sha
+) {
+  color: #e9f9ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .page-content.repository.file.list .openface-latest-commit-sha {
+  border-color: rgba(56, 232, 255, 0.28) !important;
+  background: #0a1124 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .page-content.repository.file.list :is(
+  .openface-latest-commit-message,
+  .openface-latest-commit-time
+) {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .page-content.repository.file.list #repo-files-table {
+  overflow: hidden !important;
+  margin-top: 0 !important;
+  border: 1px solid rgba(56, 232, 255, 0.3) !important;
+  border-top: 0 !important;
+  border-radius: 0 0 10px 10px !important;
+  background: #0d1327 !important;
+  color: #d9f7ff !important;
+  box-shadow: none !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .page-content.repository.file.list #repo-files-table :is(
+  tbody,
+  tr,
+  td
+) {
+  border-color: rgba(56, 232, 255, 0.12) !important;
+  background: #0d1327 !important;
+  color: #d9f7ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .page-content.repository.file.list #repo-files-table td.name :is(
+  a,
+  .openface-file-link,
+  span.gt-ellipsis
+) {
+  color: #d9f7ff !important;
+  text-decoration: none !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .page-content.repository.file.list #repo-files-table td.age,
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .page-content.repository.file.list #repo-files-table td.age :is(span, relative-time) {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .page-content.repository.file.list #repo-files-table tr[data-entryname]:hover td {
+  background: #131d37 !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-file-list] .page-content.repository.file.list .openface-file-summary-bar.openface-latest-commit-bar {
+  margin-bottom: 0 !important;
+  border-color: #b9cfad !important;
+  border-bottom-color: #d3dfca !important;
+  background: linear-gradient(180deg, #fbfcf5 0%, #f1f5e8 100%) !important;
+  color: #173b2c !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-file-list] .page-content.repository.file.list #repo-files-table {
+  margin-top: 0 !important;
+  border-color: #b9cfad !important;
+  border-top: 0 !important;
+  border-radius: 0 0 10px 10px !important;
+  background: #fbfcf5 !important;
+}
+
+/* The opaque tree surfaces above deliberately expose every Files label to the
+   contrast audit. Normalize legacy Forgejo muted utilities per palette. */
+html:not([data-openface-theme]) body[data-openface-file-list] .repository.file.list .repo-button-row :is(span, strong, .ui.label, .openface-contributors),
+html[data-openface-theme="standard"] body[data-openface-file-list] .repository.file.list .repo-button-row :is(span, strong, .ui.label, .openface-contributors) {
+  color: #4b5563 !important;
+}
+
+html:not([data-openface-theme]) body[data-openface-file-list] .repository.file.list .repo-button-row .ui.label,
+html[data-openface-theme="standard"] body[data-openface-file-list] .repository.file.list .repo-button-row .ui.label {
+  border-color: #d1d5db !important;
+  background: #f8fafc !important;
+}
+
+html:not([data-openface-theme]) body[data-openface-file-list] .page-content.repository.file.list .openface-file-summary-bar.openface-latest-commit-bar,
+html[data-openface-theme="standard"] body[data-openface-file-list] .page-content.repository.file.list .openface-file-summary-bar.openface-latest-commit-bar {
+  margin-bottom: 0 !important;
+  border-color: #d1d5db !important;
+  border-bottom-color: #e5e7eb !important;
+  border-radius: 10px 10px 0 0 !important;
+  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%) !important;
+}
+
+html:not([data-openface-theme]) body[data-openface-file-list] .page-content.repository.file.list #repo-files-table,
+html[data-openface-theme="standard"] body[data-openface-file-list] .page-content.repository.file.list #repo-files-table {
+  margin-top: 0 !important;
+  border-color: #d1d5db !important;
+  border-top: 0 !important;
+  border-radius: 0 0 10px 10px !important;
+  background: #fff !important;
+}
+
+html:not([data-openface-theme]) body[data-openface-file-list] .page-content.repository.file.list #repo-files-table :is(a, span, relative-time),
+html[data-openface-theme="standard"] body[data-openface-file-list] .page-content.repository.file.list #repo-files-table :is(a, span, relative-time) {
+  color: #4b5563 !important;
+}
+
+html:not([data-openface-theme]) body[data-openface-file-list] .page-content.repository.file.list #repo-files-table td.name :is(a, .openface-file-link, span.gt-ellipsis),
+html[data-openface-theme="standard"] body[data-openface-file-list] .page-content.repository.file.list #repo-files-table td.name :is(a, .openface-file-link, span.gt-ellipsis) {
+  color: #1f2937 !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-file-list] .repository.file.list .repo-button-row :is(span, strong, .ui.label, .openface-contributors),
+html[data-openface-theme="solarpunk"] body[data-openface-file-list] .page-content.repository.file.list #repo-files-table :is(a, span, relative-time) {
+  color: #46614f !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-file-list] .repository.file.list .repo-button-row .ui.label {
+  border-color: #b9cfad !important;
+  background: #e5eedf !important;
+  color: #315b43 !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-file-list] .page-content.repository.file.list #repo-files-table td.name :is(a, .openface-file-link, span.gt-ellipsis) {
+  color: #244c36 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .repository.file.list .repo-button-row .ui.label {
+  border-color: rgba(56, 232, 255, 0.34) !important;
+  background: #111a32 !important;
+  color: #d9f7ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .repository.file.list .repo-button-row .openface-path-summary,
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .repository.file.list .repo-button-row .openface-path-summary > :is(span, strong) {
+  border-color: rgba(56, 232, 255, 0.34) !important;
+  background: #111a32 !important;
+  color: #d9f7ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-file-list] .page-content.repository.file.list #repo-files-table :is(
+  .openface-safe-text,
+  .openface-size-cell span,
+  td.message a,
+  td.message span
+) {
+  color: #a9cddd !important;
+}
+
 html[data-openface-theme="solarpunk"] body[data-openface-model-landing] :is(.openface-model-side-pane, .openface-model-side-pane section, .openface-provider-card) {
   background-color: #fbfcf5 !important;
   color: #173b2c !important;

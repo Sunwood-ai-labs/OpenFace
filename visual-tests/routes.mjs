@@ -25,6 +25,7 @@ export const routes = [
   { id: 'dataset-detail-sample', label: 'Sample dataset detail', path: '/git/openface/sample-dataset', settleMs: 1400, scrollSelectors: [{ id: 'dataset-viewer', selector: '.openface-dataset-viewer' }], focus: 'Generated Dataset Viewer, table readability, mobile overflow, and theme contrast' },
   { id: 'skill-detail', label: 'Skill detail', path: '/openface/repository-polish-skill', focus: 'Evidence-backed Skill links in the desktop sidebar and mobile content flow, imported README, provenance, clone control, and tabs' },
   { id: 'skill-detail-no-readme', label: 'Skill detail without README', path: '/openface/frontend-design-skill', focus: 'Sidebar and mobile relationship panels remain available when the repository only provides SKILL.md' },
+  { id: 'skill-files-direct', label: 'Skill repository files', path: '/git/openface/repository-polish-skill/src/branch/main', focus: 'Cyberpunk file names, latest-commit surface, toolbar controls, and a single continuous tree edge' },
   { id: 'mcp-detail', label: 'MCP detail', path: '/openface/aira-mcp-server', focus: 'Imported MCP README, provenance, clone control, and tabs' },
   { id: 'prompt-detail', label: 'Prompt detail', path: '/openface/mystic-git-auto-commit?revision=v4.2', focus: 'Immutable revision selector, prompt source, and direct-link state' },
   { id: 'repository-files', label: 'Repository files', path: '/openface/mystic-git-auto-commit?tab=files&revision=v4.2', focus: 'Unblurred repository header, file list columns, and tabs' },

@@ -120,6 +120,17 @@ const inspectPage = () => {
       contrastRisks.push({
         tag: element.tagName.toLowerCase(),
         className: String(element.className || '').slice(0, 100),
+        parentClassName: String(element.parentElement?.className || '').slice(0, 120),
+        ancestry: Array.from({ length: 4 }, (_, index) => {
+          let ancestor = element;
+          for (let step = 0; step < index; step += 1) ancestor = ancestor?.parentElement;
+          if (!ancestor) return '';
+          const id = ancestor.id ? `#${ancestor.id}` : '';
+          const classes = typeof ancestor.className === 'string' && ancestor.className.trim()
+            ? `.${ancestor.className.trim().split(/\s+/).slice(0, 4).join('.')}`
+            : '';
+          return `${ancestor.tagName.toLowerCase()}${id}${classes}`;
+        }).filter(Boolean).join(' > '),
         text: text.slice(0, 90),
         foreground: style.color,
         background: `rgb(${background.r}, ${background.g}, ${background.b})`,
