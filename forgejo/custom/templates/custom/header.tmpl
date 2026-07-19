@@ -33,7 +33,7 @@
   }, { passive: true });
 })();
 </script>
-<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260719-files-contrast1">
+<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260719-pr-detail2">
 <style>
 @media (max-width: 767px) {
   html body nav#navbar .navbar-left.ui.secondary.menu > a.item:not(#navbar-logo),
@@ -1900,8 +1900,9 @@ html[data-openface-theme="cyberpunk"] body a.openface-community-tab.active {
     if (communityMatch) {
       document.body.setAttribute("data-openface-community-page", communityMatch[1] === "new" ? "new" : communityMatch[1] ? "detail" : "list");
     }
-    if (/^\/git\/[^/]+\/[^/]+\/pulls\/?$/.test(path)) {
-      document.body.setAttribute("data-openface-community-page", "list");
+    const pullCommunityMatch = path.match(/^\/git\/[^/]+\/[^/]+\/pulls(?:\/(\d+))?\/?$/);
+    if (pullCommunityMatch) {
+      document.body.setAttribute("data-openface-community-page", pullCommunityMatch[1] ? "detail" : "list");
     }
     if (/^\/git\/[^/]+\/[^/]+\/commit\/[a-f0-9]+/i.test(path)) {
       document.body.setAttribute("data-openface-commit-detail", "true");

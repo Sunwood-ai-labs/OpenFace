@@ -18962,3 +18962,122 @@ html.openface-hf-skin[data-openface-theme="cyberpunk"] body[data-openface-org-va
   .openface-org-card-tabs .item {
   color: #a9cddd !important;
 }
+
+/* pr-detail-mobile1: keep pull request metadata and tabs readable at phone widths. */
+@media (max-width: 767px) {
+  html body[data-openface-community-page="detail"] .repository.view.issue .issue-title-header {
+    min-height: 0 !important;
+    margin-top: 18px !important;
+    padding: 18px 16px 16px !important;
+    border-radius: 12px !important;
+  }
+
+  html body[data-openface-community-page="detail"] .repository.view.issue .issue-title {
+    margin: 0 0 12px !important;
+  }
+
+  html body[data-openface-community-page="detail"] .repository.view.issue .issue-title h1 {
+    font-size: 20px !important;
+    line-height: 1.3 !important;
+    letter-spacing: -0.012em !important;
+  }
+
+  html body[data-openface-community-page="detail"] .repository.view.issue .issue-title-meta {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+  }
+
+  html body[data-openface-community-page="detail"] .repository.view.issue .issue-title-meta > .ui.label {
+    flex: 0 0 auto !important;
+    margin: 1px 0 0 !important;
+  }
+
+  html body[data-openface-community-page="detail"] .repository.view.issue .ui.top.attached.pull.tabular.menu {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 48px !important;
+    overflow: hidden !important;
+  }
+
+  html body[data-openface-community-page="detail"] .repository.view.issue .ui.top.attached.pull.tabular.menu > .item {
+    display: flex !important;
+    min-width: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    margin: 0 !important;
+    padding: 11px 4px 10px !important;
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+  }
+
+  html body[data-openface-community-page="detail"] .repository.view.issue .ui.top.attached.pull.tabular.menu > span.tw-ml-auto {
+    display: none !important;
+  }
+
+  html body[data-openface-community-page="detail"] .repository.view.issue .issue-content {
+    padding-top: 18px !important;
+  }
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue .ui.top.attached.pull.tabular.menu {
+  border-color: rgba(56, 232, 255, 0.34) !important;
+  background: #0d1327 !important;
+  box-shadow: none !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue .ui.top.attached.pull.tabular.menu > .item {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue .ui.top.attached.pull.tabular.menu > .item.active {
+  border-color: #ff59b7 !important;
+  color: #f3fbff !important;
+}
+
+/* pr-detail-cyber2: Forgejo renders timeline events outside comment cards. */
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue :is(
+    .timeline-item.event,
+    .timeline-item.commits-list,
+    .timeline-item.commits-list .singular-commit,
+    .timeline-item.event .detail.flex-text-block
+  ) {
+  border-color: rgba(56, 232, 255, 0.26) !important;
+  background: #0d1327 !important;
+  color: #c8ebf8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue .timeline-item.event :is(.text.grey, .muted, relative-time) {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue :is(.timeline-item.event, .timeline-item.commits-list) a {
+  color: #38e8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue .timeline-item.event a.author {
+  color: #f3fbff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue .merge-section h3 {
+  color: #f3fbff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue .ui.top.attached.pull.tabular.menu .text.green {
+  color: #7ee7b0 !important;
+}
