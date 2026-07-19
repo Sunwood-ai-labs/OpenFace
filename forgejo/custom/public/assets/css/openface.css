@@ -19685,6 +19685,96 @@ html body[data-openface-community-kind="pull"]
   display: none !important;
 }
 
+/* hf-community-reactions11: Hugging Face keeps reactions as independent,
+   low-emphasis pills below the message.  The native attached segment made
+   several reactions look like a single full-width segmented control. */
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .ui.attached.segment.reactions {
+  display: flex !important;
+  align-items: center !important;
+  align-self: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  min-height: 0 !important;
+  margin: 10px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .ui.attached.segment.reactions > .comment-reaction-button.ui.label {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  min-width: 44px !important;
+  min-height: 30px !important;
+  margin: 0 !important;
+  padding: 4px 9px !important;
+  border: 1px solid var(--of-community-border) !important;
+  border-radius: 999px !important;
+  background: var(--of-community-surface-muted) !important;
+  color: var(--of-community-muted) !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+  font-size: 12px !important;
+  line-height: 1 !important;
+}
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .ui.attached.segment.reactions > .comment-reaction-button.ui.label .reaction {
+  font-size: 15px !important;
+  line-height: 1 !important;
+}
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .ui.attached.segment.reactions > .comment-reaction-button.ui.label .reaction-count {
+  min-width: 0 !important;
+  color: inherit !important;
+  font-variant-numeric: tabular-nums;
+}
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .ui.attached.segment.reactions > .comment-reaction-button.ui.label:not(.disabled):hover {
+  border-color: var(--of-community-accent) !important;
+  color: var(--of-community-accent) !important;
+}
+
+/* hf-community-events11: Hub timeline actions are compact inline rows rather
+   than cards.  Only authored comments retain a bordered surface. */
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .page-content.repository.view.issue .ui.timeline :is(.timeline-item.event, .timeline-item.commits-list) {
+  width: 100% !important;
+  margin: 0 0 14px !important;
+  padding: 8px 4px 10px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .page-content.repository.view.issue .ui.timeline :is(.timeline-item.event, .timeline-item.commits-list)
+  :is(.detail.flex-text-block, .singular-commit) {
+  min-width: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 767px) {
+  :is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+    .page-content.repository.view.issue .ui.timeline :is(.timeline-item.event, .timeline-item.commits-list) {
+    padding-inline: 2px !important;
+  }
+}
+
 .openface-hf-change-totals,
 .openface-hf-file-stats {
   display: inline-flex;
