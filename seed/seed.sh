@@ -612,6 +612,52 @@ ensure_pages_branch() {
   fi
 }
 
+# Keep one stable pull request available for visual regression coverage. The
+# issue and pull request share Forgejo's repository index, so a closed issue #1
+# makes the first fixture pull request #2 without cluttering the open list.
+ensure_pull_detail_fixture() {
+  local name="$1" branch="visual-qa-pull" code issue_number payload content_b64
+
+  code=$(api GET "/repos/${ORG_NAME}/${name}/pulls/2")
+  if [ "$code" = "200" ]; then
+    log "Pull request fixture '${name}#2' already exists."
+    return 0
+  fi
+
+  code=$(api GET "/repos/${ORG_NAME}/${name}/issues/1")
+  if [ "$code" != "200" ]; then
+    payload=$(jq -n '{title:"Visual QA fixture index",body:"Reserved closed issue used to keep the pull-request visual fixture at a stable URL."}')
+    code=$(api POST "/repos/${ORG_NAME}/${name}/issues" "$payload")
+    if [ "$code" = "201" ]; then
+      issue_number=$(jq -r '.number' /tmp/api_resp.json)
+      api PATCH "/repos/${ORG_NAME}/${name}/issues/${issue_number}" '{"state":"closed"}' >/dev/null
+      log "Created closed index fixture '${name}#${issue_number}'."
+    fi
+  fi
+
+  code=$(api GET "/repos/${ORG_NAME}/${name}/branches/${branch}")
+  if [ "$code" != "200" ]; then
+    api POST "/repos/${ORG_NAME}/${name}/branches" "$(jq -n --arg branch "$branch" '{new_branch_name:$branch,old_branch_name:"main"}')" >/dev/null
+  fi
+
+  printf '%s\n' '# Pull request visual fixture' '' 'This branch keeps the pull request detail page covered by screenshot QA.' > "${WORKDIR}/${name}_pull_fixture.md"
+  content_b64="$(b64 < "${WORKDIR}/${name}_pull_fixture.md")"
+  code=$(api GET "/repos/${ORG_NAME}/${name}/contents/visual-qa-note.md?ref=${branch}")
+  if [ "$code" != "200" ]; then
+    payload=$(jq -n --arg content "$content_b64" --arg branch "$branch" '{message:"Add pull request visual fixture",content:$content,branch:$branch}')
+    api POST "/repos/${ORG_NAME}/${name}/contents/visual-qa-note.md" "$payload" >/dev/null
+  fi
+
+  payload=$(jq -n --arg head "$branch" '{base:"main",head:$head,title:"Keep pull request detail visually covered",body:"Stable sample for title, branch metadata, tabs, Markdown, timeline events, and merge instructions."}')
+  code=$(api POST "/repos/${ORG_NAME}/${name}/pulls" "$payload")
+  if [ "$code" = "201" ]; then
+    log "Created pull request fixture '${name}#2'."
+  else
+    log "WARNING: creating pull request fixture on '${name}' returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+  fi
+}
+
 # ------------------------------------------------------------------------
 # Helper: create a lightweight, idempotent tag for a prompt's imported
 # version. This makes the visible `version-v*` topic traceable through the
@@ -2007,6 +2053,7 @@ cat > "${WORKDIR}/pages_starter_index.html" <<'EOF'
 EOF
 put_file "pages-starter" "index.html" "${WORKDIR}/pages_starter_index.html" "Add OpenFace Pages starter site"
 ensure_pages_branch "pages-starter"
+ensure_pull_detail_fixture "pages-starter"
 
 # Linked asset example: gh-pages serves HTML, CSS, and browser JavaScript from
 # the same public repository path.
