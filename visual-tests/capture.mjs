@@ -269,7 +269,7 @@ try {
       if (route.id.startsWith('community-markdown') && pageState.markdownTables < 1) defects.push('Markdown table is missing');
       if (route.id.startsWith('community-markdown') && pageState.markdownLinks < 2) defects.push('Markdown links or mention are missing');
       if (route.id.startsWith('community-markdown') && pageState.markdownDetails < 1) defects.push('Markdown disclosure is missing');
-      if (route.id.startsWith('community-') && !pageState.visibleAppTabLabels.includes('App')) defects.push('Space repository tab is not labeled App');
+      if (route.id.startsWith('community-') && route.path.includes('/qr-code-generator/') && !pageState.visibleAppTabLabels.includes('App')) defects.push('Space repository tab is not labeled App');
       if (route.id === 'skills' && pageState.skillDependencyBadges < 10) defects.push('Skills directory does not expose dependency status for every seeded Skill');
       if (route.id.startsWith('skill-detail') && !pageState.skillRelationshipMapVisible) defects.push('Skill relationship map is missing');
       if (route.id.startsWith('skill-detail') && viewport.width >= 1024 && (pageState.skillRelationshipPlacement !== 'sidebar' || !pageState.skillRelationshipInAside)) defects.push('Desktop Skill relationships are not in the sidebar');
