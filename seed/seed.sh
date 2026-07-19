@@ -162,6 +162,7 @@ ensure_maintenance_token() {
     code=$(curl -s -o /dev/null -w '%{http_code}' \
       -H "Authorization: token ${existing}" "${FORGEJO_API}/user")
     if [ "$code" = "200" ]; then
+      chmod 600 "$MAINTENANCE_TOKEN_FILE"
       log "GLM maintenance token already exists; reusing it."
       return 0
     fi
@@ -187,8 +188,8 @@ ensure_maintenance_token() {
 ensure_maintenance_webhook() {
   if [ ! -s "$MAINTENANCE_WEBHOOK_SECRET_FILE" ]; then
     dd if=/dev/urandom bs=32 count=1 2>/dev/null | base64 | tr -d '\r\n' > "$MAINTENANCE_WEBHOOK_SECRET_FILE"
-    chmod 600 "$MAINTENANCE_WEBHOOK_SECRET_FILE"
   fi
+  chmod 600 "$MAINTENANCE_WEBHOOK_SECRET_FILE"
 
   local code hook_id secret payload
   code=$(api GET "/orgs/${ORG_NAME}/hooks")
