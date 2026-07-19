@@ -53,6 +53,11 @@ def initialize_database() -> None:
             )
             """
         )
+        db.execute(
+            "UPDATE jobs SET status='interrupted', detail='Service restarted before the Claude Code /goal run completed', "
+            "updated_at=? WHERE status IN ('queued', 'running')",
+            (utc_now(),),
+        )
 
 
 initialize_database()

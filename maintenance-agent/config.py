@@ -86,7 +86,6 @@ class Settings:
             "ANTHROPIC_DEFAULT_HAIKU_MODEL": self.model,
             "ANTHROPIC_DEFAULT_SONNET_MODEL": self.model,
             "ANTHROPIC_DEFAULT_OPUS_MODEL": self.model,
-            "CLAUDE_CODE_ENABLE_EXPERIMENTAL_ADVISOR_TOOL": "1",
         }
 
     def readiness(self) -> dict[str, bool]:

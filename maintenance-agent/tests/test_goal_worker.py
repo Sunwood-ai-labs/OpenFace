@@ -38,6 +38,7 @@ class GoalWorkerTests(unittest.TestCase):
         self.assertEqual(env["ANTHROPIC_BASE_URL"], "http://openwebui:3000/api")
         self.assertEqual(env["ANTHROPIC_API_KEY"], "test-key")
         self.assertEqual(env["ANTHROPIC_MODEL"], "glm-4.7")
+        self.assertNotIn("CLAUDE_CODE_ENABLE_EXPERIMENTAL_ADVISOR_TOOL", env)
 
     def test_prompt_invokes_builtin_goal_with_completion_conditions(self) -> None:
         from config import Settings
