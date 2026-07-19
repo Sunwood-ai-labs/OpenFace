@@ -23,22 +23,46 @@ class GlmClient:
         self.client.close()
 
     def complete_json(self, system: str, prompt: str) -> dict[str, Any]:
-        response = self.client.post(
-            "/api/chat/completions",
-            json={
+        payload = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt},
+            ],
+            "stream": False,
+            "temperature": 0.1,
+            "response_format": {"type": "json_object"},
+        }
+        content = self._completion_content(payload)
+        try:
+            return _parse_json(content)
+        except (json.JSONDecodeError, ValueError):
+            repair_payload = {
                 "model": self.model,
                 "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": prompt},
+                    {
+                        "role": "system",
+                        "content": "Repair malformed JSON without changing its meaning. Return one valid JSON object only.",
+                    },
+                    {
+                        "role": "user",
+                        "content": "Repair this response. Preserve every path and complete file content:\n" + content,
+                    },
                 ],
                 "stream": False,
-                "temperature": 0.1,
-            },
+                "temperature": 0,
+                "response_format": {"type": "json_object"},
+            }
+            return _parse_json(self._completion_content(repair_payload))
+
+    def _completion_content(self, payload: dict[str, Any]) -> str:
+        response = self.client.post(
+            "/api/chat/completions",
+            json=payload,
         )
         response.raise_for_status()
-        payload = response.json()
-        content = payload.get("choices", [{}])[0].get("message", {}).get("content", "")
-        return _parse_json(content)
+        result = response.json()
+        return result.get("choices", [{}])[0].get("message", {}).get("content", "")
 
 
 def _parse_json(content: str) -> dict[str, Any]:
@@ -58,4 +82,3 @@ def _parse_json(content: str) -> dict[str, Any]:
     if not isinstance(parsed, dict):
         raise ValueError("GLM response must be a JSON object")
     return parsed
-
