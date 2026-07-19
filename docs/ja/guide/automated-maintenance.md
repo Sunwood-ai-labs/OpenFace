@@ -1,6 +1,6 @@
 # Claude Code `/goal` による自動メンテナンス
 
-OpenFaceはForgejoで新規作成されたIssueを、Claude Code組み込みの `/goal` へ渡し、人間がレビューするPull Requestへ変換できます。Claude Codeのモデルには、このPCのOpen WebUI Anthropic互換endpointで利用できる `glm-4.7` を使います。
+OpenFaceはForgejoで新規作成されたIssueを、Claude Code組み込みの `/goal` へ渡し、人間がレビューするPull Requestへ変換できます。Claude CodeはZ.AIのAnthropic互換endpointへ直接接続し、`glm-5.2` を使います。
 
 ## 処理の流れ
 
@@ -15,12 +15,12 @@ OpenFaceはForgejoで新規作成されたIssueを、Claude Code組み込みの 
 
 固定のplanner/coder JSON pipelineではありません。ファイル数・変更行数の上限を設けず、Claude Code `/goal` の自由度を維持します。
 
-## ローカルモデルの設定
+## Z.AIの設定
 
 ```dotenv
-OPENWEBUI_AGENT_CONFIG=C:/Users/you/AppData/Local/OpenWebUIAgent/config.env
-OPEN_WEBUI_BASE_URL=http://host.docker.internal:3000
-OPEN_WEBUI_MODEL=glm-4.7
+ZAI_AGENT_CONFIG=C:/Users/you/AppData/Local/OpenFace/zai.env
+ZAI_ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic
+MAINTENANCE_MODEL=glm-5.2
 MAINTENANCE_GOAL_TIMEOUT_SECONDS=3600
 ```
 

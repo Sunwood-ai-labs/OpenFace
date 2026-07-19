@@ -34,7 +34,7 @@ OpenFace turns one Docker host into a self-contained AI collaboration platform. 
 - **Always-on CPU mode:** `IDLE_TIMEOUT_MINUTES=0` keeps CPU Spaces running; a least-recently-used cap prevents unbounded growth.
 - **OpenFace Pages:** serve `gh-pages` or default-branch `docs/`, with a seeded VitePress workflow on an isolated Forgejo Actions runner.
 - **Agent operations API:** browser views, likes, and agent actions use a persisted metrics service with hashed agent credentials.
-- **Claude Code goal maintenance:** a signed Issue webhook runs Claude Code's built-in `/goal` command with local `glm-4.7`, then opens a human-reviewed Pull Request.
+- **Claude Code goal maintenance:** a signed Issue webhook runs Claude Code's built-in `/goal` command with Z.AI-hosted `glm-5.2`, then opens a human-reviewed Pull Request.
 - **Versioned Prompts:** stable repository slugs point to immutable Git tags that can be switched directly in the Prompt view.
 - **Three visual themes:** Standard, Solarpunk, and Cyberpunk persist across visits.
 - **Editable organizations:** Forgejo Owners can update organization metadata, avatars, membership, teams, and repositories from the real organization settings UI.
@@ -341,7 +341,7 @@ See the [visual QA guide](https://sunwood-ai-labs.github.io/OpenFace/guide/visua
 
 ## Automated Claude Code `/goal` maintenance
 
-Set `OPENWEBUI_AGENT_CONFIG` in the untracked `.env` file to the existing Open WebUI agent configuration, then start `maintenance-agent`. A newly opened Issue under the `openface` organization is passed to Claude Code 2.1.205 as a real `/goal` completion condition. Claude Code uses local `glm-4.7`, freely inspects and edits the cloned repository, runs relevant repository verification, and publishes the result as an `agent/issue-N` Pull Request. Add the `agent:skip` label or `<!-- openface-maintenance:skip -->` to opt out.
+Point `ZAI_AGENT_CONFIG` in the untracked `.env` file to a protected env file containing `ZAI_API_KEY`, then start `maintenance-agent`. A newly opened Issue under the `openface` organization is passed to Claude Code 2.1.205 as a real `/goal` completion condition. Claude Code connects directly to Z.AI's Anthropic-compatible endpoint with `glm-5.2`, freely inspects and edits the cloned repository, runs relevant repository verification, and publishes the result as an `agent/issue-N` Pull Request. Add the `agent:skip` label or `<!-- openface-maintenance:skip -->` to opt out.
 
 The service validates the Forgejo HMAC signature and deduplicates deliveries in SQLite. Claude Code runs as an unprivileged user inside the maintenance container: it has no host Docker socket and cannot read the Forgejo bot token, while retaining normal repository-level tools and test execution. The root wrapper alone commits and pushes after `git diff --check`; it never merges its own PR. See [Automated Claude Code maintenance](https://sunwood-ai-labs.github.io/OpenFace/guide/automated-maintenance).
 

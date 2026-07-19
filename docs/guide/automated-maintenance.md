@@ -1,6 +1,6 @@
 # Automated Claude Code `/goal` maintenance
 
-OpenFace can turn a newly opened Forgejo Issue into a human-reviewed Pull Request by running Claude Code's built-in `/goal` command against the cloned repository. Claude Code uses the `glm-4.7` model already available through the host's Open WebUI Anthropic-compatible endpoint.
+OpenFace can turn a newly opened Forgejo Issue into a human-reviewed Pull Request by running Claude Code's built-in `/goal` command against the cloned repository. Claude Code connects directly to Z.AI's Anthropic-compatible endpoint and uses `glm-5.2`.
 
 ## Flow
 
@@ -15,14 +15,14 @@ OpenFace can turn a newly opened Forgejo Issue into a human-reviewed Pull Reques
 
 This is deliberately not a fixed planner/coder JSON pipeline. There is no file-count or changed-line cap; `/goal` retains Claude Code's repository-level freedom.
 
-## Configure the local model
+## Configure Z.AI
 
-The Open WebUI API key remains in the existing agent configuration and is mounted read-only. It is never committed to Git or copied into Compose environment values.
+Keep the Z.AI API key in a protected env file outside the repository. Compose reads that file at container creation; the credential is never committed to Git.
 
 ```dotenv
-OPENWEBUI_AGENT_CONFIG=C:/Users/you/AppData/Local/OpenWebUIAgent/config.env
-OPEN_WEBUI_BASE_URL=http://host.docker.internal:3000
-OPEN_WEBUI_MODEL=glm-4.7
+ZAI_AGENT_CONFIG=C:/Users/you/AppData/Local/OpenFace/zai.env
+ZAI_ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic
+MAINTENANCE_MODEL=glm-5.2
 MAINTENANCE_GOAL_TIMEOUT_SECONDS=3600
 ```
 
