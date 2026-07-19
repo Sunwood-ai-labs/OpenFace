@@ -33,7 +33,7 @@
   }, { passive: true });
 })();
 </script>
-<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260719-pr-rails4">
+<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260719-pr-contrast7">
 <style>
 @media (max-width: 767px) {
   html body nav#navbar .navbar-left.ui.secondary.menu > a.item:not(#navbar-logo),
@@ -1900,9 +1900,19 @@ html[data-openface-theme="cyberpunk"] body a.openface-community-tab.active {
     if (communityMatch) {
       document.body.setAttribute("data-openface-community-page", communityMatch[1] === "new" ? "new" : communityMatch[1] ? "detail" : "list");
     }
-    const pullCommunityMatch = path.match(/^\/git\/[^/]+\/[^/]+\/pulls(?:\/(\d+))?\/?$/);
+    const pullCommunityMatch = path.match(/^\/git\/[^/]+\/[^/]+\/pulls(?:\/(\d+)(?:\/(commits|files))?)?\/?$/);
     if (pullCommunityMatch) {
       document.body.setAttribute("data-openface-community-page", pullCommunityMatch[1] ? "detail" : "list");
+      if (pullCommunityMatch[1]) {
+        document.body.setAttribute("data-openface-pull-view", pullCommunityMatch[2] || "conversation");
+        window.requestAnimationFrame(() => {
+          const pullTabs = document.querySelector(".ui.top.attached.pull.tabular.menu");
+          const activePullTab = pullTabs?.querySelector(":scope > .item.active");
+          if (pullTabs && activePullTab && pullTabs.scrollWidth > pullTabs.clientWidth) {
+            pullTabs.scrollLeft = activePullTab.offsetLeft - ((pullTabs.clientWidth - activePullTab.offsetWidth) / 2);
+          }
+        });
+      }
     }
     if (/^\/git\/[^/]+\/[^/]+\/commit\/[a-f0-9]+/i.test(path)) {
       document.body.setAttribute("data-openface-commit-detail", "true");

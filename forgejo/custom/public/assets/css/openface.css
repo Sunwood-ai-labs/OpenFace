@@ -19163,3 +19163,239 @@ html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"
   border: 0 !important;
   background: transparent !important;
 }
+
+/* pr-files5: keep Forgejo's pull subpages in the same themed detail shell and
+   contain wide diffs inside their own horizontal viewport on phones. */
+html body[data-openface-community-page="detail"][data-openface-pull-view]
+  .page-content.repository.view.issue.pull {
+  color: var(--color-text, #24292f) !important;
+}
+
+html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+  .page-content.repository.view.issue.pull.files > .ui.container {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+  :is(.diff-detail-box, .diff-file-box) {
+  max-width: 100% !important;
+}
+
+html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+  .diff-file-box .file-body {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  overscroll-behavior-inline: contain !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+  .diff-file-box .file-body table.chroma {
+  width: max-content !important;
+  min-width: 100% !important;
+  table-layout: auto !important;
+}
+
+html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+  .diff-file-box .file-body :is(td, td code, .lines-code) {
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+}
+
+html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+  .diff-file-box .file-body td code {
+  white-space: pre !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"][data-openface-pull-view]
+  .page-content.repository.view.issue.pull,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"][data-openface-pull-view]
+  .page-content.repository.view.issue.pull > .ui.container {
+  background: #090f20 !important;
+  color: #c8ebf8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+  :is(.diff-detail-box, .diff-file-box, .diff-file-header, .diff-file-box .file-body) {
+  border-color: rgba(56, 232, 255, 0.28) !important;
+  background: #0d1327 !important;
+  color: #c8ebf8 !important;
+  box-shadow: none !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+  .diff-file-header :is(a, .file-link, .muted) {
+  color: #38e8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+  .diff-file-box .file-body :is(td, td code) {
+  color: #d6edf7 !important;
+}
+
+@media (max-width: 767px) {
+  html body[data-openface-community-page="detail"][data-openface-pull-view]
+    .page-content.repository.view.issue.pull > .ui.container.fluid.padded {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-inline: 12px !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view]
+    .repository.view.issue .ui.top.attached.pull.tabular.menu {
+    display: flex !important;
+    gap: 0 !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view]
+    .repository.view.issue .ui.top.attached.pull.tabular.menu::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view]
+    .repository.view.issue .ui.top.attached.pull.tabular.menu > .item {
+    flex: 1 0 auto !important;
+    min-width: max-content !important;
+    padding-inline: 10px !important;
+    font-size: 12px !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-detail-box {
+    margin-bottom: 10px !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-detail-box .button-row {
+    gap: 6px !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-detail-box .ui.button {
+    min-width: 40px !important;
+    min-height: 40px !important;
+    margin: 0 !important;
+    padding: 9px !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-box {
+    margin-inline: 0 !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-header {
+    position: relative !important;
+    top: auto !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 6px !important;
+    padding: 8px 10px !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-name {
+    min-width: 0 !important;
+    flex-wrap: nowrap !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-name .file {
+    min-width: 0 !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-name .file-link {
+    display: block !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-header-actions .unescape-button {
+    display: none !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-header-actions .ui.button {
+    margin: 0 !important;
+    padding: 8px 10px !important;
+    font-size: 11px !important;
+    white-space: nowrap !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-box .file-body table.chroma {
+    min-width: 680px !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-box .file-body td.lines-num {
+    width: 42px !important;
+    min-width: 42px !important;
+  }
+}
+
+/* pr-subpage-contrast6: Forgejo's commits and diff syntax use their own
+   surfaces, so theme them explicitly instead of inheriting page-level ink. */
+html:not([data-openface-theme]) body[data-openface-pull-view="files"]
+  .diff-detail-stats strong,
+html[data-openface-theme="standard"] body[data-openface-pull-view="files"]
+  .diff-detail-stats strong {
+  color: #765300 !important;
+}
+
+html:not([data-openface-theme]) body[data-openface-pull-view="files"]
+  .diff-file-box .file-body .sb,
+html[data-openface-theme="standard"] body[data-openface-pull-view="files"]
+  .diff-file-box .file-body .sb {
+  color: #665500 !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-pull-view="files"]
+  .diff-file-box .file-body .sb {
+  color: #536000 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-pull-view="files"]
+  .diff-file-box .file-body .sb {
+  color: #b9e889 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"][data-openface-pull-view="commits"]
+  .commits-table.ui.header,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"][data-openface-pull-view="commits"]
+  .commits-table-left,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"][data-openface-pull-view="commits"]
+  #commits-table {
+  border-color: rgba(56, 232, 255, 0.28) !important;
+  background: #0d1327 !important;
+  color: #e9f8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"][data-openface-pull-view="commits"]
+  #commits-table :is(.author-wrapper, .default-link, .ref-issue, .commit-summary) {
+  color: #d6edf7 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"][data-openface-pull-view="commits"]
+  #commits-table :is(.default-link, .ref-issue):hover {
+  color: #38e8ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+  .diff-file-header .ui.basic.button {
+  border-color: rgba(56, 232, 255, 0.34) !important;
+  background: #11162b !important;
+  color: #d6edf7 !important;
+  box-shadow: none !important;
+}
