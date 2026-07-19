@@ -57,6 +57,8 @@ On the source Issue or its agent-created PR, start a comment with `/goal` follow
 
 The agent checks out the existing `agent/issue-N` branch, runs the Japanese completion prompt, verifies the new diff, and pushes a new commit to the same PR. Ordinary discussion comments do not trigger a model run. A currently queued or running Issue cannot be queued again; edit or post the follow-up after the active run finishes.
 
+The Issue reaction trail is intentionally small: 👍 for human support, 👀 while the maintenance agent is working, 🚀 after successful publication, and 😕 when a run fails or stops before publication.
+
 Up to `MAINTENANCE_MAX_WORKERS` Issues run concurrently. Each job has its own clone and `agent/issue-N` branch; overlapping edits can still produce normal Git conflicts between the resulting PRs. Values are bounded to 1–4 to avoid exhausting the host or the model provider.
 
 ## Freedom and isolation
