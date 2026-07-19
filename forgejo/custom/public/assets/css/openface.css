@@ -20168,3 +20168,25 @@ html body[data-openface-pull-view="files"] .diff-file-header-actions {
   box-sizing: content-box !important;
   padding: 0 16px 16px !important;
 }
+
+/* hf-community-header-insets22: the repository identity and issue title need
+   a real inner gutter on mobile instead of starting on the rail boundary. */
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .issue-title-header {
+  padding-top: 16px !important;
+}
+
+@media (max-width: 767px) {
+  :is(html, html[data-openface-theme]) body[data-openface-community-page]
+    .repository .repo-header {
+    height: 112px !important;
+    min-height: 112px !important;
+  }
+
+  :is(html, html[data-openface-theme]) body[data-openface-community-page]
+    .repository .repo-header .openface-repo-title-overlay {
+    left: 16px !important;
+    top: 16px !important;
+    max-width: calc(100% - 32px) !important;
+  }
+}
