@@ -34,6 +34,7 @@ venv/
 /forgejo-*.html
 /screenshots/
 /visual-tests/artifacts/
+/visual-tests/artifacts-*/
 /visual-tests/*-artifacts/
 /visual-tests/visual-tests/
 /docs/evidence/community-ui/issues-current-*.png
