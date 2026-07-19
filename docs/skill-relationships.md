@@ -5,10 +5,6 @@ root of each repository tagged with the `skill` topic. The file stays in the
 same Git history as `SKILL.md`, so repository members can review, branch, edit,
 and revert relationship changes through the normal Forgejo workflow.
 
-For migration compatibility, OpenFace still reads the legacy
-`openface.skill.json` name when `skill.json` is absent. New and updated
-repositories should use only `skill.json`.
-
 ## Schema
 
 ```json

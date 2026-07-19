@@ -111,7 +111,7 @@ export default function SkillRelationshipMap({
           <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{connectionCount} evidence-backed link{connectionCount === 1 ? '' : 's'}</p>
         </div>
         <Link
-          href={`/${owner}/${repo.name}?tab=files&path=${repo.skill_relationships?.metadataFile || 'skill.json'}`}
+          href={`/${owner}/${repo.name}?tab=files&path=skill.json`}
           className="skill-relationship-metadata rounded-lg border border-violet-200 bg-white px-2 py-1 font-mono text-[9px] font-semibold text-violet-700 hover:border-violet-400 dark:border-violet-800 dark:bg-zinc-950 dark:text-violet-300"
         >
           metadata
