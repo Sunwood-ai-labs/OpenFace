@@ -127,6 +127,8 @@ try {
           .filter((element) => window.getComputedStyle(element).display !== 'none')
           .map((element) => element.textContent?.replace(/\s+/g, ' ').trim() || '')
           .filter(Boolean);
+        const pullDiffBoxes = Array.from(document.querySelectorAll('.diff-file-box'));
+        const hfChangeTotals = document.querySelector('.openface-hf-change-totals')?.textContent?.replace(/\s+/g, ' ').trim() || '';
         const virtualAgentSlugs = ['luna-scout', 'patch-orbit', 'mikan-reviewer'];
         const virtualAgentAuthors = virtualAgentSlugs.filter((slug) =>
           document.querySelector(`.timeline-item.comment .author[href$="/${slug}"]`),
@@ -174,6 +176,11 @@ try {
           pullTabLabels,
           visiblePullTabLabels,
           pullCommitLinkVisible: Boolean(document.querySelector('.openface-pull-commit-link')),
+          hfFileSummaryRows: document.querySelectorAll('.openface-hf-file-row').length,
+          hfChangedTags: document.querySelectorAll('.openface-hf-changed-tag').length,
+          hfDiffBoxes: pullDiffBoxes.length,
+          hfSplitDiff: pullDiffBoxes.length > 0 && pullDiffBoxes.every((box) => box.querySelector('.file-body')?.classList.contains('code-diff-split')),
+          hfChangeTotals,
           skillRelationshipMapVisible: Boolean(skillRelationshipMap),
           skillRelationshipLinks: skillRelationshipMap?.querySelectorAll('[data-skill-relationship-link]').length || 0,
           skillRelationshipPlacement: skillRelationshipMap?.getAttribute('data-relationship-placement') || null,
@@ -210,6 +217,11 @@ try {
         pullTabLabels: [],
         visiblePullTabLabels: [],
         pullCommitLinkVisible: false,
+        hfFileSummaryRows: 0,
+        hfChangedTags: 0,
+        hfDiffBoxes: 0,
+        hfSplitDiff: false,
+        hfChangeTotals: '',
         skillRelationshipMapVisible: false,
         skillRelationshipLinks: 0,
         skillRelationshipPlacement: null,
@@ -244,6 +256,10 @@ try {
       if (route.id === 'pull-detail' && pageState.pullView !== 'conversation') defects.push('Pull request conversation marker is missing');
       if (route.id === 'pull-commits' && pageState.pullView !== 'commits') defects.push('Pull request commits marker is missing');
       if (route.id === 'pull-files' && pageState.pullView !== 'files') defects.push('Pull request files marker is missing');
+      if (route.id === 'pull-files' && pageState.hfFileSummaryRows < 1) defects.push('Hugging Face-style changed-file summary is missing');
+      if (route.id === 'pull-files' && pageState.hfChangedTags !== pageState.hfDiffBoxes) defects.push('Not every diff file has a CHANGED marker');
+      if (route.id === 'pull-files' && !pageState.hfSplitDiff) defects.push('Pull request is not using the Hugging Face-style split diff');
+      if (route.id === 'pull-files' && !/^\+\d+\s+-\d+$/.test(pageState.hfChangeTotals)) defects.push('Pull request change totals do not show both additions and deletions');
       if (route.id.startsWith('community-markdown') && pageState.communityPage !== 'detail') defects.push('Markdown discussion detail marker is missing');
       if (route.id.startsWith('community-markdown') && pageState.virtualAgentAuthors.length !== 3) defects.push('Markdown discussion does not show all three agent participants');
       if (route.id.startsWith('community-markdown') && pageState.markdownBlockquotes < 1) defects.push('Markdown blockquote is missing');
