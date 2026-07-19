@@ -24,6 +24,7 @@ ZAI_AGENT_CONFIG=C:/Users/you/AppData/Local/OpenFace/zai.env
 ZAI_ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic
 MAINTENANCE_MODEL=glm-5.2
 MAINTENANCE_GOAL_TIMEOUT_SECONDS=3600
+MAINTENANCE_MAX_WORKERS=2
 ```
 
 Then rebuild the idempotent seed and service:
@@ -45,6 +46,8 @@ Every newly opened Issue in the configured owner triggers maintenance by default
 - body marker: `<!-- openface-maintenance:skip -->`
 
 Repeated deliveries produce one job and one PR per Issue. The stable branch is `agent/issue-N`.
+
+Up to `MAINTENANCE_MAX_WORKERS` Issues run concurrently. Each job has its own clone and `agent/issue-N` branch; overlapping edits can still produce normal Git conflicts between the resulting PRs. Values are bounded to 1–4 to avoid exhausting the host or the model provider.
 
 ## Freedom and isolation
 

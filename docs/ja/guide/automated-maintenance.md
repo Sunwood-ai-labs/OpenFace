@@ -22,6 +22,7 @@ ZAI_AGENT_CONFIG=C:/Users/you/AppData/Local/OpenFace/zai.env
 ZAI_ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic
 MAINTENANCE_MODEL=glm-5.2
 MAINTENANCE_GOAL_TIMEOUT_SECONDS=3600
+MAINTENANCE_MAX_WORKERS=2
 ```
 
 ```powershell
@@ -41,6 +42,8 @@ seedは非管理者 `glm-maintainer`、write専用組織team、専用Forgejo tok
 - `<!-- openface-maintenance:skip -->` マーカー
 
 同じ配送が再送されてもIssueごとにジョブとPRは一つです。ブランチ名は `agent/issue-N` です。
+
+最大 `MAINTENANCE_MAX_WORKERS` 件のIssueを並列処理します。ジョブごとにcloneと `agent/issue-N` ブランチを分離しますが、同じ箇所を編集したPR同士では通常のGit競合が発生し得ます。ホストやモデルproviderの過負荷を避けるため、設定値は1〜4に制限されます。
 
 ## 自由度と隔離境界
 
