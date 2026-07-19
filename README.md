@@ -323,13 +323,13 @@ npm run capture:themes --prefix visual-tests
 npm run capture:scroll --prefix visual-tests
 ```
 
-`capture:themes` is the exhaustive theme matrix: **Standard, Solarpunk, and Cyberpunk × desktop and mobile × 30 major screens = 180 full-page screenshots**. `capture:scroll` adds **564 viewport screenshots** across the top, middle, and bottom of every page, plus direct checkpoints for Dataset Viewer, Inference Providers, and both organizations' Team members. It detects light-theme surfaces leaking into Cyberpunk even when they only appear after scrolling. Both commands accept `VISUAL_QA_THEMES`, `VISUAL_QA_VIEWPORTS`, or `VISUAL_QA_ROUTES` filters (comma-separated IDs).
+`capture:themes` is the exhaustive theme matrix: **Standard, Solarpunk, and Cyberpunk × light and dark OS color schemes × desktop and mobile × 31 major screens = 372 full-page screenshots**. It calculates rendered text contrast after alpha compositing and enforces WCAG AA (4.5:1 for normal text, 3:1 for large text). `capture:scroll` adds viewport screenshots across the top, middle, and bottom of every page, plus direct checkpoints for Dataset Viewer, Inference Providers, and both organizations' Team members. Both commands accept `VISUAL_QA_THEMES`, `VISUAL_QA_COLOR_SCHEMES`, `VISUAL_QA_VIEWPORTS`, or `VISUAL_QA_ROUTES` filters (comma-separated IDs).
 
 `npm run audit:organization --prefix visual-tests` adds focused desktop/mobile evidence for the organization profile. It fails on exposed mobile side gutters, decorative fake members, member-count mismatches, or unreadable repository focus states.
 
-Open the generated reports and contact sheets, then inspect the images rather than relying on PASS/FAIL alone. The current matrix produces 24 full-page contact sheets; the scroll audit produces 66 more.
+Open the generated reports and contact sheets, then inspect the images rather than relying on PASS/FAIL alone. The current matrix produces 48 full-page contact sheets; the scroll audit provides additional top, middle, bottom, and direct-section evidence.
 
-The latest committed manual review is the [2026-07-18 three-theme character-art audit](docs/evidence/visual-qa/2026-07-18-three-theme-character-audit.md): 180 full-page and 564 scroll screenshots across all three themes, both viewports, and all 30 routes.
+The latest committed manual review is the [2026-07-19 exhaustive theme contrast audit](docs/evidence/visual-qa/2026-07-19-theme-contrast-audit.md): **372 / 372 screenshots passed**, **19,654 rendered text nodes** were calculated, and all **48 contact sheets** were visually reviewed across every theme, OS color scheme, viewport, and all 31 routes.
 
 | Cyberpunk Dataset Viewer | Cyberpunk Inference Providers | Generated organization identity and team |
 |---|---|---|
