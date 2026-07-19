@@ -180,14 +180,14 @@ ensure_maintenance_token() {
     exit 1
   fi
   echo -n "$raw" > "$MAINTENANCE_TOKEN_FILE"
-  chmod 644 "$MAINTENANCE_TOKEN_FILE"
+  chmod 600 "$MAINTENANCE_TOKEN_FILE"
   log "GLM maintenance token written to ${MAINTENANCE_TOKEN_FILE}."
 }
 
 ensure_maintenance_webhook() {
   if [ ! -s "$MAINTENANCE_WEBHOOK_SECRET_FILE" ]; then
     dd if=/dev/urandom bs=32 count=1 2>/dev/null | base64 | tr -d '\r\n' > "$MAINTENANCE_WEBHOOK_SECRET_FILE"
-    chmod 644 "$MAINTENANCE_WEBHOOK_SECRET_FILE"
+    chmod 600 "$MAINTENANCE_WEBHOOK_SECRET_FILE"
   fi
 
   local code hook_id secret payload

@@ -26,9 +26,9 @@ settings.data_dir.mkdir(parents=True, exist_ok=True)
 settings.workspace_dir.mkdir(parents=True, exist_ok=True)
 database_path = settings.data_dir / "jobs.sqlite3"
 database_lock = Lock()
-executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="glm-maintenance")
+executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="claude-goal-maintenance")
 worker = MaintenanceWorker(settings)
-app = FastAPI(title="OpenFace GLM Maintenance Agent", version="1.0.0")
+app = FastAPI(title="OpenFace Claude Goal Maintenance Agent", version="2.0.0")
 
 
 def utc_now() -> str:
@@ -67,7 +67,7 @@ def update_job(delivery_id: str, status: str, detail: str = "", pull_url: str = 
 
 
 def process_job(delivery_id: str, task: IssueTask) -> None:
-    update_job(delivery_id, "running", f"Analyzing with {settings.model}")
+    update_job(delivery_id, "running", f"Running Claude Code /goal with {settings.model}")
     try:
         result = worker.run(task)
         update_job(delivery_id, "completed", result.summary, result.pull.url)
@@ -82,8 +82,9 @@ def process_job(delivery_id: str, task: IssueTask) -> None:
                 task.owner,
                 task.repo,
                 task.issue_number,
-                "🤖 GLM maintenance agent stopped without pushing changes. "
-                "The proposal failed a safety or validation gate. A maintainer can inspect the service job log.",
+                "🤖 Claude Code `/goal` stopped without pushing changes. "
+                "The goal failed or the resulting worktree did not pass publication checks. "
+                "A maintainer can inspect the service job log.",
             )
             client.close()
         except Exception:
@@ -178,4 +179,3 @@ async def forgejo_webhook(
         return {"accepted": True, "duplicate": True, "issue": task.issue_number}
     executor.submit(process_job, delivery_id, task)
     return {"accepted": True, "duplicate": False, "issue": task.issue_number, "model": settings.model}
-

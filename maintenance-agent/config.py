@@ -38,10 +38,8 @@ class Settings:
     data_dir: Path
     workspace_dir: Path
     allowed_owner: str
-    max_files: int
-    max_changed_lines: int
-    max_file_bytes: int
-    request_timeout_seconds: int
+    claude_user: str
+    goal_timeout_seconds: int
 
     @classmethod
     def load(cls) -> "Settings":
@@ -62,10 +60,8 @@ class Settings:
             data_dir=Path(os.getenv("MAINTENANCE_DATA_DIR", "/data")),
             workspace_dir=Path(os.getenv("MAINTENANCE_WORKSPACE_DIR", "/work")),
             allowed_owner=os.getenv("MAINTENANCE_ALLOWED_OWNER", "openface"),
-            max_files=_integer("MAINTENANCE_MAX_FILES", 6),
-            max_changed_lines=_integer("MAINTENANCE_MAX_CHANGED_LINES", 800),
-            max_file_bytes=_integer("MAINTENANCE_MAX_FILE_BYTES", 131_072),
-            request_timeout_seconds=_integer("MAINTENANCE_LLM_TIMEOUT_SECONDS", 300),
+            claude_user=os.getenv("MAINTENANCE_CLAUDE_USER", "maintainer"),
+            goal_timeout_seconds=_integer("MAINTENANCE_GOAL_TIMEOUT_SECONDS", 3600),
         )
 
     def read_forgejo_token(self) -> str:
@@ -74,10 +70,28 @@ class Settings:
     def read_webhook_secret(self) -> str:
         return self.webhook_secret_file.read_text(encoding="utf-8").strip()
 
+    def claude_environment(self) -> dict[str, str]:
+        home = f"/home/{self.claude_user}"
+        base_url = self.openwebui_base_url.rstrip("/")
+        if not base_url.endswith("/api"):
+            base_url += "/api"
+        return {
+            "PATH": os.environ.get("PATH", ""),
+            "HOME": home,
+            "LANG": "C.UTF-8",
+            "LC_ALL": "C.UTF-8",
+            "ANTHROPIC_BASE_URL": base_url,
+            "ANTHROPIC_API_KEY": self.openwebui_api_key,
+            "ANTHROPIC_MODEL": self.model,
+            "ANTHROPIC_DEFAULT_HAIKU_MODEL": self.model,
+            "ANTHROPIC_DEFAULT_SONNET_MODEL": self.model,
+            "ANTHROPIC_DEFAULT_OPUS_MODEL": self.model,
+            "CLAUDE_CODE_ENABLE_EXPERIMENTAL_ADVISOR_TOOL": "1",
+        }
+
     def readiness(self) -> dict[str, bool]:
         return {
             "forgejo_token": self.forgejo_token_file.is_file() and self.forgejo_token_file.stat().st_size > 0,
             "webhook_secret": self.webhook_secret_file.is_file() and self.webhook_secret_file.stat().st_size > 0,
             "openwebui_api_key": bool(self.openwebui_api_key),
         }
-
