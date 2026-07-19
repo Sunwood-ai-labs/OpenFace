@@ -683,6 +683,26 @@ ensure_community_reaction_fixture() {
   done
 }
 
+# Repair the deterministic community fixtures on every seed run. Earlier
+# Windows-side API experiments could persist literal question marks in these
+# records; sending JSON from the Linux seed container keeps UTF-8 intact and
+# makes visual QA reproducible across existing as well as clean volumes.
+repair_community_qa_fixture() {
+  local name="$1" payload
+
+  payload=$(jq -n \
+    --arg title "READMEに自動保守の説明を追加する" \
+    --arg body $'README.md に `## Automated maintenance` セクションを追加してください。\n\nIssueからGLM保守エージェントがPull Requestを作成する流れと、人間によるレビューが必要なことを簡潔に説明してください。' \
+    '{title:$title,body:$body}')
+  api PATCH "/repos/${ORG_NAME}/${name}/issues/1" "$payload" >/dev/null
+
+  payload=$(jq -n \
+    --arg title "[GLM] READMEに自動保守の説明を追加する" \
+    --arg body $'## GLM maintenance result\n\nREADME.md に自動保守フローの説明を追加します。\n\n### 変更ファイル\n\n- `README.md`\n\n### 確認\n\n- `git diff --check`\n- 人間によるレビューが必要です\n\nCloses #1' \
+    '{title:$title,body:$body}')
+  api PATCH "/repos/${ORG_NAME}/${name}/pulls/2" "$payload" >/dev/null
+}
+
 # ------------------------------------------------------------------------
 # Helper: create a lightweight, idempotent tag for a prompt's imported
 # version. This makes the visible `version-v*` topic traceable through the
@@ -2080,6 +2100,7 @@ put_file "pages-starter" "index.html" "${WORKDIR}/pages_starter_index.html" "Add
 ensure_pages_branch "pages-starter"
 ensure_pull_detail_fixture "pages-starter"
 ensure_community_reaction_fixture "pages-starter"
+repair_community_qa_fixture "pages-starter"
 
 # Linked asset example: gh-pages serves HTML, CSS, and browser JavaScript from
 # the same public repository path.
