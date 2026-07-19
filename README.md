@@ -220,7 +220,7 @@ Desktop and mobile evidence, route checks, and responsive results are recorded i
 
 The seed imports pinned public repositories rather than label-only fixtures. Skill entries contain `SKILL.md`; MCP entries contain an implementation and dependency definition. Source selection and verification are recorded in [docs/research/skill-mcp-sources.md](docs/research/skill-mcp-sources.md).
 
-Skill repositories can also declare typed Skill-to-Skill relationships in an editable `openface.skill.json`. OpenFace shows required/recommended dependencies, derives reverse **Referenced by** links, and marks Skills without declarations as **Standalone**. See the [relationship metadata schema and editing guide](docs/skill-relationships.md).
+Skill repositories can also declare typed Skill-to-Skill relationships in an editable `skill.json`. OpenFace shows required/recommended dependencies, derives reverse **Referenced by** links, and marks Skills without declarations as **Standalone**. See the [relationship metadata schema and editing guide](docs/skill-relationships.md).
 
 | Skills | MCPs |
 |---|---|

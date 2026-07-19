@@ -1,9 +1,13 @@
 # Skill relationship metadata
 
-OpenFace reads Skill-to-Skill relationships from `openface.skill.json` in the
+OpenFace reads Skill-to-Skill relationships from `skill.json` in the
 root of each repository tagged with the `skill` topic. The file stays in the
 same Git history as `SKILL.md`, so repository members can review, branch, edit,
 and revert relationship changes through the normal Forgejo workflow.
+
+For migration compatibility, OpenFace still reads the legacy
+`openface.skill.json` name when `skill.json` is absent. New and updated
+repositories should use only `skill.json`.
 
 ## Schema
 
@@ -48,7 +52,7 @@ the Skill directory.
 ## Editing
 
 1. Open the Skill repository in Forgejo.
-2. Create or edit `openface.skill.json` on the default branch.
+2. Create or edit `skill.json` on the default branch.
 3. Commit the change through a normal branch or pull-request workflow.
 4. Reload the Skill page. OpenFace caches relationship files briefly, then
    rebuilds both dependency and reverse-reference views automatically.

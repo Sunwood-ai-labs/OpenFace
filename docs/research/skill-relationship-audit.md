@@ -8,7 +8,7 @@ dependency evidence. A case-insensitive cross-reference scan found no Skill
 explicitly naming another catalog Skill, so the catalog currently declares
 **zero hard dependencies**. Four optional workflow links remain because the
 actual procedures have adjacent hand-off points; each link stores its section
-basis in `openface.skill.json`.
+basis in `skill.json`.
 
 ## Content inventory
 

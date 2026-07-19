@@ -2,7 +2,7 @@
 
 Verified against the Docker Compose deployment after reading the complete root
 `SKILL.md` of all ten public Skill repositories and seeding editable,
-evidence-backed `openface.skill.json` metadata.
+evidence-backed `skill.json` metadata.
 
 ## Results
 
@@ -16,7 +16,7 @@ evidence-backed `openface.skill.json` metadata.
   verification asserts the panel is in the main content flow.
 - Desktop and 390 px mobile captures report no horizontal overflow.
 - Browser interaction verified directory → Skill detail → dependency target →
-  `openface.skill.json` file navigation on the public Tailscale URL.
+  `skill.json` file navigation on the public Tailscale URL.
 
 | Directory | Relationship sidebar |
 | --- | --- |
