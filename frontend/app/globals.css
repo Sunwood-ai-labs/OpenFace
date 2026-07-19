@@ -367,6 +367,61 @@ html[data-openface-theme="cyberpunk"] .openface-theme-selector:hover {
   }
 }
 
+html:not([data-openface-theme]) .bg-zinc-900 .text-zinc-500,
+html[data-openface-theme="standard"] .bg-zinc-900 .text-zinc-500 {
+  color: #a1a1aa !important;
+}
+
+html[data-openface-theme="solarpunk"] .bg-zinc-900 .text-zinc-500 {
+  color: #e6f4dc !important;
+}
+
+html[data-openface-theme="cyberpunk"] .bg-orange-50,
+html[data-openface-theme="cyberpunk"] .bg-orange-100,
+html[data-openface-theme="cyberpunk"] .bg-violet-100 {
+  background-color: #1b2945 !important;
+  color: #9ff4ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] summary {
+  background-color: #0d1327;
+}
+
+html[data-openface-theme="cyberpunk"] details[open] > summary {
+  background-color: #0d1327 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-openface-theme]) .bg-orange-50,
+  html:not([data-openface-theme]) .bg-orange-100,
+  html:not([data-openface-theme]) .bg-violet-100,
+  html[data-openface-theme="standard"] .bg-orange-50,
+  html[data-openface-theme="standard"] .bg-orange-100,
+  html[data-openface-theme="standard"] .bg-violet-100 {
+    background-color: #3f2d18 !important;
+    color: #fde68a !important;
+  }
+
+  html:not([data-openface-theme]) summary,
+  html[data-openface-theme="standard"] summary {
+    background-color: #18181b;
+  }
+
+  html:not([data-openface-theme]) details[open] > summary,
+  html[data-openface-theme="standard"] details[open] > summary {
+    background-color: #18181b !important;
+  }
+
+  html[data-openface-theme="solarpunk"] .bg-orange-50,
+  html[data-openface-theme="solarpunk"] .bg-orange-100,
+  html[data-openface-theme="solarpunk"] .bg-violet-100,
+  html[data-openface-theme="solarpunk"] [class*="dark:text-orange-"],
+  html[data-openface-theme="solarpunk"] [class*="dark:text-violet-"] {
+    background-color: #e5eedf !important;
+    color: #315b43 !important;
+  }
+}
+
 .prose-openface {
   line-height: 1.75;
 }
@@ -1146,5 +1201,52 @@ body:has(.openface-spaces-directory) > main {
   .openface-space-stage {
     height: calc(100vh - 133px);
     min-height: calc(100vh - 133px);
+  }
+}
+
+/* Cascade terminus for contrast-sensitive compact controls. */
+html:not([data-openface-theme]) .bg-zinc-900 .text-zinc-500,
+html[data-openface-theme="standard"] .bg-zinc-900 .text-zinc-500 {
+  color: #a1a1aa !important;
+}
+
+html[data-openface-theme="solarpunk"] .bg-zinc-900 .text-zinc-500 {
+  color: #e6f4dc !important;
+}
+
+html[data-openface-theme="cyberpunk"] .bg-orange-50,
+html[data-openface-theme="cyberpunk"] .bg-orange-100,
+html[data-openface-theme="cyberpunk"] .bg-violet-100 {
+  background-color: #1b2945 !important;
+  color: #9ff4ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] summary {
+  background-color: #0d1327;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-openface-theme]) .bg-orange-50,
+  html:not([data-openface-theme]) .bg-orange-100,
+  html:not([data-openface-theme]) .bg-violet-100,
+  html[data-openface-theme="standard"] .bg-orange-50,
+  html[data-openface-theme="standard"] .bg-orange-100,
+  html[data-openface-theme="standard"] .bg-violet-100 {
+    background-color: #3f2d18 !important;
+    color: #fde68a !important;
+  }
+
+  html:not([data-openface-theme]) summary,
+  html[data-openface-theme="standard"] summary {
+    background-color: #18181b;
+  }
+
+  html[data-openface-theme="solarpunk"] .bg-orange-50,
+  html[data-openface-theme="solarpunk"] .bg-orange-100,
+  html[data-openface-theme="solarpunk"] .bg-violet-100,
+  html[data-openface-theme="solarpunk"] [class*="dark:text-orange-"],
+  html[data-openface-theme="solarpunk"] [class*="dark:text-violet-"] {
+    background-color: #e5eedf !important;
+    color: #315b43 !important;
   }
 }
