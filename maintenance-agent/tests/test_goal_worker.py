@@ -117,6 +117,17 @@ class GoalWorkerTests(unittest.TestCase):
             ["git", "-c", f"safe.directory={root.resolve()}"],
         )
 
+    def test_repeated_reaction_conflict_is_idempotent(self) -> None:
+        from config import Settings
+        from forgejo import ForgejoClient
+
+        with patch("forgejo.httpx.Client") as client_type:
+            response = Mock(status_code=409)
+            client_type.return_value.post.return_value = response
+            client = ForgejoClient(Settings.load())
+            client.react_to_issue("openface", "demo", 7, "eyes")
+        response.raise_for_status.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

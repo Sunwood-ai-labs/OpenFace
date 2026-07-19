@@ -74,8 +74,18 @@ def update_job(delivery_id: str, status: str, detail: str = "", pull_url: str = 
 def process_job(delivery_id: str, task: IssueTask) -> None:
     update_job(delivery_id, "running", f"Claude Code /goal を {settings.model} で実行中")
     try:
+        client = ForgejoClient(settings)
+        try:
+            client.react_to_issue(task.owner, task.repo, task.issue_number, "eyes")
+        finally:
+            client.close()
         result = worker.run(task)
         update_job(delivery_id, "completed", result.summary, result.pull.url)
+        client = ForgejoClient(settings)
+        try:
+            client.react_to_issue(task.owner, task.repo, task.issue_number, "rocket")
+        finally:
+            client.close()
         logger.info("Completed %s/%s issue #%s -> PR %s", task.owner, task.repo, task.issue_number, result.pull.url)
     except Exception as exc:  # fail closed and retain an inspectable job record
         message = str(exc)[:2000]
@@ -83,6 +93,7 @@ def process_job(delivery_id: str, task: IssueTask) -> None:
         logger.error("Maintenance failed for %s/%s#%s: %s", task.owner, task.repo, task.issue_number, message)
         try:
             client = ForgejoClient(settings)
+            client.react_to_issue(task.owner, task.repo, task.issue_number, "confused")
             client.comment_issue(
                 task.owner,
                 task.repo,

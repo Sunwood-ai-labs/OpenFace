@@ -68,6 +68,16 @@ class ForgejoClient:
             json={"body": body[:20_000]},
         )
 
+    def react_to_issue(self, owner: str, repo: str, issue_number: int, content: str) -> None:
+        response = self.client.post(
+            f"/repos/{owner}/{repo}/issues/{issue_number}/reactions",
+            json={"content": content},
+        )
+        # A repeated webhook may try to add the same reaction again. Forgejo
+        # reports that as a conflict; the desired visible state already exists.
+        if response.status_code not in {200, 201, 409}:
+            response.raise_for_status()
+
     def issue(self, owner: str, repo: str, issue_number: int) -> dict[str, Any]:
         return self._request("GET", f"/repos/{owner}/{repo}/issues/{issue_number}")
 
