@@ -17,17 +17,13 @@ class GoalWorkerTests(unittest.TestCase):
         root = Path(self.temp.name)
         (root / "token").write_text("test-token", encoding="utf-8")
         (root / "secret").write_text("test-secret", encoding="utf-8")
-        (root / "openwebui.env").write_text(
-            "OPEN_WEBUI_BASE_URL=http://openwebui:3000\n"
-            "OPEN_WEBUI_API_KEY=test-key\n"
-            "OPEN_WEBUI_DEFAULT_MODEL=glm-4.7\n",
-            encoding="utf-8",
-        )
         os.environ.update(
             {
                 "FORGEJO_TOKEN_FILE": str(root / "token"),
                 "WEBHOOK_SECRET_FILE": str(root / "secret"),
-                "OPEN_WEBUI_CONFIG_FILE": str(root / "openwebui.env"),
+                "ZAI_ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
+                "ZAI_API_KEY": "test-key",
+                "MAINTENANCE_MODEL": "glm-5.2",
                 "MAINTENANCE_DATA_DIR": str(root / "data"),
                 "MAINTENANCE_WORKSPACE_DIR": str(root / "work"),
             }
@@ -40,9 +36,12 @@ class GoalWorkerTests(unittest.TestCase):
         from config import Settings
 
         env = Settings.load().claude_environment()
-        self.assertEqual(env["ANTHROPIC_BASE_URL"], "http://openwebui:3000/api")
-        self.assertEqual(env["ANTHROPIC_API_KEY"], "test-key")
-        self.assertEqual(env["ANTHROPIC_MODEL"], "glm-4.7")
+        self.assertEqual(env["ANTHROPIC_BASE_URL"], "https://api.z.ai/api/anthropic")
+        self.assertEqual(env["ANTHROPIC_AUTH_TOKEN"], "test-key")
+        self.assertEqual(env["ANTHROPIC_MODEL"], "glm-5.2")
+        self.assertEqual(env["ANTHROPIC_DEFAULT_HAIKU_MODEL"], "glm-4.5-air")
+        self.assertEqual(env["ANTHROPIC_DEFAULT_SONNET_MODEL"], "glm-5.2")
+        self.assertEqual(env["CLAUDE_CODE_AUTO_COMPACT_WINDOW"], "1000000")
         self.assertNotIn("CLAUDE_CODE_ENABLE_EXPERIMENTAL_ADVISOR_TOOL", env)
 
     def test_prompt_invokes_builtin_goal_with_completion_conditions(self) -> None:

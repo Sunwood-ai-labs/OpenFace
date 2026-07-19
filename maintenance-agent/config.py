@@ -5,19 +5,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-def _read_env_file(path: Path) -> dict[str, str]:
-    values: dict[str, str] = {}
-    if not path.is_file():
-        return values
-    for raw_line in path.read_text(encoding="utf-8").splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        values[key.strip()] = value.strip().strip('"').strip("'")
-    return values
-
-
 def _integer(name: str, default: int) -> int:
     try:
         return int(os.getenv(name, str(default)))
@@ -31,9 +18,8 @@ class Settings:
     forgejo_git_base: str
     forgejo_token_file: Path
     webhook_secret_file: Path
-    openwebui_config_file: Path
-    openwebui_base_url: str
-    openwebui_api_key: str
+    zai_base_url: str
+    zai_api_key: str
     model: str
     data_dir: Path
     workspace_dir: Path
@@ -43,20 +29,14 @@ class Settings:
 
     @classmethod
     def load(cls) -> "Settings":
-        config_file = Path(os.getenv("OPEN_WEBUI_CONFIG_FILE", "/run/secrets/openwebui.env"))
-        openwebui = _read_env_file(config_file)
         return cls(
             forgejo_api=os.getenv("FORGEJO_API", "http://forgejo:3000/api/v1").rstrip("/"),
             forgejo_git_base=os.getenv("FORGEJO_GIT_BASE", "http://forgejo:3000").rstrip("/"),
             forgejo_token_file=Path(os.getenv("FORGEJO_TOKEN_FILE", "/shared/maintenance-token")),
             webhook_secret_file=Path(os.getenv("WEBHOOK_SECRET_FILE", "/shared/maintenance-webhook-secret")),
-            openwebui_config_file=config_file,
-            openwebui_base_url=os.getenv(
-                "OPEN_WEBUI_BASE_URL",
-                openwebui.get("OPEN_WEBUI_BASE_URL", "http://host.docker.internal:3000"),
-            ).rstrip("/"),
-            openwebui_api_key=os.getenv("OPEN_WEBUI_API_KEY", openwebui.get("OPEN_WEBUI_API_KEY", "")),
-            model=os.getenv("OPEN_WEBUI_MODEL", openwebui.get("OPEN_WEBUI_DEFAULT_MODEL", "glm-4.7")),
+            zai_base_url=os.getenv("ZAI_ANTHROPIC_BASE_URL", "https://api.z.ai/api/anthropic").rstrip("/"),
+            zai_api_key=os.getenv("ZAI_API_KEY", ""),
+            model=os.getenv("MAINTENANCE_MODEL", "glm-5.2"),
             data_dir=Path(os.getenv("MAINTENANCE_DATA_DIR", "/data")),
             workspace_dir=Path(os.getenv("MAINTENANCE_WORKSPACE_DIR", "/work")),
             allowed_owner=os.getenv("MAINTENANCE_ALLOWED_OWNER", "openface"),
@@ -72,25 +52,25 @@ class Settings:
 
     def claude_environment(self) -> dict[str, str]:
         home = f"/home/{self.claude_user}"
-        base_url = self.openwebui_base_url.rstrip("/")
-        if not base_url.endswith("/api"):
-            base_url += "/api"
         return {
             "PATH": os.environ.get("PATH", ""),
             "HOME": home,
             "LANG": "C.UTF-8",
             "LC_ALL": "C.UTF-8",
-            "ANTHROPIC_BASE_URL": base_url,
-            "ANTHROPIC_API_KEY": self.openwebui_api_key,
+            "ANTHROPIC_BASE_URL": self.zai_base_url,
+            "ANTHROPIC_AUTH_TOKEN": self.zai_api_key,
             "ANTHROPIC_MODEL": self.model,
-            "ANTHROPIC_DEFAULT_HAIKU_MODEL": self.model,
+            "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-4.5-air",
             "ANTHROPIC_DEFAULT_SONNET_MODEL": self.model,
             "ANTHROPIC_DEFAULT_OPUS_MODEL": self.model,
+            "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "1000000",
+            "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+            "API_TIMEOUT_MS": "3000000",
         }
 
     def readiness(self) -> dict[str, bool]:
         return {
             "forgejo_token": self.forgejo_token_file.is_file() and self.forgejo_token_file.stat().st_size > 0,
             "webhook_secret": self.webhook_secret_file.is_file() and self.webhook_secret_file.stat().st_size > 0,
-            "openwebui_api_key": bool(self.openwebui_api_key),
+            "zai_api_key": bool(self.zai_api_key),
         }

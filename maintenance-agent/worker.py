@@ -235,7 +235,7 @@ Completion condition:
 ### Execution
 
 - Claude Code built-in `/goal` command
-- Model: `{self.settings.model}` through the local Open WebUI Anthropic-compatible endpoint
+- Model: `{self.settings.model}` through Z.AI's Anthropic-compatible endpoint
 - Publication: least-privilege `glm-maintainer` Forgejo account
 - Wrapper check: `git diff --check`
 
