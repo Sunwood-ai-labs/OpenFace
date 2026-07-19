@@ -667,6 +667,22 @@ ensure_pull_detail_fixture() {
   fi
 }
 
+# Keep a stable reaction row available for screenshot QA in clean Compose
+# environments. Issue #1 is reserved above, so this fixture does not depend on
+# interactive issues created later on a developer machine.
+ensure_community_reaction_fixture() {
+  local name="$1" issue_number="1" content code
+
+  for content in "+1" "eyes" "rocket"; do
+    code=$(api POST "/repos/${ORG_NAME}/${name}/issues/${issue_number}/reactions" "$(jq -n --arg content "$content" '{content:$content}')")
+    if [ "$code" = "201" ] || [ "$code" = "200" ] || [ "$code" = "409" ]; then
+      continue
+    fi
+    log "WARNING: reaction '${content}' on ${name}#${issue_number} returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+  done
+}
+
 # ------------------------------------------------------------------------
 # Helper: create a lightweight, idempotent tag for a prompt's imported
 # version. This makes the visible `version-v*` topic traceable through the
@@ -2063,6 +2079,7 @@ EOF
 put_file "pages-starter" "index.html" "${WORKDIR}/pages_starter_index.html" "Add OpenFace Pages starter site"
 ensure_pages_branch "pages-starter"
 ensure_pull_detail_fixture "pages-starter"
+ensure_community_reaction_fixture "pages-starter"
 
 # Linked asset example: gh-pages serves HTML, CSS, and browser JavaScript from
 # the same public repository path.
