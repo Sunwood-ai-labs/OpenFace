@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import os
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
+
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 class GoalWorkerTests(unittest.TestCase):
