@@ -97,8 +97,9 @@ class MaintenanceWorker:
                 shutil.rmtree(worktree, ignore_errors=True)
 
     def _git(self, client: ForgejoClient, cwd: Path | None, *args: str) -> str:
+        git_args = ["-c", f"safe.directory={cwd.resolve()}", *args] if cwd else list(args)
         process = subprocess.run(
-            ["git", *args],
+            ["git", *git_args],
             cwd=cwd,
             env=client.git_environment(),
             text=True,

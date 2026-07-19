@@ -4,6 +4,7 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import Mock, patch
 
 
 class GoalWorkerTests(unittest.TestCase):
@@ -61,6 +62,21 @@ class GoalWorkerTests(unittest.TestCase):
         self.assertIn("claude", command)
         self.assertIn("--dangerously-skip-permissions", command)
         self.assertNotIn("--json-schema", command)
+
+    def test_root_git_scopes_safe_directory_to_the_clone(self) -> None:
+        from config import Settings
+        from worker import MaintenanceWorker
+
+        root = Path(self.temp.name) / "repo"
+        root.mkdir()
+        client = Mock()
+        client.git_environment.return_value = os.environ.copy()
+        client.token = "secret"
+        completed = Mock(returncode=0, stdout="ok")
+        with patch("worker.subprocess.run", return_value=completed) as run:
+            MaintenanceWorker(Settings.load())._git(client, root, "status", "--short")
+        command = run.call_args.args[0]
+        self.assertEqual(command[:3], ["git", "-c", f"safe.directory={root.resolve()}"])
 
 
 if __name__ == "__main__":
