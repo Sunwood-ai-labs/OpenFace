@@ -34,7 +34,7 @@ OpenFace turns one Docker host into a self-contained AI collaboration platform. 
 - **Always-on CPU mode:** `IDLE_TIMEOUT_MINUTES=0` keeps CPU Spaces running; a least-recently-used cap prevents unbounded growth.
 - **OpenFace Pages:** serve `gh-pages` or default-branch `docs/`, with a seeded VitePress workflow on an isolated Forgejo Actions runner.
 - **Agent operations API:** browser views, likes, and agent actions use a persisted metrics service with hashed agent credentials.
-- **GLM maintenance agent:** a signed Issue webhook can ask the local `glm-4.7` model to plan, edit, review, validate, and open a human-reviewed Pull Request.
+- **Claude Code goal maintenance:** a signed Issue webhook runs Claude Code's built-in `/goal` command with local `glm-4.7`, then opens a human-reviewed Pull Request.
 - **Versioned Prompts:** stable repository slugs point to immutable Git tags that can be switched directly in the Prompt view.
 - **Three visual themes:** Standard, Solarpunk, and Cyberpunk persist across visits.
 - **Editable organizations:** Forgejo Owners can update organization metadata, avatars, membership, teams, and repositories from the real organization settings UI.
@@ -95,7 +95,7 @@ The seed job should finish successfully. Long-running services should be healthy
 | `seed` | Idempotent admin, token, organization, catalog, examples, and Prompt tags | one-shot |
 | `forgejo-actions-runner` | Pages workflow jobs | internal |
 | `forgejo-actions-dind` | Isolated Docker daemon for Actions | internal `2375` |
-| `maintenance-agent` | Signed Issue webhook, bounded GLM analysis, branch and PR creation | internal `8010` |
+| `maintenance-agent` | Signed Issue webhook, Claude Code `/goal`, branch and PR creation | internal `8010` |
 
 ```mermaid
 flowchart LR
@@ -339,11 +339,11 @@ The latest committed manual review is the [2026-07-19 exhaustive theme contrast 
 
 See the [visual QA guide](https://sunwood-ai-labs.github.io/OpenFace/guide/visual-qa) for the agent feedback workflow and focused-capture options.
 
-## Automated GLM maintenance
+## Automated Claude Code `/goal` maintenance
 
-Set `OPENWEBUI_AGENT_CONFIG` in the untracked `.env` file to the existing Open WebUI agent configuration, then start `maintenance-agent`. A newly opened Issue under the `openface` organization is processed by a three-stage `glm-4.7` flow—planner, coder, reviewer—and becomes an `agent/issue-N` Pull Request. Add the `agent:skip` label or `<!-- openface-maintenance:skip -->` to opt out.
+Set `OPENWEBUI_AGENT_CONFIG` in the untracked `.env` file to the existing Open WebUI agent configuration, then start `maintenance-agent`. A newly opened Issue under the `openface` organization is passed to Claude Code 2.1.205 as a real `/goal` completion condition. Claude Code uses local `glm-4.7`, freely inspects and edits the cloned repository, runs relevant repository verification, and publishes the result as an `agent/issue-N` Pull Request. Add the `agent:skip` label or `<!-- openface-maintenance:skip -->` to opt out.
 
-The service validates the Forgejo HMAC signature, deduplicates deliveries in SQLite, redacts likely secrets before inference, forbids sensitive paths and broad diffs, and runs static syntax checks without executing repository tests. It never merges its own PR. See [Automated GLM maintenance](https://sunwood-ai-labs.github.io/OpenFace/guide/automated-maintenance).
+The service validates the Forgejo HMAC signature and deduplicates deliveries in SQLite. Claude Code runs as an unprivileged user inside the maintenance container: it has no host Docker socket and cannot read the Forgejo bot token, while retaining normal repository-level tools and test execution. The root wrapper alone commits and pushes after `git diff --check`; it never merges its own PR. See [Automated Claude Code maintenance](https://sunwood-ai-labs.github.io/OpenFace/guide/automated-maintenance).
 
 ## 📖 Documentation
 
