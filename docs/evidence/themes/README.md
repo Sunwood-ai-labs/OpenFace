@@ -2,7 +2,7 @@
 
 実行環境: `https://localhost:8443/`（Docker Compose の gateway 経由）
 
-> 最新の網羅監査は [2026-07-19 全テーマ・全ページ コントラスト監査](../visual-qa/2026-07-19-theme-contrast-audit.md) を参照してください。3テーマ × OS light/dark × desktop/mobile × 31ルートの372枚すべてが合格し、19,654個の可視テキストを計算、48枚の contact sheet を目視確認しています。
+> 最新の網羅監査は [2026-07-19 全テーマ・全ページ コントラスト監査](../visual-qa/2026-07-19-theme-contrast-audit.md) を参照してください。3テーマ × OS light/dark × desktop/mobile × 32ルートの384枚すべてが合格し、20,196個の可視テキストを計算、48枚の contact sheet を目視確認しています。
 
 ## スクロール途中のCyberpunk回帰確認
 
