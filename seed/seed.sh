@@ -197,17 +197,26 @@ ensure_maintenance_webhook() {
     hook_id=$(jq -r --arg url "$MAINTENANCE_WEBHOOK_URL" \
       'map(select(.config.url == $url))[0].id // empty' /tmp/api_resp.json)
     if [ -n "$hook_id" ]; then
-      log "GLM maintenance webhook already exists (id ${hook_id})."
-      return 0
+      secret="$(cat "$MAINTENANCE_WEBHOOK_SECRET_FILE")"
+      payload=$(jq -n --arg url "$MAINTENANCE_WEBHOOK_URL" --arg secret "$secret" \
+        '{type:"forgejo",active:true,events:["issues","issue_comment"],config:{url:$url,content_type:"json",secret:$secret}}')
+      code=$(api PATCH "/orgs/${ORG_NAME}/hooks/${hook_id}" "$payload")
+      if [ "$code" = "200" ]; then
+        log "Updated GLM maintenance webhook (id ${hook_id}) for Issue and comment events."
+        return 0
+      fi
+      log "ERROR: updating GLM maintenance webhook returned HTTP ${code}:"
+      cat /tmp/api_resp.json
+      exit 1
     fi
   fi
 
   secret="$(cat "$MAINTENANCE_WEBHOOK_SECRET_FILE")"
   payload=$(jq -n --arg url "$MAINTENANCE_WEBHOOK_URL" --arg secret "$secret" \
-    '{type:"forgejo",active:true,events:["issues"],config:{url:$url,content_type:"json",secret:$secret}}')
+    '{type:"forgejo",active:true,events:["issues","issue_comment"],config:{url:$url,content_type:"json",secret:$secret}}')
   code=$(api POST "/orgs/${ORG_NAME}/hooks" "$payload")
   if [ "$code" = "201" ]; then
-    log "Created organization Issue webhook for the GLM maintenance agent."
+    log "Created organization Issue/comment webhook for the GLM maintenance agent."
   else
     log "ERROR: creating GLM maintenance webhook returned HTTP ${code}:"
     cat /tmp/api_resp.json

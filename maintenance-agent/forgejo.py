@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -67,6 +68,15 @@ class ForgejoClient:
             json={"body": body[:20_000]},
         )
 
+    def issue(self, owner: str, repo: str, issue_number: int) -> dict[str, Any]:
+        return self._request("GET", f"/repos/{owner}/{repo}/issues/{issue_number}")
+
+    def source_issue_number_for_pull(self, owner: str, repo: str, pull_number: int) -> int | None:
+        pull = self._request("GET", f"/repos/{owner}/{repo}/pulls/{pull_number}")
+        branch = str((pull.get("head") or {}).get("ref") or "")
+        match = re.fullmatch(r"agent/issue-(\d+)", branch)
+        return int(match.group(1)) if match else None
+
     def git_environment(self) -> dict[str, str]:
         env = {
             "PATH": os.environ.get("PATH", ""),
@@ -83,4 +93,3 @@ class ForgejoClient:
 
     def clone_url(self, owner: str, repo: str) -> str:
         return f"{self.settings.forgejo_git_base}/{owner}/{repo}.git"
-

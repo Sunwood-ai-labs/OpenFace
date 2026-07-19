@@ -72,7 +72,7 @@ def update_job(delivery_id: str, status: str, detail: str = "", pull_url: str = 
 
 
 def process_job(delivery_id: str, task: IssueTask) -> None:
-    update_job(delivery_id, "running", f"Running Claude Code /goal with {settings.model}")
+    update_job(delivery_id, "running", f"Claude Code /goal を {settings.model} で実行中")
     try:
         result = worker.run(task)
         update_job(delivery_id, "completed", result.summary, result.pull.url)
@@ -87,9 +87,9 @@ def process_job(delivery_id: str, task: IssueTask) -> None:
                 task.owner,
                 task.repo,
                 task.issue_number,
-                "🤖 Claude Code `/goal` stopped without pushing changes. "
-                "The goal failed or the resulting worktree did not pass publication checks. "
-                "A maintainer can inspect the service job log.",
+                "🤖 Claude Code `/goal` は変更をpushせずに停止しました。"
+                "Goalの実行に失敗したか、生成されたworktreeが公開前検証を通過しませんでした。"
+                "メンテナーはサービスのジョブログを確認できます。",
             )
             client.close()
         except Exception:
@@ -105,9 +105,12 @@ def signature_valid(raw_body: bytes, supplied: str | None) -> bool:
     return hmac.compare_digest(expected, candidate)
 
 
-def payload_to_task(payload: dict[str, Any]) -> IssueTask:
+def payload_to_task(
+    payload: dict[str, Any], *, issue_override: dict[str, Any] | None = None,
+    follow_up: bool = False, instruction: str = "",
+) -> IssueTask:
     repository = payload.get("repository") or {}
-    issue = payload.get("issue") or {}
+    issue = issue_override or payload.get("issue") or {}
     owner = (repository.get("owner") or {}).get("login") or ""
     repo = repository.get("name") or ""
     if owner != settings.allowed_owner:
@@ -122,7 +125,42 @@ def payload_to_task(payload: dict[str, Any]) -> IssueTask:
         body=str(issue.get("body") or "")[:20_000],
         default_branch=str(repository.get("default_branch") or "main"),
         issue_url=str(issue.get("html_url") or issue.get("url") or ""),
+        follow_up=follow_up,
+        instruction=instruction[:20_000],
     )
+
+
+def follow_up_instruction(body: str) -> str | None:
+    stripped = body.strip()
+    if not stripped.startswith("/goal"):
+        return None
+    instruction = stripped.removeprefix("/goal").strip()
+    return instruction or None
+
+
+def enqueue(task: IssueTask, delivery_id: str, *, allow_retry: bool) -> bool:
+    now = utc_now()
+    with database_lock, sqlite3.connect(database_path) as db:
+        row = db.execute(
+            "SELECT delivery_id, status FROM jobs WHERE owner=? AND repo=? AND issue_number=?",
+            (task.owner, task.repo, task.issue_number),
+        ).fetchone()
+        if row:
+            if not allow_retry or row[1] in {"queued", "running"}:
+                return False
+            db.execute(
+                "UPDATE jobs SET delivery_id=?, status='queued', detail='', pull_url='', created_at=?, updated_at=? "
+                "WHERE owner=? AND repo=? AND issue_number=?",
+                (delivery_id, now, now, task.owner, task.repo, task.issue_number),
+            )
+        else:
+            db.execute(
+                "INSERT INTO jobs(delivery_id, owner, repo, issue_number, status, created_at, updated_at) "
+                "VALUES(?, ?, ?, ?, 'queued', ?, ?)",
+                (delivery_id, task.owner, task.repo, task.issue_number, now, now),
+            )
+    executor.submit(process_job, delivery_id, task)
+    return True
 
 
 @app.get("/health")
@@ -161,31 +199,49 @@ async def forgejo_webhook(
     raw_body = await request.body()
     if not signature_valid(raw_body, x_forgejo_signature):
         raise HTTPException(status_code=401, detail="Invalid webhook signature")
-    if x_forgejo_event not in {"issues", "issue"}:
+    if x_forgejo_event not in {"issues", "issue", "issue_comment"}:
         return {"accepted": False, "reason": "event ignored"}
     try:
         payload = json.loads(raw_body)
     except json.JSONDecodeError as exc:
         raise HTTPException(status_code=400, detail="Invalid JSON") from exc
-    if payload.get("action") != "opened":
-        return {"accepted": False, "reason": "action ignored"}
     issue = payload.get("issue") or {}
     body = str(issue.get("body") or "")
     labels = {str(label.get("name", "")).lower() for label in issue.get("labels", []) if isinstance(label, dict)}
     sender = (payload.get("sender") or {}).get("login", "")
     if sender == "glm-maintainer" or "agent:skip" in labels or "<!-- openface-maintenance:skip -->" in body:
         return {"accepted": False, "reason": "issue opted out"}
-    task = payload_to_task(payload)
     delivery_id = x_forgejo_delivery or hashlib.sha256(raw_body).hexdigest()
-    now = utc_now()
-    try:
-        with database_lock, sqlite3.connect(database_path) as db:
-            db.execute(
-                "INSERT INTO jobs(delivery_id, owner, repo, issue_number, status, created_at, updated_at) "
-                "VALUES(?, ?, ?, ?, 'queued', ?, ?)",
-                (delivery_id, task.owner, task.repo, task.issue_number, now, now),
-            )
-    except sqlite3.IntegrityError:
-        return {"accepted": True, "duplicate": True, "issue": task.issue_number}
-    executor.submit(process_job, delivery_id, task)
-    return {"accepted": True, "duplicate": False, "issue": task.issue_number, "model": settings.model}
+    if x_forgejo_event in {"issues", "issue"}:
+        if payload.get("action") != "opened":
+            return {"accepted": False, "reason": "action ignored"}
+        task = payload_to_task(payload)
+        queued = enqueue(task, delivery_id, allow_retry=False)
+    else:
+        if payload.get("action") not in {"created", "edited"}:
+            return {"accepted": False, "reason": "comment action ignored"}
+        instruction = follow_up_instruction(str((payload.get("comment") or {}).get("body") or ""))
+        if not instruction:
+            return {"accepted": False, "reason": "comment has no /goal instruction"}
+        repository = payload.get("repository") or {}
+        owner = str((repository.get("owner") or {}).get("login") or "")
+        repo = str(repository.get("name") or "")
+        issue_number = int(issue.get("number") or 0)
+        if issue.get("pull_request"):
+            client = ForgejoClient(settings)
+            try:
+                source_number = client.source_issue_number_for_pull(owner, repo, issue_number)
+                if not source_number:
+                    return {"accepted": False, "reason": "pull request is not managed by the agent"}
+                issue = client.issue(owner, repo, source_number)
+            finally:
+                client.close()
+        task = payload_to_task(payload, issue_override=issue, follow_up=True, instruction=instruction)
+        queued = enqueue(task, delivery_id, allow_retry=True)
+    return {
+        "accepted": True,
+        "duplicate": not queued,
+        "issue": task.issue_number,
+        "model": settings.model,
+        "follow_up": task.follow_up,
+    }

@@ -62,8 +62,21 @@ class GoalWorkerTests(unittest.TestCase):
         )
         self.assertTrue(prompt.startswith("/goal "))
         self.assertIn("Issue #7", prompt)
-        self.assertIn("Run the relevant tests", prompt)
-        self.assertIn("Finish only", prompt)
+        self.assertIn("関連するテスト", prompt)
+        self.assertIn("実行結果サマリーは日本語", prompt)
+
+    def test_follow_up_prompt_includes_comment_instruction(self) -> None:
+        from config import Settings
+        from worker import IssueTask, MaintenanceWorker
+
+        task = IssueTask(
+            "openface", "demo", 7, "ページ修正", "最初の要件", "main", "https://example/7",
+            follow_up=True, instruction="見出しも日本語にしてください",
+        )
+        prompt = MaintenanceWorker(Settings.load())._goal_prompt(task)
+        self.assertIn("今回の追加指示", prompt)
+        self.assertIn("見出しも日本語にしてください", prompt)
+        self.assertIn("既存PRのブランチ上", prompt)
 
     def test_command_uses_claude_code_and_not_bounded_json_planner(self) -> None:
         from config import Settings

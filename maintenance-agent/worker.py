@@ -20,6 +20,8 @@ class IssueTask:
     body: str
     default_branch: str
     issue_url: str
+    follow_up: bool = False
+    instruction: str = ""
 
     @property
     def branch(self) -> str:
@@ -42,8 +44,8 @@ class MaintenanceWorker:
         worktree = self.settings.workspace_dir / f"{task.owner}-{task.repo}-{task.issue_number}"
         try:
             existing = forgejo.existing_pull(task.owner, task.repo, task.branch)
-            if existing:
-                return AgentResult(existing, "An existing maintenance PR was reused.", [])
+            if existing and not task.follow_up:
+                return AgentResult(existing, "既存のメンテナンスPRを再利用しました。", [])
             if worktree.exists():
                 shutil.rmtree(worktree)
             self.settings.workspace_dir.mkdir(parents=True, exist_ok=True)
@@ -52,11 +54,12 @@ class MaintenanceWorker:
                 None,
                 "clone",
                 "--branch",
-                task.default_branch,
+                task.branch if existing else task.default_branch,
                 forgejo.clone_url(task.owner, task.repo),
                 str(worktree),
             )
-            self._git(forgejo, worktree, "checkout", "-b", task.branch)
+            if not existing:
+                self._git(forgejo, worktree, "checkout", "-b", task.branch)
             base_revision = self._git(forgejo, worktree, "rev-parse", "HEAD").strip()
             self._prepare_goal_workspace(worktree)
 
@@ -72,9 +75,14 @@ class MaintenanceWorker:
             self._git(forgejo, worktree, "config", "user.name", "Claude Goal Maintainer")
             self._git(forgejo, worktree, "config", "user.email", "glm-maintainer@agents.openface.local")
             self._git(forgejo, worktree, "add", "--all")
-            self._git(forgejo, worktree, "commit", "-m", f"fix: resolve issue #{task.issue_number}")
+            commit_message = (
+                f"fix: apply follow-up for issue #{task.issue_number}"
+                if task.follow_up
+                else f"fix: resolve issue #{task.issue_number}"
+            )
+            self._git(forgejo, worktree, "commit", "-m", commit_message)
             self._git(forgejo, worktree, "push", "origin", f"HEAD:refs/heads/{task.branch}")
-            pull = forgejo.create_pull(
+            pull = existing or forgejo.create_pull(
                 task.owner,
                 task.repo,
                 task.default_branch,
@@ -82,13 +90,14 @@ class MaintenanceWorker:
                 f"[Claude Goal + GLM] {task.title}",
                 self._pull_body(task, summary, changed),
             )
+            action = "既存PRを更新しました" if existing else "PRを作成しました"
             forgejo.comment_issue(
                 task.owner,
                 task.repo,
                 task.issue_number,
-                f"🤖 Claude Code `/goal` completed with `{self.settings.model}` and created "
-                f"PR #{pull.number}: {pull.url}\n\n"
-                f"Changed: {', '.join(f'`{path}`' for path in changed)}",
+                f"🤖 Claude Code `/goal` を `{self.settings.model}` で実行し、{action}。\n\n"
+                f"- PR: #{pull.number} {pull.url}\n"
+                f"- 変更ファイル: {', '.join(f'`{path}`' for path in changed)}",
             )
             return AgentResult(pull, summary, changed)
         finally:
@@ -121,23 +130,34 @@ class MaintenanceWorker:
             )
 
     def _goal_prompt(self, task: IssueTask) -> str:
-        return f"""/goal Resolve Forgejo Issue #{task.issue_number} in this repository completely.
+        follow_up = ""
+        if task.follow_up:
+            follow_up = f"""
+今回の追加指示:
+<follow-up>
+{task.instruction}
+</follow-up>
+既存PRのブランチ上で、上記の追加指示に必要な変更を加えてください。
+"""
+        return f"""/goal Forgejo Issue #{task.issue_number} をこのリポジトリで完全に解決してください。
 
-Issue title: {task.title}
+Issueタイトル: {task.title}
 Issue URL: {task.issue_url}
-Issue body:
+Issue本文:
 <issue>
 {task.body}
 </issue>
+{follow_up}
 
-Completion condition:
-- Inspect the repository and its local instructions before deciding the implementation.
-- Implement every relevant requirement in the Issue with production-quality changes.
-- Preserve unrelated behavior and use the repository's existing conventions.
-- Run the relevant tests, linters, builds, or focused verification available in the repository.
-- Re-read the resulting diff and fix problems you find.
-- Do not push, open a Pull Request, or access Forgejo credentials; the wrapper handles publication.
-- Finish only when the implementation and verification are complete, or clearly report a genuine blocker.
+完了条件:
+- 実装を決める前に、リポジトリとローカル指示を確認する。
+- Issueと追加指示の関連要件を、プロダクション品質で実装する。
+- 無関係な挙動を維持し、既存の規約に従う。
+- 関連するテスト、lint、ビルド、または絞り込んだ検証を実行する。
+- 最終diffを読み直し、見つけた問題を修正する。
+- push、PR作成、Forgejo認証情報へのアクセスは行わない。公開はラッパーが担当する。
+- 実装と検証が完了した場合のみ終了し、本当にブロックされた場合は理由を明示する。
+- 最後の実行結果サマリーは日本語で記述する。
 """
 
     def _claude_command(self) -> list[str]:
@@ -224,22 +244,22 @@ Completion condition:
 
     def _pull_body(self, task: IssueTask, summary: str, changed: list[str]) -> str:
         files = "\n".join(f"- `{path}`" for path in changed)
-        return f"""## Claude Code `/goal` result
+        return f"""## Claude Code `/goal` 実行結果
 
 {summary}
 
-### Changed files
+### 変更ファイル
 
 {files}
 
-### Execution
+### 実行環境
 
-- Claude Code built-in `/goal` command
-- Model: `{self.settings.model}` through Z.AI's Anthropic-compatible endpoint
-- Publication: least-privilege `glm-maintainer` Forgejo account
-- Wrapper check: `git diff --check`
+- Claude Code組み込みの `/goal` コマンド
+- モデル: Z.AIのAnthropic互換エンドポイント経由の `{self.settings.model}`
+- 公開: 最小権限のForgejoアカウント `glm-maintainer`
+- ラッパー検証: `git diff --check`
 
-Closes #{task.issue_number}
+Issue #{task.issue_number} を解決します。
 
-> The goal agent can inspect, edit, and test the cloned repository freely. Human review is required before merge.
+> Goalエージェントはクローンしたリポジトリを調査・編集・テストできます。マージ前に人によるレビューが必要です。
 """
