@@ -13,6 +13,8 @@ volumes:
     name: openface_agent-metrics-data
   forgejo-runner-data:
     name: openface_forgejo-runner-data
+  maintenance-agent-data:
+    name: openface_maintenance-agent-data
 
 services:
   gateway:
@@ -126,6 +128,7 @@ services:
       FORGEJO_API: http://forgejo:3000/api/v1
       FORGEJO_TOKEN_FILE: /shared/token
       FORGEJO_CONTAINER_NAME: openface-forgejo
+      MAINTENANCE_WEBHOOK_URL: http://maintenance-agent:8010/webhooks/forgejo
     volumes:
       - shared-token:/shared
       - /var/run/docker.sock:/var/run/docker.sock
@@ -134,6 +137,44 @@ services:
     depends_on:
       forgejo:
         condition: service_healthy
+
+  maintenance-agent:
+    build:
+      context: ./maintenance-agent
+    container_name: openface-maintenance-agent
+    restart: unless-stopped
+    expose:
+      - "8010"
+    environment:
+      FORGEJO_API: http://forgejo:3000/api/v1
+      FORGEJO_GIT_BASE: http://forgejo:3000
+      FORGEJO_TOKEN_FILE: /shared/maintenance-token
+      WEBHOOK_SECRET_FILE: /shared/maintenance-webhook-secret
+      OPEN_WEBUI_CONFIG_FILE: /run/secrets/openwebui.env
+      OPEN_WEBUI_BASE_URL: ${OPEN_WEBUI_BASE_URL:-http://host.docker.internal:3000}
+      OPEN_WEBUI_MODEL: ${OPEN_WEBUI_MODEL:-glm-4.7}
+      MAINTENANCE_ALLOWED_OWNER: ${MAINTENANCE_ALLOWED_OWNER:-openface}
+      MAINTENANCE_MAX_FILES: ${MAINTENANCE_MAX_FILES:-6}
+      MAINTENANCE_MAX_CHANGED_LINES: ${MAINTENANCE_MAX_CHANGED_LINES:-800}
+      MAINTENANCE_DATA_DIR: /data
+      MAINTENANCE_WORKSPACE_DIR: /work
+    volumes:
+      - shared-token:/shared:ro
+      - maintenance-agent-data:/data
+      - ${OPENWEBUI_AGENT_CONFIG:-./maintenance-agent/openwebui.example.env}:/run/secrets/openwebui.env:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - openface
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8010/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   # Isolated Docker daemon for Forgejo Actions. Workflows can build static
   # sites but cannot inspect or control OpenFace's host Docker containers.

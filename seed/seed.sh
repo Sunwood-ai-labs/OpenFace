@@ -23,6 +23,9 @@ FORGEJO_CONTAINER_NAME="${FORGEJO_CONTAINER_NAME:-openface-forgejo}"
 OPENFACE_ADMIN_USER="${OPENFACE_ADMIN_USER:-openface-admin}"
 OPENFACE_ADMIN_PASSWORD="${OPENFACE_ADMIN_PASSWORD:-openface1234}"
 OPENFACE_ADMIN_EMAIL="${OPENFACE_ADMIN_EMAIL:-admin@example.com}"
+MAINTENANCE_TOKEN_FILE="${MAINTENANCE_TOKEN_FILE:-/shared/maintenance-token}"
+MAINTENANCE_WEBHOOK_SECRET_FILE="${MAINTENANCE_WEBHOOK_SECRET_FILE:-/shared/maintenance-webhook-secret}"
+MAINTENANCE_WEBHOOK_URL="${MAINTENANCE_WEBHOOK_URL:-http://maintenance-agent:8010/webhooks/forgejo}"
 
 ORG_NAME="openface"
 SUNWOOD_CATALOG="${SUNWOOD_CATALOG:-/catalog/sunwood-ai-labs.json}"
@@ -147,6 +150,71 @@ ensure_actions_runner_token() {
 }
 
 # ------------------------------------------------------------------------
+# Dedicated credentials for the GLM maintenance bot. The bot is an
+# organization member rather than an administrator, and its token is kept in
+# the shared secret volume instead of Compose environment or repository files.
+# ------------------------------------------------------------------------
+ensure_maintenance_token() {
+  if [ -s "$MAINTENANCE_TOKEN_FILE" ]; then
+    local existing
+    existing="$(cat "$MAINTENANCE_TOKEN_FILE" 2>/dev/null || true)"
+    local code
+    code=$(curl -s -o /dev/null -w '%{http_code}' \
+      -H "Authorization: token ${existing}" "${FORGEJO_API}/user")
+    if [ "$code" = "200" ]; then
+      log "GLM maintenance token already exists; reusing it."
+      return 0
+    fi
+  fi
+
+  local raw
+  raw="$(docker exec -u git "${FORGEJO_CONTAINER_NAME}" \
+    forgejo admin user generate-access-token \
+      --username "glm-maintainer" \
+      --token-name "openface-glm-maintainer-$(date +%s)" \
+      --scopes all \
+      --raw 2>/tmp/maintenance_token.log | tail -n1 | tr -d '[:space:]')"
+  if [ -z "$raw" ]; then
+    log "ERROR: failed to generate GLM maintenance token."
+    cat /tmp/maintenance_token.log
+    exit 1
+  fi
+  echo -n "$raw" > "$MAINTENANCE_TOKEN_FILE"
+  chmod 644 "$MAINTENANCE_TOKEN_FILE"
+  log "GLM maintenance token written to ${MAINTENANCE_TOKEN_FILE}."
+}
+
+ensure_maintenance_webhook() {
+  if [ ! -s "$MAINTENANCE_WEBHOOK_SECRET_FILE" ]; then
+    dd if=/dev/urandom bs=32 count=1 2>/dev/null | base64 | tr -d '\r\n' > "$MAINTENANCE_WEBHOOK_SECRET_FILE"
+    chmod 644 "$MAINTENANCE_WEBHOOK_SECRET_FILE"
+  fi
+
+  local code hook_id secret payload
+  code=$(api GET "/orgs/${ORG_NAME}/hooks")
+  if [ "$code" = "200" ]; then
+    hook_id=$(jq -r --arg url "$MAINTENANCE_WEBHOOK_URL" \
+      'map(select(.config.url == $url))[0].id // empty' /tmp/api_resp.json)
+    if [ -n "$hook_id" ]; then
+      log "GLM maintenance webhook already exists (id ${hook_id})."
+      return 0
+    fi
+  fi
+
+  secret="$(cat "$MAINTENANCE_WEBHOOK_SECRET_FILE")"
+  payload=$(jq -n --arg url "$MAINTENANCE_WEBHOOK_URL" --arg secret "$secret" \
+    '{type:"forgejo",active:true,events:["issues"],config:{url:$url,content_type:"json",secret:$secret}}')
+  code=$(api POST "/orgs/${ORG_NAME}/hooks" "$payload")
+  if [ "$code" = "201" ]; then
+    log "Created organization Issue webhook for the GLM maintenance agent."
+  else
+    log "ERROR: creating GLM maintenance webhook returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+    exit 1
+  fi
+}
+
+# ------------------------------------------------------------------------
 # API helper: perform a request, treat 409/422 "already exists" as success.
 # ------------------------------------------------------------------------
 api() {
@@ -253,6 +321,44 @@ ensure_org_member_private() {
   fi
 }
 
+ensure_maintenance_org_access() {
+  local org_name="$1" username="$2" code team_id owners_id payload
+  code=$(api GET "/orgs/${org_name}/teams")
+  if [ "$code" != "200" ]; then
+    log "ERROR: listing teams for '${org_name}' returned HTTP ${code}."
+    exit 1
+  fi
+  team_id=$(jq -r 'map(select(.name == "glm-maintainers"))[0].id // empty' /tmp/api_resp.json)
+  owners_id=$(jq -r 'map(select(.name == "Owners"))[0].id // empty' /tmp/api_resp.json)
+  if [ -z "$team_id" ]; then
+    payload=$(jq -n '{name:"glm-maintainers",description:"Automated Issue analysis and Pull Request proposals",permission:"write",includes_all_repositories:true,units:["repo.code","repo.issues","repo.pulls"]}')
+    code=$(api POST "/orgs/${org_name}/teams" "$payload")
+    if [ "$code" != "201" ]; then
+      log "ERROR: creating GLM Maintainers team returned HTTP ${code}:"
+      cat /tmp/api_resp.json
+      exit 1
+    fi
+    team_id=$(jq -r '.id' /tmp/api_resp.json)
+    log "Created least-privilege glm-maintainers team."
+  fi
+  code=$(api PUT "/teams/${team_id}/members/${username}")
+  if [ "$code" != "204" ] && [ "$code" != "201" ]; then
+    log "ERROR: adding '${username}' to glm-maintainers returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+    exit 1
+  fi
+  if [ -n "$owners_id" ] && [ "$owners_id" != "$team_id" ]; then
+    code=$(api DELETE "/teams/${owners_id}/members/${username}")
+    if [ "$code" != "204" ] && [ "$code" != "404" ]; then
+      log "ERROR: removing '${username}' from Owners returned HTTP ${code}:"
+      cat /tmp/api_resp.json
+      exit 1
+    fi
+  fi
+  ensure_org_member_private "$org_name" "$username"
+  log "Granted '${username}' repository write access without organization owner rights."
+}
+
 ensure_org_not_member() {
   local org_name="$1" username="$2" code team_id
   code=$(api GET "/orgs/${org_name}/teams")
@@ -338,6 +444,7 @@ ensure_agent_user "aurelia-vale" "Aurelia Vale" "aurelia-vale@seraphim.openface.
 ensure_agent_user "cassian-reed" "Cassian Reed" "cassian-reed@seraphim.openface.local"
 ensure_agent_user "ilyana-noor" "Ilyana Noor" "ilyana-noor@seraphim.openface.local"
 ensure_agent_user "lucien-sol" "Lucien Sol" "lucien-sol@seraphim.openface.local"
+ensure_agent_user "glm-maintainer" "GLM Maintainer" "glm-maintainer@agents.openface.local"
 ensure_agent_avatar "luna-scout" "/assets/agent-avatars/luna-scout.png"
 ensure_agent_avatar "patch-orbit" "/assets/agent-avatars/patch-orbit.png"
 ensure_agent_avatar "mikan-reviewer" "/assets/agent-avatars/mikan-reviewer.png"
@@ -351,6 +458,7 @@ ensure_agent_avatar "lucien-sol" "/assets/agent-avatars/lucien-sol.png"
 ensure_org_member "openface" "aiko-mesh"
 ensure_org_member "openface" "ren-vector"
 ensure_org_member "openface" "mira-signal"
+ensure_maintenance_org_access "openface" "glm-maintainer"
 ensure_org_member "seraphim-labs" "openface-admin"
 ensure_org_member_private "seraphim-labs" "openface-admin"
 ensure_org_not_member "seraphim-labs" "aiko-mesh"
@@ -362,6 +470,8 @@ ensure_org_member "seraphim-labs" "ilyana-noor"
 ensure_org_member "seraphim-labs" "lucien-sol"
 
 ensure_actions_runner_token
+ensure_maintenance_token
+ensure_maintenance_webhook
 
 # ------------------------------------------------------------------------
 # Helper: create a repo under the org (idempotent), auto_init true.
