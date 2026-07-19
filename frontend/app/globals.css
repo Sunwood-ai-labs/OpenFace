@@ -458,6 +458,126 @@ html[data-openface-theme="cyberpunk"] .openface-theme-selector:hover {
   }
 }
 
+/* Final contrast layer: keep these rules last so component-level color
+   utilities cannot undo the selected palette. Standard intentionally stores
+   no data attribute, hence the paired :not() selector. */
+html:not([data-openface-theme]) .text-zinc-300,
+html:not([data-openface-theme]) .text-zinc-400,
+html:not([data-openface-theme]) .text-zinc-500,
+html[data-openface-theme="standard"] .text-zinc-300,
+html[data-openface-theme="standard"] .text-zinc-400,
+html[data-openface-theme="standard"] .text-zinc-500 {
+  color: #52525b !important;
+}
+
+html[data-openface-theme="solarpunk"] [class*="dark:bg-zinc-800"],
+html[data-openface-theme="solarpunk"] [class*="dark:bg-zinc-700"] {
+  background-color: #e5eedf !important;
+  color: #315b43 !important;
+}
+
+html[data-openface-theme="cyberpunk"] [class*="dark:bg-zinc-800"],
+html[data-openface-theme="cyberpunk"] [class*="dark:bg-zinc-700"] {
+  background-color: #11162b !important;
+  color: #9ff4ff !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-openface-theme]) body,
+  html[data-openface-theme="standard"] body {
+    color: #e4e4e7;
+    background-color: #09090b;
+  }
+
+  html:not([data-openface-theme]) header,
+  html:not([data-openface-theme]) .bg-white,
+  html:not([data-openface-theme]) article,
+  html:not([data-openface-theme]) .divide-y,
+  html:not([data-openface-theme]) .openface-repo-header,
+  html:not([data-openface-theme]) .openface-space-runner,
+  html:not([data-openface-theme]) .openface-space-runner-toolbar,
+  html[data-openface-theme="standard"] header,
+  html[data-openface-theme="standard"] .bg-white,
+  html[data-openface-theme="standard"] article,
+  html[data-openface-theme="standard"] .divide-y,
+  html[data-openface-theme="standard"] .openface-repo-header,
+  html[data-openface-theme="standard"] .openface-space-runner,
+  html[data-openface-theme="standard"] .openface-space-runner-toolbar {
+    background-color: #18181b !important;
+  }
+
+  html:not([data-openface-theme]) .bg-zinc-50,
+  html:not([data-openface-theme]) .bg-zinc-100,
+  html[data-openface-theme="standard"] .bg-zinc-50,
+  html[data-openface-theme="standard"] .bg-zinc-100 {
+    background-color: #27272a !important;
+  }
+
+  html:not([data-openface-theme]) .text-zinc-950,
+  html:not([data-openface-theme]) .text-zinc-900,
+  html:not([data-openface-theme]) .text-zinc-800,
+  html:not([data-openface-theme]) .text-zinc-700,
+  html[data-openface-theme="standard"] .text-zinc-950,
+  html[data-openface-theme="standard"] .text-zinc-900,
+  html[data-openface-theme="standard"] .text-zinc-800,
+  html[data-openface-theme="standard"] .text-zinc-700 {
+    color: #fafafa !important;
+  }
+
+  html:not([data-openface-theme]) .text-zinc-600,
+  html:not([data-openface-theme]) .text-zinc-500,
+  html:not([data-openface-theme]) .text-zinc-400,
+  html:not([data-openface-theme]) .text-zinc-300,
+  html[data-openface-theme="standard"] .text-zinc-600,
+  html[data-openface-theme="standard"] .text-zinc-500,
+  html[data-openface-theme="standard"] .text-zinc-400,
+  html[data-openface-theme="standard"] .text-zinc-300 {
+    color: #b4b4bd !important;
+  }
+
+  html:not([data-openface-theme]) .ring-inset,
+  html[data-openface-theme="standard"] .ring-inset {
+    background-color: #27272a !important;
+    color: #d4d4d8 !important;
+  }
+
+  html:not([data-openface-theme]) .bg-rose-50,
+  html[data-openface-theme="standard"] .bg-rose-50 {
+    background-color: #3f1d2b !important;
+  }
+
+  html:not([data-openface-theme]) [class*="text-violet-"],
+  html:not([data-openface-theme]) [class*="text-indigo-"],
+  html[data-openface-theme="standard"] [class*="text-violet-"],
+  html[data-openface-theme="standard"] [class*="text-indigo-"] {
+    color: #c4b5fd !important;
+  }
+
+  html:not([data-openface-theme]) [class*="text-cyan-"],
+  html:not([data-openface-theme]) [class*="text-blue-"],
+  html[data-openface-theme="standard"] [class*="text-cyan-"],
+  html[data-openface-theme="standard"] [class*="text-blue-"] {
+    color: #67e8f9 !important;
+  }
+
+  html:not([data-openface-theme]) [class*="text-orange-"],
+  html:not([data-openface-theme]) [class*="text-amber-"],
+  html[data-openface-theme="standard"] [class*="text-orange-"],
+  html[data-openface-theme="standard"] [class*="text-amber-"] {
+    color: #fcd34d !important;
+  }
+
+  html:not([data-openface-theme]) [class*="text-rose-"],
+  html[data-openface-theme="standard"] [class*="text-rose-"] {
+    color: #fda4af !important;
+  }
+
+  html:not([data-openface-theme]) [class*="text-emerald-"],
+  html[data-openface-theme="standard"] [class*="text-emerald-"] {
+    color: #6ee7b7 !important;
+  }
+}
+
 .prose-openface blockquote {
   border-left: 4px solid #ffd21e;
   padding-left: 1em;
@@ -807,6 +927,74 @@ html[data-openface-theme="cyberpunk"] .skill-relationship-metadata {
 html[data-openface-theme="cyberpunk"] .skill-relationship-badge {
   color: #eadfff !important;
   background: #37205f !important;
+}
+
+/* WCAG AA guardrails. Theme selection is independent from the operating
+   system preference, so utility colors must remain legible in every pairing. */
+html[data-openface-theme="standard"] .text-zinc-300,
+html[data-openface-theme="standard"] .text-zinc-400 {
+  color: #52525b !important;
+}
+
+html[data-openface-theme="solarpunk"] .text-zinc-300,
+html[data-openface-theme="solarpunk"] [class~="dark:text-zinc-300"] {
+  color: #52715d !important;
+}
+
+html[data-openface-theme="cyberpunk"] .text-violet-700,
+html[data-openface-theme="cyberpunk"] .text-violet-800,
+html[data-openface-theme="cyberpunk"] .text-orange-800 {
+  color: #73edff !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-openface-theme="standard"] body {
+    color: #e4e4e7;
+    background-color: #09090b;
+  }
+
+  html[data-openface-theme="standard"] header,
+  html[data-openface-theme="standard"] .bg-white,
+  html[data-openface-theme="standard"] article,
+  html[data-openface-theme="standard"] .divide-y,
+  html[data-openface-theme="standard"] .openface-repo-header,
+  html[data-openface-theme="standard"] .openface-space-runner,
+  html[data-openface-theme="standard"] .openface-space-runner-toolbar {
+    background-color: #18181b !important;
+  }
+
+  html[data-openface-theme="standard"] .bg-zinc-50,
+  html[data-openface-theme="standard"] .bg-zinc-100 {
+    background-color: #27272a !important;
+  }
+
+  html[data-openface-theme="standard"] .text-zinc-950,
+  html[data-openface-theme="standard"] .text-zinc-900,
+  html[data-openface-theme="standard"] .text-zinc-800,
+  html[data-openface-theme="standard"] .text-zinc-700 {
+    color: #fafafa !important;
+  }
+
+  html[data-openface-theme="standard"] .text-zinc-600,
+  html[data-openface-theme="standard"] .text-zinc-500,
+  html[data-openface-theme="standard"] .text-zinc-400,
+  html[data-openface-theme="standard"] .text-zinc-300 {
+    color: #b4b4bd !important;
+  }
+
+  html[data-openface-theme="standard"] .border-zinc-100,
+  html[data-openface-theme="standard"] .border-zinc-200,
+  html[data-openface-theme="standard"] .border-zinc-300 {
+    border-color: #52525b !important;
+  }
+
+  html[data-openface-theme="standard"] input:not([type="checkbox"]):not([type="radio"]),
+  html[data-openface-theme="standard"] textarea,
+  html[data-openface-theme="standard"] select {
+    border-color: #52525b !important;
+    background-color: #18181b !important;
+    color: #fafafa !important;
+  }
 }
 
 body:has(.openface-space-app-page) {
