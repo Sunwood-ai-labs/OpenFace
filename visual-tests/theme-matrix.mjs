@@ -67,11 +67,20 @@ const inspectPage = () => {
       current = current.parentElement;
     }
     let result = { r: 255, g: 255, b: 255, a: 1 };
+    let hasImage = false;
     for (const ancestor of ancestors) {
-      const color = parseColor(getComputedStyle(ancestor).backgroundColor);
-      if (color && color.a > 0) result = composite(color, result);
+      const ancestorStyle = getComputedStyle(ancestor);
+      const color = parseColor(ancestorStyle.backgroundColor);
+      const ancestorHasImage = ancestorStyle.backgroundImage !== 'none';
+      if (color && color.a >= 0.99) {
+        result = color;
+        hasImage = ancestorHasImage;
+      } else {
+        if (ancestorHasImage) hasImage = true;
+        if (color && color.a > 0) result = composite(color, result);
+      }
     }
-    return result;
+    return { color: result, hasImage };
   };
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
     acceptNode: (node) => node.textContent?.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT,
@@ -84,6 +93,7 @@ const inspectPage = () => {
   const candidates = Array.from(candidateSet);
   const contrastRisks = [];
   const auditedContrasts = [];
+  let imageBackedTextCount = 0;
   for (const element of candidates) {
     const rect = element.getBoundingClientRect();
     const style = getComputedStyle(element);
@@ -92,8 +102,13 @@ const inspectPage = () => {
     if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) < 0.5) continue;
     if (element.matches(':disabled, [aria-disabled="true"]')) continue;
     const foreground = parseColor(style.color);
-    const background = effectiveBackground(element);
-    if (!foreground || !background) continue;
+    const backgroundResult = effectiveBackground(element);
+    if (!foreground || !backgroundResult.color) continue;
+    if (backgroundResult.hasImage) {
+      imageBackedTextCount += 1;
+      continue;
+    }
+    const background = backgroundResult.color;
     const effectiveForeground = composite(foreground, background);
     const ratio = contrast(effectiveForeground, background);
     const fontSize = Number.parseFloat(style.fontSize) || 16;
@@ -132,6 +147,7 @@ const inspectPage = () => {
     horizontalOverflow: Math.max(0, scrollWidth - viewportWidth),
     contrastRiskCount: contrastRisks.length,
     auditedTextCount: auditedContrasts.length,
+    imageBackedTextCount,
     minimumContrast: auditedContrasts.length
       ? Number(Math.min(...auditedContrasts.map(({ ratio }) => ratio)).toFixed(2))
       : null,
@@ -235,6 +251,7 @@ const captureRoute = async ({ context, route, theme, colorScheme, viewport }) =>
     contrastRisks: [],
     contrastRiskCount: 0,
     auditedTextCount: 0,
+    imageBackedTextCount: 0,
     minimumContrast: null,
     minimumContrastMargin: null,
     lowestContrast: null,
@@ -346,6 +363,7 @@ const manifest = {
     failed: results.filter(({ passed }) => !passed).length,
     screenshots: results.length,
     auditedTextNodes: results.reduce((sum, result) => sum + result.auditedTextCount, 0),
+    imageBackedTextNodes: results.reduce((sum, result) => sum + result.imageBackedTextCount, 0),
     minimumContrastMargin: Math.min(...results.map(({ minimumContrastMargin }) => minimumContrastMargin ?? Infinity)),
   },
   results,
@@ -357,7 +375,7 @@ const markdown = [
   '',
   `Result: **${manifest.summary.passed}/${manifest.summary.total} passed**  `,
   `Coverage: **${selectedThemes.length} themes × ${selectedColorSchemes.length} OS color schemes × ${selectedViewports.length} viewports × ${selectedRoutes.length} routes = ${results.length} screenshots**`,
-  `Audited text nodes: **${manifest.summary.auditedTextNodes}** · Minimum WCAG margin: **${manifest.summary.minimumContrastMargin}× required ratio**`,
+  `Audited text nodes: **${manifest.summary.auditedTextNodes}** · Image-backed text reviewed visually: **${manifest.summary.imageBackedTextNodes}** · Minimum WCAG margin: **${manifest.summary.minimumContrastMargin}× required ratio**`,
   '',
   '| Result | Theme | OS scheme | Viewport | Route | Overflow | Contrast risks | Screenshot |',
   '|---|---|---|---|---|---:|---:|---|',
