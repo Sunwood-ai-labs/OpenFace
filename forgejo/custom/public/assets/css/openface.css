@@ -19136,3 +19136,30 @@ html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"
   background: transparent !important;
   box-shadow: none !important;
 }
+
+/* pr-detail-rails4: retain a continuous edge and breathing room without
+   bringing back the stack of individually rounded event cards. */
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .page-content.repository.view.issue .ui.timeline .timeline-item.event,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .page-content.repository.view.issue .ui.timeline .timeline-item.commits-list {
+  box-sizing: border-box !important;
+  border: 0 !important;
+  border-right: 1px solid rgba(56, 232, 255, 0.2) !important;
+  border-bottom: 1px solid rgba(56, 232, 255, 0.16) !important;
+  border-left: 1px solid rgba(56, 232, 255, 0.2) !important;
+  border-radius: 0 !important;
+  padding-right: 14px !important;
+  padding-left: 14px !important;
+  background: #0d1327 !important;
+  box-shadow: none !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .page-content.repository.view.issue .ui.timeline .timeline-item.event .detail.flex-text-block,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .page-content.repository.view.issue .ui.timeline .timeline-item.commits-list .singular-commit {
+  min-width: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
