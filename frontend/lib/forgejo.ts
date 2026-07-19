@@ -68,6 +68,7 @@ export interface SkillDependency {
 export interface SkillRelationships {
   schemaVersion: 1 | 2;
   dependencies: SkillDependency[];
+  metadataFile: 'skill.json' | 'openface.skill.json';
 }
 
 export interface SearchReposResult {
@@ -419,17 +420,20 @@ export async function getSkillRelationships(owner: string, repo: string): Promis
   const cached = skillRelationshipCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) return cached.value;
 
-  const raw = await getTextFile(owner, repo, 'openface.skill.json');
-  let value: SkillRelationships = { schemaVersion: 2, dependencies: [] };
+  const preferredRaw = await getTextFile(owner, repo, 'skill.json');
+  const legacyRaw = preferredRaw === null ? await getTextFile(owner, repo, 'openface.skill.json') : null;
+  const raw = preferredRaw ?? legacyRaw;
+  const metadataFile = preferredRaw !== null ? 'skill.json' : legacyRaw !== null ? 'openface.skill.json' : 'skill.json';
+  let value: SkillRelationships = { schemaVersion: 2, dependencies: [], metadataFile };
   if (raw) {
     try {
       const parsed = JSON.parse(raw) as Record<string, unknown>;
       const dependencies = Array.isArray(parsed.dependencies)
         ? parsed.dependencies.map(normalizeSkillDependency).filter((item): item is SkillDependency => item !== null)
         : [];
-      value = { schemaVersion: parsed.schemaVersion === 1 ? 1 : 2, dependencies };
+      value = { schemaVersion: parsed.schemaVersion === 1 ? 1 : 2, dependencies, metadataFile };
     } catch {
-      value = { schemaVersion: 2, dependencies: [] };
+      value = { schemaVersion: 2, dependencies: [], metadataFile };
     }
   }
   skillRelationshipCache.set(cacheKey, { value, expiresAt: Date.now() + README_CACHE_TTL_MS });

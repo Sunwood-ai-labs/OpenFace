@@ -371,7 +371,7 @@ async function CardTabContent({
           </div>
         ) : null}
         <div className="rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-          README.md was not found. Skill relationships remain available from <code>openface.skill.json</code>.
+          README.md was not found. Skill relationships remain available from <code>skill.json</code>.
         </div>
       </div>
     );
