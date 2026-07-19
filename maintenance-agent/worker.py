@@ -96,7 +96,7 @@ class MaintenanceWorker:
                 task.repo,
                 task.issue_number,
                 f"🤖 Claude Code `/goal` を `{self.settings.model}` で実行し、{action}。\n\n"
-                f"- PR: #{pull.number} {pull.url}\n"
+                f"- PR: [#{pull.number}]({pull.url})\n"
                 f"- 変更ファイル: {', '.join(f'`{path}`' for path in changed)}",
             )
             return AgentResult(pull, summary, changed)
