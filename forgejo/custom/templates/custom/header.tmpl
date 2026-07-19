@@ -33,7 +33,7 @@
   }, { passive: true });
 })();
 </script>
-<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260719-hf-community9">
+<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260719-hf-diff15">
 <style>
 @media (max-width: 767px) {
   html body nav#navbar .navbar-left.ui.secondary.menu > a.item:not(#navbar-logo),
@@ -1909,10 +1909,19 @@ html[data-openface-theme="cyberpunk"] body a.openface-community-tab.active {
       if (pullCommunityMatch[1]) {
         document.body.setAttribute("data-openface-community-kind", "pull");
         document.body.setAttribute("data-openface-pull-view", pullCommunityMatch[2] || "conversation");
+        if (pullCommunityMatch[2] === "files" && !new URLSearchParams(window.location.search).has("style")) {
+          const splitUrl = new URL(window.location.href);
+          splitUrl.searchParams.set("style", "split");
+          splitUrl.searchParams.set("whitespace", "show-all");
+          splitUrl.searchParams.set("show-outdated", "false");
+          window.location.replace(splitUrl.href);
+        }
         window.requestAnimationFrame(() => {
           const pullTabs = document.querySelector(".ui.top.attached.pull.tabular.menu");
           const activePullTab = pullTabs?.querySelector(":scope > .item.active");
           const commitsTab = pullTabs?.querySelector(':scope > a[href$="/commits"]');
+          const filesTab = pullTabs?.querySelector(':scope > a[href*="/files"]');
+          const changeTotalsSource = pullTabs?.querySelector(":scope > span.tw-ml-auto");
           const issueMeta = document.querySelector(".issue-title-header .issue-title-meta > .tw-flex-1");
           if (commitsTab && issueMeta && !issueMeta.querySelector(".openface-pull-commit-link")) {
             const count = commitsTab.querySelector(".ui.label")?.textContent?.trim() || "0";
@@ -1922,6 +1931,102 @@ html[data-openface-theme="cyberpunk"] body a.openface-community-tab.active {
             commitLink.textContent = `${count} commit${count === "1" ? "" : "s"}`;
             if (pullCommunityMatch[2] === "commits") commitLink.setAttribute("aria-current", "page");
             issueMeta.append(commitLink);
+          }
+          if (filesTab && changeTotalsSource && !filesTab.querySelector(".openface-hf-change-totals")) {
+            const totals = changeTotalsSource.textContent?.match(/[+-]\d+/g) || [];
+            if (totals.length) {
+              const totalsWrap = document.createElement("span");
+              totalsWrap.className = "openface-hf-change-totals";
+              for (const total of totals.slice(0, 2)) {
+                const badge = document.createElement("span");
+                badge.className = total.startsWith("+") ? "is-added" : "is-deleted";
+                badge.textContent = total;
+                totalsWrap.append(badge);
+              }
+              filesTab.append(totalsWrap);
+            }
+          }
+
+          if (pullCommunityMatch[2] === "files" && !document.querySelector(".openface-hf-file-summary")) {
+            const diffBoxes = [...document.querySelectorAll(".diff-file-box")];
+            const firstDiff = diffBoxes[0];
+            if (firstDiff) {
+              const summary = document.createElement("section");
+              summary.className = "openface-hf-file-summary";
+
+              const summaryHeader = document.createElement("header");
+              summaryHeader.className = "openface-hf-file-summary-header";
+              const summaryTitle = document.createElement("strong");
+              summaryTitle.textContent = `変更ファイル (${diffBoxes.length})`;
+              summaryHeader.append(summaryTitle);
+
+              const settings = document.createElement("details");
+              settings.className = "openface-hf-diff-settings";
+              const settingsToggle = document.createElement("summary");
+              settingsToggle.setAttribute("aria-label", "差分表示設定");
+              settingsToggle.setAttribute("title", "差分表示設定");
+              settingsToggle.textContent = "☷";
+              const settingsMenu = document.createElement("div");
+              settingsMenu.className = "openface-hf-diff-settings-menu";
+              const currentUrl = new URL(window.location.href);
+              for (const [label, style] of [["左右表示", "split"], ["統一表示", "unified"]]) {
+                const optionUrl = new URL(currentUrl.href);
+                optionUrl.searchParams.set("style", style);
+                const option = document.createElement("a");
+                option.href = optionUrl.href;
+                option.textContent = label;
+                if (currentUrl.searchParams.get("style") === style) option.setAttribute("aria-current", "page");
+                settingsMenu.append(option);
+              }
+              settings.append(settingsToggle, settingsMenu);
+              summaryHeader.append(settings);
+              summary.append(summaryHeader);
+
+              const fileList = document.createElement("div");
+              fileList.className = "openface-hf-file-list";
+              let totalAdded = 0;
+              let totalDeleted = 0;
+              for (const box of diffBoxes) {
+                const filename = box.dataset.newFilename || box.dataset.oldFilename || "file";
+                const statLabel = box.querySelector(".diff-stats-bar")?.getAttribute("aria-label") || "";
+                const numbers = statLabel.match(/\d+/g)?.map(Number) || [];
+                const added = numbers.length >= 2 ? numbers[numbers.length - 2] : 0;
+                const deleted = numbers.length >= 1 ? numbers[numbers.length - 1] : 0;
+                totalAdded += added;
+                totalDeleted += deleted;
+                const row = document.createElement("a");
+                row.className = "openface-hf-file-row";
+                row.href = `#${box.id}`;
+                row.innerHTML = `<span class="openface-hf-file-icon" aria-hidden="true">▣</span><span class="openface-hf-file-name"></span><span class="openface-hf-file-stats"><span class="is-added">+${added}</span><span class="is-deleted">-${deleted}</span></span>`;
+                row.querySelector(".openface-hf-file-name").textContent = filename;
+                fileList.append(row);
+
+                const fileName = box.querySelector(".diff-file-name");
+                if (fileName && !fileName.querySelector(".openface-hf-changed-tag")) {
+                  const tag = document.createElement("span");
+                  tag.className = "openface-hf-changed-tag";
+                  tag.textContent = "CHANGED";
+                  fileName.append(tag);
+                }
+              }
+              if (filesTab) {
+                let totalsWrap = filesTab.querySelector(".openface-hf-change-totals");
+                if (!totalsWrap) {
+                  totalsWrap = document.createElement("span");
+                  totalsWrap.className = "openface-hf-change-totals";
+                  filesTab.append(totalsWrap);
+                }
+                totalsWrap.replaceChildren();
+                for (const [total, className] of [[`+${totalAdded}`, "is-added"], [`-${totalDeleted}`, "is-deleted"]]) {
+                  const badge = document.createElement("span");
+                  badge.className = className;
+                  badge.textContent = total;
+                  totalsWrap.append(badge);
+                }
+              }
+              summary.append(fileList);
+              firstDiff.before(summary);
+            }
           }
           if (pullTabs && activePullTab && pullTabs.scrollWidth > pullTabs.clientWidth) {
             pullTabs.scrollLeft = activePullTab.offsetLeft - ((pullTabs.clientWidth - activePullTab.offsetWidth) / 2);
