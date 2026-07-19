@@ -49,6 +49,20 @@ class SafetyTests(unittest.TestCase):
         self.assertNotIn("abc123456789", value)
         self.assertNotIn("token-value-123456", value)
 
+    def test_apply_proposal_normalizes_final_newline(self) -> None:
+        from config import Settings
+        from worker import MaintenanceWorker
+
+        root = Path(self.temp.name) / "repo"
+        root.mkdir()
+        worker = MaintenanceWorker(Settings.load())
+        _, changed = worker._apply_proposal(
+            root,
+            {"summary": "test", "changes": [{"path": "README.md", "content": "hello"}]},
+        )
+        self.assertEqual(changed, ["README.md"])
+        self.assertEqual((root / "README.md").read_text(encoding="utf-8"), "hello\n")
+
 
 if __name__ == "__main__":
     unittest.main()
