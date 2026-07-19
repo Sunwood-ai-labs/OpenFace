@@ -305,6 +305,9 @@ const captureRoute = async ({ context, route, theme, colorScheme, viewport }) =>
     passed: defects.length === 0,
   };
   process.stdout.write(`${result.passed ? 'PASS' : 'FAIL'} ${theme.id.padEnd(10)} ${colorScheme.id.padEnd(5)} ${viewport.id.padEnd(7)} ${route.id}\n`);
+  if (!result.passed && result.contrastRisks.length) {
+    process.stdout.write(`  Contrast: ${JSON.stringify(result.contrastRisks)}\n`);
+  }
   await page.close();
   return result;
 };

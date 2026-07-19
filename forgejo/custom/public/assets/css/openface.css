@@ -18118,7 +18118,7 @@ html[data-openface-theme="cyberpunk"] body #navbar a.item.active {
 
 html[data-openface-theme="cyberpunk"] body[data-openface-auth="signup"] .ui.attached.header + .ui.attached.segment p,
 html[data-openface-theme="cyberpunk"] body[data-openface-auth="signup"] .ui.attached.segment.header + .ui.attached.segment p {
-  color: #374151 !important;
+  color: #c8ebf8 !important;
 }
 
 /* org-mobile1: remove decorative fake members, cover the mobile viewport, and
