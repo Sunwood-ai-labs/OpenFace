@@ -123,6 +123,10 @@ try {
         const pullTabLabels = Array.from(document.querySelectorAll('.ui.top.attached.pull.tabular.menu > .item'))
           .map((element) => element.textContent?.replace(/\s+/g, ' ').trim() || '')
           .filter(Boolean);
+        const visiblePullTabLabels = Array.from(document.querySelectorAll('.ui.top.attached.pull.tabular.menu > .item'))
+          .filter((element) => window.getComputedStyle(element).display !== 'none')
+          .map((element) => element.textContent?.replace(/\s+/g, ' ').trim() || '')
+          .filter(Boolean);
         const virtualAgentSlugs = ['luna-scout', 'patch-orbit', 'mikan-reviewer'];
         const virtualAgentAuthors = virtualAgentSlugs.filter((slug) =>
           document.querySelector(`.timeline-item.comment .author[href$="/${slug}"]`),
@@ -153,6 +157,7 @@ try {
           runningBadgeVisible: bodyText.includes('CPU · Running'),
           onDemandStageVisible: bodyText.includes('This Space runs on demand'),
           communityPage: document.body?.getAttribute('data-openface-community-page') || null,
+          communityKind: document.body?.getAttribute('data-openface-community-kind') || null,
           pullView: document.body?.getAttribute('data-openface-pull-view') || null,
           issueRowCount: document.querySelectorAll('#issue-list .flex-item').length,
           issueCommentCounts,
@@ -167,6 +172,8 @@ try {
           markdownDetails: markdownSurface?.querySelectorAll('.comment-body details').length || 0,
           visibleAppTabLabels,
           pullTabLabels,
+          visiblePullTabLabels,
+          pullCommitLinkVisible: Boolean(document.querySelector('.openface-pull-commit-link')),
           skillRelationshipMapVisible: Boolean(skillRelationshipMap),
           skillRelationshipLinks: skillRelationshipMap?.querySelectorAll('[data-skill-relationship-link]').length || 0,
           skillRelationshipPlacement: skillRelationshipMap?.getAttribute('data-relationship-placement') || null,
@@ -186,6 +193,7 @@ try {
         runningBadgeVisible: false,
         onDemandStageVisible: false,
         communityPage: null,
+        communityKind: null,
         pullView: null,
         issueRowCount: 0,
         issueCommentCounts: [],
@@ -200,6 +208,8 @@ try {
         markdownDetails: 0,
         visibleAppTabLabels: [],
         pullTabLabels: [],
+        visiblePullTabLabels: [],
+        pullCommitLinkVisible: false,
         skillRelationshipMapVisible: false,
         skillRelationshipLinks: 0,
         skillRelationshipPlacement: null,
@@ -228,6 +238,9 @@ try {
       if (route.id === 'community-detail' && pageState.virtualAgentAvatars.some(({ loaded }) => !loaded)) defects.push('A virtual-agent avatar failed to load');
       if (route.id.startsWith('pull-') && pageState.communityPage !== 'detail') defects.push('Pull request detail marker is missing');
       if (route.id.startsWith('pull-') && pageState.pullTabLabels.length !== 3) defects.push(`Expected three pull request tabs but found ${pageState.pullTabLabels.length}`);
+      if (route.id.startsWith('pull-') && pageState.communityKind !== 'pull') defects.push('Pull request community-kind marker is missing');
+      if (route.id.startsWith('pull-') && pageState.visiblePullTabLabels.length !== 2) defects.push(`Expected two Hugging Face-style primary pull tabs but found ${pageState.visiblePullTabLabels.length}`);
+      if (route.id.startsWith('pull-') && !pageState.pullCommitLinkVisible) defects.push('Pull request commit-history metadata link is missing');
       if (route.id === 'pull-detail' && pageState.pullView !== 'conversation') defects.push('Pull request conversation marker is missing');
       if (route.id === 'pull-commits' && pageState.pullView !== 'commits') defects.push('Pull request commits marker is missing');
       if (route.id === 'pull-files' && pageState.pullView !== 'files') defects.push('Pull request files marker is missing');
