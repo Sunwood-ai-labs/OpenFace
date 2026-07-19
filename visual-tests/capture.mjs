@@ -259,7 +259,7 @@ try {
       if (route.id === 'pull-files' && pageState.hfFileSummaryRows < 1) defects.push('Hugging Face-style changed-file summary is missing');
       if (route.id === 'pull-files' && pageState.hfChangedTags !== pageState.hfDiffBoxes) defects.push('Not every diff file has a CHANGED marker');
       if (route.id === 'pull-files' && !pageState.hfSplitDiff) defects.push('Pull request is not using the Hugging Face-style split diff');
-      if (route.id === 'pull-files' && !/^\+\d+\s+-\d+$/.test(pageState.hfChangeTotals)) defects.push('Pull request change totals do not show both additions and deletions');
+      if (route.id === 'pull-files' && !/^\+\d+\s*-\d+$/.test(pageState.hfChangeTotals)) defects.push('Pull request change totals do not show both additions and deletions');
       if (route.id.startsWith('community-markdown') && pageState.communityPage !== 'detail') defects.push('Markdown discussion detail marker is missing');
       if (route.id.startsWith('community-markdown') && pageState.virtualAgentAuthors.length !== 3) defects.push('Markdown discussion does not show all three agent participants');
       if (route.id.startsWith('community-markdown') && pageState.markdownBlockquotes < 1) defects.push('Markdown blockquote is missing');
