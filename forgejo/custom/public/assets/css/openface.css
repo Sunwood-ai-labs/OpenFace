@@ -20190,3 +20190,144 @@ html body[data-openface-pull-view="files"] .diff-file-header-actions {
     max-width: calc(100% - 32px) !important;
   }
 }
+
+/* hf-community-detail23: mirror the Hub's restrained discussion/PR hierarchy. */
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .issue-title-header {
+  grid-template-columns: 48px minmax(0, 1fr) !important;
+  column-gap: 12px !important;
+  margin-block: 20px 12px !important;
+  padding: 20px 16px !important;
+}
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .openface-community-kind-icon {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 12px !important;
+}
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .openface-community-kind-icon svg {
+  width: 21px !important;
+  height: 21px !important;
+}
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .issue-title { margin-bottom: 6px !important; }
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .issue-title h1 {
+  font-size: 20px !important;
+  line-height: 1.28 !important;
+}
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .issue-title .index {
+  font-size: 16px !important;
+  font-weight: 400 !important;
+}
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .issue-title-meta > .ui.label.issue-state-label {
+  display: none !important;
+}
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .issue-title-meta {
+  display: block !important;
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+}
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .timeline-item.comment > .content.comment-container {
+  border-radius: 8px !important;
+}
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .timeline-item.comment .comment-header {
+  min-height: 40px !important;
+  padding: 8px 12px !important;
+}
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .timeline-item.comment .comment-body {
+  padding: 16px !important;
+}
+
+/* hf-diff-mobile23: reserve mobile width for the two code columns. */
+@media (max-width: 767px) {
+  :is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+    .repository.view.issue .issue-title-header {
+    margin-top: 18px !important;
+    padding: 18px 16px 20px !important;
+  }
+
+  html body[data-openface-pull-view="files"] .openface-hf-file-summary,
+  html body[data-openface-pull-view="files"] .diff-file-box {
+    width: 100% !important;
+    margin-inline: 0 !important;
+  }
+
+  html body[data-openface-pull-view="files"] .openface-hf-file-summary-header,
+  html body[data-openface-pull-view="files"] .openface-hf-file-row,
+  html body[data-openface-pull-view="files"] .diff-file-box .diff-file-header {
+    min-height: 44px !important;
+    padding: 8px 12px !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-box .file-body table.chroma {
+    display: block !important;
+    font-size: 12px !important;
+    line-height: 1.45 !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-box .file-body table.chroma > tbody {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-box .file-body.code-diff-split td.lines-escape {
+    display: none !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-box .file-body.code-diff-split td.lines-num {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    padding-inline: 3px !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-box .file-body.code-diff-split td.lines-type-marker {
+    width: 10px !important;
+    min-width: 10px !important;
+    max-width: 10px !important;
+    padding: 0 !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-box .file-body.code-diff-split td.lines-code {
+    width: calc(50% - 40px) !important;
+    padding-inline: 4px !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-box .file-body.code-diff-split tr:has(.lines-num-new) {
+    display: grid !important;
+    width: 100% !important;
+    grid-template-columns: 30px 10px minmax(0, 1fr) 30px 10px minmax(0, 1fr) !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-pull-view="files"]
+    .diff-file-box .file-body.code-diff-split tr:has(.lines-num-new) > td {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+}
