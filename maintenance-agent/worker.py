@@ -186,7 +186,7 @@ Completion condition:
 
     def _changed_files(self, root: Path) -> list[str]:
         process = subprocess.run(
-            ["git", "status", "--porcelain=v1", "-z"],
+            ["git", "-c", f"safe.directory={root.resolve()}", "status", "--porcelain=v1", "-z"],
             cwd=root,
             check=True,
             capture_output=True,
@@ -215,7 +215,12 @@ Completion condition:
             candidate = (root / relative).resolve(strict=False)
             if root_resolved != candidate and root_resolved not in candidate.parents:
                 raise RuntimeError(f"Claude changed a path outside the cloned repository: {relative}")
-        subprocess.run(["git", "diff", "--check", "HEAD"], cwd=root, check=True, timeout=60)
+        subprocess.run(
+            ["git", "-c", f"safe.directory={root.resolve()}", "diff", "--check", "HEAD"],
+            cwd=root,
+            check=True,
+            timeout=60,
+        )
 
     def _pull_body(self, task: IssueTask, summary: str, changed: list[str]) -> str:
         files = "\n".join(f"- `{path}`" for path in changed)

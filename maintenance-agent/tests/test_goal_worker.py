@@ -78,6 +78,21 @@ class GoalWorkerTests(unittest.TestCase):
         command = run.call_args.args[0]
         self.assertEqual(command[:3], ["git", "-c", f"safe.directory={root.resolve()}"])
 
+    def test_changed_file_scan_scopes_safe_directory_to_the_clone(self) -> None:
+        from config import Settings
+        from worker import MaintenanceWorker
+
+        root = Path(self.temp.name) / "repo"
+        root.mkdir()
+        completed = Mock(returncode=0, stdout=b" M README.md\0")
+        with patch("worker.subprocess.run", return_value=completed) as run:
+            changed = MaintenanceWorker(Settings.load())._changed_files(root)
+        self.assertEqual(changed, ["README.md"])
+        self.assertEqual(
+            run.call_args.args[0][:3],
+            ["git", "-c", f"safe.directory={root.resolve()}"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
