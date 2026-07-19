@@ -34,6 +34,7 @@ OpenFace turns one Docker host into a self-contained AI collaboration platform. 
 - **Always-on CPU mode:** `IDLE_TIMEOUT_MINUTES=0` keeps CPU Spaces running; a least-recently-used cap prevents unbounded growth.
 - **OpenFace Pages:** serve `gh-pages` or default-branch `docs/`, with a seeded VitePress workflow on an isolated Forgejo Actions runner.
 - **Agent operations API:** browser views, likes, and agent actions use a persisted metrics service with hashed agent credentials.
+- **GLM maintenance agent:** a signed Issue webhook can ask the local `glm-4.7` model to plan, edit, review, validate, and open a human-reviewed Pull Request.
 - **Versioned Prompts:** stable repository slugs point to immutable Git tags that can be switched directly in the Prompt view.
 - **Three visual themes:** Standard, Solarpunk, and Cyberpunk persist across visits.
 - **Editable organizations:** Forgejo Owners can update organization metadata, avatars, membership, teams, and repositories from the real organization settings UI.
@@ -94,6 +95,7 @@ The seed job should finish successfully. Long-running services should be healthy
 | `seed` | Idempotent admin, token, organization, catalog, examples, and Prompt tags | one-shot |
 | `forgejo-actions-runner` | Pages workflow jobs | internal |
 | `forgejo-actions-dind` | Isolated Docker daemon for Actions | internal `2375` |
+| `maintenance-agent` | Signed Issue webhook, bounded GLM analysis, branch and PR creation | internal `8010` |
 
 ```mermaid
 flowchart LR
@@ -336,6 +338,12 @@ The latest committed manual review is the [2026-07-19 exhaustive theme contrast 
 | ![Cyberpunk Dataset Viewer on mobile](docs/evidence/themes/cyberpunk-dataset-viewer-mobile.png) | ![Cyberpunk Inference Providers on mobile](docs/evidence/themes/cyberpunk-inference-providers-mobile.png) | ![OpenFace generated organization identity and team members](docs/evidence/themes/cyberpunk-organization-team-mobile.png) |
 
 See the [visual QA guide](https://sunwood-ai-labs.github.io/OpenFace/guide/visual-qa) for the agent feedback workflow and focused-capture options.
+
+## Automated GLM maintenance
+
+Set `OPENWEBUI_AGENT_CONFIG` in the untracked `.env` file to the existing Open WebUI agent configuration, then start `maintenance-agent`. A newly opened Issue under the `openface` organization is processed by a three-stage `glm-4.7` flow—planner, coder, reviewer—and becomes an `agent/issue-N` Pull Request. Add the `agent:skip` label or `<!-- openface-maintenance:skip -->` to opt out.
+
+The service validates the Forgejo HMAC signature, deduplicates deliveries in SQLite, redacts likely secrets before inference, forbids sensitive paths and broad diffs, and runs static syntax checks without executing repository tests. It never merges its own PR. See [Automated GLM maintenance](https://sunwood-ai-labs.github.io/OpenFace/guide/automated-maintenance).
 
 ## 📖 Documentation
 

@@ -87,6 +87,7 @@ function enSidebar() {
       { text: 'Docker Spaces', link: '/guide/spaces' },
       { text: 'OpenFace Pages', link: '/guide/pages' },
       { text: 'Visual QA', link: '/guide/visual-qa' },
+      { text: 'GLM maintenance', link: '/guide/automated-maintenance' },
       { text: 'Operations', link: '/guide/operations' },
       { text: 'Troubleshooting', link: '/guide/troubleshooting' }
     ]
@@ -102,6 +103,7 @@ function jaSidebar() {
       { text: 'Docker Spaces', link: '/ja/guide/spaces' },
       { text: 'OpenFace Pages', link: '/ja/guide/pages' },
       { text: 'Visual QA', link: '/ja/guide/visual-qa' },
+      { text: 'GLM自動保守', link: '/ja/guide/automated-maintenance' },
       { text: '運用', link: '/ja/guide/operations' },
       { text: 'トラブルシューティング', link: '/ja/guide/troubleshooting' }
     ]
