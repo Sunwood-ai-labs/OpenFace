@@ -20154,3 +20154,17 @@ html body[data-openface-pull-view="files"] .diff-file-header-actions {
     min-width: 36px !important;
   }
 }
+
+/* hf-community-insets21: content should sit inside its visual boundary, not
+   touch the title rail or the lower corners of an authored comment. */
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .issue-title-header {
+  box-sizing: border-box !important;
+  padding-inline: 16px !important;
+}
+
+:is(html, html[data-openface-theme]) body[data-openface-community-page="detail"]
+  .repository.view.issue .ui.attached.segment.reactions {
+  box-sizing: content-box !important;
+  padding: 0 16px 16px !important;
+}
