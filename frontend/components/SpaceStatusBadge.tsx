@@ -49,12 +49,12 @@ export default function SpaceStatusBadge({
 
   const className = variant === 'header'
     ? status === 'running'
-      ? 'inline-flex h-8 items-center rounded-lg border border-emerald-100 bg-emerald-50 px-3 text-xs font-semibold text-emerald-700'
+      ? 'space-status-header space-status-header--running inline-flex h-8 items-center rounded-lg border border-emerald-100 bg-emerald-50 px-3 text-xs font-semibold text-emerald-700'
       : status === 'building'
-        ? 'inline-flex h-8 items-center rounded-lg border border-amber-100 bg-amber-50 px-3 text-xs font-semibold text-amber-700'
+        ? 'space-status-header space-status-header--building inline-flex h-8 items-center rounded-lg border border-amber-100 bg-amber-50 px-3 text-xs font-semibold text-amber-700'
         : status === 'error'
-          ? 'inline-flex h-8 items-center rounded-lg border border-red-100 bg-red-50 px-3 text-xs font-semibold text-red-700'
-          : 'inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-zinc-100 px-3 text-xs font-semibold text-zinc-600'
+          ? 'space-status-header space-status-header--error inline-flex h-8 items-center rounded-lg border border-red-100 bg-red-50 px-3 text-xs font-semibold text-red-700'
+          : 'space-status-header space-status-header--stopped inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-zinc-100 px-3 text-xs font-semibold text-zinc-600'
     : 'rounded bg-white/15 px-1.5 py-1 shadow-sm ring-1 ring-white/10 backdrop-blur';
 
   return (

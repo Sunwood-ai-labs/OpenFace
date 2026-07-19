@@ -66,6 +66,31 @@ header details[open] > .openface-mobile-menu-toggle {
   }
 }
 
+/* WCAG-stable status badges: do not let OS dark-mode utilities invert text only. */
+.space-status-header--running {
+  border-color: #a7f3d0 !important;
+  background-color: #ecfdf5 !important;
+  color: #065f46 !important;
+}
+
+.space-status-header--building {
+  border-color: #fde68a !important;
+  background-color: #fffbeb !important;
+  color: #92400e !important;
+}
+
+.space-status-header--error {
+  border-color: #fecaca !important;
+  background-color: #fef2f2 !important;
+  color: #991b1b !important;
+}
+
+.space-status-header--stopped {
+  border-color: #d4d4d8 !important;
+  background-color: #f4f4f5 !important;
+  color: #52525b !important;
+}
+
 .openface-mobile-nav-link:active {
   transform: translateX(1px);
 }
@@ -420,6 +445,31 @@ html[data-openface-theme="cyberpunk"] details[open] > summary {
     background-color: #e5eedf !important;
     color: #315b43 !important;
   }
+}
+
+/* Final cascade guard for status badges across explicit and OS-driven themes. */
+html body span.space-status-header.space-status-header--running.inline-flex {
+  border-color: #a7f3d0 !important;
+  background-color: #ecfdf5 !important;
+  color: #065f46 !important;
+}
+
+html body span.space-status-header.space-status-header--building.inline-flex {
+  border-color: #fde68a !important;
+  background-color: #fffbeb !important;
+  color: #92400e !important;
+}
+
+html body span.space-status-header.space-status-header--error.inline-flex {
+  border-color: #fecaca !important;
+  background-color: #fef2f2 !important;
+  color: #991b1b !important;
+}
+
+html body span.space-status-header.space-status-header--stopped.inline-flex {
+  border-color: #d4d4d8 !important;
+  background-color: #f4f4f5 !important;
+  color: #52525b !important;
 }
 
 .prose-openface {
