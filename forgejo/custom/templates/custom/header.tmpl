@@ -33,7 +33,7 @@
   }, { passive: true });
 })();
 </script>
-<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260719-hf-community18">
+<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260719-hf-community20">
 <style>
 @media (max-width: 767px) {
   html body nav#navbar .navbar-left.ui.secondary.menu > a.item:not(#navbar-logo),
@@ -1190,7 +1190,7 @@ html[data-openface-theme="cyberpunk"] body a.openface-community-tab.active {
       list.dataset.openfaceSorted = "true";
     }
     const items = Array.from(issueList.querySelectorAll(".flex-list > .flex-item"));
-    const discussionIcon = fontAwesomeIcon("message", 512, 512, "M64 0C28.7 0 0 28.7 0 64v288c0 35.3 28.7 64 64 64h80v72c0 9.8 5.8 18.6 14.8 22.5s19.5 1.8 26.4-5.2L296 416h152c35.3 0 64-28.7 64-64V64c0-35.3-28.7-64-64-64H64z");
+    const discussionIcon = fontAwesomeIcon("comments", 640, 512, "M208 352c114.9 0 208-78.8 208-176S322.9 0 208 0 0 78.8 0 176c0 38.6 14.7 74.3 39.6 103.4-3.5 31.4-16.1 61.4-35.8 85.3-3.8 4.6-4.5 11.2-1.7 16.5S10.5 390 16.4 389.4c38.6-4.2 75.8-17.9 107.9-39.7 25.4 8 53.5 12.3 83.7 12.3zm256-96c0 66.4-61.9 122.1-145.8 137.3 24.6 21.4 59 34.7 97.8 34.7 22.8 0 43.9-4.5 62.8-12.3 29.6 18.8 63.6 30.6 98.9 34.4 5.9.6 11.4-2.8 14.2-8.1s2.1-11.9-1.7-16.5c-17.9-21.7-29.7-48.8-33.5-77.2C578.2 323.5 592 291.1 592 256c0-74.4-61.9-137.1-145.9-155.1C457.4 122.6 464 148.1 464 176c0 28.6-6.8 55.5-18.9 79.5 12.4-.2 18.9.1 18.9.5z");
     const pullIcon = fontAwesomeIcon("code-pull-request", 384, 512, "M64 96a32 32 0 1 0 0-64 32 32 0 0 0 0 64zm32 50.7C151.3 161.6 192 212.1 192 272v64c0 26.5 21.5 48 48 48h24.6c10.2-27.9 36.9-48 68.4-48 40.3 0 73 32.7 73 73s-32.7 73-73 73c-31.5 0-58.2-20.1-68.4-48H240c-53 0-96-43-96-96v-64c0-33-20.1-61.4-48.7-73.5C85.2 225.2 60.9 240 32 240c-40.3 0-73-32.7-73-73s32.7-73 73-73c28.8 0 53.7 16.7 65.4 40.9L96 146.7zM64 192a32 32 0 1 0 0-64 32 32 0 0 0 0 64zm272 242a32 32 0 1 0 0-64 32 32 0 0 0 0 64z");
     const commentIcon = fontAwesomeIcon("comment", 512, 512, "M512 240c0 114.9-114.6 208-256 208-37.1 0-72.4-6.4-104.2-17.9-11.9 8.7-31.3 20.6-54.3 30.6-24.1 10.5-52.5 17.6-81.7 13.9-6.6-.8-12.2-5.2-14.5-11.4s-.7-13.3 4.1-17.9l0 0 .3-.3c.3-.3.8-.8 1.5-1.6 1.4-1.6 3.6-4.1 6.2-7.4 5.3-6.6 12.5-16.3 19.6-28.3 10.6-17.9 20.6-40 24.4-64.9C20.4 306.3 0 274.7 0 240 0 125.1 114.6 32 256 32s256 93.1 256 208z");
     for (const item of items) {
@@ -1803,6 +1803,17 @@ html[data-openface-theme="cyberpunk"] body a.openface-community-tab.active {
 
   const enhancePeripheralPages = () => {
     const path = location.pathname;
+    const installCommunityKindIcon = (kind) => window.requestAnimationFrame(() => {
+      const header = document.querySelector(".repository.view.issue .issue-title-header");
+      if (!header || header.querySelector(".openface-community-kind-icon")) return;
+      const icon = document.createElement("span");
+      icon.className = `openface-community-kind-icon is-${kind}`;
+      icon.setAttribute("aria-hidden", "true");
+      icon.innerHTML = kind === "pull"
+        ? fontAwesomeIcon("code-pull-request", 384, 512, "M64 96a32 32 0 1 0 0-64 32 32 0 0 0 0 64zm32 50.7C151.3 161.6 192 212.1 192 272v64c0 26.5 21.5 48 48 48h24.6c10.2-27.9 36.9-48 68.4-48 40.3 0 73 32.7 73 73s-32.7 73-73 73c-31.5 0-58.2-20.1-68.4-48H240c-53 0-96-43-96-96v-64c0-33-20.1-61.4-48.7-73.5C85.2 225.2 60.9 240 32 240c-40.3 0-73-32.7-73-73s32.7-73 73-73c28.8 0 53.7 16.7 65.4 40.9L96 146.7zM64 192a32 32 0 1 0 0-64 32 32 0 0 0 0 64zm272 242a32 32 0 1 0 0-64 32 32 0 1 0 0 64z")
+        : fontAwesomeIcon("comments", 640, 512, "M208 352c114.9 0 208-78.8 208-176S322.9 0 208 0 0 78.8 0 176c0 38.6 14.7 74.3 39.6 103.4-3.5 31.4-16.1 61.4-35.8 85.3-3.8 4.6-4.5 11.2-1.7 16.5S10.5 390 16.4 389.4c38.6-4.2 75.8-17.9 107.9-39.7 25.4 8 53.5 12.3 83.7 12.3zm256-96c0 66.4-61.9 122.1-145.8 137.3 24.6 21.4 59 34.7 97.8 34.7 22.8 0 43.9-4.5 62.8-12.3 29.6 18.8 63.6 30.6 98.9 34.4 5.9.6 11.4-2.8 14.2-8.1s2.1-11.9-1.7-16.5c-17.9-21.7-29.7-48.8-33.5-77.2C578.2 323.5 592 291.1 592 256c0-74.4-61.9-137.1-145.9-155.1C457.4 122.6 464 148.1 464 176c0 28.6-6.8 55.5-18.9 79.5 12.4-.2 18.9.1 18.9.5z");
+      header.prepend(icon);
+    });
     const socialMatch = path.match(/^\/git\/([^/]+)\/([^/]+)\/(watchers|stars|forks)\/?$/);
     if (socialMatch) {
       const [, owner, repo, section] = socialMatch;
@@ -1901,6 +1912,7 @@ html[data-openface-theme="cyberpunk"] body a.openface-community-tab.active {
       document.body.setAttribute("data-openface-community-page", communityMatch[1] === "new" ? "new" : communityMatch[1] ? "detail" : "list");
       if (/^\d+$/.test(communityMatch[1] || "")) {
         document.body.setAttribute("data-openface-community-kind", "discussion");
+        installCommunityKindIcon("discussion");
       }
     }
     const pullCommunityMatch = path.match(/^\/git\/[^/]+\/[^/]+\/pulls(?:\/(\d+)(?:\/(commits|files))?)?\/?$/);
@@ -1908,6 +1920,7 @@ html[data-openface-theme="cyberpunk"] body a.openface-community-tab.active {
       document.body.setAttribute("data-openface-community-page", pullCommunityMatch[1] ? "detail" : "list");
       if (pullCommunityMatch[1]) {
         document.body.setAttribute("data-openface-community-kind", "pull");
+        installCommunityKindIcon("pull");
         document.body.setAttribute("data-openface-pull-view", pullCommunityMatch[2] || "conversation");
         if (pullCommunityMatch[2] === "files" && !new URLSearchParams(window.location.search).has("style")) {
           const splitUrl = new URL(window.location.href);
