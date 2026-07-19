@@ -69,3 +69,13 @@ docker compose exec maintenance-agent python -c "import urllib.request; print(ur
 
 Interrupted `queued` or `running` jobs are marked `interrupted` on service restart instead of remaining falsely active.
 
+## Verified end-to-end example
+
+[Issue #10](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/10) produced [PR #11](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/11). The retained evidence confirms:
+
+- job detail: `Running Claude Code /goal with glm-4.7`;
+- author: `glm-maintainer`;
+- branch: `agent/issue-10` into `main`;
+- changed files: `README.md` and `index.html`;
+- Issue comment links back to PR #11;
+- Forgejo reports the PR as mergeable.

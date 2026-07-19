@@ -345,6 +345,8 @@ Set `OPENWEBUI_AGENT_CONFIG` in the untracked `.env` file to the existing Open W
 
 The service validates the Forgejo HMAC signature and deduplicates deliveries in SQLite. Claude Code runs as an unprivileged user inside the maintenance container: it has no host Docker socket and cannot read the Forgejo bot token, while retaining normal repository-level tools and test execution. The root wrapper alone commits and pushes after `git diff --check`; it never merges its own PR. See [Automated Claude Code maintenance](https://sunwood-ai-labs.github.io/OpenFace/guide/automated-maintenance).
 
+The retained end-to-end proof is [Issue #10](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/10) → [PR #11](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/11): Claude Code `/goal` used `glm-4.7`, changed `README.md` and `index.html`, posted the Issue backlink as `glm-maintainer`, and produced a mergeable PR.
+
 ## 📖 Documentation
 
 | Published English Docs | Published Japanese Docs |

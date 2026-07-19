@@ -65,3 +65,13 @@ docker compose exec maintenance-agent python -c "import urllib.request; print(ur
 
 サービス再起動時に未完了だった `queued` / `running` ジョブは、誤って実行中表示を残さず `interrupted` になります。
 
+## 確認済み実E2E
+
+[Issue #10](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/10) から [PR #11](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/11) が作成されました。次をAPIとログで照合済みです。
+
+- job detail: `Running Claude Code /goal with glm-4.7`
+- author: `glm-maintainer`
+- branch: `agent/issue-10` → `main`
+- 変更ファイル: `README.md`、`index.html`
+- IssueコメントからPR #11への逆リンク
+- Forgejoのmergeable判定: `true`
