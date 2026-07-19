@@ -18740,3 +18740,15 @@ html.openface-hf-skin[data-openface-theme="cyberpunk"] body[data-openface-auth]
   .ui.attached.segment.header.top > div.field > a {
   color: #a9cddd !important;
 }
+
+html.openface-hf-skin[data-openface-theme="solarpunk"] body[data-openface-auth="login"]
+  .openface-auth-resume a,
+html.openface-hf-skin[data-openface-theme="solarpunk"] body[data-openface-auth="login"]
+  .openface-auth-resume a > span {
+  color: #f7ffe9 !important;
+}
+
+html.openface-hf-skin[data-openface-theme="cyberpunk"] body[data-openface-org-variant="seraphim"]
+  .openface-org-card-tabs .item {
+  color: #a9cddd !important;
+}
