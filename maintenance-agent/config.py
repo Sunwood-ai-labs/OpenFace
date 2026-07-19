@@ -26,6 +26,7 @@ class Settings:
     allowed_owner: str
     claude_user: str
     goal_timeout_seconds: int
+    max_workers: int
 
     @classmethod
     def load(cls) -> "Settings":
@@ -42,6 +43,7 @@ class Settings:
             allowed_owner=os.getenv("MAINTENANCE_ALLOWED_OWNER", "openface"),
             claude_user=os.getenv("MAINTENANCE_CLAUDE_USER", "maintainer"),
             goal_timeout_seconds=_integer("MAINTENANCE_GOAL_TIMEOUT_SECONDS", 3600),
+            max_workers=max(1, min(_integer("MAINTENANCE_MAX_WORKERS", 2), 4)),
         )
 
     def read_forgejo_token(self) -> str:

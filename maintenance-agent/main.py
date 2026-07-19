@@ -26,7 +26,7 @@ settings.data_dir.mkdir(parents=True, exist_ok=True)
 settings.workspace_dir.mkdir(parents=True, exist_ok=True)
 database_path = settings.data_dir / "jobs.sqlite3"
 database_lock = Lock()
-executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="claude-goal-maintenance")
+executor = ThreadPoolExecutor(max_workers=settings.max_workers, thread_name_prefix="claude-goal-maintenance")
 worker = MaintenanceWorker(settings)
 app = FastAPI(title="OpenFace Claude Goal Maintenance Agent", version="2.0.0")
 
@@ -131,7 +131,12 @@ def health() -> JSONResponse:
     status = 200 if all(ready.values()) else 503
     return JSONResponse(
         status_code=status,
-        content={"ok": status == 200, "model": settings.model, "dependencies": ready},
+        content={
+            "ok": status == 200,
+            "model": settings.model,
+            "max_workers": settings.max_workers,
+            "dependencies": ready,
+        },
     )
 
 

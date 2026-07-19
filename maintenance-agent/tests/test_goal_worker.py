@@ -24,6 +24,7 @@ class GoalWorkerTests(unittest.TestCase):
                 "ZAI_ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
                 "ZAI_API_KEY": "test-key",
                 "MAINTENANCE_MODEL": "glm-5.2",
+                "MAINTENANCE_MAX_WORKERS": "2",
                 "MAINTENANCE_DATA_DIR": str(root / "data"),
                 "MAINTENANCE_WORKSPACE_DIR": str(root / "work"),
             }
@@ -43,6 +44,13 @@ class GoalWorkerTests(unittest.TestCase):
         self.assertEqual(env["ANTHROPIC_DEFAULT_SONNET_MODEL"], "glm-5.2")
         self.assertEqual(env["CLAUDE_CODE_AUTO_COMPACT_WINDOW"], "1000000")
         self.assertNotIn("CLAUDE_CODE_ENABLE_EXPERIMENTAL_ADVISOR_TOOL", env)
+
+    def test_worker_concurrency_is_bounded(self) -> None:
+        from config import Settings
+
+        self.assertEqual(Settings.load().max_workers, 2)
+        with patch.dict(os.environ, {"MAINTENANCE_MAX_WORKERS": "99"}):
+            self.assertEqual(Settings.load().max_workers, 4)
 
     def test_prompt_invokes_builtin_goal_with_completion_conditions(self) -> None:
         from config import Settings
