@@ -153,6 +153,7 @@ try {
           runningBadgeVisible: bodyText.includes('CPU · Running'),
           onDemandStageVisible: bodyText.includes('This Space runs on demand'),
           communityPage: document.body?.getAttribute('data-openface-community-page') || null,
+          pullView: document.body?.getAttribute('data-openface-pull-view') || null,
           issueRowCount: document.querySelectorAll('#issue-list .flex-item').length,
           issueCommentCounts,
           virtualAgentAuthors,
@@ -185,6 +186,7 @@ try {
         runningBadgeVisible: false,
         onDemandStageVisible: false,
         communityPage: null,
+        pullView: null,
         issueRowCount: 0,
         issueCommentCounts: [],
         virtualAgentAuthors: [],
@@ -224,8 +226,11 @@ try {
       if (route.id === 'community-detail' && pageState.virtualAgentAuthors.length !== 3) defects.push('All three virtual-agent participants are not visible');
       if (route.id === 'community-detail' && new Set(pageState.virtualAgentAvatars.map(({ src }) => src)).size !== 3) defects.push('Virtual-agent avatars are not distinct');
       if (route.id === 'community-detail' && pageState.virtualAgentAvatars.some(({ loaded }) => !loaded)) defects.push('A virtual-agent avatar failed to load');
-      if (route.id === 'pull-detail' && pageState.communityPage !== 'detail') defects.push('Pull request detail marker is missing');
-      if (route.id === 'pull-detail' && pageState.pullTabLabels.length !== 3) defects.push(`Expected three pull request tabs but found ${pageState.pullTabLabels.length}`);
+      if (route.id.startsWith('pull-') && pageState.communityPage !== 'detail') defects.push('Pull request detail marker is missing');
+      if (route.id.startsWith('pull-') && pageState.pullTabLabels.length !== 3) defects.push(`Expected three pull request tabs but found ${pageState.pullTabLabels.length}`);
+      if (route.id === 'pull-detail' && pageState.pullView !== 'conversation') defects.push('Pull request conversation marker is missing');
+      if (route.id === 'pull-commits' && pageState.pullView !== 'commits') defects.push('Pull request commits marker is missing');
+      if (route.id === 'pull-files' && pageState.pullView !== 'files') defects.push('Pull request files marker is missing');
       if (route.id.startsWith('community-markdown') && pageState.communityPage !== 'detail') defects.push('Markdown discussion detail marker is missing');
       if (route.id.startsWith('community-markdown') && pageState.virtualAgentAuthors.length !== 3) defects.push('Markdown discussion does not show all three agent participants');
       if (route.id.startsWith('community-markdown') && pageState.markdownBlockquotes < 1) defects.push('Markdown blockquote is missing');
