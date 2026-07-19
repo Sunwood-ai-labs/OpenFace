@@ -18386,3 +18386,357 @@ html[data-openface-theme="cyberpunk"] body[data-openface-auth] .page-content .ui
   color: #f3fbff !important;
   box-shadow: 0 0 0 2px rgba(56, 232, 255, 0.14) !important;
 }
+
+/* contrast-aa1: final Forgejo contrast guard. These selectors intentionally
+   sit at the cascade terminus because Forgejo's page-specific bundles load a
+   mix of light and dark utility tokens after the shared portal theme. */
+html:not([data-openface-theme]) .openface-title-kind,
+html:not([data-openface-theme]) .openface-title-slash,
+html:not([data-openface-theme]) .text.grey,
+html:not([data-openface-theme]) .muted-links,
+html:not([data-openface-theme]) .index,
+html[data-openface-theme="standard"] .openface-title-kind,
+html[data-openface-theme="standard"] .openface-title-slash,
+html[data-openface-theme="standard"] .text.grey,
+html[data-openface-theme="standard"] .muted-links,
+html[data-openface-theme="standard"] .index {
+  color: #4b5563 !important;
+}
+
+html:not([data-openface-theme]) .repository .ui.segment,
+html:not([data-openface-theme]) .repository .ui.table,
+html:not([data-openface-theme]) .repository .ui.table tr,
+html:not([data-openface-theme]) .repository .ui.table td,
+html:not([data-openface-theme]) .repository .ui.table th,
+html[data-openface-theme="standard"] .repository .ui.segment,
+html[data-openface-theme="standard"] .repository .ui.table,
+html[data-openface-theme="standard"] .repository .ui.table tr,
+html[data-openface-theme="standard"] .repository .ui.table td,
+html[data-openface-theme="standard"] .repository .ui.table th {
+  background-color: #fff !important;
+  color: #1f2937 !important;
+}
+
+html[data-openface-theme="solarpunk"] .openface-title-kind,
+html[data-openface-theme="solarpunk"] .openface-title-slash,
+html[data-openface-theme="solarpunk"] .text.grey,
+html[data-openface-theme="solarpunk"] .muted-links,
+html[data-openface-theme="solarpunk"] .index,
+html[data-openface-theme="solarpunk"] .resize-for-semibold {
+  color: #46614f !important;
+}
+
+html[data-openface-theme="solarpunk"] .repository .ui.segment,
+html[data-openface-theme="solarpunk"] .repository .ui.table,
+html[data-openface-theme="solarpunk"] .repository .ui.table tr,
+html[data-openface-theme="solarpunk"] .repository .ui.table td,
+html[data-openface-theme="solarpunk"] .repository .ui.table th {
+  background-color: #fbfcf5 !important;
+  color: #173b2c !important;
+}
+
+html[data-openface-theme="solarpunk"] .ui.label {
+  background-color: #e5eedf !important;
+  color: #315b43 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-title-kind,
+html[data-openface-theme="cyberpunk"] .openface-title-slash,
+html[data-openface-theme="cyberpunk"] .text.grey,
+html[data-openface-theme="cyberpunk"] .muted-links,
+html[data-openface-theme="cyberpunk"] .flex-text-inline,
+html[data-openface-theme="cyberpunk"] .flex-item-body,
+html[data-openface-theme="cyberpunk"] .resize-for-semibold,
+html[data-openface-theme="cyberpunk"] relative-time {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="cyberpunk"] .ui.label {
+  background-color: #22345a !important;
+  color: #9ff4ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] .repository .ui.segment,
+html[data-openface-theme="cyberpunk"] .repository .ui.table,
+html[data-openface-theme="cyberpunk"] .repository .ui.table tr,
+html[data-openface-theme="cyberpunk"] .repository .ui.table td,
+html[data-openface-theme="cyberpunk"] .repository .ui.table th,
+html[data-openface-theme="cyberpunk"] .repository .ui.card,
+html[data-openface-theme="cyberpunk"] .repository .ui.message {
+  border-color: rgba(55, 204, 237, 0.28) !important;
+  background-color: #0d1327 !important;
+  color: #c8ebf8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .repository .gi {
+  background-color: #153d32 !important;
+  color: #d8fff0 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-org] :is(p, li, .text.grey, .flex-text-inline, .flex-item-body, .resize-for-semibold),
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] :is(p, li, .text.grey, .flex-text-inline, .flex-item-body, .resize-for-semibold) {
+  color: #b9d8e8 !important;
+}
+
+html:not([data-openface-theme]) :is(.openface-dataset-viewer-head > div, .openface-dataset-search, .openface-dataset-table th small, .openface-dataset-pagination, .openface-dataset-info-card dt, .openface-dataset-side-pane section > span, .openface-dataset-metrics span, .openface-forge-panel span, .openface-org-hf-sidebar h2 span),
+html[data-openface-theme="standard"] :is(.openface-dataset-viewer-head > div, .openface-dataset-search, .openface-dataset-table th small, .openface-dataset-pagination, .openface-dataset-info-card dt, .openface-dataset-side-pane section > span, .openface-dataset-metrics span, .openface-forge-panel span, .openface-org-hf-sidebar h2 span) {
+  color: #4b5563 !important;
+}
+
+html[data-openface-theme="solarpunk"] :is(.openface-dataset-viewer-head > div, .openface-dataset-search, .openface-dataset-table th small, .openface-dataset-pagination, .openface-dataset-info-card dt, .openface-dataset-side-pane section > span, .openface-dataset-metrics span, .openface-forge-panel span, .openface-org-hf-sidebar h2 span) {
+  color: #46614f !important;
+}
+
+html[data-openface-theme="cyberpunk"] :is(.openface-dataset-viewer-head > div, .openface-dataset-search, .openface-dataset-table th small, .openface-dataset-pagination, .openface-dataset-info-card dt, .openface-dataset-side-pane section > span, .openface-dataset-metrics span, .openface-forge-panel span, .openface-org-hf-sidebar h2 span) {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="cyberpunk"] :is(.openface-dataset-viewer, .openface-dataset-viewer-head, .openface-dataset-selectors button, .openface-dataset-table, .openface-dataset-table th, .openface-dataset-table td, .openface-dataset-pagination, .openface-dataset-info-card div, .openface-dataset-metrics div, .openface-forge-panel) {
+  border-color: rgba(55, 204, 237, 0.28) !important;
+  background-color: #0d1327 !important;
+  color: #c8ebf8 !important;
+}
+
+html:not([data-openface-theme]) body[data-openface-community-page="detail"] .comment-body :not(a):not(code):not(pre),
+html[data-openface-theme="standard"] body[data-openface-community-page="detail"] .comment-body :not(a):not(code):not(pre) {
+  color: #374151 !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-community-page="detail"] .comment-body :not(a):not(code):not(pre) {
+  color: #315b43 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .comment-body :not(a):not(code):not(pre),
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .comment-header .muted-links,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .comment-header .text.grey {
+  color: #c8ebf8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] :is(.openface-auth-subtitle, .field, .openface-auth-resume) {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-forge-panel a,
+html[data-openface-theme="cyberpunk"] .openface-forge-actions a {
+  border-color: rgba(55, 204, 237, 0.35) !important;
+  background-color: #0d1327 !important;
+  color: #9ff4ff !important;
+}
+
+html[data-openface-theme="solarpunk"] .openface-forge-actions a:first-child {
+  background-color: #1f583c !important;
+  color: #f7ffe9 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-card-tabs .active.item,
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .ui.pagination.menu,
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .ui.pagination.menu .item {
+  background-color: #0d1327 !important;
+  color: #9ff4ff !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-org] .openface-org-card-tabs .active.item,
+html[data-openface-theme="solarpunk"] body[data-openface-org] .ui.pagination.menu,
+html[data-openface-theme="solarpunk"] body[data-openface-org] .ui.pagination.menu .item {
+  background-color: #e5eedf !important;
+  color: #315b43 !important;
+}
+
+html:not([data-openface-theme]) body[data-openface-org] .openface-org-card-tabs .active.item,
+html[data-openface-theme="standard"] body[data-openface-org] .openface-org-card-tabs .active.item {
+  background-color: #374151 !important;
+  color: #fff !important;
+}
+
+html:not([data-openface-theme]) body[data-openface-community-page] .repository .index,
+html[data-openface-theme="standard"] body[data-openface-community-page] .repository .index {
+  color: #4b5563 !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-community-page] .repository .index {
+  color: #46614f !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page] .repository :is(.openface-community-tab, .openface-community-closed, .muted-links, .text.grey, .flex-item-body, .flex-text-inline),
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository .flex-item-body :not(.issue-title) {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] .repository .comment-header :is(.muted-links, .text.grey) {
+  color: #a9cddd !important;
+}
+
+html:not([data-openface-theme]) body[data-openface-community-page="detail"] .comment-body :is(pre, code) a,
+html[data-openface-theme="standard"] body[data-openface-community-page="detail"] .comment-body :is(pre, code) a {
+  color: #bfdbfe !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-community-page="detail"] .comment-body :is(pre, code) a {
+  color: #bbf7d0 !important;
+}
+
+html:not([data-openface-theme]) body[data-openface-community-page="detail"] .comment-body .gi,
+html[data-openface-theme="standard"] body[data-openface-community-page="detail"] .comment-body .gi,
+html[data-openface-theme="solarpunk"] body[data-openface-community-page="detail"] .comment-body .gi {
+  color: #d1fae5 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-dataset-side-pane :not(a):not(button),
+html[data-openface-theme="cyberpunk"] .openface-dataset-card-copy :not(a):not(button) {
+  color: #c8ebf8 !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .ui.form .field,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .ui.form .field a {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-repo-card :is(p, span),
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .openface-org-repo-card :is(p, span) {
+  color: #b9d8e8 !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-org] .openface-org-repo-card :is(p, span),
+html[data-openface-theme="solarpunk"] body[data-openface-org-page] .openface-org-repo-card :is(p, span) {
+  color: #46614f !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-openface-theme]) body[data-openface-org] .ui.pagination.menu,
+  html:not([data-openface-theme]) body[data-openface-org] .ui.pagination.menu .item,
+  html[data-openface-theme="standard"] body[data-openface-org] .ui.pagination.menu,
+  html[data-openface-theme="standard"] body[data-openface-org] .ui.pagination.menu .item {
+    background-color: #243040 !important;
+    color: #f8fafc !important;
+  }
+}
+
+html[data-openface-theme="cyberpunk"] body .user.signin .field:has(a[href*="/user/sign_up"]),
+html[data-openface-theme="cyberpunk"] body .user.signup .field:has(a[href*="/user/login"]) {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="cyberpunk"] body.user.signin .field:has(a[href*="/user/sign_up"]),
+html[data-openface-theme="cyberpunk"] body.user.signup .field:has(a[href*="/user/login"]) {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .field,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .field a {
+  color: #a9cddd !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-openface-theme]) body[data-openface-community-page="detail"] .comment-body code.chroma,
+  html[data-openface-theme="standard"] body[data-openface-community-page="detail"] .comment-body code.chroma,
+  html[data-openface-theme="solarpunk"] body[data-openface-community-page="detail"] .comment-body code.chroma {
+    background-color: #131a21 !important;
+    color: #dbeafe !important;
+  }
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .ui.form .field,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .ui.form .field * {
+  color: #a9cddd !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-openface-theme]) body[data-openface-community-page="detail"] .comment-body code,
+  html[data-openface-theme="standard"] body[data-openface-community-page="detail"] .comment-body code,
+  html[data-openface-theme="solarpunk"] body[data-openface-community-page="detail"] .comment-body code {
+    color: #dbeafe !important;
+  }
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository.issue-list #issue-list .flex-item-body a {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .page-content.user .ui.form .field,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .page-content.user .ui.form .field * {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-model-landing] aside.openface-model-side-pane .openface-provider-card a {
+  background-color: #1f583c !important;
+  color: #f7ffe9 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-openface-theme]) body[data-openface-community-page="detail"] .comment-body a:is([href*="README.md"], [href*="docker-compose.yml"]),
+  html[data-openface-theme="standard"] body[data-openface-community-page="detail"] .comment-body a:is([href*="README.md"], [href*="docker-compose.yml"]),
+  html[data-openface-theme="solarpunk"] body[data-openface-community-page="detail"] .comment-body a:is([href*="README.md"], [href*="docker-compose.yml"]) {
+    color: #bfdbfe !important;
+  }
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="list"] .repository .flex-item-body a:not(.issue-title) {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .page-content.user .ui.form .field,
+html[data-openface-theme="cyberpunk"] body[data-openface-auth] .page-content.user .ui.form .field a {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-paper-row b,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .openface-paper-row b {
+  color: #b9d8e8 !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-org] .openface-paper-row b,
+html[data-openface-theme="solarpunk"] body[data-openface-org-page] .openface-paper-row b {
+  color: #46614f !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-org] .openface-org-hf-sidebar h2 span,
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page] .openface-org-hf-sidebar h2 span {
+  color: #b9d8e8 !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-forge-home] .openface-forge-actions a:first-child {
+  background-color: #1f583c !important;
+  color: #f7ffe9 !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-model-landing] :is(.openface-model-side-pane, .openface-model-side-pane section, .openface-provider-card) {
+  background-color: #fbfcf5 !important;
+  color: #173b2c !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-model-landing] :is(.openface-model-side-pane span, .openface-model-side-pane p, .openface-provider-card p) {
+  color: #46614f !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-model-landing] .openface-provider-card a {
+  background-color: #1f583c !important;
+  color: #f7ffe9 !important;
+}
+
+html:not([data-openface-theme]) body[data-openface-community-page="detail"] .comment-body .gi,
+html[data-openface-theme="standard"] body[data-openface-community-page="detail"] .comment-body .gi,
+html[data-openface-theme="solarpunk"] body[data-openface-community-page="detail"] .comment-body .gi {
+  color: #166534 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-openface-theme]) body[data-openface-community-page="detail"] .comment-body .gi,
+  html[data-openface-theme="standard"] body[data-openface-community-page="detail"] .comment-body .gi,
+  html[data-openface-theme="solarpunk"] body[data-openface-community-page="detail"] .comment-body .gi {
+    color: #d1fae5 !important;
+  }
+
+  html:not([data-openface-theme]) body[data-openface-community-page="detail"] .comment-body a:is([href$="README.md"], [href$="docker-compose.yml"]),
+  html[data-openface-theme="standard"] body[data-openface-community-page="detail"] .comment-body a:is([href$="README.md"], [href$="docker-compose.yml"]),
+  html[data-openface-theme="solarpunk"] body[data-openface-community-page="detail"] .comment-body a:is([href$="README.md"], [href$="docker-compose.yml"]) {
+    color: #bfdbfe !important;
+  }
+}
+
+/* contrast-aa2: auth action links live outside the form in Forgejo's header segment. */
+html.openface-hf-skin[data-openface-theme="cyberpunk"] body[data-openface-auth]
+  .ui.attached.segment.header.top > div.field,
+html.openface-hf-skin[data-openface-theme="cyberpunk"] body[data-openface-auth]
+  .ui.attached.segment.header.top > div.field > a {
+  color: #a9cddd !important;
+}
