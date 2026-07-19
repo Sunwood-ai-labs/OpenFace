@@ -19081,3 +19081,58 @@ html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"
   .repository.view.issue .ui.top.attached.pull.tabular.menu .text.green {
   color: #7ee7b0 !important;
 }
+
+/* pr-detail-edges3: one card edge for comments, quiet separators for events. */
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue .timeline-item.comment {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue .timeline-item.comment > .content.comment-container {
+  overflow: hidden !important;
+  border: 1px solid rgba(56, 232, 255, 0.3) !important;
+  border-radius: 12px !important;
+  background: #0d1327 !important;
+  box-shadow: none !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue .timeline-item.comment .comment-header {
+  border: 0 !important;
+  border-bottom: 1px solid rgba(56, 232, 255, 0.2) !important;
+  border-radius: 0 !important;
+  background: #11162b !important;
+  box-shadow: none !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue .timeline-item.comment .comment-body {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #0d1327 !important;
+  box-shadow: none !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue :is(.timeline-item.event, .timeline-item.commits-list) {
+  border: 0 !important;
+  border-bottom: 1px solid rgba(56, 232, 255, 0.16) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue :is(
+    .timeline-item.event .detail.flex-text-block,
+    .timeline-item.commits-list .singular-commit
+  ) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
