@@ -120,6 +120,9 @@ try {
           .filter((element) => element.getBoundingClientRect().width > 0)
           .map((element) => element.textContent?.trim() || '')
           .filter(Boolean);
+        const pullTabLabels = Array.from(document.querySelectorAll('.ui.top.attached.pull.tabular.menu > .item'))
+          .map((element) => element.textContent?.replace(/\s+/g, ' ').trim() || '')
+          .filter(Boolean);
         const virtualAgentSlugs = ['luna-scout', 'patch-orbit', 'mikan-reviewer'];
         const virtualAgentAuthors = virtualAgentSlugs.filter((slug) =>
           document.querySelector(`.timeline-item.comment .author[href$="/${slug}"]`),
@@ -162,6 +165,7 @@ try {
           markdownLinks: markdownSurface?.querySelectorAll('.comment-body a[href]').length || 0,
           markdownDetails: markdownSurface?.querySelectorAll('.comment-body details').length || 0,
           visibleAppTabLabels,
+          pullTabLabels,
           skillRelationshipMapVisible: Boolean(skillRelationshipMap),
           skillRelationshipLinks: skillRelationshipMap?.querySelectorAll('[data-skill-relationship-link]').length || 0,
           skillRelationshipPlacement: skillRelationshipMap?.getAttribute('data-relationship-placement') || null,
@@ -193,6 +197,7 @@ try {
         markdownLinks: 0,
         markdownDetails: 0,
         visibleAppTabLabels: [],
+        pullTabLabels: [],
         skillRelationshipMapVisible: false,
         skillRelationshipLinks: 0,
         skillRelationshipPlacement: null,
@@ -219,6 +224,8 @@ try {
       if (route.id === 'community-detail' && pageState.virtualAgentAuthors.length !== 3) defects.push('All three virtual-agent participants are not visible');
       if (route.id === 'community-detail' && new Set(pageState.virtualAgentAvatars.map(({ src }) => src)).size !== 3) defects.push('Virtual-agent avatars are not distinct');
       if (route.id === 'community-detail' && pageState.virtualAgentAvatars.some(({ loaded }) => !loaded)) defects.push('A virtual-agent avatar failed to load');
+      if (route.id === 'pull-detail' && pageState.communityPage !== 'detail') defects.push('Pull request detail marker is missing');
+      if (route.id === 'pull-detail' && pageState.pullTabLabels.length !== 3) defects.push(`Expected three pull request tabs but found ${pageState.pullTabLabels.length}`);
       if (route.id.startsWith('community-markdown') && pageState.communityPage !== 'detail') defects.push('Markdown discussion detail marker is missing');
       if (route.id.startsWith('community-markdown') && pageState.virtualAgentAuthors.length !== 3) defects.push('Markdown discussion does not show all three agent participants');
       if (route.id.startsWith('community-markdown') && pageState.markdownBlockquotes < 1) defects.push('Markdown blockquote is missing');
