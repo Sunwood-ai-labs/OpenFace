@@ -33,7 +33,7 @@
   }, { passive: true });
 })();
 </script>
-<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260719-pr-contrast7">
+<link rel="stylesheet" href="{{AssetUrlPrefix}}/css/openface.css?v=20260719-hf-community9">
 <style>
 @media (max-width: 767px) {
   html body nav#navbar .navbar-left.ui.secondary.menu > a.item:not(#navbar-logo),
@@ -1899,15 +1899,30 @@ html[data-openface-theme="cyberpunk"] body a.openface-community-tab.active {
     const communityMatch = path.match(/^\/git\/[^/]+\/[^/]+\/issues(?:\/(new|\d+))?\/?$/);
     if (communityMatch) {
       document.body.setAttribute("data-openface-community-page", communityMatch[1] === "new" ? "new" : communityMatch[1] ? "detail" : "list");
+      if (/^\d+$/.test(communityMatch[1] || "")) {
+        document.body.setAttribute("data-openface-community-kind", "discussion");
+      }
     }
     const pullCommunityMatch = path.match(/^\/git\/[^/]+\/[^/]+\/pulls(?:\/(\d+)(?:\/(commits|files))?)?\/?$/);
     if (pullCommunityMatch) {
       document.body.setAttribute("data-openface-community-page", pullCommunityMatch[1] ? "detail" : "list");
       if (pullCommunityMatch[1]) {
+        document.body.setAttribute("data-openface-community-kind", "pull");
         document.body.setAttribute("data-openface-pull-view", pullCommunityMatch[2] || "conversation");
         window.requestAnimationFrame(() => {
           const pullTabs = document.querySelector(".ui.top.attached.pull.tabular.menu");
           const activePullTab = pullTabs?.querySelector(":scope > .item.active");
+          const commitsTab = pullTabs?.querySelector(':scope > a[href$="/commits"]');
+          const issueMeta = document.querySelector(".issue-title-header .issue-title-meta > .tw-flex-1");
+          if (commitsTab && issueMeta && !issueMeta.querySelector(".openface-pull-commit-link")) {
+            const count = commitsTab.querySelector(".ui.label")?.textContent?.trim() || "0";
+            const commitLink = document.createElement("a");
+            commitLink.className = "openface-pull-commit-link";
+            commitLink.href = commitsTab.href;
+            commitLink.textContent = `${count} commit${count === "1" ? "" : "s"}`;
+            if (pullCommunityMatch[2] === "commits") commitLink.setAttribute("aria-current", "page");
+            issueMeta.append(commitLink);
+          }
           if (pullTabs && activePullTab && pullTabs.scrollWidth > pullTabs.clientWidth) {
             pullTabs.scrollLeft = activePullTab.offsetLeft - ((pullTabs.clientWidth - activePullTab.offsetWidth) / 2);
           }

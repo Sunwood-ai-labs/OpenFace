@@ -19399,3 +19399,277 @@ html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"
   color: #d6edf7 !important;
   box-shadow: none !important;
 }
+
+/* hf-community8: Discussions and pull requests share one lightweight Hub
+   surface.  Pull requests expose Discussion + Files changed as the primary
+   navigation, while the commit history remains available as metadata. */
+html:not([data-openface-theme]) body[data-openface-community-page="detail"],
+html[data-openface-theme="standard"] body[data-openface-community-page="detail"] {
+  --of-community-accent: #111827;
+  --of-community-accent-soft: #eef2ff;
+  --of-community-border: #e5e7eb;
+  --of-community-surface: #ffffff;
+  --of-community-surface-muted: #f8fafc;
+  --of-community-ink: #111827;
+  --of-community-muted: #64748b;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-community-page="detail"] {
+  --of-community-accent: #166534;
+  --of-community-accent-soft: #ecfdf3;
+  --of-community-border: #d8e8d3;
+  --of-community-surface: #fbfcf5;
+  --of-community-surface-muted: #f3f7ed;
+  --of-community-ink: #173323;
+  --of-community-muted: #607467;
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"] {
+  --of-community-accent: #38e8ff;
+  --of-community-accent-soft: #111b35;
+  --of-community-border: rgba(56, 232, 255, 0.24);
+  --of-community-surface: #0d1327;
+  --of-community-surface-muted: #11162b;
+  --of-community-ink: #e9f8ff;
+  --of-community-muted: #a9cddd;
+}
+
+html body[data-openface-community-page="detail"] .repository.view.issue .issue-title-header {
+  display: grid !important;
+  grid-template-columns: 48px minmax(0, 1fr) !important;
+  column-gap: 14px !important;
+  min-height: 0 !important;
+  margin-block: 22px 10px !important;
+  padding: 0 4px 18px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--of-community-border) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html body[data-openface-community-page="detail"] .repository.view.issue .issue-title-header::before {
+  grid-row: 1 / 3;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  content: "";
+  background-color: var(--of-community-accent-soft);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 23px 23px;
+}
+
+html body[data-openface-community-page="detail"][data-openface-community-kind="discussion"]
+  .repository.view.issue .issue-title-header::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z'/%3E%3Cpath d='M8 9h8M8 13h5'/%3E%3C/svg%3E");
+}
+
+html body[data-openface-community-page="detail"][data-openface-community-kind="pull"]
+  .repository.view.issue .issue-title-header::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='6' cy='5' r='2'/%3E%3Ccircle cx='6' cy='19' r='2'/%3E%3Ccircle cx='18' cy='5' r='2'/%3E%3Cpath d='M6 7v10M8 5h5a5 5 0 0 1 5 5v7'/%3E%3C/svg%3E");
+}
+
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"][data-openface-community-kind="discussion"]
+  .repository.view.issue .issue-title-header::before,
+html[data-openface-theme="cyberpunk"] body[data-openface-community-page="detail"][data-openface-community-kind="pull"]
+  .repository.view.issue .issue-title-header::before {
+  border: 1px solid rgba(56, 232, 255, 0.28);
+  background-color: #111b35;
+}
+
+html body[data-openface-community-page="detail"] .repository.view.issue .issue-title-header::after {
+  display: none !important;
+}
+
+html body[data-openface-community-page="detail"] .repository.view.issue .issue-title,
+html body[data-openface-community-page="detail"] .repository.view.issue .issue-title-meta {
+  grid-column: 2;
+  min-width: 0 !important;
+}
+
+html body[data-openface-community-page="detail"] .repository.view.issue .issue-title {
+  margin: 0 0 8px !important;
+}
+
+html body[data-openface-community-page="detail"] .repository.view.issue .issue-title h1 {
+  margin: 0 !important;
+  color: var(--of-community-ink) !important;
+  font-size: clamp(20px, 2vw, 26px) !important;
+  line-height: 1.24 !important;
+  letter-spacing: -0.025em !important;
+}
+
+html body[data-openface-community-page="detail"] .repository.view.issue .issue-title .index {
+  color: var(--of-community-muted) !important;
+  font-weight: 500 !important;
+}
+
+html body[data-openface-community-page="detail"] .repository.view.issue .issue-title-meta {
+  align-items: center !important;
+  gap: 8px !important;
+  color: var(--of-community-muted) !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+
+html body[data-openface-community-page="detail"] .repository.view.issue .issue-title-meta > .ui.label {
+  border-radius: 999px !important;
+  box-shadow: none !important;
+}
+
+html body[data-openface-community-page="detail"] .openface-pull-commit-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  margin-left: 8px;
+  padding: 3px 9px;
+  border: 1px solid var(--of-community-border);
+  border-radius: 999px;
+  color: var(--of-community-muted) !important;
+  background: var(--of-community-surface-muted);
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+html body[data-openface-community-page="detail"] .openface-pull-commit-link[aria-current="page"] {
+  border-color: var(--of-community-accent);
+  color: var(--of-community-accent) !important;
+}
+
+html body[data-openface-community-page="detail"][data-openface-community-kind="pull"]
+  .repository.view.issue .ui.top.attached.pull.tabular.menu {
+  display: flex !important;
+  align-items: flex-end !important;
+  gap: 24px !important;
+  min-height: 48px !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--of-community-border) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html body[data-openface-community-page="detail"][data-openface-community-kind="pull"]
+  .repository.view.issue .ui.top.attached.pull.tabular.menu > a[href$="/commits"] {
+  display: none !important;
+}
+
+html body[data-openface-community-page="detail"][data-openface-community-kind="pull"]
+  .repository.view.issue .ui.top.attached.pull.tabular.menu > .item {
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
+  padding: 13px 0 11px !important;
+  border: 0 !important;
+  border-bottom: 2px solid transparent !important;
+  color: var(--of-community-muted) !important;
+  background: transparent !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+html body[data-openface-community-page="detail"][data-openface-community-kind="pull"]
+  .repository.view.issue .ui.top.attached.pull.tabular.menu > .item.active {
+  border-bottom-color: var(--of-community-accent) !important;
+  color: var(--of-community-ink) !important;
+}
+
+html body[data-openface-community-page="detail"][data-openface-community-kind="pull"]
+  .repository.view.issue .ui.top.attached.pull.tabular.menu > .item .ui.label {
+  min-width: 22px !important;
+  margin-left: 2px !important;
+  padding: 3px 6px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--of-community-surface-muted) !important;
+  color: var(--of-community-muted) !important;
+  box-shadow: none !important;
+}
+
+html body[data-openface-community-page="detail"] .repository.view.issue .timeline-item.comment > .content.comment-container {
+  border: 1px solid var(--of-community-border) !important;
+  border-radius: 10px !important;
+  background: var(--of-community-surface) !important;
+  box-shadow: none !important;
+}
+
+html body[data-openface-community-page="detail"] .repository.view.issue .timeline-item.comment .comment-header {
+  min-height: 48px !important;
+  padding: 10px 12px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--of-community-border) !important;
+  background: var(--of-community-surface-muted) !important;
+}
+
+html body[data-openface-community-page="detail"] .repository.view.issue .timeline-item.comment .comment-body {
+  padding: 18px 20px !important;
+  border: 0 !important;
+  background: var(--of-community-surface) !important;
+  color: var(--of-community-ink) !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-community-page="detail"]
+  .repository.view.issue .comment-header :is(.text.grey.muted-links, relative-time) {
+  color: #59675f !important;
+}
+
+html body[data-openface-community-page="detail"][data-openface-pull-view="files"] .diff-detail-box {
+  border: 1px solid var(--of-community-border) !important;
+  border-radius: 10px !important;
+  background: var(--of-community-surface) !important;
+  color: var(--of-community-ink) !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 767px) {
+  html body[data-openface-community-page="detail"] .repository.view.issue .issue-title-header {
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+    column-gap: 12px !important;
+    margin-top: 18px !important;
+    padding: 0 0 16px !important;
+  }
+
+  html body[data-openface-community-page="detail"] .repository.view.issue .issue-title-header::before {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background-size: 20px 20px;
+  }
+
+  html body[data-openface-community-page="detail"] .repository.view.issue .issue-title h1 {
+    font-size: 19px !important;
+  }
+
+  html body[data-openface-community-page="detail"] .repository.view.issue .issue-title-meta {
+    display: block !important;
+    font-size: 12px !important;
+  }
+
+  html body[data-openface-community-page="detail"] .repository.view.issue .issue-title-meta > .ui.label {
+    display: inline-flex !important;
+    margin: 0 6px 6px 0 !important;
+  }
+
+  html body[data-openface-community-page="detail"] .openface-pull-commit-link {
+    margin: 7px 0 0 !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-community-kind="pull"]
+    .repository.view.issue .ui.top.attached.pull.tabular.menu {
+    gap: 20px !important;
+    padding-inline: 2px !important;
+    overflow: hidden !important;
+  }
+
+  html body[data-openface-community-page="detail"][data-openface-community-kind="pull"]
+    .repository.view.issue .ui.top.attached.pull.tabular.menu > .item {
+    padding-inline: 0 !important;
+    font-size: 13px !important;
+  }
+
+  html body[data-openface-community-page="detail"] .repository.view.issue .timeline-item.comment .comment-body {
+    padding: 16px !important;
+  }
+}
