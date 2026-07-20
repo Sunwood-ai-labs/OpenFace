@@ -24,10 +24,15 @@ class IssueTask:
     follow_up: bool = False
     instruction: str = ""
     agent_key: str = "coding"
+    reply_number: int | None = None
 
     @property
     def branch(self) -> str:
         return f"agent/issue-{self.issue_number}"
+
+    @property
+    def conversation_number(self) -> int:
+        return self.reply_number or self.issue_number
 
 
 @dataclass(frozen=True)
@@ -77,7 +82,7 @@ class MaintenanceWorker:
                 agent_client = ForgejoClient(self.settings, self.settings.agent_token_file(profile.username))
                 try:
                     agent_client.comment_issue(
-                        task.owner, task.repo, task.issue_number,
+                        task.owner, task.repo, task.conversation_number,
                         f"{profile.emoji} **{profile.display_name}** が独立レビューを完了しました。\n\n"
                         f"{summary}\n\n変更が必要な問題は見つからなかったため、追加コミットはありません。",
                     )
@@ -110,7 +115,7 @@ class MaintenanceWorker:
                 agent_client.comment_issue(
                     task.owner,
                     task.repo,
-                    task.issue_number,
+                    task.conversation_number,
                     f"{profile.emoji} **{profile.display_name}** が担当作業を完了しました。\n\n"
                     f"- PR: [#{pull.number}]({pull.url})\n"
                     f"- 変更ファイル: {', '.join(f'`{path}`' for path in changed)}\n"

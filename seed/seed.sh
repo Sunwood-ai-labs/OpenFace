@@ -226,7 +226,7 @@ ensure_maintenance_webhook() {
     if [ -n "$hook_id" ]; then
       secret="$(cat "$MAINTENANCE_WEBHOOK_SECRET_FILE")"
       payload=$(jq -n --arg url "$MAINTENANCE_WEBHOOK_URL" --arg secret "$secret" \
-        '{type:"forgejo",active:true,events:["issues","issue_comment"],config:{url:$url,content_type:"json",secret:$secret}}')
+        '{type:"forgejo",active:true,events:["issues","issue_comment","pull_request_comment"],config:{url:$url,content_type:"json",secret:$secret}}')
       code=$(api PATCH "/orgs/${ORG_NAME}/hooks/${hook_id}" "$payload")
       if [ "$code" = "200" ]; then
         log "Updated GLM maintenance webhook (id ${hook_id}) for Issue and comment events."
@@ -240,7 +240,7 @@ ensure_maintenance_webhook() {
 
   secret="$(cat "$MAINTENANCE_WEBHOOK_SECRET_FILE")"
   payload=$(jq -n --arg url "$MAINTENANCE_WEBHOOK_URL" --arg secret "$secret" \
-    '{type:"forgejo",active:true,events:["issues","issue_comment"],config:{url:$url,content_type:"json",secret:$secret}}')
+    '{type:"forgejo",active:true,events:["issues","issue_comment","pull_request_comment"],config:{url:$url,content_type:"json",secret:$secret}}')
   code=$(api POST "/orgs/${ORG_NAME}/hooks" "$payload")
   if [ "$code" = "201" ]; then
     log "Created organization Issue/comment webhook for the GLM maintenance agent."

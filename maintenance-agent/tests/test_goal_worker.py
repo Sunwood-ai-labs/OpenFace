@@ -78,6 +78,16 @@ class GoalWorkerTests(unittest.TestCase):
         self.assertIn("見出しも日本語にしてください", prompt)
         self.assertIn("既存PRのブランチ上", prompt)
 
+    def test_pull_request_conversation_can_reply_separately_from_source_issue(self) -> None:
+        from worker import IssueTask
+
+        task = IssueTask(
+            "openface", "demo", 18, "レビュー", "元Issue", "main", "https://example/18",
+            follow_up=True, instruction="レビューしてください", agent_key="review", reply_number=19,
+        )
+        self.assertEqual(task.branch, "agent/issue-18")
+        self.assertEqual(task.conversation_number, 19)
+
     def test_specialist_mention_routes_one_agent_and_removes_mention(self) -> None:
         from agents import mention_instruction, mentioned_agent
 

@@ -82,14 +82,14 @@ def process_job(delivery_id: str, task: IssueTask) -> None:
     try:
         client = ForgejoClient(settings, settings.agent_token_file(profile.username))
         try:
-            client.react_to_issue(task.owner, task.repo, task.issue_number, "eyes")
+            client.react_to_issue(task.owner, task.repo, task.conversation_number, "eyes")
         finally:
             client.close()
         result = worker.run(task)
         update_job(delivery_id, "completed", result.summary, result.pull.url)
         client = ForgejoClient(settings, settings.agent_token_file(profile.username))
         try:
-            client.react_to_issue(task.owner, task.repo, task.issue_number, "rocket")
+            client.react_to_issue(task.owner, task.repo, task.conversation_number, "rocket")
         finally:
             client.close()
         logger.info("Completed %s/%s issue #%s -> PR %s", task.owner, task.repo, task.issue_number, result.pull.url)
@@ -99,11 +99,11 @@ def process_job(delivery_id: str, task: IssueTask) -> None:
         logger.error("Maintenance failed for %s/%s#%s: %s", task.owner, task.repo, task.issue_number, message)
         try:
             client = ForgejoClient(settings)
-            client.react_to_issue(task.owner, task.repo, task.issue_number, "confused")
+            client.react_to_issue(task.owner, task.repo, task.conversation_number, "confused")
             client.comment_issue(
                 task.owner,
                 task.repo,
-                task.issue_number,
+                task.conversation_number,
                 "🤖 Claude Code `/goal` は変更をpushせずに停止しました。"
                 "Goalの実行に失敗したか、生成されたworktreeが公開前検証を通過しませんでした。"
                 "メンテナーはサービスのジョブログを確認できます。",
@@ -125,6 +125,7 @@ def signature_valid(raw_body: bytes, supplied: str | None) -> bool:
 def payload_to_task(
     payload: dict[str, Any], *, issue_override: dict[str, Any] | None = None,
     follow_up: bool = False, instruction: str = "", agent_key: str = "coding",
+    reply_number: int | None = None,
 ) -> IssueTask:
     repository = payload.get("repository") or {}
     issue = issue_override or payload.get("issue") or {}
@@ -145,6 +146,7 @@ def payload_to_task(
         follow_up=follow_up,
         instruction=instruction[:20_000],
         agent_key=agent_key,
+        reply_number=reply_number,
     )
 
 
@@ -234,7 +236,7 @@ async def forgejo_webhook(
     raw_body = await request.body()
     if not signature_valid(raw_body, x_forgejo_signature):
         raise HTTPException(status_code=401, detail="Invalid webhook signature")
-    if x_forgejo_event not in {"issues", "issue", "issue_comment"}:
+    if x_forgejo_event not in {"issues", "issue", "issue_comment", "pull_request_comment"}:
         return {"accepted": False, "reason": "event ignored"}
     try:
         payload = json.loads(raw_body)
@@ -276,7 +278,9 @@ async def forgejo_webhook(
         owner = str((repository.get("owner") or {}).get("login") or "")
         repo = str(repository.get("name") or "")
         issue_number = int(issue.get("number") or 0)
+        reply_number: int | None = None
         if issue.get("pull_request"):
+            reply_number = issue_number
             client = ForgejoClient(settings)
             try:
                 source_number = client.source_issue_number_for_pull(owner, repo, issue_number)
@@ -288,6 +292,7 @@ async def forgejo_webhook(
         profile = profile or choose_agent(str(issue.get("title") or ""), instruction)
         task = payload_to_task(
             payload, issue_override=issue, follow_up=True, instruction=instruction, agent_key=profile.key,
+            reply_number=reply_number,
         )
         queued = enqueue(task, delivery_id, allow_retry=True)
     return {
