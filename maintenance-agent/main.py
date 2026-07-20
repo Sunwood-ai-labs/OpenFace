@@ -6,15 +6,17 @@ import json
 import logging
 import sqlite3
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 from threading import Lock
+from collections.abc import Callable
 from typing import Any
 
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import JSONResponse
 
-from agents import AGENTS, BY_USERNAME, choose_agent, mention_instruction, mentioned_agent
+from agents import AGENTS, BY_USERNAME, choose_agent, delegation_comment, mention_instruction, mentioned_agent
 from config import Settings
 from forgejo import ForgejoClient
 from worker import IssueTask, MaintenanceWorker
@@ -37,7 +39,7 @@ def utc_now() -> str:
 
 
 def initialize_database() -> None:
-    with sqlite3.connect(database_path) as db:
+    with closing(sqlite3.connect(database_path)) as db, db:
         db.execute(
             """
             CREATE TABLE IF NOT EXISTS jobs (
@@ -69,7 +71,7 @@ initialize_database()
 
 
 def update_job(delivery_id: str, status: str, detail: str = "", pull_url: str = "") -> None:
-    with database_lock, sqlite3.connect(database_path) as db:
+    with database_lock, closing(sqlite3.connect(database_path)) as db, db:
         db.execute(
             "UPDATE jobs SET status=?, detail=?, pull_url=?, updated_at=? WHERE delivery_id=?",
             (status, detail[:4000], pull_url, utc_now(), delivery_id),
@@ -158,9 +160,15 @@ def follow_up_instruction(body: str) -> str | None:
     return instruction or None
 
 
-def enqueue(task: IssueTask, delivery_id: str, *, allow_retry: bool) -> bool:
+def enqueue(
+    task: IssueTask,
+    delivery_id: str,
+    *,
+    allow_retry: bool,
+    announce: Callable[[], None] | None = None,
+) -> bool:
     now = utc_now()
-    with database_lock, sqlite3.connect(database_path) as db:
+    with database_lock, closing(sqlite3.connect(database_path)) as db, db:
         row = db.execute(
             "SELECT delivery_id, status FROM jobs WHERE owner=? AND repo=? AND issue_number=?",
             (task.owner, task.repo, task.issue_number),
@@ -179,6 +187,13 @@ def enqueue(task: IssueTask, delivery_id: str, *, allow_retry: bool) -> bool:
                 "VALUES(?, ?, ?, ?, 'queued', ?, ?, ?)",
                 (delivery_id, task.owner, task.repo, task.issue_number, now, now, AGENTS[task.agent_key].username),
             )
+    try:
+        if announce:
+            announce()
+    except Exception:
+        with database_lock, closing(sqlite3.connect(database_path)) as db, db:
+            db.execute("DELETE FROM jobs WHERE delivery_id=? AND status='queued'", (delivery_id,))
+        raise
     executor.submit(process_job, delivery_id, task)
     return True
 
@@ -200,7 +215,7 @@ def health() -> JSONResponse:
 
 @app.get("/api/jobs")
 def jobs() -> dict[str, Any]:
-    with database_lock, sqlite3.connect(database_path) as db:
+    with database_lock, closing(sqlite3.connect(database_path)) as db, db:
         db.row_factory = sqlite3.Row
         rows = db.execute(
             "SELECT delivery_id, owner, repo, issue_number, status, detail, pull_url, agent, created_at, updated_at "
@@ -254,18 +269,16 @@ async def forgejo_webhook(
             return {"accepted": False, "reason": "action ignored"}
         profile = choose_agent(str(issue.get("title") or ""), body)
         task = payload_to_task(payload, agent_key=profile.key)
-        queued = enqueue(task, delivery_id, allow_retry=False)
-        if queued:
+        def announce_delegation() -> None:
             client = ForgejoClient(settings)
             try:
                 client.comment_issue(
                     task.owner, task.repo, task.issue_number,
-                    f"🧭 内容を分類し、@{profile.username} に委任しました。\n\n"
-                    f"> 担当: **{profile.display_name}** — {profile.focus}\n\n"
-                    "進捗はリアクションとコメントで更新します。",
+                    delegation_comment(profile, f"{task.title}\n{task.body}", follow_up=False),
                 )
             finally:
                 client.close()
+        queued = enqueue(task, delivery_id, allow_retry=False, announce=announce_delegation)
     else:
         if payload.get("action") not in {"created", "edited"}:
             return {"accepted": False, "reason": "comment action ignored"}
@@ -294,7 +307,16 @@ async def forgejo_webhook(
             payload, issue_override=issue, follow_up=True, instruction=instruction, agent_key=profile.key,
             reply_number=reply_number,
         )
-        queued = enqueue(task, delivery_id, allow_retry=True)
+        def announce_follow_up() -> None:
+            client = ForgejoClient(settings)
+            try:
+                client.comment_issue(
+                    task.owner, task.repo, task.conversation_number,
+                    delegation_comment(profile, instruction, follow_up=True),
+                )
+            finally:
+                client.close()
+        queued = enqueue(task, delivery_id, allow_retry=True, announce=announce_follow_up)
     return {
         "accepted": True,
         "duplicate": not queued,

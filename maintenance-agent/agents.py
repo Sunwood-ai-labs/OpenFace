@@ -47,6 +47,18 @@ def mention_instruction(body: str, profile: AgentProfile) -> str:
     return re.sub(rf"@{re.escape(profile.username)}\b", "", body, count=1, flags=re.IGNORECASE).strip()
 
 
+def delegation_comment(profile: AgentProfile, instruction: str, *, follow_up: bool) -> str:
+    summary = " ".join(instruction.split())[:600] or profile.focus
+    context = "追加指示" if follow_up else "新しいIssue"
+    return (
+        f"🧭 {context}を分類しました。\n\n"
+        f"@{profile.username} 次の作業を担当してください。\n\n"
+        f"> {summary}\n\n"
+        f"担当領域: **{profile.display_name}** — {profile.focus}\n\n"
+        "進捗と完了結果は、担当アカウント自身がリアクションとコメントで更新します。"
+    )
+
+
 def choose_agent(title: str, body: str) -> AgentProfile:
     text = f"{title}\n{body}".lower()
     if any(word in text for word in ("readme", "ドキュメント", "documentation", "vitepress", "docs/")):

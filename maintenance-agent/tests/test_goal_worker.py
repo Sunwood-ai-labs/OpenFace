@@ -111,6 +111,36 @@ class GoalWorkerTests(unittest.TestCase):
         self.assertEqual(choose_agent("モバイルUI", "CSSの余白を直す").key, "designer")
         self.assertEqual(choose_agent("API追加", "JSON endpointを実装").key, "coding")
 
+    def test_maintainer_delegation_visibly_mentions_the_specialist(self) -> None:
+        from agents import AGENTS, delegation_comment
+
+        message = delegation_comment(
+            AGENTS["docs"],
+            "READMEと再構築手順を更新してください",
+            follow_up=False,
+        )
+        self.assertIn("@docs-agent 次の作業を担当してください", message)
+        self.assertIn("READMEと再構築手順", message)
+        self.assertIn("担当アカウント自身", message)
+
+    def test_delegation_announcement_precedes_worker_submission(self) -> None:
+        import main
+        from worker import IssueTask
+
+        main.database_path = Path(self.temp.name) / "enqueue-order.sqlite3"
+        main.initialize_database()
+        events: list[str] = []
+        task = IssueTask("openface", "demo", 42, "README", "更新", "main", "https://example/42", agent_key="docs")
+        with patch.object(main.executor, "submit", side_effect=lambda *args: events.append("submit")):
+            queued = main.enqueue(
+                task,
+                "delivery-order",
+                allow_retry=False,
+                announce=lambda: events.append("mention"),
+            )
+        self.assertTrue(queued)
+        self.assertEqual(events, ["mention", "submit"])
+
     def test_specialist_prompt_contains_role_contract(self) -> None:
         from config import Settings
         from worker import IssueTask, MaintenanceWorker
