@@ -10,7 +10,7 @@ OpenFaceはForgejoで新規作成されたIssueを、Claude Code組み込みの 
 4. Claude Code 2.1.205へ、Issueと完了条件を含む本物の `/goal` を渡します。
 5. Claude Codeがローカル指示・ソースを調査し、必要なファイルを編集し、テストやbuildを実行し、diffを再確認して、goal evaluatorが完了するまで作業します。
 6. root wrapperがclone外への逸脱がないことと `git diff --check` を確認します。
-7. 専用ユーザー `glm-maintainer` がcommit・push・PR作成・Issue返信を行います。
+7. `glm-maintainer` が内容を分類し、専門エージェントへ委任します。担当エージェントがcommit・push・Issue返信を行います。
 8. 人間がPRを確認してマージまたはクローズします。自動マージ経路はありません。
 
 固定のplanner/coder JSON pipelineではありません。ファイル数・変更行数の上限を設けず、Claude Code `/goal` の自由度を維持します。
@@ -34,6 +34,26 @@ docker compose exec maintenance-agent python -c "import urllib.request; print(ur
 
 seedは非管理者 `glm-maintainer`、write専用組織team、専用Forgejo token、Webhook HMAC secret、Issue webhookを冪等に作成します。
 
+## 専門エージェントへの委任
+
+新規Issueは司令塔が内容から担当を自動選択します。コメントで担当を明示することもできます。
+
+```text
+@designer-agent モバイル画面をスクリーンショット比較して余白を修正してください
+@coding-agent APIへJSONレスポンスを追加し、テストしてください
+@docs-agent READMEとVitePressの再構築手順を更新してください
+@review-agent 現在のPRを独立レビューし、問題があれば修正してください
+```
+
+| メンション | 担当 |
+|---|---|
+| `@designer-agent` | UI/UX、テーマ、レスポンシブ、アクセシビリティ、スクリーンショット比較 |
+| `@coding-agent` | 実装、リファクタリング、テスト、ビルド |
+| `@docs-agent` | README、VitePress、設定例、再構築手順、リンク |
+| `@review-agent` | diff、テスト、セキュリティ、回帰、要件充足の独立レビュー |
+
+1コメントでは1体だけ指定します。複数メンションは曖昧な指令として実行されません。同じIssueが処理中の間は追加ジョブを投入せず、別Issueは `MAINTENANCE_MAX_WORKERS` の範囲で並列処理します。担当一覧は `GET /api/agents`、担当を含むジョブ状態は `GET /api/jobs` で確認できます。
+
 ## 起動条件と除外
 
 設定された組織の新規Issueは既定で処理されます。対象外にする場合は作成時に次のいずれかを付けます。
@@ -45,7 +65,7 @@ seedは非管理者 `glm-maintainer`、write専用組織team、専用Forgejo tok
 
 ### コメントから追加編集する
 
-元Issueまたはエージェントが作成したPRへ、追加指示を `/goal` から始めて投稿します。
+元Issueまたはエージェントが作成したPRへ、追加指示を `/goal` から始めるか、専門エージェントをメンションして投稿します。
 
 ```text
 /goal 見出しも日本語にしてください。ほかのファイルは変更しないでください。
