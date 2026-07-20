@@ -729,6 +729,9 @@ UIレビューの追加必須条件:
 - モバイル（幅480px以下）とデスクトップ（幅1024px以上）を独自に撮影する。
 - PNGを `.openface-maintenance/review-screenshots/` に保存する。
 - `review-report.json` の `screenshots` に path、caption、viewport、url を記録する。
+- JSONの`screenshots`配列には、PNG実寸幅480px以下のモバイル画像と実寸幅1024px以上のデスクトップ画像を必ず1枚以上ずつ含める。撮影しただけでJSONから漏らさない。
+- `python /app/capture_ui.py --url <URL> --output .openface-maintenance/review-screenshots/<name>.png --width <幅> --height <高さ>` を利用できる。
+- 最終JSONを書いた後に、列挙した各PNGの実寸を読み直してモバイル／デスクトップ双方の条件を満たすことを確認する。
 """
         return f"""/goal [独立レビュー専用] Forgejo PR #{pull.number} を厳格に評価してください。
 
@@ -774,7 +777,10 @@ Issue本文:
   "findings": [
     {{"severity": "critical/high/medium/low", "title": "指摘", "location": "file:line または画面/操作", "details": "再現条件と影響", "remediation": "承認に必要な修正"}}
   ],
-  "screenshots": []
+  "screenshots": [
+    {{"path": ".openface-maintenance/review-screenshots/mobile.png", "caption": "モバイル独立レビュー", "viewport": "390x844", "url": "http://127.0.0.1:8080/"}},
+    {{"path": ".openface-maintenance/review-screenshots/desktop.png", "caption": "デスクトップ独立レビュー", "viewport": "1440x1000", "url": "http://127.0.0.1:8080/"}}
+  ]
 }}
 ```
 承認時も `findings` は空配列として明示してください。最後のサマリーは日本語にしてください。

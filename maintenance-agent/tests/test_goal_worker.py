@@ -344,6 +344,8 @@ class GoalWorkerTests(unittest.TestCase):
         self.assertIn("critical/high/medium", prompt)
         self.assertIn("モバイル", prompt)
         self.assertIn("デスクトップ", prompt)
+        self.assertIn("PNG実寸幅480px以下", prompt)
+        self.assertIn("撮影しただけでJSONから漏らさない", prompt)
         self.assertIn('"reviewed_sha": "abc123"', prompt)
 
     def test_review_report_rejects_false_approval(self) -> None:
