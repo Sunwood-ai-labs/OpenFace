@@ -341,6 +341,23 @@ html[data-openface-theme="cyberpunk"] body a.openface-community-tab.active {
       "/git/luna-scout",
       "/git/patch-orbit",
       "/git/mikan-reviewer",
+      "/git/glm-maintainer",
+      "/git/designer-agent",
+      "/git/coding-agent",
+      "/git/docs-agent",
+      "/git/review-agent",
+    ]);
+    const generatedAgentNames = new Set([
+      "glm maintainer",
+      "glm-maintainer",
+      "openface designer",
+      "designer-agent",
+      "openface coding",
+      "coding-agent",
+      "openface docs",
+      "docs-agent",
+      "openface review",
+      "review-agent",
     ]);
     const organizationProfiles = new Set([
       "/git/openface",
@@ -353,7 +370,10 @@ html[data-openface-theme="cyberpunk"] body a.openface-community-tab.active {
         img.classList.add("openface-avatar-image");
         continue;
       }
-      if (generatedAgentProfiles.has(profileHref) && img.getAttribute("src")?.startsWith("/git/avatars/")) {
+      if (
+        (generatedAgentProfiles.has(profileHref) || generatedAgentNames.has(alt))
+        && img.getAttribute("src")?.startsWith("/git/avatars/")
+      ) {
         img.classList.add("openface-avatar-image");
         continue;
       }
