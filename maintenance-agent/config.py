@@ -12,6 +12,13 @@ def _integer(name: str, default: int) -> int:
         return default
 
 
+def _boolean(name: str, default: bool = False) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 @dataclass(frozen=True)
 class Settings:
     forgejo_api: str
@@ -28,6 +35,7 @@ class Settings:
     goal_timeout_seconds: int
     max_workers: int
     agent_token_dir: Path
+    auto_merge: bool
 
     @classmethod
     def load(cls) -> "Settings":
@@ -46,6 +54,7 @@ class Settings:
             goal_timeout_seconds=_integer("MAINTENANCE_GOAL_TIMEOUT_SECONDS", 3600),
             max_workers=max(1, min(_integer("MAINTENANCE_MAX_WORKERS", 2), 4)),
             agent_token_dir=Path(os.getenv("MAINTENANCE_AGENT_TOKEN_DIR", "/shared/agent-tokens")),
+            auto_merge=_boolean("MAINTENANCE_AUTO_MERGE"),
         )
 
     def agent_token_file(self, username: str) -> Path:

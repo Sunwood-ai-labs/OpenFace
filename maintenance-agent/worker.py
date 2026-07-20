@@ -109,7 +109,10 @@ class MaintenanceWorker:
                 f"[Claude Goal + GLM] {task.title}",
                 self._pull_body(task, summary, changed),
             )
-            action = "既存PRを更新しました" if existing else "PRを作成しました"
+            merged = False
+            if self.settings.auto_merge:
+                forgejo.merge_pull(task.owner, task.repo, pull.number)
+                merged = True
             agent_client = ForgejoClient(self.settings, self.settings.agent_token_file(profile.username))
             try:
                 agent_client.comment_issue(
@@ -119,7 +122,8 @@ class MaintenanceWorker:
                     f"{profile.emoji} **{profile.display_name}** が担当作業を完了しました。\n\n"
                     f"- PR: [#{pull.number}]({pull.url})\n"
                     f"- 変更ファイル: {', '.join(f'`{path}`' for path in changed)}\n"
-                    f"- 実行: Claude Code `/goal` + `{self.settings.model}`",
+                    f"- 実行: Claude Code `/goal` + `{self.settings.model}`\n"
+                    f"- 状態: {'自動マージ済み' if merged else '人間レビュー待ち'}",
                 )
             finally:
                 agent_client.close()

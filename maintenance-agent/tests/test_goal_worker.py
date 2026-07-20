@@ -25,6 +25,7 @@ class GoalWorkerTests(unittest.TestCase):
                 "ZAI_API_KEY": "test-key",
                 "MAINTENANCE_MODEL": "glm-5.2",
                 "MAINTENANCE_MAX_WORKERS": "2",
+                "MAINTENANCE_AUTO_MERGE": "true",
                 "MAINTENANCE_DATA_DIR": str(root / "data"),
                 "MAINTENANCE_WORKSPACE_DIR": str(root / "work"),
             }
@@ -49,8 +50,23 @@ class GoalWorkerTests(unittest.TestCase):
         from config import Settings
 
         self.assertEqual(Settings.load().max_workers, 2)
+        self.assertTrue(Settings.load().auto_merge)
         with patch.dict(os.environ, {"MAINTENANCE_MAX_WORKERS": "99"}):
             self.assertEqual(Settings.load().max_workers, 4)
+
+    def test_forgejo_merge_uses_guarded_server_side_merge(self) -> None:
+        from config import Settings
+        from forgejo import ForgejoClient
+
+        client = ForgejoClient(Settings.load())
+        client._request = Mock()
+        client.merge_pull("openface", "demo", 7)
+        client._request.assert_called_once_with(
+            "POST",
+            "/repos/openface/demo/pulls/7/merge",
+            json={"Do": "merge", "delete_branch_after_merge": True, "merge_when_checks_succeed": True},
+        )
+        client.close()
 
     def test_prompt_invokes_builtin_goal_with_completion_conditions(self) -> None:
         from config import Settings

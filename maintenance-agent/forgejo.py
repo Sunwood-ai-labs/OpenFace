@@ -61,6 +61,17 @@ class ForgejoClient:
         )
         return PullRequest(number=int(pull["number"]), url=pull.get("html_url") or pull.get("url", ""))
 
+    def merge_pull(self, owner: str, repo: str, pull_number: int) -> None:
+        self._request(
+            "POST",
+            f"/repos/{owner}/{repo}/pulls/{pull_number}/merge",
+            json={
+                "Do": "merge",
+                "delete_branch_after_merge": True,
+                "merge_when_checks_succeed": True,
+            },
+        )
+
     def comment_issue(self, owner: str, repo: str, issue_number: int, body: str) -> None:
         self._request(
             "POST",
