@@ -156,6 +156,8 @@ Webhook署名とIssue単位の重複排除はサービスが担当します。Cl
 
 追加編集の実E2Eは [Issue #12](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/12) → [PR #15](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/15) として残しています。日本語の `/goal` コメントから既存PRへcommit `1a505ce` が追加され、指定した1ファイルだけが更新され、日本語の実行結果と返信が残り、PRがmerge可能なままであることを確認済みです。
 
+専門委任の実E2Eは [Issue #18](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/18) → [PR #19](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/19) として残しています。自動分類でドキュメント担当へ委任した後、PRコメントの `@review-agent` から同じブランチを独立レビューできることを確認しています。
+
 初期seedには、用途別のPages例も含まれます。
 
 | リポジトリ | 配信元 | 例 |

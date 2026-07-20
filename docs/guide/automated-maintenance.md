@@ -4,13 +4,13 @@ OpenFace can turn a newly opened Forgejo Issue into a human-reviewed Pull Reques
 
 ## Flow
 
-1. Forgejo signs and sends the organization `issues` or `issue_comment` webhook.
+1. Forgejo signs and sends the organization `issues`, `issue_comment`, or `pull_request_comment` webhook.
 2. `maintenance-agent` validates the HMAC signature and records the delivery in SQLite.
 3. The service clones the repository and creates `agent/issue-N`.
 4. Claude Code 2.1.205 receives `/goal` followed by the Issue and explicit completion conditions.
 5. Claude Code inspects local instructions and source, edits any required repository files, runs relevant commands and tests, reviews its diff, and keeps working until the goal evaluator finishes.
 6. The root wrapper verifies repository containment and `git diff --check`.
-7. The dedicated `glm-maintainer` account commits, pushes, opens a PR, and comments on the Issue.
+7. `glm-maintainer` classifies the request and delegates it to a specialist identity. That specialist commits, pushes, and posts the completion reply.
 8. A human reviews and merges or closes the PR. The agent has no auto-merge path.
 
 This is deliberately not a fixed planner/coder JSON pipeline. There is no file-count or changed-line cap; `/goal` retains Claude Code's repository-level freedom.
@@ -36,7 +36,7 @@ docker compose exec maintenance-agent claude --version
 docker compose exec maintenance-agent python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8010/health').read().decode())"
 ```
 
-The seed creates the non-admin `glm-maintainer` user, its write-only organization team, a dedicated Forgejo token, a random webhook HMAC secret, and the Issue webhook.
+The seed creates the non-admin orchestrator and specialist users, their write-only organization team, separate Forgejo tokens, a random webhook HMAC secret, and the Issue/PR-comment webhook.
 
 ## Trigger and opt out
 
@@ -56,6 +56,19 @@ On the source Issue or its agent-created PR, start a comment with `/goal` follow
 ```
 
 The agent checks out the existing `agent/issue-N` branch, runs the Japanese completion prompt, verifies the new diff, and pushes a new commit to the same PR. Ordinary discussion comments do not trigger a model run. A currently queued or running Issue cannot be queued again; edit or post the follow-up after the active run finishes.
+
+### Delegate to a specialist
+
+New Issues are classified automatically. To override the routing for a follow-up, mention exactly one registered persona in an Issue or PR comment:
+
+```text
+@designer-agent Verify the responsive spacing with screenshots and fix any regression.
+@coding-agent Implement the endpoint and its focused tests.
+@docs-agent Update the rebuild guide and verify every command.
+@review-agent Independently review this PR and change files only when a defect is found.
+```
+
+One comment routes to one specialist so ownership remains explicit. `/api/agents` lists the persona contracts, while `/api/jobs` records the selected username and job state. A PR-triggered job keeps the source Issue branch but posts reactions and the completion reply back to the PR conversation where it was requested.
 
 The Issue reaction trail is intentionally small: 👍 for human support, 👀 while the maintenance agent is working, 🚀 after successful publication, and 😕 when a run fails or stops before publication.
 

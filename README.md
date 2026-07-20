@@ -345,11 +345,15 @@ Point `ZAI_AGENT_CONFIG` in the untracked `.env` file to a protected env file co
 
 After the PR exists, post a comment beginning with `/goal`, for example `/goal 見出しも日本語にしてください。`. The agent checks out the existing `agent/issue-N` branch, applies and verifies the additional instruction, pushes another commit to the same PR, and replies in Japanese. Ordinary comments do not run the agent. The trigger works on the source Issue and on its agent-created PR.
 
+The orchestrator automatically delegates each new Issue to one specialist: `@designer-agent`, `@coding-agent`, `@docs-agent`, or `@review-agent`. A maintainer can also mention exactly one specialist in an Issue or PR comment to route a follow-up explicitly. Each specialist has its own Forgejo identity, avatar, least-privilege token, role contract, commit author, reactions, and completion reply; `/api/agents` and `/api/jobs` expose the available personas and current assignment.
+
 Issue reactions provide a compact progress signal: 👍 records human support, 👀 means `glm-maintainer` accepted and is processing the request, 🚀 means the verified PR or follow-up commit was published, and 😕 marks a stopped or failed run that needs log inspection.
 
 The service validates the Forgejo HMAC signature and deduplicates deliveries in SQLite. Claude Code runs as an unprivileged user inside the maintenance container: it has no host Docker socket and cannot read the Forgejo bot token, while retaining normal repository-level tools and test execution. The root wrapper alone commits and pushes after `git diff --check`; it never merges its own PR. See [Automated Claude Code maintenance](https://sunwood-ai-labs.github.io/OpenFace/guide/automated-maintenance).
 
 The retained follow-up proof is [Issue #12](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/12) → [PR #15](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/15): a Japanese `/goal` comment produced commit `1a505ce` on the existing PR, changed only the requested file, returned a Japanese completion summary, and kept the PR mergeable.
+
+Specialist delegation is retained as [Issue #18](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/18) → [PR #19](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/19): automatic classification assigned the documentation persona, and an explicit `@review-agent` PR comment launched an independent review on the same branch.
 
 ## 📖 Documentation
 

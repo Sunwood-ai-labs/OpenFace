@@ -4,7 +4,7 @@ OpenFaceはForgejoで新規作成されたIssueを、Claude Code組み込みの 
 
 ## 処理の流れ
 
-1. Forgejoが組織の `issues` または `issue_comment` webhookへHMAC署名を付けて送信します。
+1. Forgejoが組織の `issues`、`issue_comment`、`pull_request_comment` webhookへHMAC署名を付けて送信します。
 2. `maintenance-agent` が署名を検証し、配送IDをSQLiteへ記録します。
 3. 対象リポジトリをcloneし、`agent/issue-N` ブランチを作ります。
 4. Claude Code 2.1.205へ、Issueと完了条件を含む本物の `/goal` を渡します。
@@ -72,6 +72,8 @@ seedは非管理者 `glm-maintainer`、write専用組織team、専用Forgejo tok
 ```
 
 エージェントは既存の `agent/issue-N` ブランチをcheckoutし、日本語の完了プロンプトで追加編集と検証を行い、同じPRへ新しいcommitをpushします。通常の議論コメントはモデルを起動しません。同じIssueが `queued` または `running` の間は再投入せず、完了後のコメントだけを受け付けます。
+
+PRで起動した場合も作業ブランチは元Issueの `agent/issue-N` を維持し、処理中リアクションと完了返信は指示を投稿したPR側へ返します。これにより依頼と結果が同じ会話内に残ります。
 
 Issueのリアクションは、👍 が人による賛同、👀 が保守エージェントの処理中、🚀 が公開成功、😕 が公開前の失敗・停止を示します。
 
