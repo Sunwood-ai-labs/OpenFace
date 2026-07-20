@@ -365,8 +365,9 @@ class GoalWorkerTests(unittest.TestCase):
         }
         (evidence / "review-report.json").write_text(json.dumps(report), encoding="utf-8")
         task = IssueTask("openface", "demo", 12, "UI", "fix", "main", "https://example/12")
-        with self.assertRaisesRegex(RuntimeError, "approved despite"):
-            MaintenanceWorker(Settings.load())._collect_review_evidence(root, task, "abc123")
+        result = MaintenanceWorker(Settings.load())._collect_review_evidence(root, task, "abc123")
+        self.assertEqual(result.verdict, "rejected")
+        self.assertIn("安全側へ差し戻し", result.summary)
 
     def test_review_report_is_bound_to_current_head_sha(self) -> None:
         from config import Settings

@@ -497,7 +497,11 @@ class MaintenanceWorker:
         failed = any(item.result == "failed" for item in requirements + executed_checks)
         blocking = bool(findings)
         if verdict == "approved" and (failed or blocking):
-            raise RuntimeError("Reviewer approved despite failed checks or blocking findings")
+            verdict = "rejected"
+            summary = (
+                "レビュワー出力は承認を申告しましたが、failed項目または指摘が残っているため、"
+                "ラッパーが安全側へ差し戻しました。\n\n" + summary
+            )
         if verdict == "rejected" and not (failed or findings):
             raise RuntimeError("Reviewer rejected without a failed check or actionable finding")
 
@@ -758,8 +762,7 @@ Issue本文:
 - `git diff origin/{task.default_branch}...HEAD` を全行確認する。
 - 関連テスト、lint、型検査、ビルドを実行する。実行不能はpassedにしない。
 - 回帰、境界条件、エラー処理、セキュリティ、アクセシビリティを厳しく確認する。
-- critical/high/mediumの指摘、失敗した要件、証跡不足が1件でもあれば `rejected` にする。
-- lowのみでも品質上マージすべきでなければ `rejected` にする。
+- critical/high/medium/lowの別を問わず、指摘、失敗した要件、証跡不足が1件でもあれば必ず `rejected` にする。
 - 根拠のない推測で承認しない。
 
 `.openface-maintenance/review-report.json` を次の厳密な形で作成してください:
