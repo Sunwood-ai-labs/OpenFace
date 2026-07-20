@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 import os
+import hashlib
+import hmac
+import json
+import struct
 import sys
 import tempfile
 import unittest
@@ -104,27 +108,20 @@ class GoalWorkerTests(unittest.TestCase):
         self.assertEqual(task.branch, "agent/issue-18")
         self.assertEqual(task.conversation_number, 19)
 
-    def test_specialist_mention_routes_one_agent_and_removes_mention(self) -> None:
-        from agents import mention_instruction, mentioned_agent
+    def test_maintainer_mention_is_the_user_entrypoint(self) -> None:
+        from agents import maintainer_instruction, mentions_maintainer
 
-        profile = mentioned_agent("@designer-agent モバイルの余白をスクショで確認して")
-        self.assertIsNotNone(profile)
-        self.assertEqual(profile.key, "designer")
+        self.assertTrue(mentions_maintainer("@glm-maintainer モバイルの余白をスクショで確認して"))
         self.assertEqual(
-            mention_instruction("@designer-agent モバイルの余白をスクショで確認して", profile),
+            maintainer_instruction("@glm-maintainer モバイルの余白をスクショで確認して"),
             "モバイルの余白をスクショで確認して",
         )
 
-    def test_ambiguous_specialist_mentions_are_rejected(self) -> None:
-        from agents import mentioned_agent
-
-        self.assertIsNone(mentioned_agent("@designer-agent と @coding-agent で対応して"))
-
-    def test_explicit_issue_mention_overrides_keyword_routing(self) -> None:
+    def test_specialist_mention_does_not_override_maintainer_routing(self) -> None:
         from agents import assign_agent
 
         profile = assign_agent("READMEを更新", "@coding-agent アプリのテストを修正してください")
-        self.assertEqual(profile.username, "coding-agent")
+        self.assertEqual(profile.username, "docs-agent")
 
     def test_initial_issue_classifier_prefers_docs_then_design_then_code(self) -> None:
         from agents import choose_agent
@@ -132,6 +129,13 @@ class GoalWorkerTests(unittest.TestCase):
         self.assertEqual(choose_agent("READMEを更新", "再構築手順" ).key, "docs")
         self.assertEqual(choose_agent("モバイルUI", "CSSの余白を直す").key, "designer")
         self.assertEqual(choose_agent("API追加", "JSON endpointを実装").key, "coding")
+
+    def test_ui_task_detection_covers_designer_and_app_work(self) -> None:
+        from agents import AGENTS, is_ui_task
+
+        self.assertTrue(is_ui_task("API", "JSONだけ", AGENTS["designer"]))
+        self.assertTrue(is_ui_task("アプリ画面", "ボタンを直す", AGENTS["coding"]))
+        self.assertFalse(is_ui_task("API", "JSON endpoint", AGENTS["coding"]))
 
     def test_maintainer_delegation_visibly_mentions_the_specialist(self) -> None:
         from agents import AGENTS, delegation_comment
@@ -163,6 +167,81 @@ class GoalWorkerTests(unittest.TestCase):
         self.assertTrue(queued)
         self.assertEqual(events, ["mention", "submit"])
 
+    def test_new_issue_without_maintainer_mention_is_not_started(self) -> None:
+        import main
+        from config import Settings
+        from fastapi.testclient import TestClient
+
+        payload = {
+            "action": "opened",
+            "sender": {"login": "human-user"},
+            "repository": {
+                "name": "demo",
+                "default_branch": "main",
+                "owner": {"login": "openface"},
+            },
+            "issue": {"number": 50, "title": "UI修正", "body": "余白を直して", "labels": []},
+        }
+        raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
+        signature = hmac.new(b"test-secret", raw, hashlib.sha256).hexdigest()
+        with patch.object(main, "settings", Settings.load()), patch.object(main, "enqueue") as enqueue:
+            response = TestClient(main.app).post(
+                "/webhooks/forgejo",
+                content=raw,
+                headers={
+                    "Content-Type": "application/json",
+                    "X-Forgejo-Event": "issues",
+                    "X-Forgejo-Delivery": "no-maintainer",
+                    "X-Forgejo-Signature": signature,
+                },
+            )
+        self.assertEqual(response.status_code, 202)
+        self.assertFalse(response.json()["accepted"])
+        enqueue.assert_not_called()
+
+    def test_maintainer_mention_starts_ui_job_and_chooses_specialist(self) -> None:
+        import main
+        from config import Settings
+        from fastapi.testclient import TestClient
+
+        payload = {
+            "action": "opened",
+            "sender": {"login": "human-user"},
+            "repository": {
+                "name": "demo",
+                "default_branch": "main",
+                "owner": {"login": "openface"},
+            },
+            "issue": {
+                "number": 51,
+                "title": "モバイルUI修正",
+                "body": "@glm-maintainer ボタン余白を直してスクショで確認して",
+                "labels": [],
+            },
+        }
+        raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
+        signature = hmac.new(b"test-secret", raw, hashlib.sha256).hexdigest()
+        with patch.object(main, "settings", Settings.load()), patch.object(
+            main, "enqueue", return_value=True
+        ) as enqueue:
+            response = TestClient(main.app).post(
+                "/webhooks/forgejo",
+                content=raw,
+                headers={
+                    "Content-Type": "application/json",
+                    "X-Forgejo-Event": "issues",
+                    "X-Forgejo-Delivery": "with-maintainer",
+                    "X-Forgejo-Signature": signature,
+                },
+            )
+        self.assertEqual(response.status_code, 202)
+        self.assertTrue(response.json()["accepted"])
+        self.assertEqual(response.json()["agent"], "designer-agent")
+        self.assertTrue(response.json()["ui_evidence_required"])
+        task = enqueue.call_args.args[0]
+        self.assertEqual(task.agent_key, "designer")
+        self.assertTrue(task.ui_evidence_required)
+
     def test_specialist_prompt_contains_role_contract(self) -> None:
         from config import Settings
         from worker import IssueTask, MaintenanceWorker
@@ -174,6 +253,101 @@ class GoalWorkerTests(unittest.TestCase):
         prompt = MaintenanceWorker(Settings.load())._goal_prompt(task)
         self.assertIn("OpenFace Designer", prompt)
         self.assertIn("スクリーンショット比較", prompt)
+
+    def test_ui_prompt_requires_real_mobile_and_desktop_evidence(self) -> None:
+        from config import Settings
+        from worker import IssueTask, MaintenanceWorker
+
+        task = IssueTask(
+            "openface", "demo", 8, "UI修正", "余白を直す", "main", "https://example/8",
+            agent_key="designer", ui_evidence_required=True,
+        )
+        prompt = MaintenanceWorker(Settings.load())._goal_prompt(task)
+        self.assertIn("/app/capture_ui.py", prompt)
+        self.assertIn("ui-report.json", prompt)
+        self.assertIn("モバイル", prompt)
+        self.assertIn("デスクトップ", prompt)
+        self.assertIn("実際に行ったUIテスト", prompt)
+
+    def test_ui_evidence_requires_passed_tests_and_two_real_png_sizes(self) -> None:
+        from config import Settings
+        from worker import IssueTask, MaintenanceWorker
+
+        root = Path(self.temp.name) / "repo"
+        shots = root / ".openface-maintenance" / "screenshots"
+        shots.mkdir(parents=True)
+
+        def png(width: int, height: int) -> bytes:
+            return b"\x89PNG\r\n\x1a\n" + b"\x00\x00\x00\rIHDR" + struct.pack(">II", width, height)
+
+        (shots / "mobile.png").write_bytes(png(390, 844))
+        (shots / "desktop.png").write_bytes(png(1440, 1000))
+        report = {
+            "summary": "追加と横overflowを確認",
+            "tests": [
+                {"name": "タスク追加", "viewport": "390x844", "result": "passed", "details": "推薦へ表示"}
+            ],
+            "screenshots": [
+                {"path": ".openface-maintenance/screenshots/mobile.png", "caption": "mobile"},
+                {"path": ".openface-maintenance/screenshots/desktop.png", "caption": "desktop"},
+            ],
+        }
+        (root / ".openface-maintenance" / "ui-report.json").write_text(
+            json.dumps(report), encoding="utf-8"
+        )
+        task = IssueTask(
+            "openface", "demo", 9, "UI", "fix", "main", "https://example/9",
+            ui_evidence_required=True,
+        )
+        evidence = MaintenanceWorker(Settings.load())._collect_ui_evidence(root, task)
+        self.assertIsNotNone(evidence)
+        self.assertEqual([shot.width for shot in evidence.screenshots], [390, 1440])
+        self.assertFalse((root / ".openface-maintenance").exists())
+
+    def test_ui_evidence_is_mandatory_for_ui_tasks(self) -> None:
+        from config import Settings
+        from worker import IssueTask, MaintenanceWorker
+
+        root = Path(self.temp.name) / "repo"
+        root.mkdir()
+        task = IssueTask(
+            "openface", "demo", 9, "UI", "fix", "main", "https://example/9",
+            ui_evidence_required=True,
+        )
+        with self.assertRaisesRegex(RuntimeError, "ui-report.json"):
+            MaintenanceWorker(Settings.load())._collect_ui_evidence(root, task)
+
+    def test_completion_comment_uploads_and_embeds_ui_screenshots(self) -> None:
+        from agents import AGENTS
+        from config import Settings
+        from forgejo import PullRequest
+        from worker import IssueTask, MaintenanceWorker, UiEvidence, UiScreenshot, UiTestResult
+
+        client = Mock()
+        client.comment_issue.return_value = {"id": 42}
+        client.upload_comment_attachment.side_effect = [
+            {"browser_download_url": "https://forgejo/attachments/mobile.png"},
+            {"browser_download_url": "https://forgejo/attachments/desktop.png"},
+        ]
+        evidence = UiEvidence(
+            "実操作済み",
+            [UiTestResult("追加", "390x844", "passed", "推薦カードへ表示")],
+            [
+                UiScreenshot("mobile.png", "モバイル", "390x844", "http://app", 390, 844, b"png"),
+                UiScreenshot("desktop.png", "デスクトップ", "1440x1000", "http://app", 1440, 1000, b"png"),
+            ],
+        )
+        task = IssueTask("openface", "demo", 10, "UI", "fix", "main", "https://example/10")
+        comment_id, body = MaintenanceWorker(Settings.load())._publish_completion_comment(
+            client, task, AGENTS["designer"], PullRequest(11, "https://forgejo/pr/11"),
+            ["css/styles.css"], evidence, "検証済み・マージ処理中",
+        )
+        self.assertEqual(comment_id, 42)
+        self.assertIn("### UIテスト", body)
+        self.assertIn("推薦カードへ表示", body)
+        self.assertIn("![モバイル](https://forgejo/attachments/mobile.png)", body)
+        self.assertEqual(client.upload_comment_attachment.call_count, 2)
+        client.edit_issue_comment.assert_called_once()
 
     def test_command_uses_claude_code_and_not_bounded_json_planner(self) -> None:
         from config import Settings

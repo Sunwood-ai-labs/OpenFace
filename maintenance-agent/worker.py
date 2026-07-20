@@ -3,11 +3,12 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import struct
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
-from agents import AGENTS
+from agents import AGENTS, AgentProfile
 from config import Settings
 from forgejo import ForgejoClient, PullRequest
 
@@ -25,6 +26,7 @@ class IssueTask:
     instruction: str = ""
     agent_key: str = "coding"
     reply_number: int | None = None
+    ui_evidence_required: bool = False
 
     @property
     def branch(self) -> str:
@@ -40,6 +42,32 @@ class AgentResult:
     pull: PullRequest
     summary: str
     changed_files: list[str]
+
+
+@dataclass(frozen=True)
+class UiTestResult:
+    name: str
+    viewport: str
+    result: str
+    details: str
+
+
+@dataclass(frozen=True)
+class UiScreenshot:
+    filename: str
+    caption: str
+    viewport: str
+    url: str
+    width: int
+    height: int
+    content: bytes
+
+
+@dataclass(frozen=True)
+class UiEvidence:
+    summary: str
+    tests: list[UiTestResult]
+    screenshots: list[UiScreenshot]
 
 
 class MaintenanceWorker:
@@ -77,14 +105,19 @@ class MaintenanceWorker:
             current_revision = self._git(forgejo, worktree, "rev-parse", "HEAD").strip()
             if current_revision != base_revision:
                 self._git(forgejo, worktree, "reset", "--soft", base_revision)
+            ui_evidence = self._collect_ui_evidence(worktree, task)
             changed = self._changed_files(worktree)
             if not changed and task.agent_key == "review" and existing:
                 agent_client = ForgejoClient(self.settings, self.settings.agent_token_file(profile.username))
                 try:
-                    agent_client.comment_issue(
-                        task.owner, task.repo, task.conversation_number,
-                        f"{profile.emoji} **{profile.display_name}** が独立レビューを完了しました。\n\n"
-                        f"{summary}\n\n変更が必要な問題は見つからなかったため、追加コミットはありません。",
+                    self._publish_completion_comment(
+                        agent_client,
+                        task,
+                        profile,
+                        existing,
+                        [],
+                        ui_evidence,
+                        "独立レビュー完了（追加変更なし）",
                     )
                 finally:
                     agent_client.close()
@@ -109,22 +142,31 @@ class MaintenanceWorker:
                 f"[Claude Goal + GLM] {task.title}",
                 self._pull_body(task, summary, changed),
             )
-            merged = False
-            if self.settings.auto_merge:
-                forgejo.merge_pull(task.owner, task.repo, pull.number)
-                merged = True
             agent_client = ForgejoClient(self.settings, self.settings.agent_token_file(profile.username))
             try:
-                agent_client.comment_issue(
-                    task.owner,
-                    task.repo,
-                    task.conversation_number,
-                    f"{profile.emoji} **{profile.display_name}** が担当作業を完了しました。\n\n"
-                    f"- PR: [#{pull.number}]({pull.url})\n"
-                    f"- 変更ファイル: {', '.join(f'`{path}`' for path in changed)}\n"
-                    f"- 実行: Claude Code `/goal` + `{self.settings.model}`\n"
-                    f"- 状態: {'自動マージ済み' if merged else '人間レビュー待ち'}",
+                comment_id, comment_body = self._publish_completion_comment(
+                    agent_client,
+                    task,
+                    profile,
+                    pull,
+                    changed,
+                    ui_evidence,
+                    "検証済み・マージ処理中" if self.settings.auto_merge else "人間レビュー待ち",
                 )
+            except Exception:
+                agent_client.close()
+                raise
+            merged = False
+            try:
+                if self.settings.auto_merge:
+                    forgejo.merge_pull(task.owner, task.repo, pull.number)
+                    merged = True
+                    agent_client.edit_issue_comment(
+                        task.owner,
+                        task.repo,
+                        comment_id,
+                        comment_body.replace("検証済み・マージ処理中", "自動マージ済み"),
+                    )
             finally:
                 agent_client.close()
             return AgentResult(pull, summary, changed)
@@ -157,6 +199,155 @@ class MaintenanceWorker:
                 timeout=120,
             )
 
+    def _collect_ui_evidence(self, root: Path, task: IssueTask) -> UiEvidence | None:
+        evidence_root = root / ".openface-maintenance"
+        report_path = evidence_root / "ui-report.json"
+        if not report_path.is_file():
+            if task.ui_evidence_required:
+                raise RuntimeError(
+                    "UI/app task did not produce .openface-maintenance/ui-report.json with screenshots and UI tests"
+                )
+            return None
+        try:
+            payload = json.loads(report_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise RuntimeError(f"UI evidence report is invalid: {exc}") from exc
+
+        raw_tests = payload.get("tests")
+        raw_screenshots = payload.get("screenshots")
+        if not isinstance(raw_tests, list) or not raw_tests:
+            raise RuntimeError("UI evidence must list at least one executed UI test")
+        if not isinstance(raw_screenshots, list) or len(raw_screenshots) < 2:
+            raise RuntimeError("UI evidence must include mobile and desktop screenshots")
+        if len(raw_screenshots) > 8:
+            raise RuntimeError("UI evidence may include at most eight screenshots")
+
+        tests: list[UiTestResult] = []
+        for item in raw_tests:
+            if not isinstance(item, dict):
+                raise RuntimeError("Every UI test entry must be an object")
+            result = str(item.get("result") or "").strip().lower()
+            if result != "passed":
+                raise RuntimeError(f"UI test did not pass: {item.get('name') or 'unnamed'}")
+            name = str(item.get("name") or "").strip()
+            details = str(item.get("details") or "").strip()
+            if not name or not details:
+                raise RuntimeError("Every UI test must include a name and concrete details")
+            tests.append(
+                UiTestResult(
+                    name=name[:160],
+                    viewport=str(item.get("viewport") or "—")[:40],
+                    result="passed",
+                    details=details[:600],
+                )
+            )
+
+        screenshots_dir = (evidence_root / "screenshots").resolve()
+        screenshots: list[UiScreenshot] = []
+        for index, item in enumerate(raw_screenshots):
+            if not isinstance(item, dict):
+                raise RuntimeError("Every screenshot entry must be an object")
+            relative = str(item.get("path") or "")
+            candidate = (root / relative).resolve(strict=False)
+            if screenshots_dir != candidate and screenshots_dir not in candidate.parents:
+                raise RuntimeError(f"UI screenshot must stay under .openface-maintenance/screenshots: {relative}")
+            try:
+                content = candidate.read_bytes()
+            except OSError as exc:
+                raise RuntimeError(f"UI screenshot is missing: {relative}") from exc
+            if len(content) > 10 * 1024 * 1024:
+                raise RuntimeError(f"UI screenshot is larger than 10 MiB: {relative}")
+            if len(content) < 24 or content[:8] != b"\x89PNG\r\n\x1a\n":
+                raise RuntimeError(f"UI screenshot is not a valid PNG: {relative}")
+            width, height = struct.unpack(">II", content[16:24])
+            if width < 200 or height < 200:
+                raise RuntimeError(f"UI screenshot is too small to review: {relative} ({width}x{height})")
+            screenshots.append(
+                UiScreenshot(
+                    filename=f"ui-{index + 1}-{candidate.name}"[:240],
+                    caption=str(item.get("caption") or candidate.stem)[:240],
+                    viewport=str(item.get("viewport") or f"{width}x{height}")[:40],
+                    url=str(item.get("url") or "")[:500],
+                    width=width,
+                    height=height,
+                    content=content,
+                )
+            )
+        if not any(shot.width <= 480 for shot in screenshots):
+            raise RuntimeError("UI evidence is missing a mobile screenshot (width <= 480px)")
+        if not any(shot.width >= 1024 for shot in screenshots):
+            raise RuntimeError("UI evidence is missing a desktop screenshot (width >= 1024px)")
+
+        evidence = UiEvidence(
+            summary=str(payload.get("summary") or "UI変更を実画面で検証しました。")[:1200],
+            tests=tests,
+            screenshots=screenshots,
+        )
+        shutil.rmtree(evidence_root)
+        return evidence
+
+    @staticmethod
+    def _table_cell(value: str) -> str:
+        return " ".join(value.replace("|", "\\|").split())
+
+    def _publish_completion_comment(
+        self,
+        client: ForgejoClient,
+        task: IssueTask,
+        profile: AgentProfile,
+        pull: PullRequest,
+        changed: list[str],
+        evidence: UiEvidence | None,
+        status: str,
+    ) -> tuple[int, str]:
+        changed_text = ", ".join(f"`{path}`" for path in changed) or "なし"
+        body = (
+            f"{profile.emoji} **{profile.display_name}** が担当作業を完了しました。\n\n"
+            f"- PR: [#{pull.number}]({pull.url})\n"
+            f"- 変更ファイル: {changed_text}\n"
+            f"- 実行: Claude Code `/goal` + `{self.settings.model}`\n"
+            f"- 状態: {status}"
+        )
+        if evidence:
+            rows = "\n".join(
+                f"| {self._table_cell(test.name)} | {self._table_cell(test.viewport)} | ✅ passed | "
+                f"{self._table_cell(test.details)} |"
+                for test in evidence.tests
+            )
+            body += (
+                f"\n\n### UIテスト\n\n{evidence.summary}\n\n"
+                "| テスト | viewport | 結果 | 確認内容 |\n"
+                "|---|---:|---|---|\n"
+                f"{rows}\n\n### スクリーンショット\n\n添付画像をアップロード中です。"
+            )
+        comment = client.comment_issue(task.owner, task.repo, task.conversation_number, body)
+        comment_id = int(comment["id"])
+        if evidence:
+            images: list[str] = []
+            for shot in evidence.screenshots:
+                attachment = client.upload_comment_attachment(
+                    task.owner,
+                    task.repo,
+                    comment_id,
+                    shot.filename,
+                    shot.content,
+                )
+                url = str(
+                    attachment.get("browser_download_url")
+                    or attachment.get("download_url")
+                    or attachment.get("url")
+                    or ""
+                )
+                if not url:
+                    raise RuntimeError(f"Forgejo returned no URL for UI screenshot {shot.filename}")
+                meta = f"{shot.viewport} / PNG {shot.width}x{shot.height}"
+                if shot.url:
+                    meta += f" / `{shot.url}`"
+                images.append(f"**{shot.caption}** — {meta}\n\n![{shot.caption}]({url})")
+            body = body.replace("添付画像をアップロード中です。", "\n\n".join(images))
+            client.edit_issue_comment(task.owner, task.repo, comment_id, body)
+        return comment_id, body
+
     def _goal_prompt(self, task: IssueTask) -> str:
         profile = AGENTS[task.agent_key]
         follow_up = ""
@@ -167,6 +358,30 @@ class MaintenanceWorker:
 {task.instruction}
 </follow-up>
 既存PRのブランチ上で、上記の追加指示に必要な変更を加えてください。
+"""
+        ui_evidence = ""
+        if task.ui_evidence_required:
+            ui_evidence = """
+
+UI / アプリ変更の必須証跡:
+- 実際にアプリを起動し、変更後の画面を操作して確認する。静的HTMLの推測だけで完了しない。
+- モバイル（幅480px以下）とデスクトップ（幅1024px以上）をそれぞれ1枚以上撮影する。
+- 撮影には `python /app/capture_ui.py --url <URL> --output <PNG> --width <幅> --height <高さ>` を利用できる。
+- `.openface-maintenance/screenshots/` に実画面PNGを保存する。
+- `.openface-maintenance/ui-report.json` を次の形で作る。`tests` にはクリック、入力、状態変化、レスポンシブ、横overflow、console/page errorなど、実際に行ったUIテストを具体的に列挙する。
+```json
+{
+  "summary": "実画面で確認した内容の要約",
+  "tests": [
+    {"name": "タスク追加", "viewport": "390x844", "result": "passed", "details": "追加後に推薦カードへ表示"}
+  ],
+  "screenshots": [
+    {"path": ".openface-maintenance/screenshots/mobile.png", "caption": "モバイルの変更後画面", "viewport": "390x844", "url": "http://127.0.0.1:8080/"},
+    {"path": ".openface-maintenance/screenshots/desktop.png", "caption": "デスクトップの変更後画面", "viewport": "1440x1000", "url": "http://127.0.0.1:8080/"}
+  ]
+}
+```
+- 全UIテストが `passed` で、2枚のPNGが実在しない限り完了扱いにならない。証跡ディレクトリはPRへcommitせず、Forgejo完了コメントへ添付するためラッパーが回収する。
 """
         return f"""/goal Forgejo Issue #{task.issue_number} をこのリポジトリで完全に解決してください。
 
@@ -180,6 +395,7 @@ Issue本文:
 {task.body}
 </issue>
 {follow_up}
+{ui_evidence}
 
 完了条件:
 - 実装を決める前に、リポジトリとローカル指示を確認する。

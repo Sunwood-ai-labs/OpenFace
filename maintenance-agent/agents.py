@@ -34,6 +34,14 @@ AGENTS: dict[str, AgentProfile] = {
 
 BY_USERNAME = {profile.username: profile for profile in AGENTS.values()}
 MENTION_RE = re.compile(r"@(designer-agent|coding-agent|docs-agent|review-agent)\b", re.IGNORECASE)
+MAINTAINER_USERNAME = "glm-maintainer"
+MAINTAINER_MENTION_RE = re.compile(r"@glm-maintainer\b", re.IGNORECASE)
+
+UI_KEYWORDS = (
+    "ui", "ux", "css", "html", "frontend", "front-end", "react", "vue", "next.js", "nextjs",
+    "streamlit", "gradio", "space", "アプリ", "画面", "デザイン", "レイアウト", "テーマ",
+    "レスポンシブ", "モバイル", "スクショ", "screenshot", "viewport", "accessibility", "a11y",
+)
 
 
 def mentioned_agent(body: str) -> AgentProfile | None:
@@ -45,6 +53,21 @@ def mentioned_agent(body: str) -> AgentProfile | None:
 
 def mention_instruction(body: str, profile: AgentProfile) -> str:
     return re.sub(rf"@{re.escape(profile.username)}\b", "", body, count=1, flags=re.IGNORECASE).strip()
+
+
+def mentions_maintainer(body: str) -> bool:
+    return bool(MAINTAINER_MENTION_RE.search(body))
+
+
+def maintainer_instruction(body: str) -> str:
+    return MAINTAINER_MENTION_RE.sub("", body, count=1).strip()
+
+
+def is_ui_task(title: str, body: str, profile: AgentProfile) -> bool:
+    if profile.key == "designer":
+        return True
+    text = f"{title}\n{body}".lower()
+    return any(keyword in text for keyword in UI_KEYWORDS)
 
 
 def delegation_comment(profile: AgentProfile, instruction: str, *, follow_up: bool) -> str:
@@ -69,5 +92,5 @@ def choose_agent(title: str, body: str) -> AgentProfile:
 
 
 def assign_agent(title: str, body: str) -> AgentProfile:
-    """Honor an explicit specialist mention before applying keyword routing."""
-    return mentioned_agent(body) or choose_agent(title, body)
+    """The maintainer owns routing; user-authored specialist mentions never override it."""
+    return choose_agent(title, body)

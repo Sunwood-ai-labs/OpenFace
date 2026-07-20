@@ -16,7 +16,16 @@ from typing import Any
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import JSONResponse
 
-from agents import AGENTS, BY_USERNAME, assign_agent, choose_agent, delegation_comment, mention_instruction, mentioned_agent
+from agents import (
+    AGENTS,
+    BY_USERNAME,
+    assign_agent,
+    choose_agent,
+    delegation_comment,
+    is_ui_task,
+    maintainer_instruction,
+    mentions_maintainer,
+)
 from config import Settings
 from forgejo import ForgejoClient
 from worker import IssueTask, MaintenanceWorker
@@ -127,7 +136,7 @@ def signature_valid(raw_body: bytes, supplied: str | None) -> bool:
 def payload_to_task(
     payload: dict[str, Any], *, issue_override: dict[str, Any] | None = None,
     follow_up: bool = False, instruction: str = "", agent_key: str = "coding",
-    reply_number: int | None = None,
+    reply_number: int | None = None, ui_evidence_required: bool = False,
 ) -> IssueTask:
     repository = payload.get("repository") or {}
     issue = issue_override or payload.get("issue") or {}
@@ -149,6 +158,7 @@ def payload_to_task(
         instruction=instruction[:20_000],
         agent_key=agent_key,
         reply_number=reply_number,
+        ui_evidence_required=ui_evidence_required,
     )
 
 
@@ -267,8 +277,16 @@ async def forgejo_webhook(
     if x_forgejo_event in {"issues", "issue"}:
         if payload.get("action") != "opened":
             return {"accepted": False, "reason": "action ignored"}
-        profile = assign_agent(str(issue.get("title") or ""), body)
-        task = payload_to_task(payload, agent_key=profile.key)
+        if not mentions_maintainer(body):
+            return {"accepted": False, "reason": "mention @glm-maintainer to start maintenance"}
+        instruction = maintainer_instruction(body)
+        profile = assign_agent(str(issue.get("title") or ""), instruction)
+        task = payload_to_task(
+            payload,
+            instruction=instruction,
+            agent_key=profile.key,
+            ui_evidence_required=is_ui_task(str(issue.get("title") or ""), instruction, profile),
+        )
         def announce_delegation() -> None:
             client = ForgejoClient(settings)
             try:
@@ -283,10 +301,11 @@ async def forgejo_webhook(
         if payload.get("action") not in {"created", "edited"}:
             return {"accepted": False, "reason": "comment action ignored"}
         comment_body = str((payload.get("comment") or {}).get("body") or "")
-        profile = mentioned_agent(comment_body)
-        instruction = mention_instruction(comment_body, profile) if profile else follow_up_instruction(comment_body)
+        if not mentions_maintainer(comment_body):
+            return {"accepted": False, "reason": "comment must mention @glm-maintainer"}
+        instruction = maintainer_instruction(comment_body)
         if not instruction:
-            return {"accepted": False, "reason": "comment has no /goal or specialist mention instruction"}
+            return {"accepted": False, "reason": "maintainer mention has no instruction"}
         repository = payload.get("repository") or {}
         owner = str((repository.get("owner") or {}).get("login") or "")
         repo = str(repository.get("name") or "")
@@ -302,10 +321,11 @@ async def forgejo_webhook(
                 issue = client.issue(owner, repo, source_number)
             finally:
                 client.close()
-        profile = profile or choose_agent(str(issue.get("title") or ""), instruction)
+        profile = choose_agent(str(issue.get("title") or ""), instruction)
         task = payload_to_task(
             payload, issue_override=issue, follow_up=True, instruction=instruction, agent_key=profile.key,
             reply_number=reply_number,
+            ui_evidence_required=is_ui_task(str(issue.get("title") or ""), instruction, profile),
         )
         def announce_follow_up() -> None:
             client = ForgejoClient(settings)
@@ -324,4 +344,5 @@ async def forgejo_webhook(
         "model": settings.model,
         "follow_up": task.follow_up,
         "agent": AGENTS[task.agent_key].username,
+        "ui_evidence_required": task.ui_evidence_required,
     }

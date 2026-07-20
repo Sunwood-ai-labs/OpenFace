@@ -71,12 +71,35 @@ class ForgejoClient:
             },
         )
 
-    def comment_issue(self, owner: str, repo: str, issue_number: int, body: str) -> None:
-        self._request(
+    def comment_issue(self, owner: str, repo: str, issue_number: int, body: str) -> dict[str, Any]:
+        return self._request(
             "POST",
             f"/repos/{owner}/{repo}/issues/{issue_number}/comments",
             json={"body": body[:20_000]},
         )
+
+    def edit_issue_comment(self, owner: str, repo: str, comment_id: int, body: str) -> dict[str, Any]:
+        return self._request(
+            "PATCH",
+            f"/repos/{owner}/{repo}/issues/comments/{comment_id}",
+            json={"body": body[:20_000]},
+        )
+
+    def upload_comment_attachment(
+        self,
+        owner: str,
+        repo: str,
+        comment_id: int,
+        filename: str,
+        content: bytes,
+    ) -> dict[str, Any]:
+        response = self.client.post(
+            f"/repos/{owner}/{repo}/issues/comments/{comment_id}/assets",
+            params={"name": filename},
+            files={"attachment": (filename, content, "image/png")},
+        )
+        response.raise_for_status()
+        return response.json()
 
     def react_to_issue(self, owner: str, repo: str, issue_number: int, content: str) -> None:
         response = self.client.post(
