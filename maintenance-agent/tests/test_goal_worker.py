@@ -64,7 +64,7 @@ class GoalWorkerTests(unittest.TestCase):
         client._request.assert_called_once_with(
             "POST",
             "/repos/openface/demo/pulls/7/merge",
-            json={"Do": "merge", "delete_branch_after_merge": True, "merge_when_checks_succeed": True},
+            json={"Do": "merge", "delete_branch_after_merge": True},
         )
         client.close()
 

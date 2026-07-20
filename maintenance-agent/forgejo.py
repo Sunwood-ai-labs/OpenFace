@@ -68,7 +68,6 @@ class ForgejoClient:
             json={
                 "Do": "merge",
                 "delete_branch_after_merge": True,
-                "merge_when_checks_succeed": True,
             },
         )
 
