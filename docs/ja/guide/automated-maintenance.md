@@ -115,3 +115,7 @@ docker compose exec maintenance-agent python -c "import urllib.request; print(ur
 - 追加commitの変更: `docs/concurrency-probe-a.md` の1ファイルだけ
 - 日本語のIssue返信からPR #15への逆リンク
 - Forgejoのmergeable判定: `true`
+
+### 新規アプリを完成させるE2E
+
+空の公開リポジトリから ClearNext を設計・実装・Docker化し、専門エージェント7段階と独立レビューを経て自動マージしました。実Runnerのモバイル／デスクトップ／ライト／ダーク画面、Issue・PR・merge commit、84件のテスト結果は [ClearNext 自動メンテナンス E2E](../../evidence/automated-maintenance/clear-next/README.md) に保存しています。

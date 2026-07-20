@@ -85,7 +85,7 @@ Up to `MAINTENANCE_MAX_WORKERS` Issues run concurrently. Each job has its own cl
 - The model API credential is necessarily available to the Claude Code process for inference.
 - The wrapper rejects paths that resolve outside the clone and requires `git diff --check` before publication.
 - Only the root wrapper receives Forgejo authentication for commit publication. Claude Code is instructed not to push or open PRs.
-- Human review is mandatory; the bot has no merge or administrator path.
+- With `MAINTENANCE_AUTO_MERGE=true` (the Compose default), the root wrapper requests a server-side Forgejo merge only after local validation succeeds, then deletes the work branch. Set it to `false` when human review is mandatory.
 
 This boundary permits repository code execution inside the maintenance container. Treat third-party repositories and Issue automation accordingly; it is not a host security sandbox for arbitrary untrusted code.
 
@@ -110,3 +110,7 @@ Interrupted `queued` or `running` jobs are marked `interrupted` on service resta
 - only `docs/concurrency-probe-a.md` changed in the follow-up commit;
 - the Japanese Issue reply links back to PR #15;
 - Forgejo reports the PR as mergeable.
+
+### End-to-end app delivery
+
+Starting from an empty public repository, the workflow designed, implemented, containerized, and independently reviewed ClearNext through seven specialist stages with verified auto-merge. The [ClearNext maintenance evidence](../../evidence/automated-maintenance/clear-next/README.md) preserves live Runner screenshots, Issue and PR links, merge commits, and the 84-test result.
