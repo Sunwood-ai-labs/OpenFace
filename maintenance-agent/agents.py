@@ -66,3 +66,8 @@ def choose_agent(title: str, body: str) -> AgentProfile:
     if any(word in text for word in ("デザイン", "レイアウト", "ui", "ux", "css", "テーマ", "スクショ", "responsive")):
         return AGENTS["designer"]
     return AGENTS["coding"]
+
+
+def assign_agent(title: str, body: str) -> AgentProfile:
+    """Honor an explicit specialist mention before applying keyword routing."""
+    return mentioned_agent(body) or choose_agent(title, body)

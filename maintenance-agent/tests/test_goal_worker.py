@@ -120,6 +120,12 @@ class GoalWorkerTests(unittest.TestCase):
 
         self.assertIsNone(mentioned_agent("@designer-agent と @coding-agent で対応して"))
 
+    def test_explicit_issue_mention_overrides_keyword_routing(self) -> None:
+        from agents import assign_agent
+
+        profile = assign_agent("READMEを更新", "@coding-agent アプリのテストを修正してください")
+        self.assertEqual(profile.username, "coding-agent")
+
     def test_initial_issue_classifier_prefers_docs_then_design_then_code(self) -> None:
         from agents import choose_agent
 

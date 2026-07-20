@@ -16,7 +16,7 @@ from typing import Any
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import JSONResponse
 
-from agents import AGENTS, BY_USERNAME, choose_agent, delegation_comment, mention_instruction, mentioned_agent
+from agents import AGENTS, BY_USERNAME, assign_agent, choose_agent, delegation_comment, mention_instruction, mentioned_agent
 from config import Settings
 from forgejo import ForgejoClient
 from worker import IssueTask, MaintenanceWorker
@@ -267,7 +267,7 @@ async def forgejo_webhook(
     if x_forgejo_event in {"issues", "issue"}:
         if payload.get("action") != "opened":
             return {"accepted": False, "reason": "action ignored"}
-        profile = choose_agent(str(issue.get("title") or ""), body)
+        profile = assign_agent(str(issue.get("title") or ""), body)
         task = payload_to_task(payload, agent_key=profile.key)
         def announce_delegation() -> None:
             client = ForgejoClient(settings)
