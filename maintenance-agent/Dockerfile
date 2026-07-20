@@ -1,7 +1,8 @@
 FROM python:3.12-slim
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends bash ca-certificates chromium curl git nodejs npm util-linux \
+    && apt-get install -y --no-install-recommends \
+        bash ca-certificates chromium curl fonts-noto-cjk fonts-noto-color-emoji git nodejs npm util-linux \
     && rm -rf /var/lib/apt/lists/*
 
 RUN npm install --global @anthropic-ai/claude-code@2.1.205 \

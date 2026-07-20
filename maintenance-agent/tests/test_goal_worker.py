@@ -16,6 +16,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 class GoalWorkerTests(unittest.TestCase):
+    def test_browser_image_installs_japanese_and_emoji_fonts(self) -> None:
+        dockerfile = (Path(__file__).parents[1] / "Dockerfile").read_text(encoding="utf-8")
+
+        self.assertIn("fonts-noto-cjk", dockerfile)
+        self.assertIn("fonts-noto-color-emoji", dockerfile)
+
     def setUp(self) -> None:
         self.temp = tempfile.TemporaryDirectory()
         root = Path(self.temp.name)
