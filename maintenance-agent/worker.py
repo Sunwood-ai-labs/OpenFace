@@ -326,7 +326,12 @@ class MaintenanceWorker:
         for index, item in enumerate(raw_screenshots):
             if not isinstance(item, dict):
                 raise RuntimeError("Every screenshot entry must be an object")
-            relative = str(item.get("path") or "")
+            relative = str(item.get("path") or "").strip()
+            if not relative:
+                name = str(item.get("name") or "").strip()
+                if not name or Path(name).name != name:
+                    raise RuntimeError("Every UI screenshot must include a safe path or filename")
+                relative = str(Path(".openface-maintenance") / "screenshots" / name)
             candidate = (root / relative).resolve(strict=False)
             if screenshots_dir != candidate and screenshots_dir not in candidate.parents:
                 raise RuntimeError(f"UI screenshot must stay under .openface-maintenance/screenshots: {relative}")
@@ -357,8 +362,14 @@ class MaintenanceWorker:
         if not any(shot.width >= 1024 for shot in screenshots):
             raise RuntimeError("UI evidence is missing a desktop screenshot (width >= 1024px)")
 
+        raw_summary = payload.get("summary") or "UI変更を実画面で検証しました。"
+        summary = (
+            json.dumps(raw_summary, ensure_ascii=False, separators=(",", ": "))
+            if isinstance(raw_summary, dict)
+            else str(raw_summary)
+        )
         evidence = UiEvidence(
-            summary=str(payload.get("summary") or "UI変更を実画面で検証しました。")[:1200],
+            summary=summary[:1200],
             tests=tests,
             screenshots=screenshots,
         )

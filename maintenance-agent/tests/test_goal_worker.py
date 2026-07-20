@@ -327,6 +327,38 @@ class GoalWorkerTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "ui-report.json"):
             MaintenanceWorker(Settings.load())._collect_ui_evidence(root, task)
 
+    def test_ui_evidence_accepts_safe_screenshot_names(self) -> None:
+        from config import Settings
+        from worker import IssueTask, MaintenanceWorker
+
+        root = Path(self.temp.name) / "repo-name-evidence"
+        shots = root / ".openface-maintenance" / "screenshots"
+        shots.mkdir(parents=True)
+
+        def png(width: int, height: int) -> bytes:
+            return b"\x89PNG\r\n\x1a\n" + b"\x00\x00\x00\rIHDR" + struct.pack(">II", width, height)
+
+        (shots / "mobile.png").write_bytes(png(390, 844))
+        (shots / "desktop.png").write_bytes(png(1440, 1000))
+        (root / ".openface-maintenance" / "ui-report.json").write_text(
+            json.dumps({
+                "summary": {"verdict": "passed", "configs_tested": 2},
+                "tests": [{"name": "操作", "result": "passed", "details": "実ブラウザで確認"}],
+                "screenshots": [
+                    {"name": "mobile.png", "caption": "mobile", "viewport": "390x844"},
+                    {"name": "desktop.png", "caption": "desktop", "viewport": "1440x1000"},
+                ],
+            }),
+            encoding="utf-8",
+        )
+        task = IssueTask(
+            "openface", "demo", 10, "UI", "fix", "main", "https://example/10",
+            ui_evidence_required=True,
+        )
+        evidence = MaintenanceWorker(Settings.load())._collect_ui_evidence(root, task)
+        self.assertEqual([shot.width for shot in evidence.screenshots], [390, 1440])
+        self.assertIn('\"verdict\": \"passed\"', evidence.summary)
+
     def test_review_prompt_is_read_only_strict_and_sha_bound(self) -> None:
         from config import Settings
         from forgejo import PullRequest
