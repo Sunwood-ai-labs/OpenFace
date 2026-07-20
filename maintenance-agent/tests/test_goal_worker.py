@@ -138,6 +138,8 @@ class GoalWorkerTests(unittest.TestCase):
 
         self.assertEqual(choose_agent("READMEを更新", "再構築手順" ).key, "docs")
         self.assertEqual(choose_agent("モバイルUI", "CSSの余白を直す").key, "designer")
+        self.assertEqual(choose_agent("表示を再確認", "スクリーンショットを撮影").key, "designer")
+        self.assertEqual(choose_agent("表示を再確認", "モバイルとデスクトップで確認").key, "designer")
         self.assertEqual(choose_agent("API追加", "JSON endpointを実装").key, "coding")
 
     def test_ui_task_detection_covers_designer_and_app_work(self) -> None:

@@ -40,7 +40,7 @@ MAINTAINER_MENTION_RE = re.compile(r"@glm-maintainer\b", re.IGNORECASE)
 UI_KEYWORDS = (
     "ui", "ux", "css", "html", "frontend", "front-end", "react", "vue", "next.js", "nextjs",
     "streamlit", "gradio", "space", "アプリ", "画面", "デザイン", "レイアウト", "テーマ",
-    "レスポンシブ", "モバイル", "スクショ", "screenshot", "viewport", "accessibility", "a11y",
+    "レスポンシブ", "モバイル", "スクショ", "スクリーンショット", "screenshot", "viewport", "accessibility", "a11y",
 )
 
 
@@ -106,7 +106,7 @@ def choose_agent(title: str, body: str) -> AgentProfile:
     text = f"{title}\n{body}".lower()
     if any(word in text for word in ("readme", "ドキュメント", "documentation", "vitepress", "docs/")):
         return AGENTS["docs"]
-    if any(word in text for word in ("デザイン", "レイアウト", "ui", "ux", "css", "テーマ", "スクショ", "responsive")):
+    if any(word in text for word in UI_KEYWORDS):
         return AGENTS["designer"]
     return AGENTS["coding"]
 
