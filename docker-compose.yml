@@ -162,6 +162,7 @@ services:
       MAINTENANCE_MAX_WORKERS: ${MAINTENANCE_MAX_WORKERS:-2}
       MAINTENANCE_DATA_DIR: /data
       MAINTENANCE_WORKSPACE_DIR: /work
+      MAINTENANCE_AGENT_TOKEN_DIR: /shared/agent-tokens
     volumes:
       - shared-token:/shared:ro
       - maintenance-agent-data:/data

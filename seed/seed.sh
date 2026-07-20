@@ -24,6 +24,7 @@ OPENFACE_ADMIN_USER="${OPENFACE_ADMIN_USER:-openface-admin}"
 OPENFACE_ADMIN_PASSWORD="${OPENFACE_ADMIN_PASSWORD:-openface1234}"
 OPENFACE_ADMIN_EMAIL="${OPENFACE_ADMIN_EMAIL:-admin@example.com}"
 MAINTENANCE_TOKEN_FILE="${MAINTENANCE_TOKEN_FILE:-/shared/maintenance-token}"
+MAINTENANCE_AGENT_TOKEN_DIR="${MAINTENANCE_AGENT_TOKEN_DIR:-/shared/agent-tokens}"
 MAINTENANCE_WEBHOOK_SECRET_FILE="${MAINTENANCE_WEBHOOK_SECRET_FILE:-/shared/maintenance-webhook-secret}"
 MAINTENANCE_WEBHOOK_URL="${MAINTENANCE_WEBHOOK_URL:-http://maintenance-agent:8010/webhooks/forgejo}"
 
@@ -183,6 +184,32 @@ ensure_maintenance_token() {
   echo -n "$raw" > "$MAINTENANCE_TOKEN_FILE"
   chmod 600 "$MAINTENANCE_TOKEN_FILE"
   log "GLM maintenance token written to ${MAINTENANCE_TOKEN_FILE}."
+}
+
+ensure_specialist_token() {
+  local username="$1" token_file="${MAINTENANCE_AGENT_TOKEN_DIR}/$1" existing raw code
+  mkdir -p "$MAINTENANCE_AGENT_TOKEN_DIR"
+  if [ -s "$token_file" ]; then
+    existing="$(cat "$token_file" 2>/dev/null || true)"
+    code=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: token ${existing}" "${FORGEJO_API}/user")
+    if [ "$code" = "200" ]; then
+      chmod 600 "$token_file"
+      log "Specialist token for '${username}' already exists; reusing it."
+      return 0
+    fi
+  fi
+  raw="$(docker exec -u git "${FORGEJO_CONTAINER_NAME}" \
+    forgejo admin user generate-access-token \
+      --username "$username" --token-name "openface-${username}-$(date +%s)" \
+      --scopes all --raw 2>"/tmp/${username}_token.log" | tail -n1 | tr -d '[:space:]')"
+  if [ -z "$raw" ]; then
+    log "ERROR: failed to generate specialist token for '${username}'."
+    cat "/tmp/${username}_token.log"
+    exit 1
+  fi
+  echo -n "$raw" > "$token_file"
+  chmod 600 "$token_file"
+  log "Specialist token for '${username}' written."
 }
 
 ensure_maintenance_webhook() {
@@ -455,6 +482,10 @@ ensure_agent_user "cassian-reed" "Cassian Reed" "cassian-reed@seraphim.openface.
 ensure_agent_user "ilyana-noor" "Ilyana Noor" "ilyana-noor@seraphim.openface.local"
 ensure_agent_user "lucien-sol" "Lucien Sol" "lucien-sol@seraphim.openface.local"
 ensure_agent_user "glm-maintainer" "GLM Maintainer" "glm-maintainer@agents.openface.local"
+ensure_agent_user "designer-agent" "OpenFace Designer" "designer-agent@agents.openface.local"
+ensure_agent_user "coding-agent" "OpenFace Coding" "coding-agent@agents.openface.local"
+ensure_agent_user "docs-agent" "OpenFace Docs" "docs-agent@agents.openface.local"
+ensure_agent_user "review-agent" "OpenFace Review" "review-agent@agents.openface.local"
 ensure_agent_avatar "luna-scout" "/assets/agent-avatars/luna-scout.png"
 ensure_agent_avatar "patch-orbit" "/assets/agent-avatars/patch-orbit.png"
 ensure_agent_avatar "mikan-reviewer" "/assets/agent-avatars/mikan-reviewer.png"
@@ -465,10 +496,18 @@ ensure_agent_avatar "aurelia-vale" "/assets/agent-avatars/aurelia-vale.png"
 ensure_agent_avatar "cassian-reed" "/assets/agent-avatars/cassian-reed.png"
 ensure_agent_avatar "ilyana-noor" "/assets/agent-avatars/ilyana-noor.png"
 ensure_agent_avatar "lucien-sol" "/assets/agent-avatars/lucien-sol.png"
+ensure_agent_avatar "designer-agent" "/assets/agent-avatars/luna-scout.png"
+ensure_agent_avatar "coding-agent" "/assets/agent-avatars/patch-orbit.png"
+ensure_agent_avatar "docs-agent" "/assets/agent-avatars/aiko-mesh.png"
+ensure_agent_avatar "review-agent" "/assets/agent-avatars/mikan-reviewer.png"
 ensure_org_member "openface" "aiko-mesh"
 ensure_org_member "openface" "ren-vector"
 ensure_org_member "openface" "mira-signal"
 ensure_maintenance_org_access "openface" "glm-maintainer"
+ensure_maintenance_org_access "openface" "designer-agent"
+ensure_maintenance_org_access "openface" "coding-agent"
+ensure_maintenance_org_access "openface" "docs-agent"
+ensure_maintenance_org_access "openface" "review-agent"
 ensure_org_member "seraphim-labs" "openface-admin"
 ensure_org_member_private "seraphim-labs" "openface-admin"
 ensure_org_not_member "seraphim-labs" "aiko-mesh"
@@ -481,6 +520,10 @@ ensure_org_member "seraphim-labs" "lucien-sol"
 
 ensure_actions_runner_token
 ensure_maintenance_token
+ensure_specialist_token "designer-agent"
+ensure_specialist_token "coding-agent"
+ensure_specialist_token "docs-agent"
+ensure_specialist_token "review-agent"
 ensure_maintenance_webhook
 
 # ------------------------------------------------------------------------
