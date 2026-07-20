@@ -10,8 +10,11 @@ OpenFace can turn a Forgejo Issue addressed to `@glm-maintainer` into a verified
 4. Only after that comment succeeds, the service clones the repository and creates `agent/issue-N`.
 5. Claude Code 2.1.205 receives `/goal` followed by the Issue, the selected specialist contract, and explicit completion conditions.
 6. Claude Code inspects local instructions and source, edits any required repository files, runs relevant commands and tests, reviews its diff, and keeps working until the goal evaluator finishes.
-7. The root wrapper verifies repository containment, required UI evidence, and `git diff --check`. The specialist identity commits, pushes, and posts the completion reply.
-8. After successful validation, the wrapper requests a server-side Forgejo merge and source-branch deletion when `MAINTENANCE_AUTO_MERGE=true` (the Compose default). Failed validation, missing UI evidence, or a rejected merge leaves the job failed and inspectable.
+7. The root wrapper verifies repository containment, required UI evidence, and `git diff --check`. The specialist identity commits, pushes, and posts the completion reply with status `independent review pending`.
+8. `glm-maintainer` visibly mentions `@review-agent` with the PR URL and review contract.
+9. A second Claude Code `/goal` run checks the exact PR head SHA read-only. It traces every Issue requirement, reads the full diff, reruns relevant checks, records severity/location/remediation for findings, and emits an `approved` or `rejected` report.
+10. UI/app reviews must independently start and operate the app and attach reviewer-owned mobile and desktop captures. The implementer's screenshots alone cannot satisfy this gate.
+11. Only a schema-valid approval for the unchanged head SHA permits server-side merge. The merge request also supplies Forgejo's `head_commit_id`; rejection, missing evidence, reviewer edits, timeout, stale SHA, or merge conflict leaves the PR open.
 
 This is deliberately not a fixed planner/coder JSON pipeline. There is no file-count or changed-line cap; `/goal` retains Claude Code's repository-level freedom.
 
@@ -69,6 +72,8 @@ The Issue reaction trail is intentionally small: 👍 for human support, 👀 wh
 
 UI/app work cannot auto-merge from code inspection alone. The specialist must start the real app, exercise the changed interaction, and produce `.openface-maintenance/ui-report.json` plus real PNG captures. The wrapper requires all listed tests to be `passed`, at least one mobile capture at 480px or below, and at least one desktop capture at 1024px or above. It validates PNG signatures and dimensions, removes the private evidence directory from the commit, uploads the files to the Forgejo completion comment, and renders a Markdown table describing exactly what was tested. The maintenance image includes Chromium, Japanese CJK fonts, and color emoji so Japanese screenshots remain readable.
 
+That implementer report is not approval. After the PR is pushed, `glm-maintainer` assigns `@review-agent`. The reviewer uses a distinct Forgejo token and a read-only prompt, validates the exact current head SHA, and writes `.openface-maintenance/review-report.json`. Approval requires every requirement and executed check to pass and the findings list to be empty. For UI work, the reviewer must independently capture at least one real PNG at 480px or below and one at 1024px or above; those images are uploaded from the reviewer account. A malformed report, missing image, changed tracked file, failed check, any finding, or stale head SHA blocks merge.
+
 The retained [ClearNext Issue #22](https://madesk.tail8be30.ts.net/git/openface/clear-next/issues/22) demonstrates the complete contract: human `@glm-maintainer` request, maintainer-to-designer hand-off, real disclosure interaction, mobile/desktop evidence, explicit overflow and browser-error checks, and verified auto-merge.
 
 | Forgejo completion comment | Opened mobile attachment |
@@ -86,7 +91,7 @@ Up to `MAINTENANCE_MAX_WORKERS` Issues run concurrently. Each job has its own cl
 - The model API credential is necessarily available to the Claude Code process for inference.
 - The wrapper rejects paths that resolve outside the clone and requires `git diff --check` before publication.
 - Only the root wrapper receives Forgejo authentication for commit publication. Claude Code is instructed not to push or open PRs.
-- With `MAINTENANCE_AUTO_MERGE=true` (the Compose default), the root wrapper requests a server-side Forgejo merge only after local validation succeeds, then deletes the work branch. Set it to `false` when human review is mandatory.
+- With `MAINTENANCE_AUTO_MERGE=true` (the Compose default), the root wrapper requests a server-side Forgejo merge only after independent approval of the unchanged head SHA, then deletes the work branch. Set it to `false` when an additional human merge is mandatory.
 
 This boundary permits repository code execution inside the maintenance container. Treat third-party repositories and Issue automation accordingly; it is not a host security sandbox for arbitrary untrusted code.
 

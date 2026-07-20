@@ -1,17 +1,19 @@
 # Claude Code `/goal` による自動メンテナンス
 
-OpenFaceはForgejoで新規作成されたIssueを、Claude Code組み込みの `/goal` へ渡し、人間がレビューするPull Requestへ変換できます。Claude CodeはZ.AIのAnthropic互換endpointへ直接接続し、`glm-5.2` を使います。
+OpenFaceは `@glm-maintainer` 宛てのForgejo IssueをClaude Code組み込みの `/goal` へ渡し、専門担当の実装と独立レビュワーの承認を経たPull Requestへ変換できます。Claude CodeはZ.AIのAnthropic互換endpointへ直接接続し、`glm-5.2` を使います。
 
 ## 処理の流れ
 
 1. Forgejoが組織の `issues`、`issue_comment`、`pull_request_comment` webhookへHMAC署名を付けて送信します。
 2. `maintenance-agent` が署名を検証し、配送IDをSQLiteへ記録します。
-3. 対象リポジトリをcloneし、`agent/issue-N` ブランチを作ります。
-4. Claude Code 2.1.205へ、Issueと完了条件を含む本物の `/goal` を渡します。
+3. `glm-maintainer` が内容を分類し、`@designer-agent`、`@coding-agent`、`@docs-agent` のいずれかへ会話上で指名します。
+4. 対象リポジトリをcloneし、`agent/issue-N` ブランチを作り、Claude Code 2.1.205へIssueと完了条件を含む本物の `/goal` を渡します。
 5. Claude Codeがローカル指示・ソースを調査し、必要なファイルを編集し、テストやbuildを実行し、diffを再確認して、goal evaluatorが完了するまで作業します。
 6. root wrapperがclone外への逸脱がないことと `git diff --check` を確認します。
-7. `glm-maintainer` が内容を分類し、専門エージェントへ委任します。担当エージェントがcommit・push・Issue返信を行います。
-8. 検証成功後、`MAINTENANCE_AUTO_MERGE=true`（Compose既定値）ならwrapperがForgejoのserver-side mergeと作業branch削除を要求します。人間レビューを必須にする場合は `false` にします。
+7. 担当エージェントがcommit・pushし、テスト結果と証跡を自分のForgejoアカウントから返信します。この時点ではマージしません。
+8. `glm-maintainer` が別アカウントの `@review-agent` を明示的にメンションします。
+9. レビュワーが対象SHAを固定し、コードを変更せず、要件・全diff・テスト・回帰・securityを独立評価します。UIでは実アプリを再起動し、独自のモバイル／デスクトップ画像も提出します。
+10. 全要件と検証が成功し、指摘が0件で、承認SHAが現在headと一致した場合だけ自動マージします。却下・証跡不足・不正JSON・タイムアウト・古いSHA・競合はfail-closedでPRをopenのまま残します。
 
 固定のplanner/coder JSON pipelineではありません。ファイル数・変更行数の上限を設けず、Claude Code `/goal` の自由度を維持します。
 
@@ -36,13 +38,10 @@ seedは非管理者 `glm-maintainer`、write専用組織team、専用Forgejo tok
 
 ## 専門エージェントへの委任
 
-新規Issueは司令塔が内容から担当を自動選択します。コメントで担当を明示することもできます。
+ユーザーは専門担当ではなく、必ずメンテナーだけを呼びます。
 
 ```text
-@designer-agent モバイル画面をスクリーンショット比較して余白を修正してください
-@coding-agent APIへJSONレスポンスを追加し、テストしてください
-@docs-agent READMEとVitePressの再構築手順を更新してください
-@review-agent 現在のPRを独立レビューし、問題があれば修正してください
+@glm-maintainer モバイル画面をスクリーンショット比較して余白を修正してください
 ```
 
 | メンション | 担当 |
@@ -52,7 +51,7 @@ seedは非管理者 `glm-maintainer`、write専用組織team、専用Forgejo tok
 | `@docs-agent` | README、VitePress、設定例、再構築手順、リンク |
 | `@review-agent` | diff、テスト、セキュリティ、回帰、要件充足の独立レビュー |
 
-1コメントでは1体だけ指定します。複数メンションは曖昧な指令として実行されません。同じIssueが処理中の間は追加ジョブを投入せず、別Issueは `MAINTENANCE_MAX_WORKERS` の範囲で並列処理します。担当一覧は `GET /api/agents`、担当を含むジョブ状態は `GET /api/jobs` で確認できます。
+専門担当への直接メンションはジョブを起動せず、ルーティングも上書きしません。同じIssueが処理中の間は追加ジョブを投入せず、別Issueは `MAINTENANCE_MAX_WORKERS` の範囲で並列処理します。担当一覧は `GET /api/agents`、担当を含むジョブ状態は `GET /api/jobs` で確認できます。
 
 司令塔と4体の専門担当は、それぞれ独立したForgejoユーザーです。seedはアカウントごとに最小権限tokenを発行し、役割ごとに個別生成したキャラクターを無地背景の中央に配置した専用アバターを設定します。workerを開始する前に、`glm-maintainer` は選択した専門担当へのメンションコメントを必ず投稿します。投稿に失敗した場合はDBのジョブ予約も取り消すため、会話に現れない裏側だけの実行は始まりません。保存用の[Issue #21](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/21)では、司令塔のメンションから専門担当の完了返信までを順番に確認できます。各プロフィールと会話の撮影結果は [`docs/evidence/agents`](../../evidence/agents/README.md) にあります。
 
@@ -67,10 +66,10 @@ seedは非管理者 `glm-maintainer`、write専用組織team、専用Forgejo tok
 
 ### コメントから追加編集する
 
-元Issueまたはエージェントが作成したPRへ、追加指示を `/goal` から始めるか、専門エージェントをメンションして投稿します。
+元Issueまたはエージェントが作成したPRへ、`@glm-maintainer` に続けて追加指示を投稿します。
 
 ```text
-/goal 見出しも日本語にしてください。ほかのファイルは変更しないでください。
+@glm-maintainer 見出しも日本語にしてください。ほかのファイルは変更しないでください。
 ```
 
 エージェントは既存の `agent/issue-N` ブランチをcheckoutし、日本語の完了プロンプトで追加編集と検証を行い、同じPRへ新しいcommitをpushします。通常の議論コメントはモデルを起動しません。同じIssueが `queued` または `running` の間は再投入せず、完了後のコメントだけを受け付けます。
