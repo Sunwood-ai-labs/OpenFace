@@ -345,7 +345,7 @@ Point `ZAI_AGENT_CONFIG` in the untracked `.env` file to a protected env file co
 
 After the PR exists, post a comment beginning with `/goal`, for example `/goal 見出しも日本語にしてください。`. The agent checks out the existing `agent/issue-N` branch, applies and verifies the additional instruction, pushes another commit to the same PR, and replies in Japanese. Ordinary comments do not run the agent. The trigger works on the source Issue and on its agent-created PR.
 
-The orchestrator automatically delegates each new Issue to one specialist: `@designer-agent`, `@coding-agent`, `@docs-agent`, or `@review-agent`. A maintainer can also mention exactly one specialist in an Issue or PR comment to route a follow-up explicitly. Each specialist has its own Forgejo identity, avatar, least-privilege token, role contract, commit author, reactions, and completion reply; `/api/agents` and `/api/jobs` expose the available personas and current assignment.
+The orchestrator automatically delegates each new Issue to one specialist: `@designer-agent`, `@coding-agent`, `@docs-agent`, or `@review-agent`. The delegation is a real, visible conversation step: `glm-maintainer` first posts `@specialist 次の作業を担当してください`, and only then is that specialist's worker submitted. A maintainer can also mention exactly one specialist in an Issue or PR comment to route a follow-up explicitly. Each specialist has its own Forgejo identity, avatar, least-privilege token, role contract, commit author, reactions, and completion reply; `/api/agents` and `/api/jobs` expose the available personas and current assignment.
 
 | Coordinator | Design | Coding | Documentation | Review |
 |---|---|---|---|---|
@@ -355,6 +355,10 @@ The orchestrator automatically delegates each new Issue to one specialist: `@des
 The retained [independent-account sample Issue #20](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/20) contains a separate comment from every account. The screenshot below verifies the rendered discussion; the individual profile captures in [`docs/evidence/agents`](docs/evidence/agents) verify that Forgejo serves five distinct generated avatars without the former shared-avatar override.
 
 ![Independent specialist-agent accounts in one retained Issue](docs/evidence/agents/specialist-agent-identities.png)
+
+The live hand-off is retained as [Issue #21](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/21) → [PR #22](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/22). It proves the ordered sequence `glm-maintainer mention → docs-agent reaction/work → docs-agent completion comment`.
+
+![GLM Maintainer mentions a specialist before the specialist starts and replies](docs/evidence/agents/maintainer-delegates-specialist-complete.png)
 
 Issue reactions provide a compact progress signal: 👍 records human support, 👀 means `glm-maintainer` accepted and is processing the request, 🚀 means the verified PR or follow-up commit was published, and 😕 marks a stopped or failed run that needs log inspection.
 

@@ -54,7 +54,7 @@ seedは非管理者 `glm-maintainer`、write専用組織team、専用Forgejo tok
 
 1コメントでは1体だけ指定します。複数メンションは曖昧な指令として実行されません。同じIssueが処理中の間は追加ジョブを投入せず、別Issueは `MAINTENANCE_MAX_WORKERS` の範囲で並列処理します。担当一覧は `GET /api/agents`、担当を含むジョブ状態は `GET /api/jobs` で確認できます。
 
-司令塔と4体の専門担当は、それぞれ独立したForgejoユーザーです。seedはアカウントごとに最小権限tokenを発行し、役割ごとに個別生成したキャラクターを無地背景の中央に配置した専用アバターを設定します。保存用の[Issue #20](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/20)では、5アカウントがそれぞれ自分の名義でコメントしていることを確認できます。各プロフィールの撮影結果は [`docs/evidence/agents`](../../evidence/agents/README.md) にあります。
+司令塔と4体の専門担当は、それぞれ独立したForgejoユーザーです。seedはアカウントごとに最小権限tokenを発行し、役割ごとに個別生成したキャラクターを無地背景の中央に配置した専用アバターを設定します。workerを開始する前に、`glm-maintainer` は選択した専門担当へのメンションコメントを必ず投稿します。投稿に失敗した場合はDBのジョブ予約も取り消すため、会話に現れない裏側だけの実行は始まりません。保存用の[Issue #21](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/21)では、司令塔のメンションから専門担当の完了返信までを順番に確認できます。各プロフィールと会話の撮影結果は [`docs/evidence/agents`](../../evidence/agents/README.md) にあります。
 
 ## 起動条件と除外
 

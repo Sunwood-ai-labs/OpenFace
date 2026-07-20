@@ -13,3 +13,15 @@ The retained [Issue #20](https://madesk.tail8be30.ts.net/git/openface/pages-star
 | `review-agent` | Independent reviewer | ![OpenFace Review profile](review-agent-profile.png) |
 
 All five screenshots were captured from the running Forgejo instance after reseeding. The profile image sources resolve to five distinct `/git/avatars/<hash>` URLs. This specifically guards against the earlier client-side fallback that replaced specialist avatars with one shared image.
+
+## Mention-driven delegation
+
+[Issue #21](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/21) is the retained end-to-end proof for the actual orchestration order:
+
+1. `glm-maintainer` classifies the Issue and visibly mentions `@docs-agent`.
+2. Only after the mention is published, the `docs-agent` job enters `running` and adds the 👀 reaction.
+3. `docs-agent` creates [PR #22](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/22), adds 🚀, and posts its own completion comment.
+
+![Maintainer mention visible while the specialist job is running](maintainer-mentions-specialist.png)
+
+![Maintainer mention followed by the specialist's own completion reply](maintainer-delegates-specialist-complete.png)
