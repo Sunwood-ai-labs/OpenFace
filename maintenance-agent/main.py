@@ -14,6 +14,7 @@ from typing import Any
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import JSONResponse
 
+from agents import AGENTS, BY_USERNAME, choose_agent, mention_instruction, mentioned_agent
 from config import Settings
 from forgejo import ForgejoClient
 from worker import IssueTask, MaintenanceWorker
@@ -72,16 +73,17 @@ def update_job(delivery_id: str, status: str, detail: str = "", pull_url: str = 
 
 
 def process_job(delivery_id: str, task: IssueTask) -> None:
-    update_job(delivery_id, "running", f"Claude Code /goal を {settings.model} で実行中")
+    profile = AGENTS[task.agent_key]
+    update_job(delivery_id, "running", f"{profile.display_name} が Claude Code /goal を {settings.model} で実行中")
     try:
-        client = ForgejoClient(settings)
+        client = ForgejoClient(settings, settings.agent_token_file(profile.username))
         try:
             client.react_to_issue(task.owner, task.repo, task.issue_number, "eyes")
         finally:
             client.close()
         result = worker.run(task)
         update_job(delivery_id, "completed", result.summary, result.pull.url)
-        client = ForgejoClient(settings)
+        client = ForgejoClient(settings, settings.agent_token_file(profile.username))
         try:
             client.react_to_issue(task.owner, task.repo, task.issue_number, "rocket")
         finally:
@@ -118,7 +120,7 @@ def signature_valid(raw_body: bytes, supplied: str | None) -> bool:
 
 def payload_to_task(
     payload: dict[str, Any], *, issue_override: dict[str, Any] | None = None,
-    follow_up: bool = False, instruction: str = "",
+    follow_up: bool = False, instruction: str = "", agent_key: str = "coding",
 ) -> IssueTask:
     repository = payload.get("repository") or {}
     issue = issue_override or payload.get("issue") or {}
@@ -138,6 +140,7 @@ def payload_to_task(
         issue_url=str(issue.get("html_url") or issue.get("url") or ""),
         follow_up=follow_up,
         instruction=instruction[:20_000],
+        agent_key=agent_key,
     )
 
 
@@ -220,20 +223,34 @@ async def forgejo_webhook(
     body = str(issue.get("body") or "")
     labels = {str(label.get("name", "")).lower() for label in issue.get("labels", []) if isinstance(label, dict)}
     sender = (payload.get("sender") or {}).get("login", "")
-    if sender == "glm-maintainer" or "agent:skip" in labels or "<!-- openface-maintenance:skip -->" in body:
+    if sender in {"glm-maintainer", *BY_USERNAME} or "agent:skip" in labels or "<!-- openface-maintenance:skip -->" in body:
         return {"accepted": False, "reason": "issue opted out"}
     delivery_id = x_forgejo_delivery or hashlib.sha256(raw_body).hexdigest()
     if x_forgejo_event in {"issues", "issue"}:
         if payload.get("action") != "opened":
             return {"accepted": False, "reason": "action ignored"}
-        task = payload_to_task(payload)
+        profile = choose_agent(str(issue.get("title") or ""), body)
+        task = payload_to_task(payload, agent_key=profile.key)
         queued = enqueue(task, delivery_id, allow_retry=False)
+        if queued:
+            client = ForgejoClient(settings)
+            try:
+                client.comment_issue(
+                    task.owner, task.repo, task.issue_number,
+                    f"🧭 内容を分類し、@{profile.username} に委任しました。\n\n"
+                    f"> 担当: **{profile.display_name}** — {profile.focus}\n\n"
+                    "進捗はリアクションとコメントで更新します。",
+                )
+            finally:
+                client.close()
     else:
         if payload.get("action") not in {"created", "edited"}:
             return {"accepted": False, "reason": "comment action ignored"}
-        instruction = follow_up_instruction(str((payload.get("comment") or {}).get("body") or ""))
+        comment_body = str((payload.get("comment") or {}).get("body") or "")
+        profile = mentioned_agent(comment_body)
+        instruction = mention_instruction(comment_body, profile) if profile else follow_up_instruction(comment_body)
         if not instruction:
-            return {"accepted": False, "reason": "comment has no /goal instruction"}
+            return {"accepted": False, "reason": "comment has no /goal or specialist mention instruction"}
         repository = payload.get("repository") or {}
         owner = str((repository.get("owner") or {}).get("login") or "")
         repo = str(repository.get("name") or "")
@@ -247,7 +264,10 @@ async def forgejo_webhook(
                 issue = client.issue(owner, repo, source_number)
             finally:
                 client.close()
-        task = payload_to_task(payload, issue_override=issue, follow_up=True, instruction=instruction)
+        profile = profile or choose_agent(str(issue.get("title") or ""), instruction)
+        task = payload_to_task(
+            payload, issue_override=issue, follow_up=True, instruction=instruction, agent_key=profile.key,
+        )
         queued = enqueue(task, delivery_id, allow_retry=True)
     return {
         "accepted": True,
@@ -255,4 +275,5 @@ async def forgejo_webhook(
         "issue": task.issue_number,
         "model": settings.model,
         "follow_up": task.follow_up,
+        "agent": AGENTS[task.agent_key].username,
     }

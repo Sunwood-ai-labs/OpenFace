@@ -19,9 +19,9 @@ class PullRequest:
 
 
 class ForgejoClient:
-    def __init__(self, settings: Settings):
+    def __init__(self, settings: Settings, token_file: Path | None = None):
         self.settings = settings
-        self.token = settings.read_forgejo_token()
+        self.token = (token_file or settings.forgejo_token_file).read_text(encoding="utf-8").strip()
         self.client = httpx.Client(
             base_url=settings.forgejo_api,
             headers={"Authorization": f"token {self.token}"},

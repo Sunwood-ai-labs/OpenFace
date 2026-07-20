@@ -27,6 +27,7 @@ class Settings:
     claude_user: str
     goal_timeout_seconds: int
     max_workers: int
+    agent_token_dir: Path
 
     @classmethod
     def load(cls) -> "Settings":
@@ -44,7 +45,11 @@ class Settings:
             claude_user=os.getenv("MAINTENANCE_CLAUDE_USER", "maintainer"),
             goal_timeout_seconds=_integer("MAINTENANCE_GOAL_TIMEOUT_SECONDS", 3600),
             max_workers=max(1, min(_integer("MAINTENANCE_MAX_WORKERS", 2), 4)),
+            agent_token_dir=Path(os.getenv("MAINTENANCE_AGENT_TOKEN_DIR", "/shared/agent-tokens")),
         )
+
+    def agent_token_file(self, username: str) -> Path:
+        return self.agent_token_dir / username
 
     def read_forgejo_token(self) -> str:
         return self.forgejo_token_file.read_text(encoding="utf-8").strip()

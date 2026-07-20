@@ -7,6 +7,7 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
+from agents import AGENTS
 from config import Settings
 from forgejo import ForgejoClient, PullRequest
 
@@ -22,6 +23,7 @@ class IssueTask:
     issue_url: str
     follow_up: bool = False
     instruction: str = ""
+    agent_key: str = "coding"
 
     @property
     def branch(self) -> str:
@@ -41,6 +43,7 @@ class MaintenanceWorker:
 
     def run(self, task: IssueTask) -> AgentResult:
         forgejo = ForgejoClient(self.settings)
+        profile = AGENTS[task.agent_key]
         worktree = self.settings.workspace_dir / f"{task.owner}-{task.repo}-{task.issue_number}"
         try:
             existing = forgejo.existing_pull(task.owner, task.repo, task.branch)
@@ -72,8 +75,8 @@ class MaintenanceWorker:
             changed = self._changed_files(worktree)
             self._validate_worktree(worktree, changed)
 
-            self._git(forgejo, worktree, "config", "user.name", "Claude Goal Maintainer")
-            self._git(forgejo, worktree, "config", "user.email", "glm-maintainer@agents.openface.local")
+            self._git(forgejo, worktree, "config", "user.name", profile.display_name)
+            self._git(forgejo, worktree, "config", "user.email", f"{profile.username}@agents.openface.local")
             self._git(forgejo, worktree, "add", "--all")
             commit_message = (
                 f"fix: apply follow-up for issue #{task.issue_number}"
@@ -91,14 +94,19 @@ class MaintenanceWorker:
                 self._pull_body(task, summary, changed),
             )
             action = "既存PRを更新しました" if existing else "PRを作成しました"
-            forgejo.comment_issue(
-                task.owner,
-                task.repo,
-                task.issue_number,
-                f"🤖 Claude Code `/goal` を `{self.settings.model}` で実行し、{action}。\n\n"
-                f"- PR: [#{pull.number}]({pull.url})\n"
-                f"- 変更ファイル: {', '.join(f'`{path}`' for path in changed)}",
-            )
+            agent_client = ForgejoClient(self.settings, self.settings.agent_token_file(profile.username))
+            try:
+                agent_client.comment_issue(
+                    task.owner,
+                    task.repo,
+                    task.issue_number,
+                    f"{profile.emoji} **{profile.display_name}** が担当作業を完了しました。\n\n"
+                    f"- PR: [#{pull.number}]({pull.url})\n"
+                    f"- 変更ファイル: {', '.join(f'`{path}`' for path in changed)}\n"
+                    f"- 実行: Claude Code `/goal` + `{self.settings.model}`",
+                )
+            finally:
+                agent_client.close()
             return AgentResult(pull, summary, changed)
         finally:
             forgejo.close()
@@ -130,6 +138,7 @@ class MaintenanceWorker:
             )
 
     def _goal_prompt(self, task: IssueTask) -> str:
+        profile = AGENTS[task.agent_key]
         follow_up = ""
         if task.follow_up:
             follow_up = f"""
@@ -140,6 +149,9 @@ class MaintenanceWorker:
 既存PRのブランチ上で、上記の追加指示に必要な変更を加えてください。
 """
         return f"""/goal Forgejo Issue #{task.issue_number} をこのリポジトリで完全に解決してください。
+
+あなたは **{profile.display_name}** です。専門領域は「{profile.focus}」です。
+専門領域に集中しつつ、Issueを完了させるために必要な範囲では関連ファイルも変更できます。
 
 Issueタイトル: {task.title}
 Issue URL: {task.issue_url}
@@ -256,7 +268,7 @@ Issue本文:
 
 - Claude Code組み込みの `/goal` コマンド
 - モデル: Z.AIのAnthropic互換エンドポイント経由の `{self.settings.model}`
-- 公開: 最小権限のForgejoアカウント `glm-maintainer`
+- 担当: `{AGENTS[task.agent_key].username}`（{AGENTS[task.agent_key].display_name}）
 - ラッパー検証: `git diff --check`
 
 Issue #{task.issue_number} を解決します。

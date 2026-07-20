@@ -78,6 +78,41 @@ class GoalWorkerTests(unittest.TestCase):
         self.assertIn("見出しも日本語にしてください", prompt)
         self.assertIn("既存PRのブランチ上", prompt)
 
+    def test_specialist_mention_routes_one_agent_and_removes_mention(self) -> None:
+        from agents import mention_instruction, mentioned_agent
+
+        profile = mentioned_agent("@designer-agent モバイルの余白をスクショで確認して")
+        self.assertIsNotNone(profile)
+        self.assertEqual(profile.key, "designer")
+        self.assertEqual(
+            mention_instruction("@designer-agent モバイルの余白をスクショで確認して", profile),
+            "モバイルの余白をスクショで確認して",
+        )
+
+    def test_ambiguous_specialist_mentions_are_rejected(self) -> None:
+        from agents import mentioned_agent
+
+        self.assertIsNone(mentioned_agent("@designer-agent と @coding-agent で対応して"))
+
+    def test_initial_issue_classifier_prefers_docs_then_design_then_code(self) -> None:
+        from agents import choose_agent
+
+        self.assertEqual(choose_agent("READMEを更新", "再構築手順" ).key, "docs")
+        self.assertEqual(choose_agent("モバイルUI", "CSSの余白を直す").key, "designer")
+        self.assertEqual(choose_agent("API追加", "JSON endpointを実装").key, "coding")
+
+    def test_specialist_prompt_contains_role_contract(self) -> None:
+        from config import Settings
+        from worker import IssueTask, MaintenanceWorker
+
+        task = IssueTask(
+            "openface", "demo", 8, "UI修正", "余白を直す", "main", "https://example/8",
+            agent_key="designer",
+        )
+        prompt = MaintenanceWorker(Settings.load())._goal_prompt(task)
+        self.assertIn("OpenFace Designer", prompt)
+        self.assertIn("スクリーンショット比較", prompt)
+
     def test_command_uses_claude_code_and_not_bounded_json_planner(self) -> None:
         from config import Settings
         from worker import MaintenanceWorker
