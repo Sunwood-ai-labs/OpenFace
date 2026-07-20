@@ -97,13 +97,34 @@ def process_job(delivery_id: str, task: IssueTask) -> None:
         finally:
             client.close()
         result = worker.run(task)
-        update_job(delivery_id, "completed", result.summary, result.pull.url)
+        if result.review_verdict == "rejected":
+            update_job(
+                delivery_id,
+                "changes_requested",
+                "独立レビューで差し戻されました。PRは未マージです。",
+                result.pull.url,
+            )
+            logger.info(
+                "Review requested changes for %s/%s issue #%s -> PR %s",
+                task.owner, task.repo, task.issue_number, result.pull.url,
+            )
+            return
+        update_job(
+            delivery_id,
+            "completed" if result.merged or not settings.auto_merge else "awaiting_merge",
+            result.summary,
+            result.pull.url,
+        )
         client = ForgejoClient(settings, settings.agent_token_file(profile.username))
         try:
             client.react_to_issue(task.owner, task.repo, task.conversation_number, "rocket")
         finally:
             client.close()
-        logger.info("Completed %s/%s issue #%s -> PR %s", task.owner, task.repo, task.issue_number, result.pull.url)
+        logger.info(
+            "Completed %s/%s issue #%s -> PR %s (review=%s, merged=%s)",
+            task.owner, task.repo, task.issue_number, result.pull.url,
+            result.review_verdict or "n/a", result.merged,
+        )
     except Exception as exc:  # fail closed and retain an inspectable job record
         message = str(exc)[:2000]
         update_job(delivery_id, "failed", message)

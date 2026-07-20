@@ -8,7 +8,7 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
-from agents import AGENTS, AgentProfile
+from agents import AGENTS, AgentProfile, review_delegation_comment
 from config import Settings
 from forgejo import ForgejoClient, PullRequest
 
@@ -42,6 +42,8 @@ class AgentResult:
     pull: PullRequest
     summary: str
     changed_files: list[str]
+    merged: bool = False
+    review_verdict: str = ""
 
 
 @dataclass(frozen=True)
@@ -67,6 +69,33 @@ class UiScreenshot:
 class UiEvidence:
     summary: str
     tests: list[UiTestResult]
+    screenshots: list[UiScreenshot]
+
+
+@dataclass(frozen=True)
+class ReviewCheck:
+    name: str
+    result: str
+    evidence: str
+
+
+@dataclass(frozen=True)
+class ReviewFinding:
+    severity: str
+    title: str
+    location: str
+    details: str
+    remediation: str
+
+
+@dataclass(frozen=True)
+class ReviewEvidence:
+    verdict: str
+    reviewed_sha: str
+    summary: str
+    requirements: list[ReviewCheck]
+    checks: list[ReviewCheck]
+    findings: list[ReviewFinding]
     screenshots: list[UiScreenshot]
 
 
@@ -151,29 +180,79 @@ class MaintenanceWorker:
                     pull,
                     changed,
                     ui_evidence,
-                    "検証済み・マージ処理中" if self.settings.auto_merge else "人間レビュー待ち",
+                    "独立レビュー待ち",
                 )
             except Exception:
                 agent_client.close()
                 raise
+            review = None
             merged = False
             try:
-                if self.settings.auto_merge:
-                    forgejo.merge_pull(task.owner, task.repo, pull.number)
-                    merged = True
+                if task.agent_key != "review":
+                    review = self._run_independent_review(
+                        forgejo, worktree, task, profile, pull, changed
+                    )
+                merged = self._merge_if_approved(forgejo, task, pull, review)
+                if merged:
                     agent_client.edit_issue_comment(
                         task.owner,
                         task.repo,
                         comment_id,
-                        comment_body.replace("検証済み・マージ処理中", "自動マージ済み"),
+                        comment_body.replace(
+                            "独立レビュー待ち",
+                            "独立レビュー承認済み・自動マージ済み",
+                        ),
+                    )
+                elif review is not None and review.verdict == "rejected":
+                    agent_client.edit_issue_comment(
+                        task.owner,
+                        task.repo,
+                        comment_id,
+                        comment_body.replace("独立レビュー待ち", "独立レビューで差し戻し"),
+                    )
+                    findings = "\n".join(
+                        f"- **{item.severity}**: {item.title} (`{item.location}`) — "
+                        f"{item.details} / 修正条件: {item.remediation}"
+                        for item in review.findings
+                    )
+                    forgejo.comment_issue(
+                        task.owner,
+                        task.repo,
+                        task.conversation_number,
+                        f"🧭 @{profile.username} 独立レビューで差し戻されました。"
+                        + "\n\n次の指摘を修正し、メンテナーへ再レビューを依頼してください。\n\n"
+                        + findings,
                     )
             finally:
                 agent_client.close()
-            return AgentResult(pull, summary, changed)
+            return AgentResult(
+                pull, summary, changed, merged=merged,
+                review_verdict=review.verdict if review is not None else "",
+            )
         finally:
             forgejo.close()
             if worktree.exists():
                 shutil.rmtree(worktree, ignore_errors=True)
+
+    def _merge_if_approved(
+        self,
+        forgejo: ForgejoClient,
+        task: IssueTask,
+        pull: PullRequest,
+        review: ReviewEvidence | None,
+    ) -> bool:
+        if not self.settings.auto_merge or review is None or review.verdict != "approved":
+            return False
+        current_head = forgejo.pull_head_sha(task.owner, task.repo, pull.number)
+        if current_head != review.reviewed_sha:
+            raise RuntimeError("PR head changed after independent review; refusing stale approval")
+        forgejo.merge_pull(
+            task.owner,
+            task.repo,
+            pull.number,
+            expected_head_sha=review.reviewed_sha,
+        )
+        return True
 
     def _git(self, client: ForgejoClient, cwd: Path | None, *args: str) -> str:
         git_args = ["-c", f"safe.directory={cwd.resolve()}", *args] if cwd else list(args)
@@ -285,6 +364,230 @@ class MaintenanceWorker:
         )
         shutil.rmtree(evidence_root)
         return evidence
+
+    def _run_independent_review(
+        self,
+        maintainer_client: ForgejoClient,
+        worktree: Path,
+        task: IssueTask,
+        implementation_profile: AgentProfile,
+        pull: PullRequest,
+        changed: list[str],
+    ) -> ReviewEvidence:
+        reviewer = AGENTS["review"]
+        implementation_token = self.settings.agent_token_file(
+            implementation_profile.username
+        ).read_text(encoding="utf-8").strip()
+        reviewer_token = self.settings.agent_token_file(reviewer.username).read_text(
+            encoding="utf-8"
+        ).strip()
+        if not reviewer_token or reviewer_token == implementation_token:
+            raise RuntimeError(
+                "Independent reviewer must use a non-empty token distinct from the implementer"
+            )
+        maintainer_client.comment_issue(
+            task.owner,
+            task.repo,
+            task.conversation_number,
+            review_delegation_comment(
+                implementation_profile,
+                pull.number,
+                pull.url,
+                ui_review_required=task.ui_evidence_required,
+            ),
+        )
+        reviewer_client = ForgejoClient(
+            self.settings, self.settings.agent_token_file(reviewer.username)
+        )
+        try:
+            reviewer_client.react_to_issue(
+                task.owner, task.repo, task.conversation_number, "eyes"
+            )
+            reviewed_sha = maintainer_client.pull_head_sha(task.owner, task.repo, pull.number)
+            local_sha = self._git(maintainer_client, worktree, "rev-parse", "HEAD").strip()
+            if reviewed_sha != local_sha:
+                raise RuntimeError("Local review checkout does not match current PR head")
+            before = self._tracked_state(worktree)
+            self._run_claude_prompt(
+                worktree, self._review_prompt(task, pull, changed, reviewed_sha)
+            )
+            after = self._tracked_state(worktree)
+            if before != after:
+                raise RuntimeError("Independent reviewer modified tracked files; review must be read-only")
+            evidence = self._collect_review_evidence(worktree, task, reviewed_sha)
+            self._publish_review_comment(reviewer_client, task, pull, evidence)
+            reviewer_client.react_to_issue(
+                task.owner,
+                task.repo,
+                task.conversation_number,
+                "+1" if evidence.verdict == "approved" else "-1",
+            )
+            return evidence
+        finally:
+            reviewer_client.close()
+
+    def _tracked_state(self, root: Path) -> str:
+        process = subprocess.run(
+            ["git", "-c", f"safe.directory={root.resolve()}", "status", "--short", "--untracked-files=no"],
+            cwd=root, check=True, text=True, capture_output=True, timeout=30,
+        )
+        return process.stdout
+
+    def _collect_review_evidence(
+        self, root: Path, task: IssueTask, expected_sha: str
+    ) -> ReviewEvidence:
+        evidence_root = root / ".openface-maintenance"
+        report_path = evidence_root / "review-report.json"
+        try:
+            payload = json.loads(report_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise RuntimeError(f"Independent review report is missing or invalid: {exc}") from exc
+        verdict = str(payload.get("verdict") or "").strip().lower()
+        if verdict not in {"approved", "rejected"}:
+            raise RuntimeError("Independent review verdict must be approved or rejected")
+        reviewed_sha = str(payload.get("reviewed_sha") or "").strip()
+        if reviewed_sha != expected_sha:
+            raise RuntimeError("Independent review report does not match the current PR head SHA")
+        summary = str(payload.get("summary") or "").strip()
+        if not summary:
+            raise RuntimeError("Independent review must include a summary")
+
+        def checks(key: str) -> list[ReviewCheck]:
+            values = payload.get(key)
+            if not isinstance(values, list) or not values:
+                raise RuntimeError(f"Independent review must include {key}")
+            result: list[ReviewCheck] = []
+            for item in values:
+                if not isinstance(item, dict):
+                    raise RuntimeError(f"Every {key} entry must be an object")
+                name = str(item.get("name") or "").strip()
+                state = str(item.get("result") or "").strip().lower()
+                proof = str(item.get("evidence") or "").strip()
+                if not name or state not in {"passed", "failed"} or not proof:
+                    raise RuntimeError(f"Every {key} entry needs name, passed/failed, and evidence")
+                result.append(ReviewCheck(name[:160], state, proof[:800]))
+            return result
+
+        requirements = checks("requirements")
+        executed_checks = checks("checks")
+        raw_findings = payload.get("findings")
+        if not isinstance(raw_findings, list):
+            raise RuntimeError("Independent review must include a findings list")
+        findings: list[ReviewFinding] = []
+        for item in raw_findings:
+            if not isinstance(item, dict):
+                raise RuntimeError("Every review finding must be an object")
+            severity = str(item.get("severity") or "").strip().lower()
+            title = str(item.get("title") or "").strip()
+            location = str(item.get("location") or "").strip()
+            details = str(item.get("details") or "").strip()
+            remediation = str(item.get("remediation") or "").strip()
+            if (
+                severity not in {"critical", "high", "medium", "low"}
+                or not title or not location or not details or not remediation
+            ):
+                raise RuntimeError(
+                    "Every finding needs severity, title, location, details, and remediation"
+                )
+            findings.append(
+                ReviewFinding(
+                    severity, title[:200], location[:300], details[:1000], remediation[:1000]
+                )
+            )
+        failed = any(item.result == "failed" for item in requirements + executed_checks)
+        blocking = bool(findings)
+        if verdict == "approved" and (failed or blocking):
+            raise RuntimeError("Reviewer approved despite failed checks or blocking findings")
+        if verdict == "rejected" and not (failed or findings):
+            raise RuntimeError("Reviewer rejected without a failed check or actionable finding")
+
+        screenshots: list[UiScreenshot] = []
+        if task.ui_evidence_required:
+            screenshots = self._review_screenshots(root, payload)
+        shutil.rmtree(evidence_root, ignore_errors=True)
+        return ReviewEvidence(
+            verdict, reviewed_sha, summary[:1600], requirements, executed_checks, findings, screenshots
+        )
+
+    def _review_screenshots(self, root: Path, payload: dict[str, object]) -> list[UiScreenshot]:
+        raw = payload.get("screenshots")
+        if not isinstance(raw, list) or len(raw) < 2:
+            raise RuntimeError("UI review requires independent mobile and desktop screenshots")
+        allowed = (root / ".openface-maintenance" / "review-screenshots").resolve()
+        screenshots: list[UiScreenshot] = []
+        for index, item in enumerate(raw):
+            if not isinstance(item, dict):
+                raise RuntimeError("Every review screenshot must be an object")
+            relative = str(item.get("path") or "")
+            candidate = (root / relative).resolve(strict=False)
+            if allowed != candidate and allowed not in candidate.parents:
+                raise RuntimeError("Review screenshots must stay under review-screenshots")
+            content = candidate.read_bytes()
+            if len(content) < 24 or content[:8] != b"\x89PNG\r\n\x1a\n":
+                raise RuntimeError(f"Review screenshot is not a valid PNG: {relative}")
+            width, height = struct.unpack(">II", content[16:24])
+            screenshots.append(UiScreenshot(
+                f"review-{index + 1}-{candidate.name}"[:240],
+                str(item.get("caption") or candidate.stem)[:240],
+                str(item.get("viewport") or f"{width}x{height}")[:40],
+                str(item.get("url") or "")[:500], width, height, content,
+            ))
+        if not any(shot.width <= 480 for shot in screenshots):
+            raise RuntimeError("UI review is missing a mobile screenshot")
+        if not any(shot.width >= 1024 for shot in screenshots):
+            raise RuntimeError("UI review is missing a desktop screenshot")
+        return screenshots
+
+    def _publish_review_comment(
+        self,
+        client: ForgejoClient,
+        task: IssueTask,
+        pull: PullRequest,
+        evidence: ReviewEvidence,
+    ) -> tuple[int, str]:
+        verdict_label = "✅ 承認" if evidence.verdict == "approved" else "⛔ 却下・差し戻し"
+        requirement_rows = "\n".join(
+            f"| {self._table_cell(item.name)} | {'✅' if item.result == 'passed' else '❌'} {item.result} | {self._table_cell(item.evidence)} |"
+            for item in evidence.requirements
+        )
+        check_rows = "\n".join(
+            f"| {self._table_cell(item.name)} | {'✅' if item.result == 'passed' else '❌'} {item.result} | {self._table_cell(item.evidence)} |"
+            for item in evidence.checks
+        )
+        finding_rows = "\n".join(
+            f"| `{item.severity}` | {self._table_cell(item.title)} | {self._table_cell(item.location)} | "
+            f"{self._table_cell(item.details)} | {self._table_cell(item.remediation)} |"
+            for item in evidence.findings
+        ) or "| — | 指摘なし | — | ブロッキング指摘はありません。 | — |"
+        body = (
+            f"🔎 **OpenFace Review** が [PR #{pull.number}]({pull.url}) を独立評価しました。\n\n"
+            f"- 判定: **{verdict_label}**\n"
+            f"- レビュー対象SHA: `{evidence.reviewed_sha}`\n"
+            f"- 実行: Claude Code `/goal` + `{self.settings.model}`\n"
+            "- 独立性: 実装担当とは別アカウント・読み取り専用レビュー\n\n"
+            f"{evidence.summary}\n\n"
+            "### 要件トレーサビリティ\n\n| 要件 | 結果 | 根拠 |\n|---|---|---|\n"
+            f"{requirement_rows}\n\n### 実行した検証\n\n| 検証 | 結果 | 根拠 |\n|---|---|---|\n"
+            f"{check_rows}\n\n### 指摘\n\n| 重大度 | 指摘 | 場所 | 詳細 | 修正条件 |\n"
+            f"|---|---|---|---|---|\n{finding_rows}"
+        )
+        if evidence.screenshots:
+            body += "\n\n### レビュワー独自スクリーンショット\n\nアップロード中です。"
+        comment = client.comment_issue(task.owner, task.repo, task.conversation_number, body)
+        comment_id = int(comment["id"])
+        if evidence.screenshots:
+            images = []
+            for shot in evidence.screenshots:
+                attachment = client.upload_comment_attachment(
+                    task.owner, task.repo, comment_id, shot.filename, shot.content
+                )
+                url = str(attachment.get("browser_download_url") or attachment.get("url") or "")
+                if not url:
+                    raise RuntimeError("Forgejo returned no reviewer screenshot URL")
+                images.append(f"**{shot.caption}** — {shot.viewport} / PNG {shot.width}x{shot.height}\n\n![{shot.caption}]({url})")
+            body = body.replace("アップロード中です。", "\n\n".join(images))
+            client.edit_issue_comment(task.owner, task.repo, comment_id, body)
+        return comment_id, body
 
     @staticmethod
     def _table_cell(value: str) -> str:
@@ -408,6 +711,75 @@ Issue本文:
 - 最後の実行結果サマリーは日本語で記述する。
 """
 
+    def _review_prompt(
+        self,
+        task: IssueTask,
+        pull: PullRequest,
+        changed: list[str],
+        reviewed_sha: str,
+    ) -> str:
+        files = "\n".join(f"- {path}" for path in changed) or "- 変更ファイルなし"
+        ui_contract = ""
+        if task.ui_evidence_required:
+            ui_contract = """
+
+UIレビューの追加必須条件:
+- 実装担当のスクリーンショットを信用するだけでなく、現在のSHAから実アプリを起動して独自に操作する。
+- クリックとキーボード操作、主要状態変化、横overflow、console error、page error、主要なアクセシビリティを確認する。
+- モバイル（幅480px以下）とデスクトップ（幅1024px以上）を独自に撮影する。
+- PNGを `.openface-maintenance/review-screenshots/` に保存する。
+- `review-report.json` の `screenshots` に path、caption、viewport、url を記録する。
+"""
+        return f"""/goal [独立レビュー専用] Forgejo PR #{pull.number} を厳格に評価してください。
+
+あなたは **OpenFace Review** (`review-agent`) です。実装担当とは別アカウントです。
+コードを修正、commit、pushしてはいけません。読み取り専用で調査・実行・判定してください。
+実装担当の自己申告を前提にせず、Issueの各要件と実際のdiff・挙動を照合してください。
+
+Issueタイトル: {task.title}
+Issue URL: {task.issue_url}
+PR URL: {pull.url}
+レビュー対象SHA: {reviewed_sha}
+実装担当: {AGENTS[task.agent_key].username}
+変更ファイル:
+{files}
+
+Issue本文:
+<issue>
+{task.body}
+</issue>
+{ui_contract}
+
+必須評価:
+- Issue要件を一項目ずつ追跡し、具体的なファイル・コマンド・実画面を根拠にする。
+- `git diff origin/{task.default_branch}...HEAD` を全行確認する。
+- 関連テスト、lint、型検査、ビルドを実行する。実行不能はpassedにしない。
+- 回帰、境界条件、エラー処理、セキュリティ、アクセシビリティを厳しく確認する。
+- critical/high/mediumの指摘、失敗した要件、証跡不足が1件でもあれば `rejected` にする。
+- lowのみでも品質上マージすべきでなければ `rejected` にする。
+- 根拠のない推測で承認しない。
+
+`.openface-maintenance/review-report.json` を次の厳密な形で作成してください:
+```json
+{{
+  "verdict": "approved または rejected",
+  "reviewed_sha": "{reviewed_sha}",
+  "summary": "日本語の厳格な総評",
+  "requirements": [
+    {{"name": "Issueの具体的要件", "result": "passed または failed", "evidence": "確認箇所と根拠"}}
+  ],
+  "checks": [
+    {{"name": "実行したコマンドまたは操作", "result": "passed または failed", "evidence": "終了コードや観測結果"}}
+  ],
+  "findings": [
+    {{"severity": "critical/high/medium/low", "title": "指摘", "location": "file:line または画面/操作", "details": "再現条件と影響", "remediation": "承認に必要な修正"}}
+  ],
+  "screenshots": []
+}}
+```
+承認時も `findings` は空配列として明示してください。最後のサマリーは日本語にしてください。
+"""
+
     def _claude_command(self) -> list[str]:
         command = [
             "claude",
@@ -429,8 +801,11 @@ Issue本文:
         return "__OPENFACE_GOAL_PROMPT__"
 
     def _run_claude_goal(self, worktree: Path, task: IssueTask) -> str:
+        return self._run_claude_prompt(worktree, self._goal_prompt(task))
+
+    def _run_claude_prompt(self, worktree: Path, prompt: str) -> str:
         command = self._claude_command()
-        command[command.index(self._goal_prompt_placeholder)] = self._goal_prompt(task)
+        command[command.index(self._goal_prompt_placeholder)] = prompt
         process = subprocess.run(
             command,
             cwd=worktree,

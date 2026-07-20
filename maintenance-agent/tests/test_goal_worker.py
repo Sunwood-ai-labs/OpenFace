@@ -70,11 +70,15 @@ class GoalWorkerTests(unittest.TestCase):
 
         client = ForgejoClient(Settings.load())
         client._request = Mock()
-        client.merge_pull("openface", "demo", 7)
+        client.merge_pull("openface", "demo", 7, expected_head_sha="abc123")
         client._request.assert_called_once_with(
             "POST",
             "/repos/openface/demo/pulls/7/merge",
-            json={"Do": "merge", "delete_branch_after_merge": True},
+            json={
+                "Do": "merge",
+                "delete_branch_after_merge": True,
+                "head_commit_id": "abc123",
+            },
         )
         client.close()
 
@@ -322,6 +326,113 @@ class GoalWorkerTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(RuntimeError, "ui-report.json"):
             MaintenanceWorker(Settings.load())._collect_ui_evidence(root, task)
+
+    def test_review_prompt_is_read_only_strict_and_sha_bound(self) -> None:
+        from config import Settings
+        from forgejo import PullRequest
+        from worker import IssueTask, MaintenanceWorker
+
+        task = IssueTask(
+            "openface", "demo", 12, "モバイルUI", "余白と操作を直す", "main",
+            "https://example/12", agent_key="designer", ui_evidence_required=True,
+        )
+        prompt = MaintenanceWorker(Settings.load())._review_prompt(
+            task, PullRequest(13, "https://forgejo/pr/13", "abc123"), ["index.html"], "abc123"
+        )
+        self.assertIn("review-agent", prompt)
+        self.assertIn("コードを修正、commit、pushしてはいけません", prompt)
+        self.assertIn("critical/high/medium", prompt)
+        self.assertIn("モバイル", prompt)
+        self.assertIn("デスクトップ", prompt)
+        self.assertIn('"reviewed_sha": "abc123"', prompt)
+
+    def test_review_report_rejects_false_approval(self) -> None:
+        from config import Settings
+        from worker import IssueTask, MaintenanceWorker
+
+        root = Path(self.temp.name) / "review"
+        evidence = root / ".openface-maintenance"
+        evidence.mkdir(parents=True)
+        report = {
+            "verdict": "approved",
+            "reviewed_sha": "abc123",
+            "summary": "問題なし",
+            "requirements": [{"name": "ボタン", "result": "failed", "evidence": "クリック不能"}],
+            "checks": [{"name": "test", "result": "passed", "evidence": "1 passed"}],
+            "findings": [],
+        }
+        (evidence / "review-report.json").write_text(json.dumps(report), encoding="utf-8")
+        task = IssueTask("openface", "demo", 12, "UI", "fix", "main", "https://example/12")
+        with self.assertRaisesRegex(RuntimeError, "approved despite"):
+            MaintenanceWorker(Settings.load())._collect_review_evidence(root, task, "abc123")
+
+    def test_review_report_is_bound_to_current_head_sha(self) -> None:
+        from config import Settings
+        from worker import IssueTask, MaintenanceWorker
+
+        root = Path(self.temp.name) / "review-sha"
+        evidence = root / ".openface-maintenance"
+        evidence.mkdir(parents=True)
+        report = {
+            "verdict": "approved",
+            "reviewed_sha": "old-sha",
+            "summary": "問題なし",
+            "requirements": [{"name": "要件", "result": "passed", "evidence": "diff確認"}],
+            "checks": [{"name": "test", "result": "passed", "evidence": "exit 0"}],
+            "findings": [],
+        }
+        (evidence / "review-report.json").write_text(json.dumps(report), encoding="utf-8")
+        task = IssueTask("openface", "demo", 12, "API", "fix", "main", "https://example/12")
+        with self.assertRaisesRegex(RuntimeError, "current PR head SHA"):
+            MaintenanceWorker(Settings.load())._collect_review_evidence(root, task, "new-sha")
+
+    def test_auto_merge_requires_approved_current_head_review(self) -> None:
+        from config import Settings
+        from forgejo import PullRequest
+        from worker import IssueTask, MaintenanceWorker, ReviewCheck, ReviewEvidence
+
+        worker = MaintenanceWorker(Settings.load())
+        task = IssueTask("openface", "demo", 12, "UI", "fix", "main", "https://example/12")
+        pull = PullRequest(13, "https://forgejo/pr/13", "abc123")
+        check = ReviewCheck("要件", "passed", "根拠")
+        approved = ReviewEvidence("approved", "abc123", "承認", [check], [check], [], [])
+        rejected = ReviewEvidence("rejected", "abc123", "却下", [check], [check], [], [])
+        client = Mock()
+        client.pull_head_sha.return_value = "abc123"
+
+        self.assertFalse(worker._merge_if_approved(client, task, pull, rejected))
+        client.merge_pull.assert_not_called()
+        self.assertTrue(worker._merge_if_approved(client, task, pull, approved))
+        client.merge_pull.assert_called_once_with(
+            "openface", "demo", 13, expected_head_sha="abc123"
+        )
+
+    def test_auto_merge_refuses_stale_reviewer_approval(self) -> None:
+        from config import Settings
+        from forgejo import PullRequest
+        from worker import IssueTask, MaintenanceWorker, ReviewCheck, ReviewEvidence
+
+        check = ReviewCheck("要件", "passed", "根拠")
+        review = ReviewEvidence("approved", "reviewed-sha", "承認", [check], [check], [], [])
+        task = IssueTask("openface", "demo", 12, "UI", "fix", "main", "https://example/12")
+        client = Mock()
+        client.pull_head_sha.return_value = "changed-after-review"
+        with self.assertRaisesRegex(RuntimeError, "stale approval"):
+            MaintenanceWorker(Settings.load())._merge_if_approved(
+                client, task, PullRequest(13, "https://forgejo/pr/13"), review
+            )
+        client.merge_pull.assert_not_called()
+
+    def test_maintainer_review_delegation_mentions_separate_reviewer(self) -> None:
+        from agents import AGENTS, review_delegation_comment
+
+        body = review_delegation_comment(
+            AGENTS["designer"], 13, "https://forgejo/pr/13", ui_review_required=True
+        )
+        self.assertIn("@review-agent", body)
+        self.assertIn("OpenFace Designer", body)
+        self.assertIn("承認されるまで自動マージしません", body)
+        self.assertIn("モバイル／デスクトップ", body)
 
     def test_completion_comment_uploads_and_embeds_ui_screenshots(self) -> None:
         from agents import AGENTS

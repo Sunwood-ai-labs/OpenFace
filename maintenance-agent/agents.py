@@ -28,7 +28,7 @@ AGENTS: dict[str, AgentProfile] = {
     ),
     "review": AgentProfile(
         "review", "review-agent", "OpenFace Review", "🔎",
-        "diff、テスト、セキュリティ、回帰、要件充足を独立にレビューし必要なら修正する",
+        "diff、テスト、セキュリティ、回帰、要件充足を独立に評価し、コードを修正せず承認または差し戻す",
     ),
 }
 
@@ -79,6 +79,26 @@ def delegation_comment(profile: AgentProfile, instruction: str, *, follow_up: bo
         f"> {summary}\n\n"
         f"担当領域: **{profile.display_name}** — {profile.focus}\n\n"
         "進捗と完了結果は、担当アカウント自身がリアクションとコメントで更新します。"
+    )
+
+
+def review_delegation_comment(
+    implementation_profile: AgentProfile,
+    pull_number: int,
+    pull_url: str,
+    *,
+    ui_review_required: bool,
+) -> str:
+    evidence = (
+        "実アプリを操作し、モバイル／デスクトップ双方の独自スクリーンショットも提出してください。"
+        if ui_review_required
+        else "diff、要件、回帰、テスト結果を根拠付きで確認してください。"
+    )
+    return (
+        f"🧭 **{implementation_profile.display_name}** の成果物を独立レビューへ移します。\n\n"
+        f"@review-agent [PR #{pull_number}]({pull_url}) を厳格に評価してください。\n\n"
+        f"> 実装担当の自己評価を前提にせず、Issue要件を一項目ずつ照合してください。{evidence}\n\n"
+        "承認されるまで自動マージしません。重大度を付けた指摘が1件でも残る場合は却下してください。"
     )
 
 

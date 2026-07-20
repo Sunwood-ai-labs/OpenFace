@@ -16,6 +16,7 @@ from config import Settings
 class PullRequest:
     number: int
     url: str
+    head_sha: str = ""
 
 
 class ForgejoClient:
@@ -42,7 +43,11 @@ class ForgejoClient:
         pulls = self._request("GET", f"/repos/{owner}/{repo}/pulls", params={"state": "open", "limit": 50})
         for pull in pulls:
             if pull.get("head", {}).get("ref") == branch:
-                return PullRequest(number=int(pull["number"]), url=pull.get("html_url") or pull.get("url", ""))
+                return PullRequest(
+                    number=int(pull["number"]),
+                    url=pull.get("html_url") or pull.get("url", ""),
+                    head_sha=str((pull.get("head") or {}).get("sha") or ""),
+                )
         return None
 
     def create_pull(
@@ -59,16 +64,37 @@ class ForgejoClient:
             f"/repos/{owner}/{repo}/pulls",
             json={"base": base, "head": branch, "title": title[:240], "body": body},
         )
-        return PullRequest(number=int(pull["number"]), url=pull.get("html_url") or pull.get("url", ""))
+        return PullRequest(
+            number=int(pull["number"]),
+            url=pull.get("html_url") or pull.get("url", ""),
+            head_sha=str((pull.get("head") or {}).get("sha") or ""),
+        )
 
-    def merge_pull(self, owner: str, repo: str, pull_number: int) -> None:
+    def pull_head_sha(self, owner: str, repo: str, pull_number: int) -> str:
+        pull = self._request("GET", f"/repos/{owner}/{repo}/pulls/{pull_number}")
+        sha = str((pull.get("head") or {}).get("sha") or "")
+        if not sha:
+            raise RuntimeError(f"Forgejo returned no head SHA for PR #{pull_number}")
+        return sha
+
+    def merge_pull(
+        self,
+        owner: str,
+        repo: str,
+        pull_number: int,
+        *,
+        expected_head_sha: str = "",
+    ) -> None:
+        payload: dict[str, Any] = {
+            "Do": "merge",
+            "delete_branch_after_merge": True,
+        }
+        if expected_head_sha:
+            payload["head_commit_id"] = expected_head_sha
         self._request(
             "POST",
             f"/repos/{owner}/{repo}/pulls/{pull_number}/merge",
-            json={
-                "Do": "merge",
-                "delete_branch_after_merge": True,
-            },
+            json=payload,
         )
 
     def comment_issue(self, owner: str, repo: str, issue_number: int, body: str) -> dict[str, Any]:
