@@ -80,4 +80,8 @@ class Settings:
             "forgejo_token": self.forgejo_token_file.is_file() and self.forgejo_token_file.stat().st_size > 0,
             "webhook_secret": self.webhook_secret_file.is_file() and self.webhook_secret_file.stat().st_size > 0,
             "zai_api_key": bool(self.zai_api_key),
+            "specialist_tokens": all(
+                self.agent_token_file(username).is_file()
+                for username in ("designer-agent", "coding-agent", "docs-agent", "review-agent")
+            ),
         }

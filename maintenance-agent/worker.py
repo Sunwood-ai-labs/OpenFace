@@ -73,6 +73,17 @@ class MaintenanceWorker:
             if current_revision != base_revision:
                 self._git(forgejo, worktree, "reset", "--soft", base_revision)
             changed = self._changed_files(worktree)
+            if not changed and task.agent_key == "review" and existing:
+                agent_client = ForgejoClient(self.settings, self.settings.agent_token_file(profile.username))
+                try:
+                    agent_client.comment_issue(
+                        task.owner, task.repo, task.issue_number,
+                        f"{profile.emoji} **{profile.display_name}** が独立レビューを完了しました。\n\n"
+                        f"{summary}\n\n変更が必要な問題は見つからなかったため、追加コミットはありません。",
+                    )
+                finally:
+                    agent_client.close()
+                return AgentResult(existing, summary, [])
             self._validate_worktree(worktree, changed)
 
             self._git(forgejo, worktree, "config", "user.name", profile.display_name)
@@ -237,8 +248,6 @@ Issue本文:
                 path = entries[index]
                 index += 1
             changed.append(path.replace("\\", "/"))
-        if not changed:
-            raise RuntimeError("Claude Code /goal completed without producing a git diff")
         return sorted(set(changed))
 
     def _validate_worktree(self, root: Path, changed: list[str]) -> None:

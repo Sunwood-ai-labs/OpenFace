@@ -50,10 +50,14 @@ def initialize_database() -> None:
                 pull_url TEXT NOT NULL DEFAULT '',
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
+                agent TEXT NOT NULL DEFAULT 'coding-agent',
                 UNIQUE(owner, repo, issue_number)
             )
             """
         )
+        columns = {row[1] for row in db.execute("PRAGMA table_info(jobs)")}
+        if "agent" not in columns:
+            db.execute("ALTER TABLE jobs ADD COLUMN agent TEXT NOT NULL DEFAULT 'coding-agent'")
         db.execute(
             "UPDATE jobs SET status='interrupted', detail='Service restarted before the Claude Code /goal run completed', "
             "updated_at=? WHERE status IN ('queued', 'running')",
@@ -163,15 +167,15 @@ def enqueue(task: IssueTask, delivery_id: str, *, allow_retry: bool) -> bool:
             if not allow_retry or row[1] in {"queued", "running"}:
                 return False
             db.execute(
-                "UPDATE jobs SET delivery_id=?, status='queued', detail='', pull_url='', created_at=?, updated_at=? "
+                "UPDATE jobs SET delivery_id=?, status='queued', detail='', pull_url='', created_at=?, updated_at=?, agent=? "
                 "WHERE owner=? AND repo=? AND issue_number=?",
-                (delivery_id, now, now, task.owner, task.repo, task.issue_number),
+                (delivery_id, now, now, AGENTS[task.agent_key].username, task.owner, task.repo, task.issue_number),
             )
         else:
             db.execute(
-                "INSERT INTO jobs(delivery_id, owner, repo, issue_number, status, created_at, updated_at) "
-                "VALUES(?, ?, ?, ?, 'queued', ?, ?)",
-                (delivery_id, task.owner, task.repo, task.issue_number, now, now),
+                "INSERT INTO jobs(delivery_id, owner, repo, issue_number, status, created_at, updated_at, agent) "
+                "VALUES(?, ?, ?, ?, 'queued', ?, ?, ?)",
+                (delivery_id, task.owner, task.repo, task.issue_number, now, now, AGENTS[task.agent_key].username),
             )
     executor.submit(process_job, delivery_id, task)
     return True
@@ -197,10 +201,27 @@ def jobs() -> dict[str, Any]:
     with database_lock, sqlite3.connect(database_path) as db:
         db.row_factory = sqlite3.Row
         rows = db.execute(
-            "SELECT delivery_id, owner, repo, issue_number, status, detail, pull_url, created_at, updated_at "
+            "SELECT delivery_id, owner, repo, issue_number, status, detail, pull_url, agent, created_at, updated_at "
             "FROM jobs ORDER BY created_at DESC LIMIT 50"
         ).fetchall()
     return {"jobs": [dict(row) for row in rows]}
+
+
+@app.get("/api/agents")
+def agents() -> dict[str, Any]:
+    return {
+        "agents": [
+            {
+                "key": profile.key,
+                "username": profile.username,
+                "display_name": profile.display_name,
+                "emoji": profile.emoji,
+                "focus": profile.focus,
+                "mention": f"@{profile.username}",
+            }
+            for profile in AGENTS.values()
+        ]
+    }
 
 
 @app.post("/webhooks/forgejo", status_code=202)
