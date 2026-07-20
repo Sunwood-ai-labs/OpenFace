@@ -113,4 +113,4 @@ Interrupted `queued` or `running` jobs are marked `interrupted` on service resta
 
 ### End-to-end app delivery
 
-Starting from an empty public repository, the workflow designed, implemented, containerized, and independently reviewed ClearNext through seven specialist stages with verified auto-merge. The [ClearNext maintenance evidence](../evidence/automated-maintenance/clear-next/README.md) preserves live Runner screenshots, Issue and PR links, merge commits, and the 84-test result.
+Starting from an empty public repository, the workflow designed, implemented, containerized, and independently reviewed ClearNext through eight specialist stages with verified auto-merge. The [ClearNext maintenance evidence](../evidence/automated-maintenance/clear-next/README.md) preserves live Runner screenshots, Issue and PR links, merge commits, and the 103-test result.
