@@ -347,6 +347,15 @@ After the PR exists, post a comment beginning with `/goal`, for example `/goal �
 
 The orchestrator automatically delegates each new Issue to one specialist: `@designer-agent`, `@coding-agent`, `@docs-agent`, or `@review-agent`. A maintainer can also mention exactly one specialist in an Issue or PR comment to route a follow-up explicitly. Each specialist has its own Forgejo identity, avatar, least-privilege token, role contract, commit author, reactions, and completion reply; `/api/agents` and `/api/jobs` expose the available personas and current assignment.
 
+| Coordinator | Design | Coding | Documentation | Review |
+|---|---|---|---|---|
+| <img src="seed/assets/agent-avatars/glm-maintainer.png" alt="GLM Maintainer avatar" width="96"> | <img src="seed/assets/agent-avatars/designer-agent.png" alt="OpenFace Designer avatar" width="96"> | <img src="seed/assets/agent-avatars/coding-agent.png" alt="OpenFace Coding avatar" width="96"> | <img src="seed/assets/agent-avatars/docs-agent.png" alt="OpenFace Docs avatar" width="96"> | <img src="seed/assets/agent-avatars/review-agent.png" alt="OpenFace Review avatar" width="96"> |
+| `glm-maintainer` | `designer-agent` | `coding-agent` | `docs-agent` | `review-agent` |
+
+The retained [independent-account sample Issue #20](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/20) contains a separate comment from every account. The screenshot below verifies the rendered discussion; the individual profile captures in [`docs/evidence/agents`](docs/evidence/agents) verify that Forgejo serves five distinct generated avatars without the former shared-avatar override.
+
+![Independent specialist-agent accounts in one retained Issue](docs/evidence/agents/specialist-agent-identities.png)
+
 Issue reactions provide a compact progress signal: 👍 records human support, 👀 means `glm-maintainer` accepted and is processing the request, 🚀 means the verified PR or follow-up commit was published, and 😕 marks a stopped or failed run that needs log inspection.
 
 The service validates the Forgejo HMAC signature and deduplicates deliveries in SQLite. Claude Code runs as an unprivileged user inside the maintenance container: it has no host Docker socket and cannot read the Forgejo bot token, while retaining normal repository-level tools and test execution. The root wrapper alone commits and pushes after `git diff --check`; it never merges its own PR. See [Automated Claude Code maintenance](https://sunwood-ai-labs.github.io/OpenFace/guide/automated-maintenance).

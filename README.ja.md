@@ -150,6 +150,15 @@ PR作成後も、元Issueまたはエージェントが作ったPRへ `/goal 見
 
 司令塔はIssueを `@designer-agent`、`@coding-agent`、`@docs-agent`、`@review-agent` のいずれかへ自動委任します。IssueまたはPRコメントで1体を明示的にメンションして、既存PRへ専門的な追加作業を依頼することもできます。各担当は固有のForgejoアカウント・アバター・最小権限tokenを持ち、ジョブAPIにも担当名が記録されます。
 
+| 司令塔 | デザイン | 実装 | ドキュメント | レビュー |
+|---|---|---|---|---|
+| <img src="seed/assets/agent-avatars/glm-maintainer.png" alt="GLM Maintainerのアバター" width="96"> | <img src="seed/assets/agent-avatars/designer-agent.png" alt="OpenFace Designerのアバター" width="96"> | <img src="seed/assets/agent-avatars/coding-agent.png" alt="OpenFace Codingのアバター" width="96"> | <img src="seed/assets/agent-avatars/docs-agent.png" alt="OpenFace Docsのアバター" width="96"> | <img src="seed/assets/agent-avatars/review-agent.png" alt="OpenFace Reviewのアバター" width="96"> |
+| `glm-maintainer` | `designer-agent` | `coding-agent` | `docs-agent` | `review-agent` |
+
+保存用の[独立アカウント動作確認 Issue #20](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/20)には、5アカウントが各自のtokenで投稿したコメントを残しています。次のスクリーンショットで会話画面を、[`docs/evidence/agents`](docs/evidence/agents) 配下の各プロフィール画像で、共通アイコンへの上書きがなく5種類の生成アバターがForgejoから配信されることを確認できます。
+
+![独立した専門エージェント5アカウントのIssue会話](docs/evidence/agents/specialist-agent-identities.png)
+
 Issueのリアクションで進行状況も確認できます。👍 は人による賛同、👀 は `glm-maintainer` が受付・処理中、🚀 は検証済みPRまたは追加commitの公開完了、😕 はログ確認が必要な停止・失敗を表します。
 
 Webhook署名とIssue単位の重複排除はサービスが担当します。Claude Codeは保守コンテナ内の非特権ユーザーとして動き、ホストDocker socketもForgejo bot tokenも読めません。一方、リポジトリ内では通常のツールとテスト実行を制限しません。root wrapperだけが `git diff --check` 後にcommit・pushし、自動マージはしません。詳細は[Claude Code `/goal` 自動メンテナンス](docs/ja/guide/automated-maintenance.md)を参照してください。
