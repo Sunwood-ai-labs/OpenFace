@@ -11,7 +11,7 @@ OpenFace can turn a newly opened Forgejo Issue into a human-reviewed Pull Reques
 5. Claude Code inspects local instructions and source, edits any required repository files, runs relevant commands and tests, reviews its diff, and keeps working until the goal evaluator finishes.
 6. The root wrapper verifies repository containment and `git diff --check`.
 7. `glm-maintainer` classifies the request and delegates it to a specialist identity. That specialist commits, pushes, and posts the completion reply.
-8. A human reviews and merges or closes the PR. The agent has no auto-merge path.
+8. After successful validation, the wrapper requests a server-side Forgejo merge and source-branch deletion when `MAINTENANCE_AUTO_MERGE=true` (the Compose default). Set it to `false` when human review must gate merging.
 
 This is deliberately not a fixed planner/coder JSON pipeline. There is no file-count or changed-line cap; `/goal` retains Claude Code's repository-level freedom.
 

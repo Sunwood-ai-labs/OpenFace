@@ -165,7 +165,7 @@ PR作成後も、元Issueまたはエージェントが作ったPRへ `/goal 見
 
 Issueのリアクションで進行状況も確認できます。👍 は人による賛同、👀 は `glm-maintainer` が受付・処理中、🚀 は検証済みPRまたは追加commitの公開完了、😕 はログ確認が必要な停止・失敗を表します。
 
-Webhook署名とIssue単位の重複排除はサービスが担当します。Claude Codeは保守コンテナ内の非特権ユーザーとして動き、ホストDocker socketもForgejo bot tokenも読めません。一方、リポジトリ内では通常のツールとテスト実行を制限しません。root wrapperだけが `git diff --check` 後にcommit・pushし、自動マージはしません。詳細は[Claude Code `/goal` 自動メンテナンス](docs/ja/guide/automated-maintenance.md)を参照してください。
+Webhook署名とIssue単位の重複排除はサービスが担当します。Claude Codeは保守コンテナ内の非特権ユーザーとして動き、ホストDocker socketもForgejo bot tokenも読めません。一方、リポジトリ内では通常のツールとテスト実行を制限しません。root wrapperだけが `git diff --check` 後にcommit・pushします。Compose既定値の `MAINTENANCE_AUTO_MERGE=true` では、その後Forgejoのserver-side mergeと作業branch削除を要求します。検証失敗・競合・merge拒否は成功扱いにせず、ジョブへ失敗として残します。人間レビュー必須へ戻す場合は `false` にします。詳細は[Claude Code `/goal` 自動メンテナンス](docs/ja/guide/automated-maintenance.md)を参照してください。
 
 追加編集の実E2Eは [Issue #12](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/12) → [PR #15](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/15) として残しています。日本語の `/goal` コメントから既存PRへcommit `1a505ce` が追加され、指定した1ファイルだけが更新され、日本語の実行結果と返信が残り、PRがmerge可能なままであることを確認済みです。
 
