@@ -40,3 +40,8 @@ Open the [full theme matrix](theme-matrix/THEME_MATRIX.md) for every screenshot 
 |---|---|---|
 | ![Standard mobile matrix](theme-matrix/contact-sheets/standard--light--mobile--1.png) | ![Solarpunk mobile matrix](theme-matrix/contact-sheets/solarpunk--light--mobile--1.png) | ![Cyberpunk mobile matrix](theme-matrix/contact-sheets/cyberpunk--dark--mobile--1.png) |
 
+## GitHub README render
+
+The pushed public README was opened again on GitHub. Both comparison columns render their real PNGs at the intended size; no broken-image placeholder or Markdown fallback is present.
+
+![Rendered Zenn and OpenFace comparison in the public GitHub README](github-readme-comparison-render.png)
