@@ -58,54 +58,110 @@ export default defineConfig({
 
 function enNav() {
   return [
-    { text: 'Guide', link: '/guide/getting-started' },
-    { text: 'Architecture', link: '/guide/architecture' },
-    { text: 'Spaces', link: '/guide/spaces' },
-    { text: 'Pages', link: '/guide/pages' },
-    { text: 'Visual QA', link: '/guide/visual-qa' },
-    { text: 'Operations', link: '/guide/operations' }
+    { text: 'Field notes', link: '/articles/' },
+    { text: 'Knowledge atlas', link: '/wiki/' },
+    {
+      text: 'Build',
+      items: [
+        { text: 'Getting started', link: '/guide/getting-started' },
+        { text: 'Docker Spaces', link: '/guide/spaces' },
+        { text: 'OpenFace Pages', link: '/guide/pages' }
+      ]
+    },
+    {
+      text: 'Operate',
+      items: [
+        { text: 'Automated maintenance', link: '/guide/automated-maintenance' },
+        { text: 'Visual QA', link: '/guide/visual-qa' },
+        { text: 'Operations', link: '/guide/operations' },
+        { text: 'Troubleshooting', link: '/guide/troubleshooting' }
+      ]
+    }
   ]
 }
 
 function jaNav() {
   return [
-    { text: 'ガイド', link: '/ja/guide/getting-started' },
-    { text: '構成', link: '/ja/guide/architecture' },
-    { text: 'Spaces', link: '/ja/guide/spaces' },
-    { text: 'Pages', link: '/ja/guide/pages' },
-    { text: 'Visual QA', link: '/ja/guide/visual-qa' },
-    { text: '運用', link: '/ja/guide/operations' }
+    { text: '読みもの', link: '/ja/articles/' },
+    { text: '知識地図', link: '/ja/wiki/' },
+    {
+      text: 'つくる',
+      items: [
+        { text: 'はじめに', link: '/ja/guide/getting-started' },
+        { text: 'Docker Spaces', link: '/ja/guide/spaces' },
+        { text: 'OpenFace Pages', link: '/ja/guide/pages' }
+      ]
+    },
+    {
+      text: '運用する',
+      items: [
+        { text: '自動メンテナンス', link: '/ja/guide/automated-maintenance' },
+        { text: 'Visual QA', link: '/ja/guide/visual-qa' },
+        { text: '運用', link: '/ja/guide/operations' },
+        { text: 'トラブルシューティング', link: '/ja/guide/troubleshooting' }
+      ]
+    }
   ]
 }
 
 function enSidebar() {
+  return {
+    '/articles/': [{
+      text: 'Field notes',
+      items: [
+        { text: 'All field notes', link: '/articles/' },
+        { text: 'Why a local AI hub?', link: '/articles/local-first-hub' },
+        { text: 'Independent review before merge', link: '/articles/independent-review' },
+        { text: 'A Space is app + repository', link: '/articles/docker-spaces' }
+      ]
+    }],
+    '/wiki/': wikiSidebar(''),
+    '/guide/': guideSidebar('')
+  }
+}
+
+function jaSidebar() {
+  return {
+    '/ja/articles/': [{
+      text: '読みもの',
+      items: [
+        { text: 'すべての読みもの', link: '/ja/articles/' },
+        { text: 'ローカルAIハブという選択', link: '/ja/articles/local-first-hub' },
+        { text: '自動マージの前に、別の目を置く', link: '/ja/articles/independent-review' },
+        { text: 'Spaceはアプリで、リポジトリでもある', link: '/ja/articles/docker-spaces' }
+      ]
+    }],
+    '/ja/wiki/': wikiSidebar('/ja', true),
+    '/ja/guide/': guideSidebar('/ja', true)
+  }
+}
+
+function wikiSidebar(prefix: string, ja = false) {
   return [{
-    text: 'OpenFace guide',
+    text: ja ? 'Knowledge Atlas' : 'Knowledge atlas',
     items: [
-      { text: 'Getting started', link: '/guide/getting-started' },
-      { text: 'Architecture', link: '/guide/architecture' },
-      { text: 'Docker Spaces', link: '/guide/spaces' },
-      { text: 'OpenFace Pages', link: '/guide/pages' },
-      { text: 'Visual QA', link: '/guide/visual-qa' },
-      { text: 'GLM maintenance', link: '/guide/automated-maintenance' },
-      { text: 'Operations', link: '/guide/operations' },
-      { text: 'Troubleshooting', link: '/guide/troubleshooting' }
+      { text: ja ? '知識地図' : 'Atlas index', link: `${prefix}/wiki/` },
+      { text: ja ? 'プラットフォーム地図' : 'Platform map', link: `${prefix}/wiki/platform-map` },
+      { text: ja ? 'カタログの構造' : 'Catalog anatomy', link: `${prefix}/wiki/catalog` },
+      { text: ja ? '実行環境' : 'Runtime', link: `${prefix}/wiki/runtime` },
+      { text: ja ? 'エージェント運用' : 'Agent operations', link: `${prefix}/wiki/agent-operations` },
+      { text: ja ? '用語集' : 'Glossary', link: `${prefix}/wiki/glossary` }
     ]
   }]
 }
 
-function jaSidebar() {
+function guideSidebar(prefix: string, ja = false) {
   return [{
-    text: 'OpenFace ガイド',
+    text: ja ? '実践ガイド' : 'Practical guides',
     items: [
-      { text: 'はじめに', link: '/ja/guide/getting-started' },
-      { text: 'アーキテクチャ', link: '/ja/guide/architecture' },
-      { text: 'Docker Spaces', link: '/ja/guide/spaces' },
-      { text: 'OpenFace Pages', link: '/ja/guide/pages' },
-      { text: 'Visual QA', link: '/ja/guide/visual-qa' },
-      { text: 'GLM自動保守', link: '/ja/guide/automated-maintenance' },
-      { text: '運用', link: '/ja/guide/operations' },
-      { text: 'トラブルシューティング', link: '/ja/guide/troubleshooting' }
+      { text: ja ? 'はじめに' : 'Getting started', link: `${prefix}/guide/getting-started` },
+      { text: ja ? 'アーキテクチャ' : 'Architecture', link: `${prefix}/guide/architecture` },
+      { text: 'Docker Spaces', link: `${prefix}/guide/spaces` },
+      { text: 'OpenFace Pages', link: `${prefix}/guide/pages` },
+      { text: 'Visual QA', link: `${prefix}/guide/visual-qa` },
+      { text: ja ? '自動メンテナンス' : 'Automated maintenance', link: `${prefix}/guide/automated-maintenance` },
+      { text: ja ? '運用' : 'Operations', link: `${prefix}/guide/operations` },
+      { text: ja ? 'トラブルシューティング' : 'Troubleshooting', link: `${prefix}/guide/troubleshooting` }
     ]
   }]
 }
