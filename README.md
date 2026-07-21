@@ -7,7 +7,7 @@
 <p align="center"><strong>The AI community building locally.</strong></p>
 
 <p align="center">
-  A local-first, Forgejo-backed hub for models, datasets, Docker Spaces, Skills, MCPs, versioned Prompts, and static Pages.
+  A local-first, Forgejo-backed hub for models, datasets, Docker Spaces, Skills, MCPs, versioned Prompts, living Docs, and static Pages.
 </p>
 
 <p align="center">
@@ -36,6 +36,7 @@ OpenFace turns one Docker host into a self-contained AI collaboration platform. 
 - **Agent operations API:** browser views, likes, and agent actions use a persisted metrics service with hashed agent credentials.
 - **Claude Code goal maintenance:** mention `@glm-maintainer` on an Issue or agent-created PR; it delegates to a specialist, runs Claude Code's built-in `/goal` with Z.AI-hosted `glm-5.2`, verifies evidence, and auto-merges the Pull Request.
 - **Versioned Prompts:** stable repository slugs point to immutable Git tags that can be switched directly in the Prompt view.
+- **Living Docs library:** publish Git-backed Articles, Wiki nodes, Guides, and Reference entries with topic search and repository history.
 - **Three visual themes:** Standard, Solarpunk, and Cyberpunk persist across visits.
 - **Editable organizations:** Forgejo Owners can update organization metadata, avatars, membership, teams, and repositories from the real organization settings UI.
 - **Bilingual public docs:** English and Japanese VitePress guides build and deploy through GitHub Actions.
@@ -143,8 +144,19 @@ OpenFace chooses the catalog from a **Forgejo topic**:
 | `skill` | Skills |
 | `mcp` | MCPs |
 | `prompt` | Prompts |
+| `doc` | Docs |
 
 Topics classify the repository itself. README frontmatter `tags` add multiple content labels such as `audio`, `gradio`, or `classification`; they do not replace the type topic.
+
+## 📚 Git-backed Docs library
+
+The internal [`/docs`](https://localhost:8443/docs) category is a repository-backed knowledge library, separate from the VitePress operator manual. Add the `doc` topic plus one format topic—`article`, `wiki`, `guide`, or `reference`—and OpenFace publishes the repository README with its real files, commits, clone URL, and permissions. The idempotent seed includes six connected entries for immediate reconstruction testing.
+
+| Editorial directory | Wiki document on mobile |
+|---|---|
+| <img src="docs/evidence/docs-category/screenshots/standard--light--desktop--docs.png" alt="OpenFace Docs editorial directory in the Standard theme" width="100%"> | <img src="docs/evidence/docs-category/screenshots/cyberpunk--dark--mobile--doc-detail.png" alt="Git-backed OpenFace Wiki document in the Cyberpunk theme on mobile" width="320"> |
+
+The [Docs category visual QA report](docs/evidence/docs-category/THEME_MATRIX.md) records 24 passing screenshots across three themes, two OS color schemes, desktop/mobile widths, and directory/detail routes, including automated overflow and WCAG contrast checks.
 
 ```yaml
 ---

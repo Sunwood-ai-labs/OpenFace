@@ -39,7 +39,7 @@ OpenFace は次のサービスで構成されています。
 
 <img src="docs/images/seraphim-angel-team-portraits.png" alt="光輪と白い翼を持つAurelia Vale、Cassian Reed、Ilyana Noor、Lucien Solのキャラクターイラスト" width="640">
 
-リポジトリの種別（モデル / データセット / Space / Skill / MCP / Prompt）は Forgejo の **topics**（`model` / `dataset` / `space` / `skill` / `mcp` / `prompt`）で判定します。Prompt のリポジトリ名・URLは版に依存しない安定slug（例: `mystic-git-auto-commit`）に固定し、個別版は `version-v4.2` のような追加 topic と同名のGit tagで管理します。版を更新してもリポジトリ名・clone URL・参照先を変更する必要はありません。各詳細カードはリポジトリ直下の `README.md` を使い、相対画像もローカル Forgejo の実ファイルから表示します。
+リポジトリの種別（モデル / データセット / Space / Skill / MCP / Prompt / Doc）は Forgejo の **topics**（`model` / `dataset` / `space` / `skill` / `mcp` / `prompt` / `doc`）で判定します。Prompt のリポジトリ名・URLは版に依存しない安定slug（例: `mystic-git-auto-commit`）に固定し、個別版は `version-v4.2` のような追加 topic と同名のGit tagで管理します。版を更新してもリポジトリ名・clone URL・参照先を変更する必要はありません。各詳細カードはリポジトリ直下の `README.md` を使い、相対画像もローカル Forgejo の実ファイルから表示します。
 
 ### アーキテクチャ図
 
@@ -95,6 +95,16 @@ flowchart LR
 | <img src="docs/evidence/themes/standard-home.png" alt="Standard テーマの OpenFace ホーム" width="100%"> | <img src="docs/evidence/themes/solarpunk-home.png" alt="Solarpunk テーマの OpenFace ホーム" width="100%"> | <img src="docs/evidence/themes/cyberpunk-home.png" alt="Cyberpunk テーマの OpenFace ホーム" width="100%"> |
 
 テーマセレクタの実操作・永続化・各画面の確認結果は [Theme verification evidence](docs/evidence/themes/README.md) に記録しています。
+
+### Docs（記事＋Wiki）
+
+内部の [`/docs`](https://localhost:8443/docs) は、運用マニュアル用VitePressとは別の、Gitリポジトリを土台にしたナレッジカテゴリです。topicへ `doc` と、形式を表す `article` / `wiki` / `guide` / `reference` のいずれかを追加すると、READMEを記事として公開しながら、実ファイル・コミット履歴・clone URL・権限をそのまま保持できます。再構築直後から確認できる6件の関連ドキュメントもseedします。
+
+| エディトリアルなDocs一覧 | モバイルのWiki詳細 |
+|---|---|
+| <img src="docs/evidence/docs-category/screenshots/standard--light--desktop--docs.png" alt="StandardテーマのOpenFace Docs一覧" width="100%"> | <img src="docs/evidence/docs-category/screenshots/cyberpunk--dark--mobile--doc-detail.png" alt="Cyberpunkテーマで表示したGit-backed Wiki詳細" width="320"> |
+
+[DocsカテゴリのビジュアルQAレポート](docs/evidence/docs-category/THEME_MATRIX.md)には、3テーマ×OS配色2種×PC/モバイル×一覧/詳細の24スクリーンショットと、横はみ出し・WCAGコントラストの自動検査結果を保存しています。
 
 ### Skills / MCPs
 
@@ -258,7 +268,7 @@ docker compose up -d --build
 ### モデル / データセット / Skill / MCP / Prompt の公開手順
 
 1. Forgejo の Web UI（`/git/repo/create` 、またはトップページの「新規作成」導線）でリポジトリを作成します。
-2. リポジトリ設定画面から **topic** に `model`、`dataset`、`skill`、`mcp`、`prompt` のいずれかを追加します（これで OpenFace 上での種別が決まります）。Prompt はリポジトリ名を版なしの安定slugにし、個別版を表す `version-v1`、`version-v4.2` のような topic と、同名のGit tag（`v1`、`v4.2`）を追加します。
+2. リポジトリ設定画面から **topic** に `model`、`dataset`、`skill`、`mcp`、`prompt`、`doc` のいずれかを追加します（これで OpenFace 上での種別が決まります）。Docはさらに `article`、`wiki`、`guide`、`reference` のいずれかを追加します。Prompt はリポジトリ名を版なしの安定slugにし、個別版を表す `version-v1`、`version-v4.2` のような topic と、同名のGit tag（`v1`、`v4.2`）を追加します。
 3. `README.md` に HuggingFace 互換の YAML frontmatter（`license`, `tags`, `pipeline_tag`, `language` など）を書くと、frontend がバッジとして表示します。
 4. 大きなファイルは Git LFS でpushします。
 
