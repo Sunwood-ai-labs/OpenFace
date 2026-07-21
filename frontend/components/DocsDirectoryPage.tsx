@@ -145,7 +145,7 @@ export default async function DocsDirectoryPage({
           </div>
         </div>
 
-        <section id="how-to-use" aria-labelledby="docs-how-to-title" className="mb-12 scroll-mt-24 border-y border-zinc-300 bg-[#f4f0e8] dark:border-zinc-700 dark:bg-zinc-900">
+        <section id="how-to-use" aria-labelledby="docs-how-to-title" className="openface-docs-onboarding mb-12 scroll-mt-24 border-y border-zinc-300 bg-[#f4f0e8] dark:border-zinc-700 dark:bg-zinc-900">
           <div className="grid lg:grid-cols-[220px_minmax(0,1fr)]">
             <div className="border-b border-zinc-300 p-6 dark:border-zinc-700 lg:border-b-0 lg:border-r lg:p-8">
               <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-orange-700 dark:text-orange-400">Start here</p>

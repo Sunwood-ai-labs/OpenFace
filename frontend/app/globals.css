@@ -431,6 +431,20 @@ html[data-openface-theme="solarpunk"] .openface-docs-directory .openface-docs-fo
   color: #fffdf3 !important;
 }
 
+html[data-openface-theme="solarpunk"] .openface-docs-directory .openface-docs-onboarding {
+  background: #f0edda !important;
+  color: #173b2c !important;
+}
+
+html[data-openface-theme="solarpunk"] .openface-docs-directory .openface-docs-onboarding h2,
+html[data-openface-theme="solarpunk"] .openface-docs-directory .openface-docs-onboarding h3 {
+  color: #173b2c !important;
+}
+
+html[data-openface-theme="solarpunk"] .openface-docs-directory .openface-docs-onboarding p {
+  color: #46624f !important;
+}
+
 html[data-openface-theme="cyberpunk"] .openface-docs-directory {
   background: #05070d !important;
   color: #f4f7ff !important;
@@ -475,6 +489,25 @@ html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-fo
   border-color: #45e4e7 !important;
   background: #45e4e7 !important;
   color: #061014 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-onboarding {
+  background: #0d1327 !important;
+  color: #f4f7ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-onboarding h2,
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-onboarding h3 {
+  color: #f4f7ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-onboarding p {
+  color: #a9bdd3 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-onboarding code {
+  background: #05070d !important;
+  color: #f4f7ff !important;
 }
 
 @media (prefers-color-scheme: dark) {
