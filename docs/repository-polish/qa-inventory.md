@@ -71,7 +71,7 @@ This inventory is updated during signoff if the final change surface differs fro
 |---|---|
 | Skill installation | Compared all 34 installed files with GitHub commit `89e98c1` by SHA-256 |
 | Public project files | Added MIT license, third-party notices, contribution, support, conduct, security, Issue forms, and a PR template |
-| Documentation | Added VitePress config, locked dependencies, English and Japanese homes, six parallel guides per locale, identity assets, and Pages deployment |
+| Documentation | Added an editorial VitePress theme, bilingual field notes, connected Wiki nodes, metadata-rich guides, locked dependencies, identity assets, and Pages deployment |
 | Repository landing | Rebuilt `README.md` in English, preserved and corrected `README.ja.md`, added language switches, screenshots, Docs links, badges, and security guidance |
 | Application maintenance | Migrated Next.js 14 to supported Next.js 16 and React 19, updated asynchronous route props, and made Docker dependency installation deterministic |
 | Automation | Added CI, Pages, Dependabot, compatible update grouping, and explicit major-version exclusion |
@@ -91,6 +91,15 @@ This inventory is updated during signoff if the final change surface differs fro
 - Browser checks found no horizontal overflow on the tested OpenFace and Docs routes.
 - README local links and images resolved, and GitHub rendered the identity, language links, passing badges, and product screenshot.
 - Every direct polish commit passed the staged payload guard before push.
+
+## 2026-07-21 editorial atlas follow-up
+
+- Added matching English/Japanese article, Wiki, and guide inventories.
+- Added a custom VitePress theme with dark mode and responsive layouts.
+- Added `npm run docs:check` and made it a required step before the Pages build.
+- Browser-tested English/Japanese home, article, and Wiki routes at 1440 × 1000 and 390 × 844.
+- Click-tested dark-theme and mobile-navigation controls; browser console remained free of errors and warnings.
+- Preserved the screenshot packet in [`docs/evidence/docs-atlas`](../evidence/docs-atlas/README.md).
 
 ## Known dependency note
 

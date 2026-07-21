@@ -380,14 +380,22 @@ UI and application changes have two evidence gates. First, the implementer must 
 
 ## 📖 Documentation
 
-| Published English Docs | Published Japanese Docs |
-|---|---|
-| ![Published English VitePress documentation](docs/repository-polish/github-pages-en.png) | ![Published Japanese VitePress documentation](docs/repository-polish/github-pages-ja.png) |
+The public docs now use an **article + wiki** model: field notes explain why decisions were made, knowledge nodes hold stable reference, and practical guides contain the exact procedures. Every page exposes reading time, topics, and related knowledge in both English and Japanese.
 
-The complete [repository polish verification record](docs/repository-polish/index.md) also includes the post-upgrade OpenFace home, Spaces directory, and immutable Prompt revision screenshots.
+| Editorial home | Knowledge atlas node |
+|---|---|
+| ![OpenFace editorial field manual](docs/evidence/docs-atlas/home-en-desktop.png) | ![OpenFace platform map knowledge node](docs/evidence/docs-atlas/wiki-platform-map.png) |
+
+| Dark theme | Japanese mobile article |
+|---|---|
+| ![OpenFace field manual in dark mode](docs/evidence/docs-atlas/home-en-dark.png) | ![Japanese OpenFace field note on mobile](docs/evidence/docs-atlas/article-ja-mobile.png) |
+
+The [editorial knowledge atlas verification record](docs/evidence/docs-atlas/README.md) includes responsive metrics, interaction checks, and additional mobile screenshots. The complete [repository polish verification record](docs/repository-polish/index.md) also includes the post-upgrade OpenFace home, Spaces directory, and immutable Prompt revision screenshots.
 
 - [English documentation](https://sunwood-ai-labs.github.io/OpenFace/)
 - [日本語ドキュメント](https://sunwood-ai-labs.github.io/OpenFace/ja/)
+- [Field notes](https://sunwood-ai-labs.github.io/OpenFace/articles/)
+- [Knowledge atlas](https://sunwood-ai-labs.github.io/OpenFace/wiki/)
 - [Japanese README](README.ja.md)
 - [Contributing](CONTRIBUTING.md)
 - [Support](SUPPORT.md)

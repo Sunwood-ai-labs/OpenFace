@@ -428,11 +428,17 @@ OpenFace/
 
 ### 公開ドキュメントの実画面
 
-| English | 日本語 |
-|---|---|
-| ![公開済み英語VitePressドキュメント](docs/repository-polish/github-pages-en.png) | ![公開済み日本語VitePressドキュメント](docs/repository-polish/github-pages-ja.png) |
+公開ドキュメントを **記事＋Wiki** 型に再構成しました。読みものは判断の背景と証跡を伝え、知識ノードは安定した参照情報を保持し、実践ガイドは操作手順を担当します。英日すべてのページから、読む時間・トピック・関連記事をたどれます。
 
-Next.js更新後のOpenFaceホーム、CPU Space一覧、Prompt v4.2固定表示を含む実ブラウザ検証は [Repository polish verification](docs/repository-polish/index.md) に記録しています。
+| 編集型ホーム | 知識地図ノード |
+|---|---|
+| ![OpenFaceの編集型フィールドマニュアル](docs/evidence/docs-atlas/home-en-desktop.png) | ![OpenFaceプラットフォーム地図](docs/evidence/docs-atlas/wiki-platform-map.png) |
+
+| ダークテーマ | 日本語モバイル記事 |
+|---|---|
+| ![ダークテーマのフィールドマニュアル](docs/evidence/docs-atlas/home-en-dark.png) | ![モバイル表示の日本語読みもの](docs/evidence/docs-atlas/article-ja-mobile.png) |
+
+[記事＋Wiki検証記録](docs/evidence/docs-atlas/README.md)に、レスポンシブ計測、操作確認、追加のモバイルスクリーンショットを保存しています。Next.js更新後のOpenFaceホーム、CPU Space一覧、Prompt v4.2固定表示を含む実ブラウザ検証は [Repository polish verification](docs/repository-polish/index.md) に記録しています。
 
 ### エージェント向け画面撮影テスト
 
