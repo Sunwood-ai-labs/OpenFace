@@ -372,6 +372,12 @@ UI and application changes have two evidence gates. First, the implementer must 
 |---|---|
 | ![Designer completion comment with UI test table](docs/evidence/automated-maintenance/issue-22-completion-comment.png) | ![ClearNext opened privacy disclosure on mobile](docs/evidence/automated-maintenance/issue-22-mobile-opened.png) |
 
+[Pages starter Issue #25](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/25) → [PR #26](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/26) is the retained proof for the independent review gate itself. The maintainer handed the implementation to a specialist, explicitly mentioned `@review-agent`, and withheld merge until that separate account approved the exact head SHA `b55a7369cdee3d49b5ffcc5c74bd6a46882018a8`. The reviewer independently reran the app, passed all 10 requirements and 9 checks, attached eight mobile/desktop screenshots, and returned no findings. Only then did `glm-maintainer` server-side merge commit `b64e42021f03f4110614c7cd2f9fd3b27a6b254a`.
+
+| Maintainer hand-off | Independent SHA-bound approval | Auto-merged PR |
+|---|---|---|
+| ![Maintainer explicitly assigns review-agent and blocks merge](docs/evidence/automated-maintenance/issue-25-review-handoff.png) | ![Review-agent approval with traceability table](docs/evidence/automated-maintenance/issue-25-review-approved.png) | ![Forgejo PR merged by glm-maintainer](docs/evidence/automated-maintenance/issue-25-auto-merged.png) |
+
 ## 📖 Documentation
 
 | Published English Docs | Published Japanese Docs |

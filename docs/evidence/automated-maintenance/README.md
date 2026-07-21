@@ -12,3 +12,14 @@ This directory keeps browser-verified evidence for the maintainer-led Claude Cod
 - Attachments: four validated PNG files (mobile/desktop, closed/opened)
 
 `issue-22-completion-comment.png` is a browser capture of Forgejo rendering the specialist's Markdown report. `issue-22-mobile-opened.png` is a browser capture of the actual attached mobile PNG. Japanese text is readable after adding Noto CJK fonts to the maintenance image.
+
+## Independent reviewer and auto-merge gate
+
+- Request: [Pages starter Issue #25](https://madesk.tail8be30.ts.net/git/openface/pages-starter/issues/25)
+- Result: [PR #26](https://madesk.tail8be30.ts.net/git/openface/pages-starter/pulls/26)
+- Reviewed head: `b55a7369cdee3d49b5ffcc5c74bd6a46882018a8`
+- Reviewer: `review-agent`, a separate Forgejo identity using a read-only `/goal` contract
+- Review result: 10 requirements passed, 9 checks passed, zero findings, eight independent screenshots
+- Merge: performed only after approval by `glm-maintainer`, commit `b64e42021f03f4110614c7cd2f9fd3b27a6b254a`
+
+The three `issue-25-*.png` files are browser captures of the visible maintainer hand-off, the SHA-bound reviewer approval and traceability table, and the final merged PR header. They confirm that the implementer's self-assessment is not treated as approval.
