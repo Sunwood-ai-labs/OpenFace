@@ -2253,6 +2253,295 @@ Record the route, viewport, theme, action taken, expected result, observed resul
 EOF
 create_doc_fixture "visual-qa-field-notes" "How screenshot evidence becomes a repeatable interface review" "article" "visual-qa" "themes" "${WORKDIR}/doc_visual_qa.md"
 
+cat > "${WORKDIR}/doc_cpu_first.md" <<'EOF'
+---
+license: MIT
+tags: [cpu, inference, operations]
+---
+
+# CPU-first AI systems are a product choice
+
+CPU-first does not mean treating performance as an afterthought. It means choosing workloads whose value survives without scarce accelerators: retrieval, document processing, structured extraction, small classifiers, and browser-side inference.
+
+## Design for the ordinary machine
+
+A useful CPU workload starts quickly, exposes honest health information, and degrades predictably under concurrency. Model size, image size, dependency count, and cold-start time all belong in the product budget.
+
+## A practical review
+
+- measure cold and warm response times separately;
+- cap worker concurrency before memory pressure becomes failure;
+- cache deterministic artifacts outside the request path;
+- keep GPU-only features out of the default experience.
+
+The result is easier to reproduce on a laptop, a lab server, and a private network.
+EOF
+create_doc_fixture "cpu-first-ai-systems" "Designing useful local AI workloads for ordinary machines" "article" "cpu" "inference" "${WORKDIR}/doc_cpu_first.md"
+
+cat > "${WORKDIR}/doc_forgejo_truth.md" <<'EOF'
+---
+license: MIT
+tags: [forgejo, git, architecture]
+---
+
+# Forgejo as the source of truth
+
+OpenFace reads identities, repositories, topics, files, Issues, and pull requests from Forgejo. The catalog is a projection of that durable state rather than a second database that operators must reconcile.
+
+## Why the boundary matters
+
+Repository history explains who changed a model card, a Space, or a guide. Topics drive discovery. Pull requests preserve review evidence. Backups remain ordinary Forgejo backups.
+
+## What OpenFace adds
+
+OpenFace supplies task-specific discovery, rich artifact pages, embedded runtimes, Pages, and maintenance-agent workflows. It should never silently replace the repository history that proves those experiences.
+
+> If a catalog claim cannot be traced to a repository, it is not durable product state.
+EOF
+create_doc_fixture "forgejo-source-of-truth" "Why OpenFace projects Forgejo state instead of duplicating it" "article" "forgejo" "architecture" "${WORKDIR}/doc_forgejo_truth.md"
+
+cat > "${WORKDIR}/doc_community_design.md" <<'EOF'
+---
+license: MIT
+tags: [community, design, accessibility]
+---
+
+# Designing a local AI community
+
+A community catalog must help a newcomer answer three questions quickly: what exists, why it matters, and how to participate. Dense metadata is useful only after those questions are clear.
+
+## Editorial hierarchy
+
+Names and summaries lead. Topics provide orientation. Counts and timestamps provide confidence. Actions appear where the user has enough context to choose them.
+
+## Inclusive defaults
+
+Navigation remains usable with touch, keyboard, and narrow screens. Theme color never carries meaning alone. Empty states explain the next useful action instead of merely reporting absence.
+
+The visual language can be distinctive without turning routine repository work into a puzzle.
+EOF
+create_doc_fixture "community-design-principles" "Editorial and accessible design principles for a community catalog" "article" "community" "design" "${WORKDIR}/doc_community_design.md"
+
+cat > "${WORKDIR}/doc_identity_map.md" <<'EOF'
+---
+license: MIT
+tags: [identity, permissions, security]
+---
+
+# Identity and permission map
+
+This Wiki node explains which identity performs each class of action.
+
+| Identity | Typical capability | Guardrail |
+|---|---|---|
+| Visitor | Read public catalogs and repositories | No mutation |
+| Member | Comment, react, and contribute | Repository permission |
+| Organization owner | Manage teams and organization profile | Forgejo ownership |
+| Maintenance agent | Open branches and pull requests | Scoped token |
+| Review agent | Approve verified heads | Independent identity |
+
+## Rule of least authority
+
+Runtime containers do not receive administrative Forgejo credentials. Agent tokens are scoped to the repositories and operations they need. Human ownership remains visible in the same audit trail as automated work.
+EOF
+create_doc_fixture "identity-permission-map" "A Wiki map of human, organization, and agent permissions" "wiki" "identity" "security" "${WORKDIR}/doc_identity_map.md"
+
+cat > "${WORKDIR}/doc_service_boundaries.md" <<'EOF'
+---
+license: MIT
+tags: [services, docker, architecture]
+---
+
+# Service boundary Wiki
+
+OpenFace uses small services with explicit responsibilities.
+
+| Service | Owns | Does not own |
+|---|---|---|
+| Gateway | TLS and request routing | Repository data |
+| Frontend | Catalog and artifact experience | Container builds |
+| Forgejo | Git, identity, Issues, pull requests | Space execution |
+| Spaces Runner | Docker builds and app lifecycle | User accounts |
+| Maintenance Agent | Delegation and review workflow | Merge authority without evidence |
+
+## Debug from the boundary
+
+Start with the public route, identify its owning service, then follow the service health and logs. This prevents a visual symptom from becoming an unfocused search across every container.
+EOF
+create_doc_fixture "service-boundary-wiki" "A connected map of OpenFace services and ownership boundaries" "wiki" "services" "architecture" "${WORKDIR}/doc_service_boundaries.md"
+
+cat > "${WORKDIR}/doc_metrics_agents.md" <<'EOF'
+---
+license: MIT
+tags: [metrics, agents, api]
+---
+
+# Metrics and agent API Wiki
+
+Views, likes, reactions, and comments are user actions first. Agent APIs expose the same domain operations so automation does not require browser scraping or privileged database writes.
+
+## Event flow
+
+1. A browser or agent sends an authenticated action.
+2. OpenFace validates identity and repository visibility.
+3. The action is recorded against the durable artifact.
+4. Listing and detail views read the updated aggregate.
+
+## Operational rule
+
+Retries must be idempotent. A network retry must not turn one view or one reaction into several. Agent activity remains attributable to its own account and avatar.
+EOF
+create_doc_fixture "metrics-and-agent-api-wiki" "How human and agent interactions share auditable domain operations" "wiki" "metrics" "api" "${WORKDIR}/doc_metrics_agents.md"
+
+cat > "${WORKDIR}/doc_publishing_quickstart.md" <<'EOF'
+---
+license: MIT
+tags: [docs, publishing, forgejo]
+---
+
+# Publish your first OpenFace Doc
+
+An OpenFace Doc is an ordinary public Forgejo repository. The README is the article body and repository topics decide where it appears.
+
+## 1. Create the repository
+
+Open **New → Doc**, choose an owner and a short repository name, then continue to Forgejo. Keep the repository public if it should appear in the shared library.
+
+## 2. Add topics
+
+Add `doc`, exactly one format topic (`article`, `wiki`, `guide`, or `reference`), and a few descriptive topics such as `docker` or `security`.
+
+```text
+doc  guide  docker  deployment
+```
+
+## 3. Write the README
+
+Lead with a clear title and purpose. Use headings, lists, tables, code blocks, and links where they make the material easier to apply. Commit the file normally.
+
+## 4. Verify discovery
+
+Return to `/docs`, select the matching format, and open the document. If it is missing, confirm the repository is public and the `doc` topic is present.
+EOF
+create_doc_fixture "docs-publishing-quickstart" "Create, classify, write, and verify a Git-backed OpenFace document" "guide" "docs" "publishing" "${WORKDIR}/doc_publishing_quickstart.md"
+
+cat > "${WORKDIR}/doc_tailscale_guide.md" <<'EOF'
+---
+license: MIT
+tags: [tailscale, deployment, tls]
+---
+
+# Publish OpenFace through Tailscale
+
+Use a tailnet when OpenFace should be reachable from trusted phones and computers without exposing the service to the public internet.
+
+## Checklist
+
+1. Start the Docker Compose stack and verify `https://localhost:8443`.
+2. Authenticate Tailscale on the host.
+3. Serve the local HTTPS endpoint through Tailscale Serve.
+4. Open the generated `*.ts.net` URL from a second tailnet device.
+5. Test navigation, embedded Spaces, and long mobile pages.
+
+## TLS note
+
+The browser connects to the Tailscale certificate while the local gateway retains the same routes. Do not publish Forgejo or runner ports separately unless the network design explicitly requires it.
+EOF
+create_doc_fixture "tailscale-private-deployment" "Expose OpenFace safely to trusted devices on a tailnet" "guide" "tailscale" "deployment" "${WORKDIR}/doc_tailscale_guide.md"
+
+cat > "${WORKDIR}/doc_recovery_playbook.md" <<'EOF'
+---
+license: MIT
+tags: [recovery, operations, docker]
+---
+
+# Incident recovery playbook
+
+Use this guide when a catalog route, repository page, or Space stops responding.
+
+## Triage
+
+1. Capture the failing URL and visible error.
+2. Check Compose service health before restarting anything.
+3. Inspect logs for the owning service and the gateway.
+4. Verify Forgejo API reachability for catalog failures.
+5. Verify runner container state for Space failures.
+
+## Recover carefully
+
+Recreate only the affected stateless service first. Preserve Forgejo volumes and repository data. After recovery, repeat the exact browser action and record a screenshot plus the relevant log excerpt.
+
+Escalate persistent data or permission faults instead of masking them with repeated full-stack restarts.
+EOF
+create_doc_fixture "incident-recovery-playbook" "A bounded diagnosis and recovery path for common OpenFace failures" "guide" "recovery" "operations" "${WORKDIR}/doc_recovery_playbook.md"
+
+cat > "${WORKDIR}/doc_env_reference.md" <<'EOF'
+---
+license: MIT
+tags: [configuration, docker, environment]
+---
+
+# Environment variable reference
+
+Environment values belong in Compose configuration or a local `.env`, never in committed example repositories.
+
+| Concern | Example value | Purpose |
+|---|---|---|
+| Public origin | `https://localhost:8443` | Absolute links and callbacks |
+| Forgejo base URL | Internal service URL | Repository API access |
+| Runner port | `7860` | Embedded Space contract |
+| Agent concurrency | Small positive integer | Parallel maintenance limit |
+| Theme default | `system` | Initial browser preference |
+
+## Validation
+
+After changing configuration, render the effective Compose config, recreate only affected services, and verify health endpoints before testing the browser surface.
+EOF
+create_doc_fixture "environment-variable-reference" "A concise reference for deployment and runtime configuration" "reference" "configuration" "environment" "${WORKDIR}/doc_env_reference.md"
+
+cat > "${WORKDIR}/doc_route_reference.md" <<'EOF'
+---
+license: MIT
+tags: [routes, api, gateway]
+---
+
+# Route and endpoint reference
+
+| Route family | Purpose |
+|---|---|
+| `/models`, `/datasets`, `/spaces` | Artifact discovery |
+| `/skills`, `/mcps`, `/prompts`, `/docs` | Reusable knowledge discovery |
+| `/{owner}/{repo}` | Repository-backed detail page |
+| `/pages/{owner}/{repo}/` | Published static site |
+| `/git/` | Forgejo user interface through the gateway |
+
+## Ownership
+
+Public application routes resolve through the frontend or runner. Forgejo routes remain under `/git/`. The gateway keeps these namespaces stable so internal service addresses do not leak into user-facing links.
+EOF
+create_doc_fixture "route-and-endpoint-reference" "Public route families, purposes, and service ownership" "reference" "routes" "gateway" "${WORKDIR}/doc_route_reference.md"
+
+cat > "${WORKDIR}/doc_format_reference.md" <<'EOF'
+---
+license: MIT
+tags: [docs, taxonomy, topics]
+---
+
+# Document format reference
+
+Every OpenFace Doc uses `doc` plus one format topic.
+
+| Format | Use it for | Avoid |
+|---|---|---|
+| `article` | Context, analysis, and decisions | Step-by-step procedures |
+| `wiki` | Connected concepts and system maps | Chronological field notes |
+| `guide` | A task completed from start to finish | Unstable fact lists |
+| `reference` | Contracts, options, routes, and glossaries | Narrative persuasion |
+
+Add two or three subject topics after the format. Topics should describe what readers will search for, not duplicate every word in the title.
+EOF
+create_doc_fixture "document-format-reference" "Choose the right Docs format and descriptive topics" "reference" "docs" "taxonomy" "${WORKDIR}/doc_format_reference.md"
+
 # ------------------------------------------------------------------------
 # OpenFace Pages fixture.  This demonstrates the same convention as GitHub
 # Pages: files from a public repo's `gh-pages` branch are served at
