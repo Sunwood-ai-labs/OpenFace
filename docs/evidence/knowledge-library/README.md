@@ -1,5 +1,13 @@
 # Knowledge library — Zenn comparison and theme QA
 
+## 日本語表示の確認
+
+ナレッジ一覧、記事詳細、ナビゲーション、フッター、18件のサンプル記事を日本語化しました。公開中のモバイル画面を375px幅で再確認し、`html lang="ja"`、横方向のオーバーフローなし、ブラウザーの警告・エラーなしを確認しています。
+
+| 日本語の記事一覧 | 日本語の記事詳細 | スクロール後の本文 |
+|---|---|---|
+| ![日本語化したナレッジ一覧](ja/articles-mobile-ja.png) | ![日本語化した記事詳細](ja/article-mobile-ja.png) | ![日本語化した記事本文](ja/article-body-mobile-ja.png) |
+
 OpenFace uses Zenn's reading hierarchy as a reference without copying its product identity. The implementation keeps the OpenFace typography and theme tokens while adopting the parts that make a publication easy to scan: a compact author/time line, an emoji cover, unboxed article rows, topic pills, a centered article header, and a narrow reading column.
 
 Reference pages: [Zenn Articles](https://zenn.dev/articles) and a live [Zenn article detail](https://zenn.dev/mk0bayashi/articles/2a6ee4123e671f).
