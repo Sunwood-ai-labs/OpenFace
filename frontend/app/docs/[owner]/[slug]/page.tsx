@@ -38,7 +38,7 @@ export default async function KnowledgeArticlePage({ params }: { params: Promise
         </div>
         <div className="grid gap-10 py-10 lg:grid-cols-[minmax(0,760px)_190px] lg:justify-center lg:py-14">
           <div className="github-markdown-body prose-openface min-w-0 bg-transparent dark:bg-transparent" dangerouslySetInnerHTML={{ __html: article.bodyHtml || '' }} />
-          <aside className="order-first border-y border-zinc-300 py-5 text-sm dark:border-zinc-700 lg:order-last lg:border-y-0 lg:border-l lg:py-0 lg:pl-6">
+          <aside className="border-y border-zinc-300 py-5 text-sm dark:border-zinc-700 lg:border-y-0 lg:border-l lg:py-0 lg:pl-6">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-500">Source</p>
           <p className="mt-3 leading-6 text-zinc-600 dark:text-zinc-400">This entry is published from <code>articles/{article.slug}.md</code>.</p>
             <a href={`${forgejoRepoUrl(article.owner, article.repository)}/src/branch/${article.branch}/${article.path}`} className="mt-4 inline-flex items-center gap-2 font-bold text-teal-900 hover:underline dark:text-teal-300">View source <HfIcon name="arrowRight" className="h-3 w-3" /></a>

@@ -93,9 +93,9 @@ export default async function DocsDirectoryPage({
 
   return (
     <div className="openface-docs-directory min-h-screen bg-[#fbfaf6] text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
-      <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
+      <section className="openface-docs-hero relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
         <div className="pointer-events-none absolute inset-0 opacity-50 [background-image:linear-gradient(to_right,rgba(39,39,42,.08)_1px,transparent_1px)] [background-size:80px_100%] dark:opacity-20" />
-        <div className="relative mx-auto grid max-w-[1440px] gap-8 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-end lg:px-12">
+        <div className="openface-docs-hero-grid relative mx-auto grid max-w-[1440px] gap-8 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-end lg:px-12">
           <div>
             <div className="mb-5 flex items-center gap-3 font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-orange-700 dark:text-orange-400">
               <span className="h-px w-10 bg-current" /> OpenFace Docs Library
@@ -103,10 +103,10 @@ export default async function DocsDirectoryPage({
             <h1 className="max-w-4xl font-serif text-[clamp(2.8rem,7vw,6.5rem)] font-semibold leading-[0.88] tracking-[-0.05em]">
               Knowledge,<br />published by people.
             </h1>
-            <p className="mt-7 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400 sm:text-lg">
+            <p className="openface-docs-hero-copy mt-7 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400 sm:text-lg">
               Your Git-backed knowledge base for articles, research notes, procedures, and durable references—owned by you or your team.
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="openface-docs-hero-actions mt-7 flex flex-wrap gap-3">
               <a href="#how-to-use" className="inline-flex h-11 items-center gap-2 border border-zinc-950 bg-zinc-950 px-5 text-sm font-bold text-white transition hover:bg-teal-900 dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:border-teal-300 dark:hover:bg-teal-300">
                 Start your knowledge base <HfIcon name="arrowRight" className="h-3.5 w-3.5" />
               </a>
@@ -115,7 +115,7 @@ export default async function DocsDirectoryPage({
               </Link>
             </div>
           </div>
-          <dl className="grid grid-cols-2 border-y border-zinc-300 py-5 dark:border-zinc-700 lg:grid-cols-1 lg:border-y-0 lg:border-l lg:py-0 lg:pl-8">
+          <dl className="openface-docs-hero-stats grid grid-cols-2 border-y border-zinc-300 py-5 dark:border-zinc-700 lg:grid-cols-1 lg:border-y-0 lg:border-l lg:py-0 lg:pl-8">
             <div className="border-r border-zinc-200 pr-5 dark:border-zinc-800 lg:border-b lg:border-r-0 lg:pb-5 lg:pr-0">
               <dt className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">Published entries</dt>
               <dd className="mt-2 font-serif text-4xl">{result.ok ? result.totalCount : 0}</dd>
@@ -144,34 +144,6 @@ export default async function DocsDirectoryPage({
             ))}
           </div>
         </div>
-
-        <section id="how-to-use" aria-labelledby="docs-how-to-title" className="openface-docs-onboarding mb-12 scroll-mt-24 border-y border-zinc-300 bg-[#f4f0e8] dark:border-zinc-700 dark:bg-zinc-900">
-          <div className="grid lg:grid-cols-[220px_minmax(0,1fr)]">
-            <div className="border-b border-zinc-300 p-6 dark:border-zinc-700 lg:border-b-0 lg:border-r lg:p-8">
-              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-orange-700 dark:text-orange-400">Start here</p>
-              <h2 id="docs-how-to-title" className="mt-3 font-serif text-3xl leading-none">Use the library in three moves.</h2>
-              <p className="mt-4 text-sm leading-6 text-zinc-600 dark:text-zinc-400">One person or team has one publication repository. Each file in articles/ becomes an entry.</p>
-            </div>
-            <div className="grid sm:grid-cols-3">
-              <div className="border-b border-zinc-300 p-6 dark:border-zinc-700 sm:border-b-0 sm:border-r lg:p-8">
-                <div className="flex items-center justify-between"><span className="font-mono text-xs font-bold text-orange-700 dark:text-orange-400">01</span><HfIcon name="doc" className="h-5 w-5 text-teal-800 dark:text-teal-300" /></div>
-                <h3 className="mt-7 font-serif text-2xl">Capture</h3>
-                <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">Create your publication once, then save articles, research notes, runbooks, and references in <code className="bg-white px-1 py-0.5 text-xs dark:bg-zinc-950">articles/*.md</code>.</p>
-              </div>
-              <div className="border-b border-zinc-300 p-6 dark:border-zinc-700 sm:border-b-0 sm:border-r lg:p-8">
-                <div className="flex items-center justify-between"><span className="font-mono text-xs font-bold text-orange-700 dark:text-orange-400">02</span><HfIcon name="search" className="h-5 w-5 text-teal-800 dark:text-teal-300" /></div>
-                <h3 className="mt-7 font-serif text-2xl">Organize</h3>
-                <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">Front matter gives each file a title, format, and topics. Search and topic links bring that knowledge back later.</p>
-              </div>
-              <div className="p-6 lg:p-8">
-                <div className="flex items-center justify-between"><span className="font-mono text-xs font-bold text-orange-700 dark:text-orange-400">03</span><HfIcon name="plus" className="h-5 w-5 text-teal-800 dark:text-teal-300" /></div>
-                <h3 className="mt-7 font-serif text-2xl">Grow</h3>
-                <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">Edit Markdown as your thinking changes. Commits preserve every version; pull requests let a team review before publishing.</p>
-                <Link href="/new?type=doc&template=documentation" className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-teal-900 hover:underline dark:text-teal-300">Add knowledge <HfIcon name="arrowRight" className="h-3 w-3" /></Link>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {!result.ok ? (
           <div className="border border-dashed border-zinc-300 p-12 text-center text-zinc-500 dark:border-zinc-700">Could not connect to Forgejo.</div>
@@ -241,6 +213,34 @@ export default async function DocsDirectoryPage({
             </section>
           </>
         )}
+
+        <section id="how-to-use" aria-labelledby="docs-how-to-title" className="openface-docs-onboarding mt-14 scroll-mt-24 border-y border-zinc-300 bg-[#f4f0e8] dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="grid lg:grid-cols-[220px_minmax(0,1fr)]">
+            <div className="border-b border-zinc-300 p-6 dark:border-zinc-700 lg:border-b-0 lg:border-r lg:p-8">
+              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-orange-700 dark:text-orange-400">Start here</p>
+              <h2 id="docs-how-to-title" className="mt-3 font-serif text-3xl leading-none">Use the library in three moves.</h2>
+              <p className="mt-4 text-sm leading-6 text-zinc-600 dark:text-zinc-400">One person or team has one publication repository. Each file in articles/ becomes an entry.</p>
+            </div>
+            <div className="grid sm:grid-cols-3">
+              <div className="border-b border-zinc-300 p-6 dark:border-zinc-700 sm:border-b-0 sm:border-r lg:p-8">
+                <div className="flex items-center justify-between"><span className="font-mono text-xs font-bold text-orange-700 dark:text-orange-400">01</span><HfIcon name="doc" className="h-5 w-5 text-teal-800 dark:text-teal-300" /></div>
+                <h3 className="mt-7 font-serif text-2xl">Capture</h3>
+                <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">Create your publication once, then save articles, research notes, runbooks, and references in <code className="bg-white px-1 py-0.5 text-xs dark:bg-zinc-950">articles/*.md</code>.</p>
+              </div>
+              <div className="border-b border-zinc-300 p-6 dark:border-zinc-700 sm:border-b-0 sm:border-r lg:p-8">
+                <div className="flex items-center justify-between"><span className="font-mono text-xs font-bold text-orange-700 dark:text-orange-400">02</span><HfIcon name="search" className="h-5 w-5 text-teal-800 dark:text-teal-300" /></div>
+                <h3 className="mt-7 font-serif text-2xl">Organize</h3>
+                <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">Front matter gives each file a title, format, and topics. Search and topic links bring that knowledge back later.</p>
+              </div>
+              <div className="p-6 lg:p-8">
+                <div className="flex items-center justify-between"><span className="font-mono text-xs font-bold text-orange-700 dark:text-orange-400">03</span><HfIcon name="plus" className="h-5 w-5 text-teal-800 dark:text-teal-300" /></div>
+                <h3 className="mt-7 font-serif text-2xl">Grow</h3>
+                <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">Edit Markdown as your thinking changes. Commits preserve every version; pull requests let a team review before publishing.</p>
+                <Link href="/new?type=doc&template=documentation" className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-teal-900 hover:underline dark:text-teal-300">Add knowledge <HfIcon name="arrowRight" className="h-3 w-3" /></Link>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );

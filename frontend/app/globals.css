@@ -558,6 +558,41 @@ html[data-openface-theme="cyberpunk"] .openface-doc-feature-art {
   color: #67e8f9;
 }
 
+@media (max-width: 639px) {
+  .openface-docs-hero-grid {
+    gap: 1.25rem;
+    padding-block: 1.75rem;
+  }
+
+  .openface-docs-hero h1 {
+    font-size: 2.8rem;
+    line-height: .9;
+  }
+
+  .openface-docs-hero-copy {
+    margin-top: 1.1rem;
+    font-size: .875rem;
+    line-height: 1.45rem;
+  }
+
+  .openface-docs-hero-actions {
+    margin-top: 1.15rem;
+  }
+
+  .openface-docs-hero-actions > :first-child {
+    display: none;
+  }
+
+  .openface-docs-hero-stats {
+    padding-block: .75rem;
+  }
+
+  .openface-docs-hero-stats dd {
+    margin-top: .25rem;
+    font-size: 1.75rem;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #18181b;
