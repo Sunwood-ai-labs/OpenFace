@@ -148,15 +148,17 @@ OpenFace chooses the catalog from a **Forgejo topic**:
 
 Topics classify the repository itself. README frontmatter `tags` add multiple content labels such as `audio`, `gradio`, or `classification`; they do not replace the type topic.
 
-## 📚 Git-backed Docs library
+## 📚 Git-backed knowledge publishing
 
-The internal [`/docs`](https://localhost:8443/docs) category is a repository-backed knowledge library, separate from the VitePress operator manual. Add the `doc` topic plus one format topic—`article`, `wiki`, `guide`, or `reference`—and OpenFace publishes the repository README with its real files, commits, clone URL, and permissions. The idempotent seed includes six connected entries for immediate reconstruction testing.
+The internal [`/docs`](https://localhost:8443/docs) category is a repository-backed publication library, separate from the VitePress operator manual. Like a Zenn publication, one person or team owns one repository. Add the `doc` repository topic and place Markdown in `articles/*.md`; OpenFace aggregates every published file into the shared Articles, Wiki, Guides, and Reference index while Git keeps authorship and history intact.
 
-| Editorial directory | Wiki document on mobile |
-|---|---|
-| <img src="docs/evidence/docs-category/screenshots/standard--light--desktop--docs.png" alt="OpenFace Docs editorial directory in the Standard theme" width="100%"> | <img src="docs/evidence/docs-category/screenshots/cyberpunk--dark--mobile--doc-detail.png" alt="Git-backed OpenFace Wiki document in the Cyberpunk theme on mobile" width="320"> |
+The seed publication contains 18 useful sample entries. Each entry supports `title`, `description`, `emoji`, `format`, `topics`, `published`, and `updated` front matter, plus automatic reading-time calculation.
 
-The [Docs category visual QA report](docs/evidence/docs-category/THEME_MATRIX.md) records 24 passing screenshots across three themes, two OS color schemes, desktop/mobile widths, and directory/detail routes, including automated overflow and WCAG contrast checks.
+| Zenn reference | OpenFace Standard | OpenFace Cyberpunk |
+|---|---|---|
+| <img src="docs/evidence/knowledge-library/reference-zenn-articles-mobile.png" alt="Zenn article timeline used as a layout reference" width="320"> | <img src="docs/evidence/knowledge-library/openface-articles-mobile-standard.png" alt="OpenFace knowledge publications in the Standard theme" width="320"> | <img src="docs/evidence/knowledge-library/openface-articles-mobile-cyberpunk.png" alt="OpenFace knowledge publications in the Cyberpunk theme" width="320"> |
+
+The [Zenn comparison and knowledge-library verification](docs/evidence/knowledge-library/README.md) includes article-detail comparisons and the complete **24/24 passing** theme matrix across all three platform themes, light/dark OS schemes, mobile/desktop viewports, horizontal-overflow checks, and computed WCAG text contrast.
 
 ```yaml
 ---
