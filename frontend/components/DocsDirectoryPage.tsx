@@ -169,8 +169,7 @@ export default async function DocsDirectoryPage({
                   </Link>
                 </div>
                 <div className="openface-doc-feature-art relative min-h-52 overflow-hidden border-t border-zinc-200 bg-[#153c3b] text-[#f3d28f] dark:border-zinc-800 lg:border-l lg:border-t-0">
-                  <div className="absolute inset-0 opacity-30 [background-image:radial-gradient(circle_at_center,transparent_0,transparent_22%,currentColor_22.5%,transparent_23%,transparent_38%,currentColor_38.5%,transparent_39%)]" />
-                  <div className="absolute left-1/2 top-1/2 grid h-32 w-32 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[2rem] border border-current bg-white/5 text-6xl">{featured.emoji}</div>
+                  <div className="absolute left-1/2 top-1/2 grid h-32 w-32 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[2rem] border border-current bg-white/5 text-6xl shadow-[0_18px_55px_rgba(0,0,0,0.22)]">{featured.emoji}</div>
                   <div className="absolute bottom-5 left-5 right-5 flex justify-between font-mono text-[9px] font-bold uppercase tracking-[0.2em]">
                     <span>Gitで管理</span><span>育つナレッジ</span>
                   </div>
