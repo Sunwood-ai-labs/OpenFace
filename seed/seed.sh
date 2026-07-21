@@ -2096,6 +2096,164 @@ create_dataset_fixture "image-edit-prompts" "Image Edit Prompts" "Instruction da
 create_dataset_fixture "table-question-answering" "Table Question Answering" "Tabular QA fixture with small CSV splits" "tabular" "qa"
 
 # ------------------------------------------------------------------------
+# Git-backed Docs library. Each entry is an ordinary Forgejo repository with
+# the `doc` topic plus one editorial format topic. This keeps articles, Wiki
+# nodes, guides, and reference pages versionable, forkable, and discussable.
+# ------------------------------------------------------------------------
+create_doc_fixture() {
+  local name="$1" description="$2" format="$3" tag1="$4" tag2="$5" source_file="$6"
+  ensure_repo "$name" "$description"
+  set_topics "$name" "doc" "$format" "$tag1" "$tag2"
+  put_file "$name" "README.md" "$source_file" "Publish ${format} documentation"
+}
+
+cat > "${WORKDIR}/doc_local_first.md" <<'EOF'
+---
+license: MIT
+tags: [architecture, local-first, forgejo]
+---
+
+# Why a local AI hub matters
+
+OpenFace treats Git history as the source of truth and Docker as the execution boundary. The result is a community hub that can live on a workstation, a lab server, or a trusted LAN without handing ownership to a hosted catalog.
+
+## The useful constraint
+
+Every artifact remains a repository. Models, datasets, Spaces, Skills, MCP servers, prompts, and documentation therefore share branches, reviews, permissions, and durable history.
+
+## What this changes
+
+- discovery stays close to the files that prove each claim;
+- teams can inspect and fork knowledge the same way they fork code;
+- offline and private-network operation remain first-class deployment modes.
+
+> Local-first is not isolation. It is a deliberate ownership boundary.
+EOF
+create_doc_fixture "local-first-ai-hub" "Why Git-backed knowledge makes a local AI community durable" "article" "architecture" "local-first" "${WORKDIR}/doc_local_first.md"
+
+cat > "${WORKDIR}/doc_platform_atlas.md" <<'EOF'
+---
+license: MIT
+tags: [wiki, architecture, routes]
+---
+
+# OpenFace platform atlas
+
+This Wiki node connects the platform's public surfaces to the service that owns each responsibility.
+
+| Surface | Owner | Durable state |
+|---|---|---|
+| Catalog and repository cards | Frontend | Forgejo repositories |
+| Issues, pull requests, identities | Forgejo | Forgejo volumes |
+| Running Spaces | Spaces Runner | Docker images and runtime metadata |
+| Published Pages | Spaces Runner | Repository branches and files |
+| Automated maintenance | Maintenance Agent | Issue and PR conversations |
+
+## Follow the boundary
+
+The gateway terminates TLS and routes requests. It does not own repository data or run arbitrary application builds. Those responsibilities stay separated so an operator can reason about risk and recovery.
+EOF
+create_doc_fixture "platform-knowledge-atlas" "A connected Wiki map of OpenFace services, routes, and state" "wiki" "architecture" "routes" "${WORKDIR}/doc_platform_atlas.md"
+
+cat > "${WORKDIR}/doc_docker_spaces.md" <<'EOF'
+---
+license: MIT
+tags: [spaces, docker, deployment]
+---
+
+# Ship a Docker Space
+
+Use this guide when an application should run inside OpenFace as a CPU or normal Docker workload.
+
+## Contract
+
+1. Place a `Dockerfile` at the repository root.
+2. Listen on port `7860` inside the container.
+3. Add the `space` topic to the public Forgejo repository.
+4. Keep secrets outside the repository.
+5. Verify both the embedded route and the direct runner health endpoint.
+
+## Frameworks
+
+Gradio, Streamlit, FastAPI, Node.js, static HTML, React, Vue, and Next.js can all use the same contract. Framework-specific base-path support belongs in the application image, not in the catalog.
+EOF
+create_doc_fixture "docker-space-field-guide" "A practical path from Dockerfile to a running OpenFace Space" "guide" "spaces" "docker" "${WORKDIR}/doc_docker_spaces.md"
+
+cat > "${WORKDIR}/doc_agent_ops.md" <<'EOF'
+---
+license: MIT
+tags: [agents, review, automation]
+---
+
+# Agent operations Wiki
+
+Automated maintenance is a conversation between independent identities rather than one invisible background process.
+
+## Roles
+
+- **Maintainer** classifies work and delegates it.
+- **Designer, Coding, and Docs agents** implement within a focused boundary.
+- **Review agent** validates the exact proposed head SHA.
+
+## Merge invariant
+
+A pull request can auto-merge only after the required evidence exists, the reviewer is independent from the author, and approval still targets the current head SHA. Any new commit invalidates the earlier approval.
+
+## Evidence
+
+UI work includes real mobile and desktop captures. Code work includes relevant tests and a readable completion note. The Issue remains the durable audit trail.
+EOF
+create_doc_fixture "agent-operations-wiki" "Roles, delegation, evidence, and guarded auto-merge" "wiki" "agents" "review" "${WORKDIR}/doc_agent_ops.md"
+
+cat > "${WORKDIR}/doc_catalog_reference.md" <<'EOF'
+---
+license: MIT
+tags: [catalog, topics, metadata]
+---
+
+# Catalog topic reference
+
+OpenFace uses Forgejo topics as lightweight, composable metadata.
+
+| Type topic | Directory |
+|---|---|
+| `model` | `/models` |
+| `dataset` | `/datasets` |
+| `space` | `/spaces` |
+| `skill` | `/skills` |
+| `mcp` | `/mcps` |
+| `prompt` | `/prompts` |
+| `doc` | `/docs` |
+
+Add descriptive topics after the type topic. A document can use `doc`, `wiki`, `architecture`, and `routes`; filters remain useful without inventing a rigid schema.
+EOF
+create_doc_fixture "catalog-topic-reference" "The stable topic contract for every OpenFace directory" "reference" "catalog" "metadata" "${WORKDIR}/doc_catalog_reference.md"
+
+cat > "${WORKDIR}/doc_visual_qa.md" <<'EOF'
+---
+license: MIT
+tags: [visual-qa, themes, mobile]
+---
+
+# Visual QA field notes
+
+Screenshots are evidence only when they exercise the real route, the relevant interaction, and the layouts users actually see.
+
+## Review matrix
+
+- standard, Solarpunk, and Cyberpunk themes;
+- desktop and narrow mobile viewports;
+- top, middle, and bottom scroll states;
+- menus, disclosures, filters, tabs, and navigation transitions;
+- horizontal overflow and browser-console checks.
+
+## A useful report
+
+Record the route, viewport, theme, action taken, expected result, observed result, and screenshot path. A green test without the corresponding visual state is not sufficient for UI approval.
+EOF
+create_doc_fixture "visual-qa-field-notes" "How screenshot evidence becomes a repeatable interface review" "article" "visual-qa" "themes" "${WORKDIR}/doc_visual_qa.md"
+
+# ------------------------------------------------------------------------
 # OpenFace Pages fixture.  This demonstrates the same convention as GitHub
 # Pages: files from a public repo's `gh-pages` branch are served at
 # /pages/{owner}/{repo}/.  Keeping it in the seed makes a fresh Compose
