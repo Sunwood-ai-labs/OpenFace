@@ -2117,26 +2117,26 @@ ensure_repo "openface-knowledge" "OpenFace team's articles, Wiki notes, guides, 
 set_topics "openface-knowledge" "doc" "knowledge" "markdown" "publication"
 
 cat > "${WORKDIR}/knowledge_repo_readme.md" <<'EOF'
-# OpenFace Knowledge
+# OpenFace ナレッジ
 
-This is the OpenFace team's Git-backed knowledge publication.
+OpenFaceチームがGitで管理するナレッジ公開リポジトリです。
 
-## Add an entry
+## 記事を追加する
 
 Create `articles/{slug}.md` with front matter and Markdown content:
 
 ```yaml
 ---
-title: My research note
+title: 私の調査メモ
 format: article
 topics: [research, local-ai]
 published: true
 ---
 ```
 
-OpenFace aggregates every published file into `/docs`. Use `article`, `wiki`,
-`guide`, or `reference` as the format. Edit and review entries with the normal
-Git and pull-request workflow.
+OpenFaceは公開対象のファイルを`/docs`へ集約します。形式には`article`、
+`wiki`、`guide`、`reference`を使用します。通常のGitとプルリクエストの
+流れで、記事を編集・レビューできます。
 EOF
 put_file "openface-knowledge" "README.md" "${WORKDIR}/knowledge_repo_readme.md" "Explain the knowledge publication format"
 
@@ -2162,23 +2162,23 @@ license: MIT
 tags: [architecture, local-first, forgejo]
 ---
 
-# Why a local AI hub matters
+# ローカルAIハブが必要な理由
 
-OpenFace treats Git history as the source of truth and Docker as the execution boundary. The result is a community hub that can live on a workstation, a lab server, or a trusted LAN without handing ownership to a hosted catalog.
+OpenFaceはGit履歴を信頼できる情報源とし、Dockerを実行境界として扱います。ホスト型カタログへ所有権を渡さず、ワークステーション、研究室のサーバー、信頼できるLAN上でコミュニティハブを運用できます。
 
-## The useful constraint
+## 制約が生む利点
 
-Every artifact remains a repository. Models, datasets, Spaces, Skills, MCP servers, prompts, and documentation therefore share branches, reviews, permissions, and durable history.
+すべての成果物はリポジトリとして残ります。モデル、データセット、Space、Skill、MCPサーバー、プロンプト、ドキュメントが、ブランチ、レビュー、権限、永続的な履歴を共有できます。
 
-## What this changes
+## 何が変わるか
 
-- discovery stays close to the files that prove each claim;
-- teams can inspect and fork knowledge the same way they fork code;
-- offline and private-network operation remain first-class deployment modes.
+- カタログ上の説明を、根拠となるファイルからすぐ確認できる
+- コードと同じように、知識も調査・フォークできる
+- オフラインやプライベートネットワークを正式な運用形態として扱える
 
-> Local-first is not isolation. It is a deliberate ownership boundary.
+> ローカルファーストは孤立ではありません。所有権の境界を自分たちで決める設計です。
 EOF
-create_doc_fixture "local-first-ai-hub" "Why Git-backed knowledge makes a local AI community durable" "article" "architecture" "local-first" "${WORKDIR}/doc_local_first.md"
+create_doc_fixture "local-first-ai-hub" "Gitで管理する知識が、ローカルAIコミュニティを長く支える理由" "article" "architecture" "local-first" "${WORKDIR}/doc_local_first.md"
 
 cat > "${WORKDIR}/doc_platform_atlas.md" <<'EOF'
 ---
@@ -2186,23 +2186,23 @@ license: MIT
 tags: [wiki, architecture, routes]
 ---
 
-# OpenFace platform atlas
+# OpenFaceプラットフォーム全体図
 
-This Wiki node connects the platform's public surfaces to the service that owns each responsibility.
+公開画面と、その責務を担当するサービスの関係をまとめたWikiです。
 
-| Surface | Owner | Durable state |
+| 画面・機能 | 担当 | 永続データ |
 |---|---|---|
-| Catalog and repository cards | Frontend | Forgejo repositories |
-| Issues, pull requests, identities | Forgejo | Forgejo volumes |
-| Running Spaces | Spaces Runner | Docker images and runtime metadata |
-| Published Pages | Spaces Runner | Repository branches and files |
-| Automated maintenance | Maintenance Agent | Issue and PR conversations |
+| カタログとリポジトリカード | Frontend | Forgejoリポジトリ |
+| Issue、プルリクエスト、ID | Forgejo | Forgejoボリューム |
+| 実行中のSpace | Spaces Runner | Dockerイメージと実行情報 |
+| 公開Pages | Spaces Runner | リポジトリのブランチとファイル |
+| 自動メンテナンス | Maintenance Agent | IssueとPRの会話 |
 
-## Follow the boundary
+## 境界をたどる
 
-The gateway terminates TLS and routes requests. It does not own repository data or run arbitrary application builds. Those responsibilities stay separated so an operator can reason about risk and recovery.
+GatewayはTLS終端とリクエストの振り分けを担当します。リポジトリデータの所有や任意アプリのビルドは行いません。責務を分離することで、運用者がリスクと復旧方法を判断しやすくしています。
 EOF
-create_doc_fixture "platform-knowledge-atlas" "A connected Wiki map of OpenFace services, routes, and state" "wiki" "architecture" "routes" "${WORKDIR}/doc_platform_atlas.md"
+create_doc_fixture "platform-knowledge-atlas" "OpenFaceのサービス、ルート、状態をつなぐWikiマップ" "wiki" "architecture" "routes" "${WORKDIR}/doc_platform_atlas.md"
 
 cat > "${WORKDIR}/doc_docker_spaces.md" <<'EOF'
 ---
@@ -2210,23 +2210,23 @@ license: MIT
 tags: [spaces, docker, deployment]
 ---
 
-# Ship a Docker Space
+# Docker Spaceを公開する
 
-Use this guide when an application should run inside OpenFace as a CPU or normal Docker workload.
+CPUまたは通常のDockerワークロードとして、アプリをOpenFace内で動かすためのガイドです。
 
-## Contract
+## 実行ルール
 
-1. Place a `Dockerfile` at the repository root.
-2. Listen on port `7860` inside the container.
-3. Add the `space` topic to the public Forgejo repository.
-4. Keep secrets outside the repository.
-5. Verify both the embedded route and the direct runner health endpoint.
+1. リポジトリ直下に`Dockerfile`を置く
+2. コンテナ内のポート`7860`で待ち受ける
+3. 公開Forgejoリポジトリへ`space`トピックを追加する
+4. 秘密情報はリポジトリの外で管理する
+5. 埋め込み画面とRunnerのヘルスエンドポイントを確認する
 
-## Frameworks
+## 対応フレームワーク
 
-Gradio, Streamlit, FastAPI, Node.js, static HTML, React, Vue, and Next.js can all use the same contract. Framework-specific base-path support belongs in the application image, not in the catalog.
+Gradio、Streamlit、FastAPI、Node.js、静的HTML、React、Vue、Next.jsは同じルールで動かせます。フレームワーク固有のベースパス対応は、カタログではなくアプリのイメージ側で行います。
 EOF
-create_doc_fixture "docker-space-field-guide" "A practical path from Dockerfile to a running OpenFace Space" "guide" "spaces" "docker" "${WORKDIR}/doc_docker_spaces.md"
+create_doc_fixture "docker-space-field-guide" "DockerfileからOpenFace Spaceを起動するまでの実践手順" "guide" "spaces" "docker" "${WORKDIR}/doc_docker_spaces.md"
 
 cat > "${WORKDIR}/doc_agent_ops.md" <<'EOF'
 ---
@@ -2234,25 +2234,25 @@ license: MIT
 tags: [agents, review, automation]
 ---
 
-# Agent operations Wiki
+# エージェント運用Wiki
 
-Automated maintenance is a conversation between independent identities rather than one invisible background process.
+自動メンテナンスは、見えない単一プロセスではなく、独立したアカウント同士の会話として進みます。
 
-## Roles
+## 役割
 
-- **Maintainer** classifies work and delegates it.
-- **Designer, Coding, and Docs agents** implement within a focused boundary.
-- **Review agent** validates the exact proposed head SHA.
+- **メンテナー**が作業を分類し、専門エージェントへ委任する
+- **デザイン、コーディング、ドキュメントの各エージェント**が担当範囲を実装する
+- **レビューエージェント**が提案されたhead SHAを検証する
 
-## Merge invariant
+## マージ条件
 
-A pull request can auto-merge only after the required evidence exists, the reviewer is independent from the author, and approval still targets the current head SHA. Any new commit invalidates the earlier approval.
+必要な証跡が揃い、作成者とは別のレビュアーが現在のhead SHAを承認した場合だけ、自動マージできます。新しいコミットが追加された時点で、以前の承認は無効になります。
 
-## Evidence
+## 証跡
 
-UI work includes real mobile and desktop captures. Code work includes relevant tests and a readable completion note. The Issue remains the durable audit trail.
+UI作業では実際のモバイル・デスクトップ画面を撮影します。コード作業では関連テストと読みやすい完了報告を残します。Issueが監査履歴として残ります。
 EOF
-create_doc_fixture "agent-operations-wiki" "Roles, delegation, evidence, and guarded auto-merge" "wiki" "agents" "review" "${WORKDIR}/doc_agent_ops.md"
+create_doc_fixture "agent-operations-wiki" "役割分担、委任、証跡、安全な自動マージの設計" "wiki" "agents" "review" "${WORKDIR}/doc_agent_ops.md"
 
 cat > "${WORKDIR}/doc_catalog_reference.md" <<'EOF'
 ---
@@ -2260,11 +2260,11 @@ license: MIT
 tags: [catalog, topics, metadata]
 ---
 
-# Catalog topic reference
+# カタログトピック一覧
 
-OpenFace uses Forgejo topics as lightweight, composable metadata.
+OpenFaceではForgejoのトピックを、組み合わせ可能な軽量メタデータとして使います。
 
-| Type topic | Directory |
+| 種別トピック | 一覧ページ |
 |---|---|
 | `model` | `/models` |
 | `dataset` | `/datasets` |
@@ -2274,9 +2274,9 @@ OpenFace uses Forgejo topics as lightweight, composable metadata.
 | `prompt` | `/prompts` |
 | `doc` | `/docs` |
 
-Add descriptive topics after the type topic. A document can use `doc`, `wiki`, `architecture`, and `routes`; filters remain useful without inventing a rigid schema.
+種別トピックのあとに、内容を説明するトピックを追加します。たとえば文書には`doc`、`wiki`、`architecture`、`routes`を同時に設定でき、硬直したスキーマを作らず検索性を保てます。
 EOF
-create_doc_fixture "catalog-topic-reference" "The stable topic contract for every OpenFace directory" "reference" "catalog" "metadata" "${WORKDIR}/doc_catalog_reference.md"
+create_doc_fixture "catalog-topic-reference" "OpenFaceの各一覧で共通して使うトピック仕様" "reference" "catalog" "metadata" "${WORKDIR}/doc_catalog_reference.md"
 
 cat > "${WORKDIR}/doc_visual_qa.md" <<'EOF'
 ---
@@ -2284,23 +2284,23 @@ license: MIT
 tags: [visual-qa, themes, mobile]
 ---
 
-# Visual QA field notes
+# ビジュアルQA実践メモ
 
-Screenshots are evidence only when they exercise the real route, the relevant interaction, and the layouts users actually see.
+スクリーンショットは、実際のURL、必要な操作、利用者が見るレイアウトを再現して初めて証跡になります。
 
-## Review matrix
+## 確認マトリクス
 
-- standard, Solarpunk, and Cyberpunk themes;
-- desktop and narrow mobile viewports;
-- top, middle, and bottom scroll states;
-- menus, disclosures, filters, tabs, and navigation transitions;
-- horizontal overflow and browser-console checks.
+- Standard、Solarpunk、Cyberpunkの各テーマ
+- デスクトップと狭いモバイル画面
+- ページ上部・中部・下部のスクロール状態
+- メニュー、折りたたみ、フィルター、タブ、画面遷移
+- 横方向のはみ出しとブラウザーコンソール
 
-## A useful report
+## 役に立つレポート
 
-Record the route, viewport, theme, action taken, expected result, observed result, and screenshot path. A green test without the corresponding visual state is not sufficient for UI approval.
+URL、画面サイズ、テーマ、操作、期待結果、実際の結果、画像パスを記録します。対応する画面証跡がないテスト成功だけでは、UIを承認しません。
 EOF
-create_doc_fixture "visual-qa-field-notes" "How screenshot evidence becomes a repeatable interface review" "article" "visual-qa" "themes" "${WORKDIR}/doc_visual_qa.md"
+create_doc_fixture "visual-qa-field-notes" "スクリーンショットを再現可能なUIレビュー証跡にする方法" "article" "visual-qa" "themes" "${WORKDIR}/doc_visual_qa.md"
 
 cat > "${WORKDIR}/doc_cpu_first.md" <<'EOF'
 ---
@@ -2308,24 +2308,24 @@ license: MIT
 tags: [cpu, inference, operations]
 ---
 
-# CPU-first AI systems are a product choice
+# CPUファーストは製品設計の選択
 
-CPU-first does not mean treating performance as an afterthought. It means choosing workloads whose value survives without scarce accelerators: retrieval, document processing, structured extraction, small classifiers, and browser-side inference.
+CPUファーストは性能を軽視することではありません。検索、文書処理、構造化抽出、小型分類器、ブラウザー推論など、希少なアクセラレーターがなくても価値を出せる処理を選ぶ設計です。
 
-## Design for the ordinary machine
+## 普通のマシンを基準にする
 
-A useful CPU workload starts quickly, exposes honest health information, and degrades predictably under concurrency. Model size, image size, dependency count, and cold-start time all belong in the product budget.
+有用なCPU処理は素早く起動し、正確な稼働状態を示し、同時実行が増えたときも予測可能に劣化します。モデルサイズ、イメージサイズ、依存関係、コールドスタート時間も製品予算の一部です。
 
-## A practical review
+## 実践的な確認項目
 
-- measure cold and warm response times separately;
-- cap worker concurrency before memory pressure becomes failure;
-- cache deterministic artifacts outside the request path;
-- keep GPU-only features out of the default experience.
+- コールド時とウォーム時の応答時間を分けて計測する
+- メモリ不足になる前にワーカー同時実行数を制限する
+- 再現可能な成果物をリクエスト経路の外へキャッシュする
+- GPU専用機能を標準体験から外す
 
-The result is easier to reproduce on a laptop, a lab server, and a private network.
+これにより、ノートPC、研究室サーバー、プライベートネットワークのどこでも再現しやすくなります。
 EOF
-create_doc_fixture "cpu-first-ai-systems" "Designing useful local AI workloads for ordinary machines" "article" "cpu" "inference" "${WORKDIR}/doc_cpu_first.md"
+create_doc_fixture "cpu-first-ai-systems" "普通のマシンで役立つローカルAI処理を設計する" "article" "cpu" "inference" "${WORKDIR}/doc_cpu_first.md"
 
 cat > "${WORKDIR}/doc_forgejo_truth.md" <<'EOF'
 ---
@@ -2333,21 +2333,21 @@ license: MIT
 tags: [forgejo, git, architecture]
 ---
 
-# Forgejo as the source of truth
+# Forgejoを信頼できる情報源にする
 
-OpenFace reads identities, repositories, topics, files, Issues, and pull requests from Forgejo. The catalog is a projection of that durable state rather than a second database that operators must reconcile.
+OpenFaceはID、リポジトリ、トピック、ファイル、Issue、プルリクエストをForgejoから読み取ります。カタログはその永続データを投影するもので、運用者が同期し続ける第2のデータベースではありません。
 
-## Why the boundary matters
+## この境界が重要な理由
 
-Repository history explains who changed a model card, a Space, or a guide. Topics drive discovery. Pull requests preserve review evidence. Backups remain ordinary Forgejo backups.
+リポジトリ履歴を見れば、誰がモデルカード、Space、ガイドを変更したか分かります。トピックが検索を支え、プルリクエストがレビュー証跡を残します。バックアップも通常のForgejoバックアップのままです。
 
-## What OpenFace adds
+## OpenFaceが加えるもの
 
-OpenFace supplies task-specific discovery, rich artifact pages, embedded runtimes, Pages, and maintenance-agent workflows. It should never silently replace the repository history that proves those experiences.
+OpenFaceは用途別の検索、詳しい成果物ページ、埋め込み実行環境、Pages、メンテナンスエージェントのワークフローを提供します。ただし、それらの根拠となるリポジトリ履歴を暗黙に置き換えることはありません。
 
-> If a catalog claim cannot be traced to a repository, it is not durable product state.
+> カタログ上の説明をリポジトリまでたどれないなら、それは永続的な製品データではありません。
 EOF
-create_doc_fixture "forgejo-source-of-truth" "Why OpenFace projects Forgejo state instead of duplicating it" "article" "forgejo" "architecture" "${WORKDIR}/doc_forgejo_truth.md"
+create_doc_fixture "forgejo-source-of-truth" "OpenFaceがForgejoの状態を複製せず投影する理由" "article" "forgejo" "architecture" "${WORKDIR}/doc_forgejo_truth.md"
 
 cat > "${WORKDIR}/doc_community_design.md" <<'EOF'
 ---
@@ -2355,21 +2355,21 @@ license: MIT
 tags: [community, design, accessibility]
 ---
 
-# Designing a local AI community
+# ローカルAIコミュニティのデザイン
 
-A community catalog must help a newcomer answer three questions quickly: what exists, why it matters, and how to participate. Dense metadata is useful only after those questions are clear.
+コミュニティカタログは、初めて来た人が「何があるか」「なぜ重要か」「どう参加するか」をすぐ理解できる必要があります。細かなメタデータは、その3点が伝わったあとで初めて役立ちます。
 
-## Editorial hierarchy
+## 情報の優先順位
 
-Names and summaries lead. Topics provide orientation. Counts and timestamps provide confidence. Actions appear where the user has enough context to choose them.
+名前と概要を最初に見せ、トピックで方向を示し、件数と日時で信頼感を補います。操作ボタンは、利用者が判断できるだけの文脈が揃った場所に置きます。
 
-## Inclusive defaults
+## 誰でも使える標準状態
 
-Navigation remains usable with touch, keyboard, and narrow screens. Theme color never carries meaning alone. Empty states explain the next useful action instead of merely reporting absence.
+タッチ、キーボード、狭い画面でもナビゲーションを使えるようにします。テーマ色だけで意味を伝えません。空の状態では「何もない」だけでなく、次にできる操作を案内します。
 
-The visual language can be distinctive without turning routine repository work into a puzzle.
+日常的なリポジトリ作業を謎解きにせず、個性的な見た目を実現できます。
 EOF
-create_doc_fixture "community-design-principles" "Editorial and accessible design principles for a community catalog" "article" "community" "design" "${WORKDIR}/doc_community_design.md"
+create_doc_fixture "community-design-principles" "コミュニティカタログの情報設計とアクセシビリティ原則" "article" "community" "design" "${WORKDIR}/doc_community_design.md"
 
 cat > "${WORKDIR}/doc_identity_map.md" <<'EOF'
 ---
@@ -2377,23 +2377,23 @@ license: MIT
 tags: [identity, permissions, security]
 ---
 
-# Identity and permission map
+# IDと権限のマップ
 
-This Wiki node explains which identity performs each class of action.
+どのアカウントが、どの種類の操作を担当するかを整理したWikiです。
 
-| Identity | Typical capability | Guardrail |
+| ID | 主な権限 | ガードレール |
 |---|---|---|
-| Visitor | Read public catalogs and repositories | No mutation |
-| Member | Comment, react, and contribute | Repository permission |
-| Organization owner | Manage teams and organization profile | Forgejo ownership |
-| Maintenance agent | Open branches and pull requests | Scoped token |
-| Review agent | Approve verified heads | Independent identity |
+| 訪問者 | 公開カタログとリポジトリの閲覧 | 変更不可 |
+| メンバー | コメント、リアクション、貢献 | リポジトリ権限 |
+| 組織オーナー | チームと組織プロフィールの管理 | Forgejo所有権 |
+| メンテナンスエージェント | ブランチとPRの作成 | スコープ付きトークン |
+| レビューエージェント | 検証済みheadの承認 | 独立したID |
 
-## Rule of least authority
+## 最小権限の原則
 
-Runtime containers do not receive administrative Forgejo credentials. Agent tokens are scoped to the repositories and operations they need. Human ownership remains visible in the same audit trail as automated work.
+実行コンテナへForgejoの管理者認証情報を渡しません。エージェントトークンは必要なリポジトリと操作だけに絞ります。人間の所有権と自動作業を同じ監査履歴で確認できます。
 EOF
-create_doc_fixture "identity-permission-map" "A Wiki map of human, organization, and agent permissions" "wiki" "identity" "security" "${WORKDIR}/doc_identity_map.md"
+create_doc_fixture "identity-permission-map" "人、組織、エージェントの権限を整理したWikiマップ" "wiki" "identity" "security" "${WORKDIR}/doc_identity_map.md"
 
 cat > "${WORKDIR}/doc_service_boundaries.md" <<'EOF'
 ---
@@ -2401,23 +2401,23 @@ license: MIT
 tags: [services, docker, architecture]
 ---
 
-# Service boundary Wiki
+# サービス境界Wiki
 
-OpenFace uses small services with explicit responsibilities.
+OpenFaceは責務を明確にした小さなサービスで構成されています。
 
-| Service | Owns | Does not own |
+| サービス | 担当するもの | 担当しないもの |
 |---|---|---|
-| Gateway | TLS and request routing | Repository data |
-| Frontend | Catalog and artifact experience | Container builds |
-| Forgejo | Git, identity, Issues, pull requests | Space execution |
-| Spaces Runner | Docker builds and app lifecycle | User accounts |
-| Maintenance Agent | Delegation and review workflow | Merge authority without evidence |
+| Gateway | TLSとリクエスト振り分け | リポジトリデータ |
+| Frontend | カタログと成果物画面 | コンテナビルド |
+| Forgejo | Git、ID、Issue、PR | Space実行 |
+| Spaces Runner | Dockerビルドとアプリのライフサイクル | ユーザーアカウント |
+| Maintenance Agent | 委任とレビューの流れ | 証跡なしのマージ権限 |
 
-## Debug from the boundary
+## 境界からデバッグする
 
-Start with the public route, identify its owning service, then follow the service health and logs. This prevents a visual symptom from becoming an unfocused search across every container.
+まず公開URLを確認し、担当サービスを特定してから、そのヘルス状態とログを追います。画面上の症状だけを手掛かりに全コンテナを無差別に調べることを防げます。
 EOF
-create_doc_fixture "service-boundary-wiki" "A connected map of OpenFace services and ownership boundaries" "wiki" "services" "architecture" "${WORKDIR}/doc_service_boundaries.md"
+create_doc_fixture "service-boundary-wiki" "OpenFaceのサービスと責務境界をつなぐマップ" "wiki" "services" "architecture" "${WORKDIR}/doc_service_boundaries.md"
 
 cat > "${WORKDIR}/doc_metrics_agents.md" <<'EOF'
 ---
@@ -2425,22 +2425,22 @@ license: MIT
 tags: [metrics, agents, api]
 ---
 
-# Metrics and agent API Wiki
+# メトリクスとエージェントAPI Wiki
 
-Views, likes, reactions, and comments are user actions first. Agent APIs expose the same domain operations so automation does not require browser scraping or privileged database writes.
+閲覧、いいね、リアクション、コメントは、まず利用者の操作です。エージェントAPIも同じドメイン操作を公開し、自動化のためにブラウザースクレイピングや特権DB書き込みを必要としない設計にします。
 
-## Event flow
+## イベントの流れ
 
-1. A browser or agent sends an authenticated action.
-2. OpenFace validates identity and repository visibility.
-3. The action is recorded against the durable artifact.
-4. Listing and detail views read the updated aggregate.
+1. ブラウザーまたはエージェントが認証済み操作を送る
+2. OpenFaceがIDとリポジトリの公開範囲を確認する
+3. 操作を永続的な成果物へ関連付けて記録する
+4. 一覧と詳細画面が更新後の集計値を読む
 
-## Operational rule
+## 運用ルール
 
-Retries must be idempotent. A network retry must not turn one view or one reaction into several. Agent activity remains attributable to its own account and avatar.
+再試行は冪等でなければなりません。ネットワーク再試行によって1回の閲覧やリアクションが複数回に増えてはいけません。エージェントの活動は、それぞれのアカウントとアバターへ紐づけます。
 EOF
-create_doc_fixture "metrics-and-agent-api-wiki" "How human and agent interactions share auditable domain operations" "wiki" "metrics" "api" "${WORKDIR}/doc_metrics_agents.md"
+create_doc_fixture "metrics-and-agent-api-wiki" "人とエージェントが監査可能な操作を共有する仕組み" "wiki" "metrics" "api" "${WORKDIR}/doc_metrics_agents.md"
 
 cat > "${WORKDIR}/doc_publishing_quickstart.md" <<'EOF'
 ---
@@ -2448,38 +2448,38 @@ license: MIT
 tags: [docs, publishing, forgejo]
 ---
 
-# Publish your first OpenFace knowledge entry
+# 最初のOpenFaceナレッジを公開する
 
-An OpenFace publication is an ordinary public Forgejo repository containing many Markdown entries. Create it once, then keep adding knowledge over time.
+OpenFaceの公開ナレッジは、複数のMarkdown記事を持つ通常の公開Forgejoリポジトリです。一度作成すれば、同じ場所へ知識を追加し続けられます。
 
-## 1. Create your publication
+## 1. 公開リポジトリを作る
 
-Open **New → Doc**, choose your user or team as the owner, and create a repository such as `my-knowledge`. Keep it public if its entries should appear in the shared library.
+**新規作成 → ドキュメント**を開き、個人またはチームを所有者に選び、`my-knowledge`のようなリポジトリを作ります。共有ライブラリへ掲載する場合は公開にします。
 
-Add the repository topics `doc`, `knowledge`, and `markdown` in Forgejo.
+Forgejoで`doc`、`knowledge`、`markdown`トピックを追加します。
 
-## 2. Add an article
+## 2. 記事を追加する
 
-Create `articles/my-first-note.md`. Put article metadata in front matter:
+`articles/my-first-note.md`を作り、フロントマターへ記事情報を書きます。
 
 ```yaml
 ---
-title: My first research note
+title: 最初の調査メモ
 format: article
 topics: [local-ai, research]
 published: true
 ---
 ```
 
-## 3. Write the knowledge
+## 3. ナレッジを書く
 
-Write below the front matter with ordinary Markdown. Use headings, lists, tables, code blocks, images, and links where they make the material easier to apply. Commit the file normally.
+フロントマターの下へ通常のMarkdownで本文を書きます。見出し、箇条書き、表、コード、画像、リンクを使い、実践しやすい内容にします。完成したら通常どおりコミットします。
 
-## 4. Verify discovery
+## 4. 掲載を確認する
 
-Return to `/docs`, select the matching format, and open the entry. If it is missing, confirm the repository is public, the `doc` topic is present, the file is under `articles/`, and `published` is not `false`.
+`/docs`へ戻り、形式を選んで記事を開きます。表示されない場合は、リポジトリが公開されていること、`doc`トピックがあること、ファイルが`articles/`配下にあること、`published`が`false`でないことを確認します。
 EOF
-create_doc_fixture "docs-publishing-quickstart" "Create a personal publication and add searchable Markdown knowledge" "guide" "docs" "publishing" "${WORKDIR}/doc_publishing_quickstart.md"
+create_doc_fixture "docs-publishing-quickstart" "個人の公開リポジトリを作り、検索できるMarkdown記事を追加する" "guide" "docs" "publishing" "${WORKDIR}/doc_publishing_quickstart.md"
 
 cat > "${WORKDIR}/doc_tailscale_guide.md" <<'EOF'
 ---
@@ -2487,23 +2487,23 @@ license: MIT
 tags: [tailscale, deployment, tls]
 ---
 
-# Publish OpenFace through Tailscale
+# TailscaleでOpenFaceを公開する
 
-Use a tailnet when OpenFace should be reachable from trusted phones and computers without exposing the service to the public internet.
+OpenFaceを公開インターネットへ露出せず、信頼できるスマートフォンやPCから利用する場合はtailnetを使います。
 
-## Checklist
+## チェックリスト
 
-1. Start the Docker Compose stack and verify `https://localhost:8443`.
-2. Authenticate Tailscale on the host.
-3. Serve the local HTTPS endpoint through Tailscale Serve.
-4. Open the generated `*.ts.net` URL from a second tailnet device.
-5. Test navigation, embedded Spaces, and long mobile pages.
+1. Docker Composeを起動し、`https://localhost:8443`を確認する
+2. ホストでTailscaleへログインする
+3. Tailscale ServeでローカルHTTPSを配信する
+4. 別のtailnet端末から生成された`*.ts.net` URLを開く
+5. ナビゲーション、埋め込みSpace、長いモバイルページを確認する
 
-## TLS note
+## TLSについて
 
-The browser connects to the Tailscale certificate while the local gateway retains the same routes. Do not publish Forgejo or runner ports separately unless the network design explicitly requires it.
+ブラウザーはTailscale証明書へ接続し、ローカルGatewayは同じルートを維持します。ネットワーク設計上の明確な理由がない限り、ForgejoやRunnerのポートを個別公開しません。
 EOF
-create_doc_fixture "tailscale-private-deployment" "Expose OpenFace safely to trusted devices on a tailnet" "guide" "tailscale" "deployment" "${WORKDIR}/doc_tailscale_guide.md"
+create_doc_fixture "tailscale-private-deployment" "信頼できるtailnet端末へOpenFaceを安全に公開する" "guide" "tailscale" "deployment" "${WORKDIR}/doc_tailscale_guide.md"
 
 cat > "${WORKDIR}/doc_recovery_playbook.md" <<'EOF'
 ---
@@ -2511,25 +2511,25 @@ license: MIT
 tags: [recovery, operations, docker]
 ---
 
-# Incident recovery playbook
+# 障害復旧プレイブック
 
-Use this guide when a catalog route, repository page, or Space stops responding.
+カタログ、リポジトリ画面、Spaceが応答しなくなったときに使うガイドです。
 
-## Triage
+## 切り分け
 
-1. Capture the failing URL and visible error.
-2. Check Compose service health before restarting anything.
-3. Inspect logs for the owning service and the gateway.
-4. Verify Forgejo API reachability for catalog failures.
-5. Verify runner container state for Space failures.
+1. 失敗したURLと表示エラーを記録する
+2. 再起動する前にComposeサービスの状態を確認する
+3. 担当サービスとGatewayのログを確認する
+4. カタログ障害ではForgejo APIへの到達性を確認する
+5. Space障害ではRunnerコンテナの状態を確認する
 
-## Recover carefully
+## 安全に復旧する
 
-Recreate only the affected stateless service first. Preserve Forgejo volumes and repository data. After recovery, repeat the exact browser action and record a screenshot plus the relevant log excerpt.
+まず影響を受けたステートレスサービスだけを再作成します。Forgejoのボリュームとリポジトリデータは保持します。復旧後は同じブラウザー操作を繰り返し、スクリーンショットと関連ログを残します。
 
-Escalate persistent data or permission faults instead of masking them with repeated full-stack restarts.
+データや権限の問題が続く場合は、全体再起動を繰り返して隠さず、原因調査へ切り替えます。
 EOF
-create_doc_fixture "incident-recovery-playbook" "A bounded diagnosis and recovery path for common OpenFace failures" "guide" "recovery" "operations" "${WORKDIR}/doc_recovery_playbook.md"
+create_doc_fixture "incident-recovery-playbook" "OpenFaceの一般的な障害を安全に診断・復旧する手順" "guide" "recovery" "operations" "${WORKDIR}/doc_recovery_playbook.md"
 
 cat > "${WORKDIR}/doc_env_reference.md" <<'EOF'
 ---
@@ -2537,23 +2537,23 @@ license: MIT
 tags: [configuration, docker, environment]
 ---
 
-# Environment variable reference
+# 環境変数リファレンス
 
-Environment values belong in Compose configuration or a local `.env`, never in committed example repositories.
+環境値はCompose設定またはローカルの`.env`へ置き、サンプルリポジトリにはコミットしません。
 
-| Concern | Example value | Purpose |
+| 項目 | 値の例 | 用途 |
 |---|---|---|
-| Public origin | `https://localhost:8443` | Absolute links and callbacks |
-| Forgejo base URL | Internal service URL | Repository API access |
-| Runner port | `7860` | Embedded Space contract |
-| Agent concurrency | Small positive integer | Parallel maintenance limit |
-| Theme default | `system` | Initial browser preference |
+| 公開オリジン | `https://localhost:8443` | 絶対リンクとコールバック |
+| ForgejoベースURL | 内部サービスURL | リポジトリAPIアクセス |
+| Runnerポート | `7860` | 埋め込みSpaceの契約 |
+| エージェント同時実行数 | 小さな正整数 | 並列メンテナンス上限 |
+| 標準テーマ | `system` | ブラウザーの初期設定 |
 
-## Validation
+## 検証
 
-After changing configuration, render the effective Compose config, recreate only affected services, and verify health endpoints before testing the browser surface.
+設定変更後は有効なCompose設定を出力し、影響するサービスだけを再作成します。画面を試す前にヘルスエンドポイントを確認します。
 EOF
-create_doc_fixture "environment-variable-reference" "A concise reference for deployment and runtime configuration" "reference" "configuration" "environment" "${WORKDIR}/doc_env_reference.md"
+create_doc_fixture "environment-variable-reference" "デプロイと実行時設定の簡潔なリファレンス" "reference" "configuration" "environment" "${WORKDIR}/doc_env_reference.md"
 
 cat > "${WORKDIR}/doc_route_reference.md" <<'EOF'
 ---
@@ -2561,21 +2561,21 @@ license: MIT
 tags: [routes, api, gateway]
 ---
 
-# Route and endpoint reference
+# URLとエンドポイント一覧
 
-| Route family | Purpose |
+| URL | 用途 |
 |---|---|
-| `/models`, `/datasets`, `/spaces` | Artifact discovery |
-| `/skills`, `/mcps`, `/prompts`, `/docs` | Reusable knowledge discovery |
-| `/{owner}/{repo}` | Repository-backed detail page |
-| `/pages/{owner}/{repo}/` | Published static site |
-| `/git/` | Forgejo user interface through the gateway |
+| `/models`, `/datasets`, `/spaces` | 成果物を探す |
+| `/skills`, `/mcps`, `/prompts`, `/docs` | 再利用可能な知識を探す |
+| `/{owner}/{repo}` | リポジトリに紐づく詳細画面 |
+| `/pages/{owner}/{repo}/` | 公開静的サイト |
+| `/git/` | Gateway経由のForgejo画面 |
 
-## Ownership
+## 担当サービス
 
-Public application routes resolve through the frontend or runner. Forgejo routes remain under `/git/`. The gateway keeps these namespaces stable so internal service addresses do not leak into user-facing links.
+公開アプリのURLはFrontendまたはRunnerが処理します。ForgejoのURLは`/git/`配下に保ちます。Gatewayが名前空間を安定させ、内部サービスのアドレスを利用者向けリンクへ露出させません。
 EOF
-create_doc_fixture "route-and-endpoint-reference" "Public route families, purposes, and service ownership" "reference" "routes" "gateway" "${WORKDIR}/doc_route_reference.md"
+create_doc_fixture "route-and-endpoint-reference" "公開URLの用途と担当サービス一覧" "reference" "routes" "gateway" "${WORKDIR}/doc_route_reference.md"
 
 cat > "${WORKDIR}/doc_format_reference.md" <<'EOF'
 ---
@@ -2583,20 +2583,20 @@ license: MIT
 tags: [docs, taxonomy, topics]
 ---
 
-# Document format reference
+# ドキュメント形式一覧
 
-Every OpenFace Doc uses `doc` plus one format topic.
+OpenFaceの各文書には`doc`と、1つの形式トピックを設定します。
 
-| Format | Use it for | Avoid |
+| 形式 | 向いている内容 | 避ける内容 |
 |---|---|---|
-| `article` | Context, analysis, and decisions | Step-by-step procedures |
-| `wiki` | Connected concepts and system maps | Chronological field notes |
-| `guide` | A task completed from start to finish | Unstable fact lists |
-| `reference` | Contracts, options, routes, and glossaries | Narrative persuasion |
+| `article` | 背景、分析、意思決定 | 手順だけの説明 |
+| `wiki` | 関連する概念とシステムマップ | 時系列の作業記録 |
+| `guide` | 最初から最後まで行う作業 | 変化しやすい事実の一覧 |
+| `reference` | 仕様、選択肢、URL、用語集 | 読み物としての主張 |
 
-Add two or three subject topics after the format. Topics should describe what readers will search for, not duplicate every word in the title.
+形式のあとに内容を表すトピックを2〜3個追加します。トピックはタイトルの単語を繰り返すのではなく、読者が検索する言葉を選びます。
 EOF
-create_doc_fixture "document-format-reference" "Choose the right Docs format and descriptive topics" "reference" "docs" "taxonomy" "${WORKDIR}/doc_format_reference.md"
+create_doc_fixture "document-format-reference" "文書に合う形式と検索しやすいトピックの選び方" "reference" "docs" "taxonomy" "${WORKDIR}/doc_format_reference.md"
 
 # ------------------------------------------------------------------------
 # OpenFace Pages fixture.  This demonstrates the same convention as GitHub
