@@ -16,4 +16,3 @@ Coverage: **24 full-page screenshots** grouped into **12 review sheets**.
 | cyberpunk | light | mobile | 1 | doc-detail, docs | [open](contact-sheets/cyberpunk--light--mobile--1.png) |
 | cyberpunk | dark | desktop | 1 | doc-detail, docs | [open](contact-sheets/cyberpunk--dark--desktop--1.png) |
 | cyberpunk | dark | mobile | 1 | doc-detail, docs | [open](contact-sheets/cyberpunk--dark--mobile--1.png) |
-
