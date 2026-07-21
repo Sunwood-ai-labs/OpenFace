@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import HfIcon from '@/components/HfIcon';
+import { useLocale } from './LocaleProvider';
+import { ui } from '@/lib/i18n';
 
 type ViewResponse = {
   metrics?: { views?: number };
@@ -17,6 +19,7 @@ export default function RepoViewCount({
   initialViews: number;
 }) {
   const [views, setViews] = useState(initialViews);
+  const { locale } = useLocale();
 
   useEffect(() => {
     // performance.timeOrigin is stable for this document (including React
@@ -47,7 +50,8 @@ export default function RepoViewCount({
   return (
     <span
       className="inline-flex h-8 items-center rounded-lg border border-zinc-100 px-2.5 text-xs text-zinc-500"
-      title={`${views} views`}
+      title={ui(locale, `閲覧 ${views}回`, `${views} views`)}
+      aria-label={ui(locale, `閲覧 ${views}回`, `${views} views`)}
     >
       <HfIcon name="eye" className="mr-1 h-3 w-3" />
       {views}

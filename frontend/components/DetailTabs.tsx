@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import HfIcon from './HfIcon';
 import type { RepoKind } from '@/lib/forgejo';
+import { Locale, ui } from '@/lib/i18n';
 
 export default function DetailTabs({
   owner,
@@ -10,6 +11,7 @@ export default function DetailTabs({
   kind,
   communityCount,
   revision,
+  locale,
 }: {
   owner: string;
   repo: string;
@@ -18,6 +20,7 @@ export default function DetailTabs({
   kind?: RepoKind | null;
   communityCount?: number;
   revision?: string | null;
+  locale: Locale;
 }) {
   const filesHref = revision
     ? `/git/${owner}/${repo}/src/tag/${encodeURIComponent(revision)}`
@@ -28,16 +31,16 @@ export default function DetailTabs({
   const cardLabel = isSpace
     ? 'App'
     : kind === 'dataset'
-      ? 'Dataset card'
+      ? ui(locale, 'データセットカード', 'Dataset card')
       : kind === 'skill'
-        ? 'Skill card'
+        ? ui(locale, 'スキルカード', 'Skill card')
         : kind === 'mcp'
           ? 'MCP card'
           : kind === 'prompt'
-            ? 'Prompt card'
+            ? ui(locale, 'プロンプトカード', 'Prompt card')
           : kind === 'doc'
-            ? 'Document'
-          : 'Model card';
+            ? ui(locale, 'ナレッジ', 'Knowledge')
+          : ui(locale, 'モデルカード', 'Model card');
   const tabClass = (tab: string) =>
     `inline-flex min-h-12 items-center gap-2 border-b-2 px-4 py-2 text-sm font-semibold ${
       active === tab
@@ -53,11 +56,11 @@ export default function DetailTabs({
       </Link>
       <a href={filesHref} className={tabClass('files')}>
         <HfIcon name="folder" className="h-3.5 w-3.5" />
-        Files
+        {ui(locale, 'ファイル', 'Files')}
       </a>
       <a href={`/git/${owner}/${repo}/issues`} className={tabClass('community')}>
         <HfIcon name="link" className="h-3.5 w-3.5" />
-        Community
+        {ui(locale, 'コミュニティ', 'Community')}
         {typeof communityCount === 'number' && communityCount > 0 ? (
           <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-zinc-100 px-1.5 text-xs font-semibold text-zinc-500">
             {communityCount}

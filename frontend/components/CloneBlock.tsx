@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useLocale } from './LocaleProvider';
+import { ui } from '@/lib/i18n';
 
 export default function CloneBlock({ cloneUrl }: { cloneUrl: string }) {
+  const { locale } = useLocale();
   const [copied, setCopied] = useState(false);
   const command = `git clone ${cloneUrl}`;
 
@@ -19,7 +22,7 @@ export default function CloneBlock({ cloneUrl }: { cloneUrl: string }) {
   return (
     <div>
       <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-        Clone
+        {ui(locale, 'クローン', 'Clone')}
       </p>
       <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-2.5 shadow-sm">
         <code className="block break-all text-[10px] leading-4 text-zinc-100">
@@ -32,7 +35,7 @@ export default function CloneBlock({ cloneUrl }: { cloneUrl: string }) {
           onClick={copy}
           className="mt-2 inline-flex min-h-8 w-full items-center justify-center rounded-md bg-zinc-700 px-2 py-1.5 text-xs font-medium text-zinc-100 transition-colors hover:bg-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
         >
-          {copied ? 'Copied' : 'Copy command'}
+          {copied ? ui(locale, 'コピーしました', 'Copied') : ui(locale, 'コマンドをコピー', 'Copy command')}
         </button>
       </div>
     </div>

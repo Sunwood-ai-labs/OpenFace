@@ -19,7 +19,9 @@ import {
   RepoKind,
 } from '@/lib/forgejo';
 import { parseReadme } from '@/lib/markdown';
-import { timeAgoEn } from '@/lib/format';
+import { timeAgoEn, timeAgoJa } from '@/lib/format';
+import { getLocale } from '@/lib/i18n-server';
+import { Locale, ui } from '@/lib/i18n';
 import DetailTabs from '@/components/DetailTabs';
 import CardBadges from '@/components/CardBadges';
 import CloneBlock from '@/components/CloneBlock';
@@ -40,9 +42,10 @@ export async function generateMetadata({
   params: Promise<{ owner: string; repo: string }>;
 }) {
   const { owner, repo } = await params;
+  const locale = await getLocale();
   const repoInfo = await getRepo(owner, repo);
   const kind = repoInfo ? repoKind(repoInfo.topics) : null;
-  const label = kind === 'space' ? 'Space' : kind === 'dataset' ? 'Dataset' : kind === 'skill' ? 'Skill' : kind === 'mcp' ? 'MCP server' : kind === 'prompt' ? 'Prompt' : kind === 'doc' ? 'Doc' : 'Model';
+  const label = kind === 'space' ? 'Space' : kind === 'dataset' ? ui(locale, 'データセット', 'Dataset') : kind === 'skill' ? ui(locale, 'スキル', 'Skill') : kind === 'mcp' ? 'MCP server' : kind === 'prompt' ? ui(locale, 'プロンプト', 'Prompt') : kind === 'doc' ? ui(locale, 'ナレッジ', 'Knowledge') : ui(locale, 'モデル', 'Model');
   const repoName = repoInfo?.full_name || `${owner}/${repo}`;
   return {
     title: `${repoName} - ${label} - OpenFace`,
@@ -68,6 +71,7 @@ export default async function RepoDetailPage({
   searchParams: Promise<{ tab?: string; path?: string; revision?: string }>;
 }) {
   const [{ owner, repo }, resolvedSearchParams] = await Promise.all([params, searchParams]);
+  const locale = await getLocale();
   const tab = resolvedSearchParams.tab === 'files' ? 'files' : 'card';
   const path = resolvedSearchParams.path || '';
 
@@ -78,9 +82,9 @@ export default async function RepoDetailPage({
     // Render a graceful empty-state rather than throwing during SSR.
     return (
       <div className="mx-auto max-w-2xl rounded-lg border border-dashed border-zinc-300 p-10 text-center text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-        <p className="mb-2 text-lg font-semibold">Repository not found</p>
+        <p className="mb-2 text-lg font-semibold">{ui(locale, 'リポジトリが見つかりません', 'Repository not found')}</p>
         <p className="text-sm">
-          {owner}/{repo} does not exist or Forgejo is not reachable.
+          {ui(locale, `${owner}/${repo} は存在しないか、Forgejoに接続できません。`, `${owner}/${repo} does not exist or Forgejo is not reachable.`)}
         </p>
       </div>
     );
@@ -100,7 +104,7 @@ export default async function RepoDetailPage({
   const selectedRevision = requestedRevision && promptTags.some((tag) => tag.name === requestedRevision)
     ? requestedRevision
     : null;
-  const kindLabel = isSpace ? 'Spaces' : kind === 'dataset' ? 'Datasets' : kind === 'skill' ? 'Skills' : kind === 'mcp' ? 'MCPs' : kind === 'prompt' ? 'Prompts' : kind === 'doc' ? 'Docs' : 'Models';
+  const kindLabel = isSpace ? 'Spaces' : kind === 'dataset' ? ui(locale, 'データセット', 'Datasets') : kind === 'skill' ? ui(locale, 'スキル', 'Skills') : kind === 'mcp' ? 'MCPs' : kind === 'prompt' ? ui(locale, 'プロンプト', 'Prompts') : kind === 'doc' ? ui(locale, 'ナレッジ', 'Knowledge') : ui(locale, 'モデル', 'Models');
   const kindHref = isSpace ? '/spaces' : kind === 'dataset' ? '/datasets' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : kind === 'doc' ? '/docs' : '/models';
   const kindIcon = kind ? KIND_ICON[kind] : 'box';
   const isSpaceApp = isSpace && tab === 'card';
@@ -111,8 +115,8 @@ export default async function RepoDetailPage({
         <div className="flex min-w-0 flex-1 items-center gap-2 py-3 max-sm:flex-wrap">
           <a
             href={kindHref}
-            aria-label={`Back to ${kindLabel}`}
-            title={`Back to ${kindLabel}`}
+            aria-label={ui(locale, `${kindLabel}へ戻る`, `Back to ${kindLabel}`)}
+            title={ui(locale, `${kindLabel}へ戻る`, `Back to ${kindLabel}`)}
             className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
           >
             <HfIcon name={kindIcon} className="h-4 w-4" />
@@ -130,11 +134,11 @@ export default async function RepoDetailPage({
           </h1>
           <a
             href={forgejoRepoUrl(owner, repo)}
-            title={isSpace ? `${agentMetrics?.likes ?? 0} agent likes` : 'Open the Forgejo repository to like this project'}
+            title={isSpace ? ui(locale, `エージェントから${agentMetrics?.likes ?? 0}件のいいね`, `${agentMetrics?.likes ?? 0} agent likes`) : ui(locale, 'Forgejoでこのプロジェクトにいいねする', 'Open the Forgejo repository to like this project')}
             className="ml-2 inline-flex h-8 items-center gap-1 rounded-lg border border-zinc-200 px-2.5 text-xs text-zinc-500 hover:bg-zinc-50"
           >
             <HfIcon name="heart" className="h-3 w-3" />
-            {isSpace ? `${agentMetrics?.likes ?? 0} likes` : 'like'}
+            {isSpace ? ui(locale, `${agentMetrics?.likes ?? 0} いいね`, `${agentMetrics?.likes ?? 0} likes`) : ui(locale, 'いいね', 'like')}
           </a>
           {isSpace ? (
             <RepoViewCount owner={owner} repo={repo} initialViews={agentMetrics?.views ?? 0} />
@@ -148,7 +152,7 @@ export default async function RepoDetailPage({
           ) : null}
         </div>
         <div className={isSpaceApp ? 'max-sm:hidden' : ''}>
-          <DetailTabs owner={owner} repo={repo} active={tab} isSpace={isSpace} kind={kind} communityCount={repoInfo.open_issues_count} revision={selectedRevision} />
+          <DetailTabs owner={owner} repo={repo} active={tab} isSpace={isSpace} kind={kind} communityCount={repoInfo.open_issues_count} revision={selectedRevision} locale={locale} />
         </div>
       </div>
 
@@ -159,11 +163,11 @@ export default async function RepoDetailPage({
           )}
           {promptVersion ? (
             <a href={`${kindHref}?q=${encodeURIComponent(`version-${promptVersion}`)}`} className="mt-3 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 font-mono text-xs font-bold text-orange-800 hover:bg-orange-100">
-              <HfIcon name="prompt" className="h-3 w-3" /> Current release {promptVersion}
+              <HfIcon name="prompt" className="h-3 w-3" /> {ui(locale, '現在のリリース', 'Current release')} {promptVersion}
             </a>
           ) : null}
           {kind === 'prompt' && promptTags.length > 0 ? (
-            <PromptRevisionSwitcher owner={owner} repo={repo} tags={promptTags} selectedRevision={selectedRevision} />
+            <PromptRevisionSwitcher owner={owner} repo={repo} tags={promptTags} selectedRevision={selectedRevision} locale={locale} />
           ) : null}
           {topicBadges.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5">
@@ -198,6 +202,7 @@ export default async function RepoDetailPage({
               revision={selectedRevision}
               skillRepo={kind === 'skill' ? repoInfo : null}
               skillCatalog={skillCatalog?.data || []}
+              locale={locale}
             />
           ) : (
             <FilesTabContent
@@ -206,6 +211,7 @@ export default async function RepoDetailPage({
               path={path}
               defaultBranch={repoInfo.default_branch || 'main'}
               updatedAt={repoInfo.updated_at}
+              locale={locale}
             />
           )}
         </div>
@@ -213,89 +219,89 @@ export default async function RepoDetailPage({
         {tab === 'card' && <aside className="flex flex-col gap-4">
           {kind === 'skill' ? (
             <div className="hidden lg:block">
-              <SkillRelationshipMap repo={repoInfo} catalog={skillCatalog?.data || []} placement="sidebar" />
+              <SkillRelationshipMap repo={repoInfo} catalog={skillCatalog?.data || []} placement="sidebar" locale={locale} />
             </div>
           ) : null}
           <div className="rounded-lg border border-zinc-200 bg-white p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              {isSpace ? 'Space actions' : kind === 'dataset' ? 'Dataset actions' : kind === 'skill' ? 'Skill actions' : kind === 'mcp' ? 'MCP actions' : kind === 'prompt' ? 'Prompt actions' : kind === 'doc' ? 'Document actions' : 'Model actions'}
+              {isSpace ? ui(locale, 'Spaceの操作', 'Space actions') : kind === 'dataset' ? ui(locale, 'データセットの操作', 'Dataset actions') : kind === 'skill' ? ui(locale, 'スキルの操作', 'Skill actions') : kind === 'mcp' ? ui(locale, 'MCPの操作', 'MCP actions') : kind === 'prompt' ? ui(locale, 'プロンプトの操作', 'Prompt actions') : kind === 'doc' ? ui(locale, 'ナレッジの操作', 'Knowledge actions') : ui(locale, 'モデルの操作', 'Model actions')}
             </p>
             <div className="grid gap-2">
               {isSpace ? (
                 <>
                   <a href={`/${owner}/${repo}`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-zinc-950 px-3 text-sm font-semibold text-white hover:bg-zinc-800">
                     <HfIcon name="play" className="h-3.5 w-3.5" />
-                    Open app
+                    {ui(locale, 'アプリを開く', 'Open app')}
                   </a>
                   <a href={`/new?type=space&template=${encodeURIComponent(`${owner}/${repo}`)}`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
                     <HfIcon name="fork" className="h-3.5 w-3.5" />
-                    Duplicate Space
+                    {ui(locale, 'Spaceを複製', 'Duplicate Space')}
                   </a>
                 </>
               ) : kind === 'dataset' ? (
                 <>
                   <a href={`/${owner}/${repo}?tab=files`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-zinc-950 px-3 text-sm font-semibold text-white hover:bg-zinc-800">
                     <HfIcon name="table" className="h-3.5 w-3.5" />
-                    Preview dataset
+                    {ui(locale, 'データセットをプレビュー', 'Preview dataset')}
                   </a>
                   <a href={forgejoRepoUrl(owner, repo)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
                     <HfIcon name="download" className="h-3.5 w-3.5" />
-                    Use this dataset
+                    {ui(locale, 'このデータセットを使う', 'Use this dataset')}
                   </a>
                 </>
               ) : kind === 'skill' ? (
                 <>
                   <a href={`/${owner}/${repo}?tab=files`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-violet-700 px-3 text-sm font-semibold text-white hover:bg-violet-800">
                     <HfIcon name="skill" className="h-3.5 w-3.5" />
-                    Inspect SKILL.md
+                    {ui(locale, 'SKILL.mdを確認', 'Inspect SKILL.md')}
                   </a>
                   <a href={forgejoRepoUrl(owner, repo)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
                     <HfIcon name="download" className="h-3.5 w-3.5" />
-                    Install this skill
+                    {ui(locale, 'このスキルを導入', 'Install this skill')}
                   </a>
                 </>
               ) : kind === 'mcp' ? (
                 <>
                   <a href={`/${owner}/${repo}?tab=files`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-cyan-700 px-3 text-sm font-semibold text-white hover:bg-cyan-800">
                     <HfIcon name="mcp" className="h-3.5 w-3.5" />
-                    Inspect server
+                    {ui(locale, 'サーバーを確認', 'Inspect server')}
                   </a>
                   <a href={forgejoRepoUrl(owner, repo)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
                     <HfIcon name="code" className="h-3.5 w-3.5" />
-                    Configure MCP
+                    {ui(locale, 'MCPを設定', 'Configure MCP')}
                   </a>
                 </>
               ) : kind === 'prompt' ? (
                 <>
                   <a href={selectedRevision ? forgejoTreeUrl(owner, repo, '', selectedRevision, 'tag') : `/${owner}/${repo}?tab=files`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-orange-700 px-3 text-sm font-semibold text-white hover:bg-orange-800">
                     <HfIcon name="prompt" className="h-3.5 w-3.5" />
-                    Inspect prompt source
+                    {ui(locale, 'プロンプト原文を確認', 'Inspect prompt source')}
                   </a>
                   <a href={forgejoRepoUrl(owner, repo)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
                     <HfIcon name="fork" className="h-3.5 w-3.5" />
-                    Fork this prompt
+                    {ui(locale, 'このプロンプトをフォーク', 'Fork this prompt')}
                   </a>
                 </>
               ) : kind === 'doc' ? (
                 <>
                   <a href={`/${owner}/${repo}?tab=files`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-teal-800 px-3 text-sm font-semibold text-white hover:bg-teal-900">
                     <HfIcon name="doc" className="h-3.5 w-3.5" />
-                    Browse source
+                    {ui(locale, 'ソースを見る', 'Browse source')}
                   </a>
                   <a href={forgejoRepoUrl(owner, repo)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
                     <HfIcon name="filePen" className="h-3.5 w-3.5" />
-                    Edit this doc
+                    {ui(locale, 'このナレッジを編集', 'Edit this knowledge')}
                   </a>
                 </>
               ) : (
                 <>
                   <a href={forgejoRepoUrl(owner, repo)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-zinc-950 px-3 text-sm font-semibold text-white hover:bg-zinc-800">
                     <HfIcon name="play" className="h-3.5 w-3.5" />
-                    Use this model
+                    {ui(locale, 'このモデルを使う', 'Use this model')}
                   </a>
                   <a href={`/${owner}/${repo}?tab=files`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
                     <HfIcon name="code" className="h-3.5 w-3.5" />
-                    Deploy
+                    {ui(locale, 'デプロイ', 'Deploy')}
                   </a>
                 </>
               )}
@@ -309,23 +315,23 @@ export default async function RepoDetailPage({
           {pagesSource ? (
             <div className="rounded-lg border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-4 dark:border-indigo-900 dark:from-indigo-950/30 dark:to-zinc-900">
               <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700 dark:text-indigo-300">OpenFace Pages</p>
-              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">Static site from {pagesSource === 'gh-pages' ? 'the gh-pages branch' : 'docs/ on the default branch'}.</p>
+              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">{ui(locale, pagesSource === 'gh-pages' ? 'gh-pagesブランチから公開された静的サイトです。' : 'デフォルトブランチのdocs/から公開された静的サイトです。', `Static site from ${pagesSource === 'gh-pages' ? 'the gh-pages branch' : 'docs/ on the default branch'}.`)}</p>
               <a href={`/pages/${owner}/${repo}/`} target="_blank" rel="noreferrer" className="mt-3 inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-indigo-700 px-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-indigo-800 hover:shadow-md">
-                <HfIcon name="globe" className="h-3.5 w-3.5" /> Visit site
+                <HfIcon name="globe" className="h-3.5 w-3.5" /> {ui(locale, 'サイトを見る', 'Visit site')}
               </a>
             </div>
           ) : null}
 
           <div className="rounded-lg border border-zinc-200 bg-white p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              Stats
+              {ui(locale, '統計', 'Stats')}
             </p>
             <ul className="space-y-2 text-zinc-600 dark:text-zinc-400">
               <li><a href={forgejoRepoUrl(owner, repo)} className="flex items-center gap-2 hover:text-zinc-900"><HfIcon name="star" className="h-3.5 w-3.5 text-zinc-400" />Stars: {repoInfo.stars_count ?? 0}</a></li>
               <li><a href={`/git/${owner}/${repo}/forks`} className="flex items-center gap-2 hover:text-zinc-900"><HfIcon name="fork" className="h-3.5 w-3.5 text-zinc-400" />Forks: {repoInfo.forks_count ?? 0}</a></li>
               <li><a href={forgejoRepoUrl(owner, repo)} className="flex items-center gap-2 hover:text-zinc-900"><HfIcon name="eye" className="h-3.5 w-3.5 text-zinc-400" />Watchers: {repoInfo.watchers_count ?? 0}</a></li>
               <li className="flex items-center gap-2" title={repoInfo.updated_at}>
-                <HfIcon name="clock" className="h-3.5 w-3.5 text-zinc-400" />Updated {timeAgoEn(repoInfo.updated_at)}
+                <HfIcon name="clock" className="h-3.5 w-3.5 text-zinc-400" />{ui(locale, `更新 ${timeAgoJa(repoInfo.updated_at)}`, `Updated ${timeAgoEn(repoInfo.updated_at)}`)}
               </li>
             </ul>
           </div>
@@ -335,7 +341,7 @@ export default async function RepoDetailPage({
             className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white p-4 text-center text-sm font-semibold text-zinc-700 hover:border-amber-400 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300"
           >
             <HfIcon name="link" className="h-3.5 w-3.5" />
-            Open in Forgejo
+            {ui(locale, 'Forgejoで開く', 'Open in Forgejo')}
           </a>
         </aside>}
       </div>}
@@ -351,6 +357,7 @@ async function CardTabContent({
   revision,
   skillRepo,
   skillCatalog,
+  locale,
 }: {
   owner: string;
   repo: string;
@@ -359,6 +366,7 @@ async function CardTabContent({
   revision?: string | null;
   skillRepo: import('@/lib/forgejo').Repo | null;
   skillCatalog: import('@/lib/forgejo').Repo[];
+  locale: Locale;
 }) {
   const ref = revision || defaultBranch;
   const refKind = revision ? 'tag' : 'branch';
@@ -379,11 +387,11 @@ async function CardTabContent({
       <div>
         {kind === 'skill' && skillRepo ? (
           <div className="mb-7 lg:hidden">
-            <SkillRelationshipMap repo={skillRepo} catalog={skillCatalog} placement="mobile" />
+            <SkillRelationshipMap repo={skillRepo} catalog={skillCatalog} placement="mobile" locale={locale} />
           </div>
         ) : null}
         <div className="rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-          README.md was not found. Skill relationships remain available from <code>skill.json</code>.
+          {ui(locale, 'README.mdが見つかりません。スキル連携情報は', 'README.md was not found. Skill relationships remain available from')} <code>skill.json</code>{ui(locale, 'で確認できます。', '.')}
         </div>
       </div>
     );
@@ -394,13 +402,13 @@ async function CardTabContent({
       {kind === 'prompt' && revision ? (
         <div className="mb-5 flex items-center gap-3 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900 dark:border-orange-950 dark:bg-orange-950/20 dark:text-orange-200">
           <HfIcon name="prompt" className="h-4 w-4 shrink-0" />
-          <span><strong className="font-mono">{revision}</strong> のGit tagに保存された <code>PROMPT.md</code> 原文を表示しています。</span>
+          <span>{ui(locale, <><strong className="font-mono">{revision}</strong> のGit tagに保存された <code>PROMPT.md</code> 原文を表示しています。</>, <>Showing the original <code>PROMPT.md</code> stored in Git tag <strong className="font-mono">{revision}</strong>.</>)}</span>
         </div>
       ) : null}
       <CardBadges frontmatter={frontmatter} basePath={kind === 'dataset' ? '/datasets' : kind === 'space' ? '/spaces' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : kind === 'doc' ? '/docs' : '/models'} />
       {kind === 'skill' && skillRepo ? (
         <div className="mb-7 lg:hidden">
-          <SkillRelationshipMap repo={skillRepo} catalog={skillCatalog} placement="mobile" />
+          <SkillRelationshipMap repo={skillRepo} catalog={skillCatalog} placement="mobile" locale={locale} />
         </div>
       ) : null}
       <div
@@ -419,12 +427,14 @@ async function FilesTabContent({
   path,
   defaultBranch,
   updatedAt,
+  locale,
 }: {
   owner: string;
   repo: string;
   path: string;
   defaultBranch: string;
   updatedAt: string;
+  locale: Locale;
 }) {
   const [res, commits] = await Promise.all([
     getContents(owner, repo, path),
@@ -434,7 +444,7 @@ async function FilesTabContent({
   if (!res.ok || !res.data) {
     return (
       <div className="rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-        Could not load files.
+        {ui(locale, 'ファイルを読み込めませんでした。', 'Could not load files.')}
       </div>
     );
   }
@@ -452,6 +462,7 @@ async function FilesTabContent({
       updatedAt={updatedAt}
       forgejoUrl={forgejoTreeUrl(owner, repo, path, defaultBranch)}
       cloneUrl={cloneUrl(owner, repo)}
+      locale={locale}
     />
   );
 }

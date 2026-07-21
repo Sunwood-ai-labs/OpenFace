@@ -8,6 +8,7 @@ import {
 } from '@/lib/forgejo';
 import { formatBytes } from '@/lib/format';
 import HfIcon, { HfIconName } from './HfIcon';
+import { Locale, ui } from '@/lib/i18n';
 
 function icon(entry: ContentEntry): HfIconName {
   if (entry.type === 'dir') return 'folder';
@@ -31,6 +32,7 @@ export default function FileTree({
   updatedAt,
   forgejoUrl,
   cloneUrl,
+  locale,
 }: {
   owner: string;
   repo: string;
@@ -41,6 +43,7 @@ export default function FileTree({
   updatedAt: string;
   forgejoUrl: string;
   cloneUrl: string;
+  locale: Locale;
 }) {
   const sorted = [...entries].sort((a, b) => {
     if (a.type === 'dir' && b.type !== 'dir') return -1;
@@ -50,7 +53,7 @@ export default function FileTree({
 
   const segments = currentPath.split('/').filter(Boolean);
   const latestCommit = commits[0];
-  const latestMessage = latestCommit?.commit?.message?.split('\n')[0] || 'Synced from Forgejo';
+  const latestMessage = latestCommit?.commit?.message?.split('\n')[0] || ui(locale, 'Forgejoから同期', 'Synced from Forgejo');
   const latestAuthor =
     latestCommit?.author?.login ||
     latestCommit?.commit?.author?.name ||
@@ -69,7 +72,7 @@ export default function FileTree({
         <a
           href={forgejoTreeUrl(owner, repo, currentPath, branch)}
           className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 shadow-sm hover:border-amber-400"
-          title="Open this branch in Forgejo"
+          title={ui(locale, 'このブランチをForgejoで開く', 'Open this branch in Forgejo')}
         >
           <HfIcon name="fork" className="h-3.5 w-3.5" />
           {branch}
@@ -87,7 +90,7 @@ export default function FileTree({
                 <a
                   href={forgejoTreeUrl(owner, repo, pathSoFar, branch)}
                   className="hover:text-amber-700 hover:underline"
-                  title="Open this folder in Forgejo"
+                  title={ui(locale, 'このフォルダをForgejoで開く', 'Open this folder in Forgejo')}
                 >
                   {seg}
                 </a>
@@ -102,7 +105,7 @@ export default function FileTree({
         <details className="group relative w-full max-w-xs">
           <summary className="flex cursor-pointer list-none items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-500 shadow-sm marker:hidden hover:border-amber-400 [&::-webkit-details-marker]:hidden">
             <HfIcon name="search" className="h-3.5 w-3.5 text-zinc-400" />
-            <span className="truncate">Go to file</span>
+            <span className="truncate">{ui(locale, 'ファイルへ移動', 'Go to file')}</span>
           </summary>
           <div className="absolute right-0 z-30 mt-2 max-h-80 w-full overflow-auto rounded-lg border border-zinc-200 bg-white p-2 text-sm shadow-xl">
             {sorted.length > 0 ? (
@@ -114,7 +117,7 @@ export default function FileTree({
                     key={`go-${entry.path}`}
                     href={href}
                     className="flex items-center gap-2 rounded-lg px-3 py-2 text-zinc-700 hover:bg-zinc-50"
-                    title="Open in Forgejo"
+                    title={ui(locale, 'Forgejoで開く', 'Open in Forgejo')}
                   >
                     <HfIcon name={icon(entry)} className="h-3.5 w-3.5 text-zinc-400" />
                     <span className="min-w-0 truncate">{entry.path}</span>
@@ -122,7 +125,7 @@ export default function FileTree({
                 );
               })
             ) : (
-              <span className="block px-3 py-2 text-zinc-500">No files in this folder</span>
+              <span className="block px-3 py-2 text-zinc-500">{ui(locale, 'このフォルダにファイルはありません', 'No files in this folder')}</span>
             )}
           </div>
         </details>
@@ -132,7 +135,7 @@ export default function FileTree({
           className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 shadow-sm"
         >
           <HfIcon name="clock" className="h-3.5 w-3.5" />
-          History: {commits.length || 0} commits
+          {ui(locale, `履歴: ${commits.length || 0}コミット`, `History: ${commits.length || 0} commits`)}
         </a>
       </div>
 
@@ -155,7 +158,7 @@ export default function FileTree({
                       {shortSha}
                     </a>
                   )}
-                  <span className="text-xs text-zinc-500">{new Date(latestDate).toLocaleDateString('ja-JP')}</span>
+                  <span className="text-xs text-zinc-500">{new Date(latestDate).toLocaleDateString(locale === 'ja' ? 'ja-JP' : 'en-US')}</span>
                 </div>
               </td>
             </tr>
@@ -170,10 +173,10 @@ export default function FileTree({
                   className="border-t border-zinc-100 first:border-t-0 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800/50"
                 >
                   <td className="px-4 py-2.5">
-                    <a href={href} className="flex items-center gap-2 text-zinc-800 dark:text-zinc-200" title="Open in Forgejo">
+                    <a href={href} className="flex items-center gap-2 text-zinc-800 dark:text-zinc-200" title={ui(locale, 'Forgejoで開く', 'Open in Forgejo')}>
                       <HfIcon name={icon(entry)} className="h-3.5 w-3.5 text-zinc-400" />
                       <span className={isDir ? 'font-medium' : ''}>{entry.name}</span>
-                      {!isDir && <span className="rounded border border-zinc-200 px-1.5 py-0.5 text-[10px] text-zinc-400">Safe</span>}
+                      {!isDir && <span className="rounded border border-zinc-200 px-1.5 py-0.5 text-[10px] text-zinc-400">{ui(locale, '安全', 'Safe')}</span>}
                     </a>
                   </td>
                   <td className="hidden px-4 py-2.5 text-xs text-zinc-500 dark:text-zinc-400 md:table-cell">
@@ -199,7 +202,7 @@ export default function FileTree({
             {sorted.length === 0 && (
               <tr>
                 <td className="px-4 py-6 text-center text-zinc-500 dark:text-zinc-400" colSpan={4}>
-                  このフォルダは空です。
+                  {ui(locale, 'このフォルダは空です。', 'This folder is empty.')}
                 </td>
               </tr>
             )}
@@ -210,7 +213,7 @@ export default function FileTree({
       <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
         <a href={forgejoUrl} className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 px-3 py-2 font-medium text-zinc-700 hover:border-amber-400">
           <HfIcon name="link" className="h-3.5 w-3.5" />
-          Open this tree in Forgejo
+          {ui(locale, 'このツリーをForgejoで開く', 'Open this tree in Forgejo')}
         </a>
         <code className="rounded-lg bg-zinc-100 px-3 py-2 text-xs text-zinc-600">
           git clone {cloneUrl}

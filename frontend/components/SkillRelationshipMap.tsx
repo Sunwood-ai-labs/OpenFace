@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Repo, SkillDependency } from '@/lib/forgejo';
 import HfIcon from './HfIcon';
+import { Locale, ui } from '@/lib/i18n';
 
 type ResolvedDependency = SkillDependency & {
   owner: string;
@@ -34,7 +35,7 @@ function resolveDependency(dependency: SkillDependency, owner: string, catalog: 
   };
 }
 
-function RelationshipCard({ dependency, reverse = false }: { dependency: ResolvedDependency; reverse?: boolean }) {
+function RelationshipCard({ dependency, reverse = false, locale }: { dependency: ResolvedDependency; reverse?: boolean; locale: Locale }) {
   return (
     <Link
       href={`/${dependency.owner}/${dependency.name}`}
@@ -49,15 +50,15 @@ function RelationshipCard({ dependency, reverse = false }: { dependency: Resolve
           {dependency.name}
         </span>
         <span className={`skill-relationship-badge shrink-0 rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide ${dependency.type === 'required' ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' : 'bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300'}`}>
-          {dependency.type === 'required' ? 'Required' : 'Workflow'}
+          {dependency.type === 'required' ? ui(locale, '必須', 'Required') : ui(locale, 'ワークフロー', 'Workflow')}
         </span>
       </span>
       <span className="skill-relationship-reason mt-2 block text-[11px] leading-4 text-zinc-600 dark:text-zinc-400">
-        {dependency.reason || dependency.description || 'Related Skill workflow'}
+        {dependency.reason || dependency.description || ui(locale, '関連するスキルワークフロー', 'Related Skill workflow')}
       </span>
       {dependency.evidence ? (
         <span className="skill-relationship-evidence mt-1.5 block border-l-2 border-violet-200 pl-2 text-[10px] leading-4 text-zinc-500 dark:border-violet-800 dark:text-zinc-500">
-          <strong className="font-semibold text-zinc-600 dark:text-zinc-400">SKILL.md basis:</strong> {dependency.evidence}
+          <strong className="font-semibold text-zinc-600 dark:text-zinc-400">{ui(locale, 'SKILL.mdの根拠:', 'SKILL.md basis:')}</strong> {dependency.evidence}
         </span>
       ) : null}
     </Link>
@@ -68,10 +69,12 @@ export default function SkillRelationshipMap({
   repo,
   catalog,
   placement,
+  locale,
 }: {
   repo: Repo;
   catalog: Repo[];
   placement: 'sidebar' | 'mobile';
+  locale: Locale;
 }) {
   const owner = repo.owner?.login ?? repo.full_name.split('/')[0];
   const dependencies = (repo.skill_relationships?.dependencies || []).map((dependency) =>
@@ -107,30 +110,30 @@ export default function SkillRelationshipMap({
           <HfIcon name="link" className="h-3.5 w-3.5" />
         </span>
         <div className="min-w-0 flex-1">
-          <h2 id={titleId} className="text-sm font-semibold text-zinc-950 dark:text-zinc-100">Skill relationships</h2>
-          <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{connectionCount} evidence-backed link{connectionCount === 1 ? '' : 's'}</p>
+          <h2 id={titleId} className="text-sm font-semibold text-zinc-950 dark:text-zinc-100">{ui(locale, 'スキルの関連', 'Skill relationships')}</h2>
+          <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{ui(locale, `根拠付きリンク ${connectionCount}件`, `${connectionCount} evidence-backed link${connectionCount === 1 ? '' : 's'}`)}</p>
         </div>
         <Link
           href={`/${owner}/${repo.name}?tab=files&path=skill.json`}
           className="skill-relationship-metadata rounded-lg border border-violet-200 bg-white px-2 py-1 font-mono text-[9px] font-semibold text-violet-700 hover:border-violet-400 dark:border-violet-800 dark:bg-zinc-950 dark:text-violet-300"
         >
-          metadata
+          {ui(locale, 'メタデータ', 'metadata')}
         </Link>
       </div>
 
       <div className={`grid gap-4 p-3.5 ${placement === 'mobile' ? 'sm:grid-cols-2' : ''}`}>
         <div className="min-w-0">
           <div className="mb-2 flex items-center justify-between gap-2">
-            <h3 className="skill-relationship-section-title text-[10px] font-bold uppercase tracking-[0.14em] text-violet-700 dark:text-violet-300">Uses / works with</h3>
-            <span className="text-[9px] text-zinc-400">{requiredCount} required · {workflowCount} workflow</span>
+            <h3 className="skill-relationship-section-title text-[10px] font-bold uppercase tracking-[0.14em] text-violet-700 dark:text-violet-300">{ui(locale, '使用／連携', 'Uses / works with')}</h3>
+            <span className="text-[9px] text-zinc-400">{ui(locale, `必須 ${requiredCount} · ワークフロー ${workflowCount}`, `${requiredCount} required · ${workflowCount} workflow`)}</span>
           </div>
           <div className="grid gap-2">
             {dependencies.length ? dependencies.map((dependency) => (
-              <RelationshipCard key={`${dependency.fullName}-${dependency.type}`} dependency={dependency} />
+              <RelationshipCard key={`${dependency.fullName}-${dependency.type}`} dependency={dependency} locale={locale} />
             )) : (
               <div className="skill-relationship-empty rounded-xl border border-dashed border-violet-200 bg-white/60 px-3 py-4 text-center dark:border-violet-900 dark:bg-zinc-950/40">
-                <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Self-contained</p>
-                <p className="mt-1 text-[10px] text-zinc-500">No required or curated workflow link</p>
+                <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{ui(locale, '単独で完結', 'Self-contained')}</p>
+                <p className="mt-1 text-[10px] text-zinc-500">{ui(locale, '必須または推奨ワークフローのリンクはありません', 'No required or curated workflow link')}</p>
               </div>
             )}
           </div>
@@ -138,16 +141,16 @@ export default function SkillRelationshipMap({
 
         <div className="min-w-0">
           <div className="mb-2 flex items-center justify-between gap-2">
-            <h3 className="skill-relationship-section-title text-[10px] font-bold uppercase tracking-[0.14em] text-fuchsia-700 dark:text-fuchsia-300">Referenced by</h3>
-            <span className="text-[9px] text-zinc-400">reverse links</span>
+            <h3 className="skill-relationship-section-title text-[10px] font-bold uppercase tracking-[0.14em] text-fuchsia-700 dark:text-fuchsia-300">{ui(locale, '参照元', 'Referenced by')}</h3>
+            <span className="text-[9px] text-zinc-400">{ui(locale, '逆方向リンク', 'reverse links')}</span>
           </div>
           <div className="grid gap-2">
             {incoming.length ? incoming.map((dependency) => (
-              <RelationshipCard key={`${dependency.fullName}-${dependency.type}`} dependency={dependency} reverse />
+              <RelationshipCard key={`${dependency.fullName}-${dependency.type}`} dependency={dependency} reverse locale={locale} />
             )) : (
               <div className="skill-relationship-empty rounded-xl border border-dashed border-fuchsia-200 bg-white/60 px-3 py-4 text-center dark:border-fuchsia-900 dark:bg-zinc-950/40">
-                <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">No reverse links</p>
-                <p className="mt-1 text-[10px] text-zinc-500">No catalog Skill points here yet</p>
+                <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{ui(locale, '参照元はありません', 'No reverse links')}</p>
+                <p className="mt-1 text-[10px] text-zinc-500">{ui(locale, 'このスキルを参照するカタログ項目はまだありません', 'No catalog Skill points here yet')}</p>
               </div>
             )}
           </div>

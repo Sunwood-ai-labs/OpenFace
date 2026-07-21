@@ -3,13 +3,8 @@
 import { useContext, useEffect, useState } from 'react';
 import type { SpaceStatus } from '@/lib/space-status';
 import { SpaceStatusContext } from './SpaceStatusProvider';
-
-const labels: Record<SpaceStatus, string> = {
-  building: 'CPU · Building',
-  running: 'CPU · Running',
-  stopped: 'CPU · On demand',
-  error: 'CPU · Error',
-};
+import { useLocale } from './LocaleProvider';
+import { ui } from '@/lib/i18n';
 
 export default function SpaceStatusBadge({
   owner,
@@ -20,6 +15,13 @@ export default function SpaceStatusBadge({
   repo: string;
   variant?: 'card' | 'header';
 }) {
+  const { locale } = useLocale();
+  const labels: Record<SpaceStatus, string> = {
+    building: ui(locale, 'CPU · ビルド中', 'CPU · Building'),
+    running: ui(locale, 'CPU · 実行中', 'CPU · Running'),
+    stopped: ui(locale, 'CPU · オンデマンド', 'CPU · On demand'),
+    error: ui(locale, 'CPU · エラー', 'CPU · Error'),
+  };
   const directoryStatuses = useContext(SpaceStatusContext);
   const directoryStatus = directoryStatuses?.[`${owner}/${repo}`];
   const [detailStatus, setDetailStatus] = useState<SpaceStatus>('stopped');
