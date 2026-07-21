@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "docs:dev": "vitepress",
+    "docs:check": "node scripts/validate-docs.mjs",
     "docs:build": "vitepress build",
     "docs:preview": "vitepress preview"
   },
