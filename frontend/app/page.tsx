@@ -76,7 +76,7 @@ function CompactRepoList({
       icon: 'bg-teal-100 text-teal-800 ring-teal-200',
       link: 'hover:bg-teal-50/80',
       dot: 'bg-teal-700',
-      browse: 'text-teal-800 hover:text-teal-950',
+      browse: 'text-teal-800 hover:text-teal-950 dark:text-teal-300 dark:hover:text-teal-200',
       title: 'text-teal-900',
     },
   }[kind];
@@ -154,7 +154,7 @@ export default async function HomePage() {
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-orange-700">Living knowledge</p>
           <h2 className="mt-3 font-serif text-4xl leading-none text-zinc-950">Docs are part of the community.</h2>
           <p className="mt-4 max-w-lg text-sm leading-6 text-zinc-600">Publish articles, Wiki nodes, guides, and reference as normal Forgejo repositories—versioned, discussable, and easy to fork.</p>
-          <Link href="/docs" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-teal-900 hover:underline">Enter the library <HfIcon name="arrowRight" className="h-3 w-3" /></Link>
+          <Link href="/docs" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-teal-900 hover:underline dark:text-teal-300">Enter the library <HfIcon name="arrowRight" className="h-3 w-3" /></Link>
         </div>
         <CompactRepoList repos={docs.data} href="/docs" label="Docs" />
       </section>
