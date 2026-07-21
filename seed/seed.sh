@@ -2096,15 +2096,51 @@ create_dataset_fixture "image-edit-prompts" "Image Edit Prompts" "Instruction da
 create_dataset_fixture "table-question-answering" "Table Question Answering" "Tabular QA fixture with small CSV splits" "tabular" "qa"
 
 # ------------------------------------------------------------------------
-# Git-backed Docs library. Each entry is an ordinary Forgejo repository with
-# the `doc` topic plus one editorial format topic. This keeps articles, Wiki
-# nodes, guides, and reference pages versionable, forkable, and discussable.
+# Git-backed Docs library. Zenn-style publications keep many Markdown entries
+# in one repository per person or team. OpenFace aggregates articles/*.md from
+# public repositories carrying the `doc` topic.
 # ------------------------------------------------------------------------
+ensure_repo "openface-knowledge" "OpenFace team's articles, Wiki notes, guides, and references"
+set_topics "openface-knowledge" "doc" "knowledge" "markdown" "publication"
+
+cat > "${WORKDIR}/knowledge_repo_readme.md" <<'EOF'
+# OpenFace Knowledge
+
+This is the OpenFace team's Git-backed knowledge publication.
+
+## Add an entry
+
+Create `articles/{slug}.md` with front matter and Markdown content:
+
+```yaml
+---
+title: My research note
+format: article
+topics: [research, local-ai]
+published: true
+---
+```
+
+OpenFace aggregates every published file into `/docs`. Use `article`, `wiki`,
+`guide`, or `reference` as the format. Edit and review entries with the normal
+Git and pull-request workflow.
+EOF
+put_file "openface-knowledge" "README.md" "${WORKDIR}/knowledge_repo_readme.md" "Explain the knowledge publication format"
+
 create_doc_fixture() {
   local name="$1" description="$2" format="$3" tag1="$4" tag2="$5" source_file="$6"
-  ensure_repo "$name" "$description"
-  set_topics "$name" "doc" "$format" "$tag1" "$tag2"
-  put_file "$name" "README.md" "$source_file" "Publish ${format} documentation"
+  local staged_file="${WORKDIR}/knowledge_${name}.md"
+  awk -v format="$format" -v description="$description" '
+    NR == 1 && $0 == "---" {
+      print
+      print "format: " format
+      print "description: \"" description "\""
+      print "published: true"
+      next
+    }
+    { print }
+  ' "$source_file" > "$staged_file"
+  put_file "openface-knowledge" "articles/${name}.md" "$staged_file" "Publish ${format}: ${name}"
 }
 
 cat > "${WORKDIR}/doc_local_first.md" <<'EOF'
@@ -2399,31 +2435,38 @@ license: MIT
 tags: [docs, publishing, forgejo]
 ---
 
-# Publish your first OpenFace Doc
+# Publish your first OpenFace knowledge entry
 
-An OpenFace Doc is an ordinary public Forgejo repository. The README is the article body and repository topics decide where it appears.
+An OpenFace publication is an ordinary public Forgejo repository containing many Markdown entries. Create it once, then keep adding knowledge over time.
 
-## 1. Create the repository
+## 1. Create your publication
 
-Open **New → Doc**, choose an owner and a short repository name, then continue to Forgejo. Keep the repository public if it should appear in the shared library.
+Open **New → Doc**, choose your user or team as the owner, and create a repository such as `my-knowledge`. Keep it public if its entries should appear in the shared library.
 
-## 2. Add topics
+Add the repository topics `doc`, `knowledge`, and `markdown` in Forgejo.
 
-Add `doc`, exactly one format topic (`article`, `wiki`, `guide`, or `reference`), and a few descriptive topics such as `docker` or `security`.
+## 2. Add an article
 
-```text
-doc  guide  docker  deployment
+Create `articles/my-first-note.md`. Put article metadata in front matter:
+
+```yaml
+---
+title: My first research note
+format: article
+topics: [local-ai, research]
+published: true
+---
 ```
 
-## 3. Write the README
+## 3. Write the knowledge
 
-Lead with a clear title and purpose. Use headings, lists, tables, code blocks, and links where they make the material easier to apply. Commit the file normally.
+Write below the front matter with ordinary Markdown. Use headings, lists, tables, code blocks, images, and links where they make the material easier to apply. Commit the file normally.
 
 ## 4. Verify discovery
 
-Return to `/docs`, select the matching format, and open the document. If it is missing, confirm the repository is public and the `doc` topic is present.
+Return to `/docs`, select the matching format, and open the entry. If it is missing, confirm the repository is public, the `doc` topic is present, the file is under `articles/`, and `published` is not `false`.
 EOF
-create_doc_fixture "docs-publishing-quickstart" "Create, classify, write, and verify a Git-backed OpenFace document" "guide" "docs" "publishing" "${WORKDIR}/doc_publishing_quickstart.md"
+create_doc_fixture "docs-publishing-quickstart" "Create a personal publication and add searchable Markdown knowledge" "guide" "docs" "publishing" "${WORKDIR}/doc_publishing_quickstart.md"
 
 cat > "${WORKDIR}/doc_tailscale_guide.md" <<'EOF'
 ---
