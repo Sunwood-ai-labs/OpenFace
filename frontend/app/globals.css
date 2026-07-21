@@ -386,6 +386,97 @@ html[data-openface-theme="cyberpunk"] .openface-theme-selector:hover {
   box-shadow: 0 0 22px rgb(44 231 255 / 34%);
 }
 
+/* The Docs library owns an editorial palette. Keep it isolated from the
+   broad compatibility remaps above so OS color-scheme and app theme never
+   combine into low-contrast text. */
+html[data-openface-theme="solarpunk"] .openface-docs-directory {
+  background: #f7f5e7 !important;
+  color: #173b2c !important;
+}
+
+html[data-openface-theme="solarpunk"] .openface-docs-directory .bg-white,
+html[data-openface-theme="solarpunk"] .openface-docs-directory [class*="dark:bg-zinc-900"] {
+  background: #fffdf3 !important;
+}
+
+html[data-openface-theme="solarpunk"] .openface-docs-directory h1,
+html[data-openface-theme="solarpunk"] .openface-docs-directory h2,
+html[data-openface-theme="solarpunk"] .openface-docs-directory dd,
+html[data-openface-theme="solarpunk"] .openface-docs-directory strong,
+html[data-openface-theme="solarpunk"] .openface-docs-directory [class*="text-zinc-9"] {
+  color: #173b2c !important;
+}
+
+html[data-openface-theme="solarpunk"] .openface-docs-directory .text-zinc-600,
+html[data-openface-theme="solarpunk"] .openface-docs-directory .text-zinc-500,
+html[data-openface-theme="solarpunk"] .openface-docs-directory .text-zinc-400,
+html[data-openface-theme="solarpunk"] .openface-docs-directory .text-zinc-300 {
+  color: #46624f !important;
+}
+
+html[data-openface-theme="solarpunk"] .openface-docs-directory .openface-docs-primary-action {
+  background: #173b2c !important;
+  color: #fffdf3 !important;
+}
+
+html[data-openface-theme="solarpunk"] .openface-docs-directory .text-teal-800,
+html[data-openface-theme="solarpunk"] .openface-docs-directory .text-teal-900,
+html[data-openface-theme="solarpunk"] .openface-docs-directory [class*="dark:text-teal-300"] {
+  color: #1d5c43 !important;
+}
+
+html[data-openface-theme="solarpunk"] .openface-docs-directory .openface-docs-format-active {
+  border-color: #173b2c !important;
+  background: #173b2c !important;
+  color: #fffdf3 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-docs-directory {
+  background: #05070d !important;
+  color: #f4f7ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-docs-directory h1,
+html[data-openface-theme="cyberpunk"] .openface-docs-directory h2,
+html[data-openface-theme="cyberpunk"] .openface-docs-directory dd,
+html[data-openface-theme="cyberpunk"] .openface-docs-directory strong,
+html[data-openface-theme="cyberpunk"] .openface-docs-directory [class*="text-zinc-9"] {
+  color: #f4f7ff !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .text-zinc-600,
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .text-zinc-500,
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .text-zinc-400 {
+  color: #a9bdd3 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .text-zinc-300,
+html[data-openface-theme="cyberpunk"] .openface-docs-directory [class*="dark:text-zinc-700"] {
+  color: #8298b0 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .text-orange-700,
+html[data-openface-theme="cyberpunk"] .openface-docs-directory [class*="dark:text-orange-400"] {
+  color: #ff9b4a !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .text-teal-800,
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .text-teal-900,
+html[data-openface-theme="cyberpunk"] .openface-docs-directory [class*="dark:text-teal-300"] {
+  color: #45e4e7 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-primary-action {
+  background: #45e4e7 !important;
+  color: #061014 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-format-active {
+  border-color: #45e4e7 !important;
+  background: #45e4e7 !important;
+  color: #061014 !important;
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #18181b;

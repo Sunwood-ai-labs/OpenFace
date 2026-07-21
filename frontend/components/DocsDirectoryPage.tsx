@@ -96,7 +96,7 @@ export default async function DocsDirectoryPage({
   };
 
   return (
-    <div className="openface-docs-directory -mx-4 -mt-6 min-h-screen bg-[#fbfaf6] text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100 sm:-mx-6 lg:-mx-8">
+    <div className="openface-docs-directory min-h-screen bg-[#fbfaf6] text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
       <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
         <div className="pointer-events-none absolute inset-0 opacity-50 [background-image:linear-gradient(to_right,rgba(39,39,42,.08)_1px,transparent_1px)] [background-size:80px_100%] dark:opacity-20" />
         <div className="relative mx-auto grid max-w-[1440px] gap-8 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-end lg:px-12">
@@ -132,9 +132,9 @@ export default async function DocsDirectoryPage({
             {selectedFormat ? <input type="hidden" name="type" value={selectedFormat} /> : null}
           </form>
           <div className="flex flex-wrap gap-2">
-            <Link href={formatHref()} aria-current={!selectedFormat ? 'page' : undefined} className={`border px-3 py-2 text-xs font-bold uppercase tracking-wide ${!selectedFormat ? 'border-teal-900 bg-teal-900 text-white dark:border-teal-300 dark:bg-teal-300 dark:text-zinc-950' : 'border-zinc-300 text-zinc-600 hover:border-zinc-500 dark:border-zinc-700 dark:text-zinc-300'}`}>All</Link>
+            <Link href={formatHref()} aria-current={!selectedFormat ? 'page' : undefined} className={`openface-docs-format-tab border px-3 py-2 text-xs font-bold uppercase tracking-wide ${!selectedFormat ? 'openface-docs-format-active border-teal-900 bg-teal-900 text-white dark:border-teal-300 dark:bg-teal-300 dark:text-zinc-950' : 'border-zinc-300 text-zinc-600 hover:border-zinc-500 dark:border-zinc-700 dark:text-zinc-300'}`}>All</Link>
             {formats.map((format) => (
-              <Link key={format.value} href={formatHref(format.value)} aria-current={selectedFormat === format.value ? 'page' : undefined} className={`border px-3 py-2 text-xs font-bold uppercase tracking-wide ${selectedFormat === format.value ? 'border-teal-900 bg-teal-900 text-white dark:border-teal-300 dark:bg-teal-300 dark:text-zinc-950' : 'border-zinc-300 text-zinc-600 hover:border-zinc-500 dark:border-zinc-700 dark:text-zinc-300'}`}>
+              <Link key={format.value} href={formatHref(format.value)} aria-current={selectedFormat === format.value ? 'page' : undefined} className={`openface-docs-format-tab border px-3 py-2 text-xs font-bold uppercase tracking-wide ${selectedFormat === format.value ? 'openface-docs-format-active border-teal-900 bg-teal-900 text-white dark:border-teal-300 dark:bg-teal-300 dark:text-zinc-950' : 'border-zinc-300 text-zinc-600 hover:border-zinc-500 dark:border-zinc-700 dark:text-zinc-300'}`}>
                 {format.label}
               </Link>
             ))}
@@ -159,7 +159,7 @@ export default async function DocsDirectoryPage({
                     {featured.name.replace(/-/g, ' ')}
                   </Link>
                   <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400">{featured.description}</p>
-                  <Link href={docHref(featured)} className="mt-8 inline-flex h-11 items-center gap-3 bg-zinc-950 px-5 text-sm font-bold text-white transition hover:bg-teal-900 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-teal-300">
+                  <Link href={docHref(featured)} className="openface-docs-primary-action mt-8 inline-flex h-11 items-center gap-3 bg-zinc-950 px-5 text-sm font-bold text-white transition hover:bg-teal-900 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-teal-300">
                     Open document <HfIcon name="arrowRight" className="h-3.5 w-3.5" />
                   </Link>
                 </div>
