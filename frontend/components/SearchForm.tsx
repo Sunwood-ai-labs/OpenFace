@@ -2,6 +2,8 @@
 
 import { FormEvent } from 'react';
 import HfIcon from './HfIcon';
+import { useLocale } from './LocaleProvider';
+import { ui } from '@/lib/i18n';
 
 function targetForSearch(rawQuery: string) {
   const query = rawQuery.trim();
@@ -14,6 +16,7 @@ function targetForSearch(rawQuery: string) {
 }
 
 export default function SearchForm({ className = '', compact = false }: { className?: string; compact?: boolean }) {
+  const { locale } = useLocale();
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -28,8 +31,8 @@ export default function SearchForm({ className = '', compact = false }: { classN
         <input
           type="search"
           name="q"
-          placeholder="モデル、データセット、ユーザーを検索…"
-          aria-label="OpenFaceを検索"
+          placeholder={ui(locale, 'モデル、データセット、ユーザーを検索…', 'Search models, datasets, users…')}
+          aria-label={ui(locale, 'OpenFaceを検索', 'Search OpenFace')}
           className={
             compact
               ? 'h-9 w-full rounded-lg border border-zinc-200 bg-white px-3 pl-9 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-200'

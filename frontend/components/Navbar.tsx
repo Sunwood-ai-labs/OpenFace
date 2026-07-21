@@ -6,20 +6,23 @@ import BrandMark from './BrandMark';
 import HfIcon from './HfIcon';
 import SearchForm from './SearchForm';
 import ThemeSelector from './ThemeSelector';
-
-const navItems = [
-  { href: '/models', label: 'モデル' },
-  { href: '/datasets', label: 'データセット' },
-  { href: '/spaces', label: 'Space' },
-  { href: '/skills', label: 'スキル' },
-  { href: '/mcps', label: 'MCPs' },
-  { href: '/prompts', label: 'プロンプト' },
-  { href: '/docs', label: 'ナレッジ' },
-];
+import LanguageSelector from './LanguageSelector';
+import { useLocale } from './LocaleProvider';
+import { ui } from '@/lib/i18n';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { locale } = useLocale();
   const isCurrent = (href: string) => href.startsWith('/') && (pathname === href || pathname.startsWith(`${href}/`));
+  const navItems = [
+    { href: '/models', label: ui(locale, 'モデル', 'Models') },
+    { href: '/datasets', label: ui(locale, 'データセット', 'Datasets') },
+    { href: '/spaces', label: 'Spaces' },
+    { href: '/skills', label: ui(locale, 'スキル', 'Skills') },
+    { href: '/mcps', label: 'MCPs' },
+    { href: '/prompts', label: ui(locale, 'プロンプト', 'Prompts') },
+    { href: '/docs', label: ui(locale, 'ナレッジ', 'Knowledge') },
+  ];
 
   return (
     <header className="sticky top-0 z-30 border-b border-zinc-100 bg-white dark:border-zinc-800 dark:bg-zinc-950">
@@ -46,26 +49,26 @@ export default function Navbar() {
             </summary>
             <div className="absolute right-0 z-40 mt-3 hidden w-[520px] grid-cols-3 gap-6 rounded-lg border border-zinc-200 bg-white p-5 text-sm shadow-xl group-open:grid">
               <div>
-                <h2 className="mb-2 text-xs font-semibold uppercase tracking-normal text-zinc-400">コンテンツ</h2>
-                <a href="/models" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">モデル</a>
-                <a href="/datasets" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">データセット</a>
-                <a href="/spaces" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Space</a>
-                <a href="/skills" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">スキル</a>
+                <h2 className="mb-2 text-xs font-semibold uppercase tracking-normal text-zinc-400">{ui(locale, 'コンテンツ', 'Content')}</h2>
+                <a href="/models" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'モデル', 'Models')}</a>
+                <a href="/datasets" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'データセット', 'Datasets')}</a>
+                <a href="/spaces" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Spaces</a>
+                <a href="/skills" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'スキル', 'Skills')}</a>
                 <a href="/mcps" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">MCPs</a>
-                <a href="/prompts" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">プロンプト</a>
-                <a href="/docs" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">ナレッジ</a>
+                <a href="/prompts" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'プロンプト', 'Prompts')}</a>
+                <a href="/docs" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'ナレッジ', 'Knowledge')}</a>
               </div>
               <div>
-                <h2 className="mb-2 text-xs font-semibold uppercase tracking-normal text-zinc-400">コミュニティ</h2>
-                <a href="/git/explore/repos" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">リポジトリ</a>
-                <a href="/git/explore/users" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">ユーザー</a>
-                <a href="https://github.com/Sunwood-ai-labs/OpenFace/issues" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">議論</a>
+                <h2 className="mb-2 text-xs font-semibold uppercase tracking-normal text-zinc-400">{ui(locale, 'コミュニティ', 'Community')}</h2>
+                <a href="/git/explore/repos" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'リポジトリ', 'Repositories')}</a>
+                <a href="/git/explore/users" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'ユーザー', 'Users')}</a>
+                <a href="https://github.com/Sunwood-ai-labs/OpenFace/issues" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, '議論', 'Discussions')}</a>
               </div>
               <div>
-                <h2 className="mb-2 text-xs font-semibold uppercase tracking-normal text-zinc-400">セルフホスト</h2>
-                <a href="/git/repo/create" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">リポジトリを作成</a>
-                <a href="/git/user/settings" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">設定</a>
-                <a href="/git/admin" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">管理</a>
+                <h2 className="mb-2 text-xs font-semibold uppercase tracking-normal text-zinc-400">{ui(locale, 'セルフホスト', 'Self-host')}</h2>
+                <a href="/git/repo/create" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'リポジトリを作成', 'Create repository')}</a>
+                <a href="/git/user/settings" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, '設定', 'Settings')}</a>
+                <a href="/git/admin" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, '管理', 'Administration')}</a>
               </div>
             </div>
           </details>
@@ -74,13 +77,14 @@ export default function Navbar() {
         <div className="hidden lg:block">
           <ThemeSelector />
         </div>
+        <div className="hidden lg:block"><LanguageSelector /></div>
 
         <div className="hidden shrink-0 items-center gap-4 text-sm font-semibold lg:flex">
           <a href="/git/user/login" className="text-zinc-900 hover:text-zinc-600">
-            ログイン
+            {ui(locale, 'ログイン', 'Log in')}
           </a>
           <a href="/git/user/sign_up" className="rounded-full bg-zinc-950 px-4 py-2 text-white hover:bg-zinc-800">
-            新規登録
+            {ui(locale, '新規登録', 'Sign up')}
           </a>
         </div>
 
@@ -90,7 +94,7 @@ export default function Navbar() {
           </summary>
           <div className="absolute right-0 z-40 mt-3 hidden w-[min(88vw,320px)] gap-1 rounded-lg border border-zinc-200 bg-white p-3 text-sm shadow-xl group-open:grid">
             <SearchForm className="mb-1" compact />
-            <div className="mb-1 px-3 pt-1"><ThemeSelector /></div>
+            <div className="mb-1 flex items-center gap-2 px-3 pt-1"><ThemeSelector /><LanguageSelector /></div>
             {navItems.map((item) => (
               <Link
                 key={item.href}
@@ -105,12 +109,12 @@ export default function Navbar() {
               href="/git/explore/repos"
               aria-current={isCurrent('/git/explore/repos') ? 'page' : undefined}
               className="openface-mobile-nav-link"
-            >リポジトリ</a>
+            >{ui(locale, 'リポジトリ', 'Repositories')}</a>
             <a
               href="/git/explore/users"
               aria-current={isCurrent('/git/explore/users') ? 'page' : undefined}
               className="openface-mobile-nav-link"
-            >ユーザー</a>
+            >{ui(locale, 'ユーザー', 'Users')}</a>
           </div>
         </details>
       </div>

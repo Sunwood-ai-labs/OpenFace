@@ -2,15 +2,26 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import LocaleProvider from '@/components/LocaleProvider';
+import { getLocale } from '@/lib/i18n-server';
+import { ui } from '@/lib/i18n';
 
-export const metadata: Metadata = {
-  title: 'OpenFace - ローカルAIコミュニティハブ',
-  description: 'Forgejoを基盤に、モデル、データセット、Space、ナレッジを共有できるローカルAIプラットフォーム。',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return {
+    title: ui(locale, 'OpenFace - ローカルAIコミュニティハブ', 'OpenFace - Local AI Community Hub'),
+    description: ui(
+      locale,
+      'Forgejoを基盤に、モデル、データセット、Space、ナレッジを共有できるローカルAIプラットフォーム。',
+      'A local AI platform for sharing models, datasets, Spaces, and knowledge, backed by Forgejo.',
+    ),
+  };
+}
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
   return (
-    <html lang="ja">
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -24,9 +35,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen bg-white text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
-        <Navbar />
-        <main className="mx-auto w-full max-w-[1544px] px-0 py-0">{children}</main>
-        <Footer />
+        <LocaleProvider initialLocale={locale}>
+          <Navbar />
+          <main className="mx-auto w-full max-w-[1544px] px-0 py-0">{children}</main>
+          <Footer />
+        </LocaleProvider>
       </body>
     </html>
   );

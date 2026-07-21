@@ -128,6 +128,46 @@ header details[open] > .openface-mobile-menu-toggle {
   transition: border-color 160ms ease, box-shadow 160ms ease, color 160ms ease, transform 160ms ease;
 }
 
+.openface-language-selector {
+  display: inline-flex;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+  border: 1px solid rgb(212 212 216);
+  border-radius: .55rem;
+  padding-inline: .55rem;
+  color: rgb(82 82 91);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .05em;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+
+.openface-language-selector:hover {
+  border-color: rgb(13 148 136);
+  color: rgb(15 118 110);
+  background: rgb(240 253 250);
+}
+
+.openface-language-selector:disabled {
+  opacity: .55;
+}
+
+@media (prefers-color-scheme: dark) {
+  .openface-language-selector {
+    border-color: rgb(63 63 70);
+    color: rgb(212 212 216);
+  }
+
+  .openface-language-selector:hover {
+    border-color: rgb(45 212 191);
+    color: rgb(94 234 212);
+    background: rgb(19 78 74 / 25%);
+  }
+}
+
 .openface-theme-selector:hover {
   border-color: #a1a1aa;
   color: #18181b;

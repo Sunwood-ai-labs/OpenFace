@@ -1,14 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useLocale } from './LocaleProvider';
+import { ui } from '@/lib/i18n';
 
 const STORAGE_KEY = 'openface-theme-v2';
 const LEGACY_STORAGE_KEY = 'openface-theme';
 
 const themes = [
-  { value: 'standard', label: 'スタンダード' },
-  { value: 'solarpunk', label: 'ソーラーパンク' },
-  { value: 'cyberpunk', label: 'サイバーパンク' },
+  { value: 'standard', ja: 'スタンダード', en: 'Standard' },
+  { value: 'solarpunk', ja: 'ソーラーパンク', en: 'Solarpunk' },
+  { value: 'cyberpunk', ja: 'サイバーパンク', en: 'Cyberpunk' },
 ] as const;
 
 type ThemeName = (typeof themes)[number]['value'];
@@ -53,6 +55,7 @@ function ThemeIcon({ theme }: { theme: ThemeName }) {
 }
 
 export default function ThemeSelector() {
+  const { locale } = useLocale();
   const [theme, setTheme] = useState<ThemeName>('standard');
 
   useEffect(() => {
@@ -71,14 +74,16 @@ export default function ThemeSelector() {
 
   const currentIndex = themes.findIndex(({ value }) => value === theme);
   const nextTheme = themes[(currentIndex + 1) % themes.length];
+  const currentLabel = ui(locale, themes[currentIndex].ja, themes[currentIndex].en);
+  const nextLabel = ui(locale, nextTheme.ja, nextTheme.en);
 
   return (
     <button
       type="button"
       className="openface-theme-selector"
       data-theme={theme}
-      aria-label={`現在は${themes[currentIndex].label}テーマ。${nextTheme.label}へ切り替える`}
-      title={`${themes[currentIndex].label} · ${nextTheme.label}へ切り替え`}
+      aria-label={ui(locale, `現在は${currentLabel}テーマ。${nextLabel}へ切り替える`, `Current theme: ${currentLabel}. Switch to ${nextLabel}`)}
+      title={ui(locale, `${currentLabel} · ${nextLabel}へ切り替え`, `${currentLabel} · switch to ${nextLabel}`)}
       onClick={() => {
         setTheme(nextTheme.value);
         applyTheme(nextTheme.value);
