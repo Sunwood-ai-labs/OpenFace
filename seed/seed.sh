@@ -1479,7 +1479,7 @@ import_hf_space() {
   # complete (small, vetted) Space history rather than using --depth 1.
   cloned=0
   for attempt in 1 2 3; do
-    if git clone "https://huggingface.co/spaces/${source}" "$clone_dir"; then
+    if timeout "${HF_CLONE_TIMEOUT_SECONDS:-20}" git clone "https://huggingface.co/spaces/${source}" "$clone_dir"; then
       cloned=1
       break
     fi

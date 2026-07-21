@@ -129,6 +129,7 @@ services:
       FORGEJO_TOKEN_FILE: /shared/token
       FORGEJO_CONTAINER_NAME: openface-forgejo
       MAINTENANCE_WEBHOOK_URL: http://maintenance-agent:8010/webhooks/forgejo
+      HF_CLONE_TIMEOUT_SECONDS: ${HF_CLONE_TIMEOUT_SECONDS:-20}
     volumes:
       - shared-token:/shared
       - /var/run/docker.sock:/var/run/docker.sock
