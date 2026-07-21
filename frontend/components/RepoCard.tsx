@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Repo, nonTypeTopics, repoPromptVersion } from '@/lib/forgejo';
-import { timeAgoEn } from '@/lib/format';
+import { timeAgoEn, timeAgoJa } from '@/lib/format';
+import { Locale, ui } from '@/lib/i18n';
 import { getSpaceTheme } from '@/lib/space-theme';
 import HfIcon, { HfIconName } from './HfIcon';
 
@@ -58,7 +59,7 @@ const KIND_THEME = {
   },
 };
 
-export default function RepoCard({ repo, kind }: { repo: Repo; kind?: 'model' | 'dataset' | 'space' | 'skill' | 'mcp' | 'prompt' }) {
+export default function RepoCard({ repo, kind, locale }: { repo: Repo; kind?: 'model' | 'dataset' | 'space' | 'skill' | 'mcp' | 'prompt'; locale: Locale }) {
   const owner = repo.owner?.login ?? repo.full_name.split('/')[0];
   const name = repo.name;
   const badges = nonTypeTopics(repo.topics).slice(0, 4);
@@ -74,7 +75,7 @@ export default function RepoCard({ repo, kind }: { repo: Repo; kind?: 'model' | 
         <Link
           href={`/${owner}/${name}`}
           className={`relative flex h-24 shrink-0 items-center justify-center overflow-hidden bg-gradient-to-br ${spaceTheme.gradient}`}
-          aria-label={`Open ${repo.full_name}`}
+          aria-label={ui(locale, `${repo.full_name}を開く`, `Open ${repo.full_name}`)}
         >
           <span className={`absolute -left-8 -top-12 h-28 w-28 rounded-full opacity-60 blur-2xl ${spaceTheme.glow}`} />
           <span className="absolute -bottom-16 -right-8 h-32 w-32 rounded-full bg-white/25 blur-2xl" />
@@ -110,7 +111,7 @@ export default function RepoCard({ repo, kind }: { repo: Repo; kind?: 'model' | 
         </div>
 
         <Link href={`/${owner}/${name}`} className="mt-2 line-clamp-2 min-h-[2.5rem] text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400">
-          {repo.description || 'No description'}
+          {repo.description || ui(locale, '説明はありません', 'No description')}
         </Link>
 
         {badges.length > 0 && (
@@ -130,7 +131,7 @@ export default function RepoCard({ repo, kind }: { repo: Repo; kind?: 'model' | 
         <div className="mt-auto flex items-center gap-3 pt-3 text-xs text-zinc-500 dark:text-zinc-400">
           <a href={`/git/${owner}/${name}`} className="inline-flex items-center gap-1 hover:text-zinc-900" title="Stars"><HfIcon name="star" className="h-3 w-3" />{repo.stars_count ?? 0}</a>
           <a href={`/git/${owner}/${name}/forks`} className="inline-flex items-center gap-1 hover:text-zinc-900" title="Forks"><HfIcon name="download" className="h-3 w-3" />{repo.forks_count ?? 0}</a>
-          <span className="ml-auto">{timeAgoEn(repo.updated_at)}</span>
+          <span className="ml-auto">{locale === 'ja' ? timeAgoJa(repo.updated_at) : timeAgoEn(repo.updated_at)}</span>
         </div>
       </div>
     </article>

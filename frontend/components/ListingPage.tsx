@@ -2,6 +2,8 @@ import { searchReposByTopicAndQuery, SortOption, RepoKind } from '@/lib/forgejo'
 import HfIcon, { HfIconName } from './HfIcon';
 import FilterRail from './FilterRail';
 import RepoSearchList from './RepoSearchList';
+import { getLocale } from '@/lib/i18n-server';
+import { ui } from '@/lib/i18n';
 
 export interface ListingPageProps {
   topic: RepoKind;
@@ -18,6 +20,7 @@ export default async function ListingPage({
   placeholder,
   searchParams,
 }: ListingPageProps) {
+  const locale = await getLocale();
   const q = searchParams?.q?.trim() || undefined;
   const sort: SortOption = searchParams?.sort === 'stars' ? 'stars' : 'updated';
   const basePath = `/${topic}s`;
@@ -30,7 +33,7 @@ export default async function ListingPage({
       .sort((left, right) => left.localeCompare(right, undefined, { numeric: true, sensitivity: 'base' }))
     : [];
   const iconTone = topic === 'dataset' ? 'text-emerald-600' : topic === 'skill' ? 'text-violet-600' : topic === 'mcp' ? 'text-cyan-600' : topic === 'prompt' ? 'text-orange-600' : 'text-amber-600';
-  const createLabel = topic === 'dataset' ? 'Dataset' : topic === 'space' ? 'Space' : topic === 'skill' ? 'Skill' : topic === 'mcp' ? 'MCP server' : topic === 'prompt' ? 'Prompt' : 'Model';
+  const createLabel = topic === 'dataset' ? ui(locale, 'データセット', 'Dataset') : topic === 'space' ? 'Space' : topic === 'skill' ? ui(locale, 'スキル', 'Skill') : topic === 'mcp' ? 'MCP server' : topic === 'prompt' ? ui(locale, 'プロンプト', 'Prompt') : ui(locale, 'モデル', 'Model');
   const mobileFilters: Array<{ label: string; query?: string }> = topic === 'dataset'
     ? ['Audio', 'Image', 'Text', 'Tabular', 'parquet', 'Benchmark'].map((label) => ({ label }))
     : topic === 'skill'
@@ -46,7 +49,7 @@ export default async function ListingPage({
 
   return (
     <div className="mx-auto grid min-w-0 max-w-[1536px] gap-8 px-4 lg:grid-cols-[422px_minmax(0,1fr)]">
-      <FilterRail topic={topic === 'space' ? 'model' : topic} promptVersionTopics={promptVersionTopics} />
+      <FilterRail topic={topic === 'space' ? 'model' : topic} promptVersionTopics={promptVersionTopics} locale={locale} />
       <div className="min-w-0 lg:pt-[34px]">
         <div className="mb-6 flex min-w-0 flex-wrap items-center gap-3">
           <h1 className="flex items-center gap-2 text-xl font-semibold">
@@ -81,15 +84,15 @@ export default async function ListingPage({
               href={`/new?type=${topic}`}
               className="hidden w-full rounded-lg bg-zinc-950 px-4 py-2 text-center text-sm font-semibold text-white hover:bg-zinc-800 sm:w-auto"
             >
-              New {createLabel}
+              {ui(locale, `新規${createLabel}`, `New ${createLabel}`)}
             </a>
-            {topic === 'model' && <a href={filterHref('base')} className="inline-flex h-[30px] w-auto items-center rounded-full border border-zinc-200 px-3 text-center text-sm text-zinc-600 hover:bg-zinc-50">Base only</a>}
-            {topic === 'model' && <a href={filterHref('inference')} className="inline-flex h-[30px] w-auto items-center rounded-full border border-zinc-200 px-3 text-center text-sm text-zinc-600 hover:bg-zinc-50">Inference Available</a>}
-            {topic === 'dataset' && <a href={filterHref(q || 'text')} className="inline-flex h-[30px] w-auto items-center rounded-full border border-zinc-200 px-3 text-center text-sm text-zinc-600 hover:bg-zinc-50">Full-text search</a>}
+            {topic === 'model' && <a href={filterHref('base')} className="inline-flex h-[30px] w-auto items-center rounded-full border border-zinc-200 px-3 text-center text-sm text-zinc-600 hover:bg-zinc-50">{ui(locale, 'ベースのみ', 'Base only')}</a>}
+            {topic === 'model' && <a href={filterHref('inference')} className="inline-flex h-[30px] w-auto items-center rounded-full border border-zinc-200 px-3 text-center text-sm text-zinc-600 hover:bg-zinc-50">{ui(locale, '推論対応', 'Inference available')}</a>}
+            {topic === 'dataset' && <a href={filterHref(q || 'text')} className="inline-flex h-[30px] w-auto items-center rounded-full border border-zinc-200 px-3 text-center text-sm text-zinc-600 hover:bg-zinc-50">{ui(locale, '全文検索', 'Full-text search')}</a>}
             <details name={`${topic}-add-filter-menu`} className="group relative w-auto lg:hidden">
               <summary className="inline-flex h-[30px] w-auto cursor-pointer list-none items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-600 marker:hidden hover:bg-zinc-50 [&::-webkit-details-marker]:hidden">
                 <HfIcon name="sliders" className="h-3.5 w-3.5" />
-                Add filters
+                {ui(locale, 'フィルターを追加', 'Add filters')}
               </summary>
               <div className="absolute left-0 right-auto z-20 mt-2 hidden w-full rounded-lg border border-zinc-200 bg-white p-2 text-sm shadow-lg group-open:grid sm:left-auto sm:right-0 sm:w-56">
                 {mobileFilters.map((item) => (
@@ -102,11 +105,11 @@ export default async function ListingPage({
             <details name={`${topic}-toolbar-menu`} className="group relative w-auto">
               <summary className="inline-flex h-[30px] w-auto cursor-pointer list-none items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-600 marker:hidden hover:bg-zinc-50 [&::-webkit-details-marker]:hidden">
                 <HfIcon name="sort" className="h-3.5 w-3.5" />
-                Sort: {sort === 'stars' ? 'Most liked' : 'Trending'}
+                {ui(locale, '並び順', 'Sort')}: {sort === 'stars' ? ui(locale, 'いいね順', 'Most liked') : ui(locale, 'トレンド', 'Trending')}
               </summary>
               <div className="absolute left-0 right-auto z-20 mt-2 hidden w-full rounded-lg border border-zinc-200 bg-white p-2 text-sm shadow-lg group-open:grid sm:left-auto sm:right-0 sm:w-52">
-                <a href={`${basePath}?sort=updated${querySuffix}`} className="rounded-lg px-3 py-2 font-medium text-zinc-800 hover:bg-zinc-50">Trending</a>
-                <a href={`${basePath}?sort=stars${querySuffix}`} className="rounded-lg px-3 py-2 text-zinc-600 hover:bg-zinc-50">Most liked</a>
+                <a href={`${basePath}?sort=updated${querySuffix}`} className="rounded-lg px-3 py-2 font-medium text-zinc-800 hover:bg-zinc-50">{ui(locale, 'トレンド', 'Trending')}</a>
+                <a href={`${basePath}?sort=stars${querySuffix}`} className="rounded-lg px-3 py-2 text-zinc-600 hover:bg-zinc-50">{ui(locale, 'いいね順', 'Most liked')}</a>
               </div>
             </details>
           </div>
@@ -114,13 +117,14 @@ export default async function ListingPage({
 
         {!result.ok ? (
           <div className="rounded-lg border border-dashed border-zinc-300 p-10 text-center text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-            Could not connect to Forgejo. Please try again shortly.
+            {ui(locale, 'Forgejoに接続できませんでした。しばらくしてから再度お試しください。', 'Could not connect to Forgejo. Please try again shortly.')}
           </div>
         ) : (
           <RepoSearchList
             repos={result.data}
             kind={topic === 'dataset' ? 'dataset' : topic === 'skill' ? 'skill' : topic === 'mcp' ? 'mcp' : topic === 'prompt' ? 'prompt' : 'model'}
-            emptyMessage={`No ${title.toLowerCase()} yet.`}
+            emptyMessage={ui(locale, `${title}はまだありません。`, `No ${title.toLowerCase()} yet.`)}
+            locale={locale}
           />
         )}
       </div>

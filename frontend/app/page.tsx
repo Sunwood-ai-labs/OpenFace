@@ -3,23 +3,30 @@ import BrandMark from '@/components/BrandMark';
 import { searchRepos } from '@/lib/forgejo';
 import HfIcon from '@/components/HfIcon';
 import RepoGrid from '@/components/RepoGrid';
-import { timeAgoEn } from '@/lib/format';
+import { timeAgoEn, timeAgoJa } from '@/lib/format';
+import { getLocale } from '@/lib/i18n-server';
+import { Locale, ui } from '@/lib/i18n';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata = {
-  title: 'OpenFace - The AI community building locally',
-  description: 'A Forgejo-backed community hub for models, datasets, and Spaces.',
-};
+export async function generateMetadata() {
+  const locale = await getLocale();
+  return {
+    title: ui(locale, 'OpenFace - ローカルで育てるAIコミュニティ', 'OpenFace - The AI community building locally'),
+    description: ui(locale, 'Forgejoを基盤としたモデル、データセット、Spaceのコミュニティハブ。', 'A Forgejo-backed community hub for models, datasets, and Spaces.'),
+  };
+}
 
 function CompactRepoList({
   repos,
   href,
   label,
+  locale,
 }: {
   repos: Awaited<ReturnType<typeof searchRepos>>['data'];
   href: string;
   label: string;
+  locale: Locale;
 }) {
   const kind = label === 'Models' ? 'model' : label === 'Datasets' ? 'dataset' : label === 'Skills' ? 'skill' : label === 'MCPs' ? 'mcp' : label === 'Prompts' ? 'prompt' : label === 'Docs' ? 'doc' : 'space';
   const theme = {
@@ -80,6 +87,7 @@ function CompactRepoList({
       title: 'text-teal-900',
     },
   }[kind];
+  const displayLabel = ({ Models: 'モデル', Datasets: 'データセット', Spaces: 'Spaces', Skills: 'スキル', MCPs: 'MCPs', Prompts: 'プロンプト', Docs: 'ナレッジ' } as Record<string, string>)[label] || label;
 
   return (
     <section className="min-w-0">
@@ -88,10 +96,10 @@ function CompactRepoList({
           <span className={`flex h-8 w-8 items-center justify-center rounded-lg ring-1 ${theme.icon}`}>
             <HfIcon name={kind} className="h-3.5 w-3.5" />
           </span>
-          {label}
+          {ui(locale, displayLabel, label)}
         </h2>
         <Link href={href} className={`shrink-0 text-sm font-semibold hover:underline ${theme.browse}`}>
-          Browse all
+          {ui(locale, 'すべて見る', 'Browse all')}
         </Link>
       </div>
       <div className={`divide-y divide-zinc-100 overflow-hidden rounded-xl border shadow-sm ${theme.shell}`}>
@@ -103,14 +111,14 @@ function CompactRepoList({
               <div className="min-w-0">
                 <p className={`truncate font-mono text-sm font-semibold group-hover:underline ${theme.title}`}>{repo.full_name}</p>
                 <p className="mt-1 truncate text-xs text-zinc-500">
-                  Updated {timeAgoEn(repo.updated_at)} · {repo.description || 'No description'}
+                  {ui(locale, `更新 ${timeAgoJa(repo.updated_at)}`, `Updated ${timeAgoEn(repo.updated_at)}`)} · {repo.description || ui(locale, '説明はありません', 'No description')}
                 </p>
               </div>
             </Link>
           );
         })}
         {repos.length === 0 ? (
-          <div className="px-4 py-8 text-center text-sm text-zinc-500">No repositories yet.</div>
+          <div className="px-4 py-8 text-center text-sm text-zinc-500">{ui(locale, 'リポジトリはまだありません。', 'No repositories yet.')}</div>
         ) : null}
       </div>
     </section>
@@ -118,6 +126,7 @@ function CompactRepoList({
 }
 
 export default async function HomePage() {
+  const locale = await getLocale();
   const [models, datasets, spaces, skills, mcps, prompts, docs] = await Promise.all([
     searchRepos({ topic: 'model', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'dataset', sort: 'updated', limit: 8 }),
@@ -133,55 +142,55 @@ export default async function HomePage() {
       <section className="mx-auto max-w-5xl pb-8 pt-8 text-center sm:pt-10">
         <BrandMark className="mx-auto mb-5 h-14 w-14 rounded-[15px]" />
         <h1 className="mx-auto max-w-3xl text-3xl font-extrabold leading-tight tracking-normal text-zinc-950 sm:text-4xl">
-          The AI community building locally.
+          {ui(locale, 'ローカルで育てるAIコミュニティ。', 'The AI community building locally.')}
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-zinc-500">
-          The platform where your team collaborates on models, datasets, applications, skills, MCP servers, and versioned prompts.
+          {ui(locale, 'モデル、データセット、アプリ、スキル、MCPサーバー、バージョン管理されたプロンプトをチームで共有できるプラットフォームです。', 'The platform where your team collaborates on models, datasets, applications, skills, MCP servers, and versioned prompts.')}
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm">
           <Link href="/spaces" className="inline-flex h-10 items-center rounded-full border border-zinc-300 bg-white px-5 font-semibold text-zinc-950 shadow-sm hover:bg-zinc-50">
-            Explore AI Apps
+            {ui(locale, 'AIアプリを見る', 'Explore AI Apps')}
           </Link>
-          <span className="text-zinc-400">or</span>
+          <span className="text-zinc-400">{ui(locale, 'または', 'or')}</span>
           <Link href="/models" className="inline-flex h-10 items-center font-semibold text-zinc-700 underline decoration-zinc-200 underline-offset-8 hover:text-zinc-950">
-            Browse models
+            {ui(locale, 'モデルを見る', 'Browse models')}
           </Link>
         </div>
       </section>
 
       <section className="mx-auto mb-12 grid max-w-[1180px] gap-6 border-y border-zinc-200 py-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
         <div>
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-orange-700">Living knowledge</p>
-          <h2 className="mt-3 font-serif text-4xl leading-none text-zinc-950">Docs are part of the community.</h2>
-          <p className="mt-4 max-w-lg text-sm leading-6 text-zinc-600">Publish articles, Wiki nodes, guides, and reference as normal Forgejo repositories—versioned, discussable, and easy to fork.</p>
-          <Link href="/docs" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-teal-900 hover:underline dark:text-teal-300">Enter the library <HfIcon name="arrowRight" className="h-3 w-3" /></Link>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-orange-700">{ui(locale, '育つナレッジ', 'Living knowledge')}</p>
+          <h2 className="mt-3 font-serif text-4xl leading-none text-zinc-950">{ui(locale, 'ナレッジもコミュニティの一部です。', 'Knowledge is part of the community.')}</h2>
+          <p className="mt-4 max-w-lg text-sm leading-6 text-zinc-600">{ui(locale, '記事、Wiki、ガイド、リファレンスを通常のForgejoリポジトリとして公開できます。履歴を残し、議論し、フォークできます。', 'Publish articles, Wiki nodes, guides, and references as normal Forgejo repositories—versioned, discussable, and easy to fork.')}</p>
+          <Link href="/docs" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-teal-900 hover:underline dark:text-teal-300">{ui(locale, 'ライブラリを開く', 'Enter the library')} <HfIcon name="arrowRight" className="h-3 w-3" /></Link>
         </div>
-        <CompactRepoList repos={docs.data} href="/docs" label="Docs" />
+        <CompactRepoList repos={docs.data} href="/docs" label="Docs" locale={locale} />
       </section>
 
       <section className="mx-auto mb-12 max-w-[1180px]">
         <div className="mb-5 flex items-center justify-center gap-4 text-lg font-bold text-zinc-950">
           <span className="h-px w-24 bg-violet-200" />
-          <span>Agent tooling</span>
+          <span>{ui(locale, 'エージェントツール', 'Agent tooling')}</span>
           <span className="h-px w-24 bg-cyan-200" />
         </div>
         <div className="grid gap-5 lg:grid-cols-3">
-          <CompactRepoList repos={skills.data} href="/skills" label="Skills" />
-          <CompactRepoList repos={mcps.data} href="/mcps" label="MCPs" />
-          <CompactRepoList repos={prompts.data} href="/prompts" label="Prompts" />
+          <CompactRepoList repos={skills.data} href="/skills" label="Skills" locale={locale} />
+          <CompactRepoList repos={mcps.data} href="/mcps" label="MCPs" locale={locale} />
+          <CompactRepoList repos={prompts.data} href="/prompts" label="Prompts" locale={locale} />
         </div>
       </section>
 
       <section className="mx-auto mb-12 max-w-[1180px]">
         <div className="mb-5 flex items-center justify-center gap-4 text-lg font-bold text-zinc-950">
           <span className="h-px w-24 bg-zinc-200" />
-          <span>Trending on OpenFace this week</span>
+          <span>{ui(locale, '今週のOpenFaceトレンド', 'Trending on OpenFace this week')}</span>
           <span className="h-px w-24 bg-zinc-200" />
         </div>
         <div className="grid gap-5 lg:grid-cols-3">
-          <CompactRepoList repos={models.data} href="/models" label="Models" />
-          <CompactRepoList repos={spaces.data} href="/spaces" label="Spaces" />
-          <CompactRepoList repos={datasets.data} href="/datasets" label="Datasets" />
+          <CompactRepoList repos={models.data} href="/models" label="Models" locale={locale} />
+          <CompactRepoList repos={spaces.data} href="/spaces" label="Spaces" locale={locale} />
+          <CompactRepoList repos={datasets.data} href="/datasets" label="Datasets" locale={locale} />
         </div>
       </section>
 
@@ -191,13 +200,13 @@ export default async function HomePage() {
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-700 ring-1 ring-amber-200">
               <HfIcon name="model" className="h-3.5 w-3.5" />
             </span>
-            Latest models
+            {ui(locale, '最新モデル', 'Latest models')}
           </h2>
           <Link href="/models" className="inline-flex items-center gap-1 text-sm font-semibold text-zinc-600 hover:text-zinc-950 hover:underline">
-            Browse all <HfIcon name="arrowRight" className="h-3 w-3" />
+            {ui(locale, 'すべて見る', 'Browse all')} <HfIcon name="arrowRight" className="h-3 w-3" />
           </Link>
         </div>
-        <RepoGrid repos={models.data} kind="model" emptyMessage="No models yet." />
+        <RepoGrid repos={models.data} kind="model" emptyMessage={ui(locale, 'モデルはまだありません。', 'No models yet.')} locale={locale} />
       </section>
 
       <section className="mb-12">
@@ -209,10 +218,10 @@ export default async function HomePage() {
             Spaces
           </h2>
           <Link href="/spaces" className="inline-flex items-center gap-1 text-sm font-semibold text-zinc-600 hover:text-zinc-950 hover:underline">
-            Browse all <HfIcon name="arrowRight" className="h-3 w-3" />
+            {ui(locale, 'すべて見る', 'Browse all')} <HfIcon name="arrowRight" className="h-3 w-3" />
           </Link>
         </div>
-        <RepoGrid repos={spaces.data} kind="space" emptyMessage="No Spaces yet." />
+        <RepoGrid repos={spaces.data} kind="space" emptyMessage={ui(locale, 'Spaceはまだありません。', 'No Spaces yet.')} locale={locale} />
       </section>
 
       <section className="mb-14">
@@ -221,13 +230,13 @@ export default async function HomePage() {
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200">
               <HfIcon name="dataset" className="h-3.5 w-3.5" />
             </span>
-            Datasets
+            {ui(locale, 'データセット', 'Datasets')}
           </h2>
           <Link href="/datasets" className="inline-flex items-center gap-1 text-sm font-semibold text-zinc-600 hover:text-zinc-950 hover:underline">
-            Browse all <HfIcon name="arrowRight" className="h-3 w-3" />
+            {ui(locale, 'すべて見る', 'Browse all')} <HfIcon name="arrowRight" className="h-3 w-3" />
           </Link>
         </div>
-        <RepoGrid repos={datasets.data} kind="dataset" emptyMessage="No datasets yet." />
+        <RepoGrid repos={datasets.data} kind="dataset" emptyMessage={ui(locale, 'データセットはまだありません。', 'No datasets yet.')} locale={locale} />
       </section>
 
     </div>

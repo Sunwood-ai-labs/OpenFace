@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Repo } from '@/lib/forgejo';
-import { timeAgoEn } from '@/lib/format';
+import { timeAgoEn, timeAgoJa } from '@/lib/format';
+import { Locale, ui } from '@/lib/i18n';
 import { nonTypeTopics, repoPromptVersion } from '@/lib/forgejo';
 import HfIcon from './HfIcon';
 
@@ -8,15 +9,17 @@ export default function RepoSearchList({
   repos,
   kind,
   emptyMessage,
+  locale,
 }: {
   repos: Repo[];
   kind: 'model' | 'dataset' | 'skill' | 'mcp' | 'prompt';
   emptyMessage?: string;
+  locale: Locale;
 }) {
   if (!repos || repos.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-zinc-300 p-10 text-center text-sm text-zinc-500">
-        {emptyMessage || 'No repositories found.'}
+        {emptyMessage || ui(locale, 'リポジトリが見つかりません。', 'No repositories found.')}
       </div>
     );
   }
@@ -57,10 +60,10 @@ export default function RepoSearchList({
                 <span
                   data-skill-dependency-count
                   className={`inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${dependencyCount ? 'bg-violet-100 text-violet-700' : 'bg-zinc-100 text-zinc-500'}`}
-                  title={dependencyCount ? `${dependencyCount} evidence-backed Skill workflow links` : 'No Skill workflow links declared'}
+                  title={dependencyCount ? ui(locale, `${dependencyCount}件の根拠付きスキル連携`, `${dependencyCount} evidence-backed Skill workflow links`) : ui(locale, 'スキル連携は未設定です', 'No Skill workflow links declared')}
                 >
                   <HfIcon name="link" className="h-2.5 w-2.5" />
-                  {dependencyCount ? `${dependencyCount} links` : 'Standalone'}
+                  {dependencyCount ? ui(locale, `${dependencyCount}件`, `${dependencyCount} links`) : ui(locale, '単独', 'Standalone')}
                 </span>
               ) : null}
             </div>
@@ -77,7 +80,7 @@ export default function RepoSearchList({
                     </Link>
                   </>
                 ) : null}
-                {' · '}Updated {timeAgoEn(repo.updated_at)}
+                {' · '}{ui(locale, `更新 ${timeAgoJa(repo.updated_at)}`, `Updated ${timeAgoEn(repo.updated_at)}`)}
                 {repo.description ? ` · ${repo.description}` : ''}
               </p>
               <a href={`/git/${owner}/${repo.name}/forks`} className="hidden shrink-0 items-center gap-1 text-xs hover:text-zinc-700 sm:inline-flex" title="Forks">

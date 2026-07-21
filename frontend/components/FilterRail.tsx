@@ -1,5 +1,7 @@
 import HfIcon, { HfIconName } from './HfIcon';
 import type { RepoKind } from '@/lib/forgejo';
+import type { Locale } from '@/lib/i18n';
+import { ui } from '@/lib/i18n';
 
 interface FilterGroup {
   title: string;
@@ -146,7 +148,7 @@ const promptFamilyFilters: FilterGroup[] = [
   },
 ];
 
-export default function FilterRail({ topic, promptVersionTopics = [] }: { topic: Exclude<RepoKind, 'space'>; promptVersionTopics?: string[] }) {
+export default function FilterRail({ topic, promptVersionTopics = [], locale }: { topic: Exclude<RepoKind, 'space'>; promptVersionTopics?: string[]; locale: Locale }) {
   const promptFilters: FilterGroup[] = [
     ...promptFamilyFilters,
     ...(promptVersionTopics.length > 0 ? [{
@@ -162,6 +164,11 @@ export default function FilterRail({ topic, promptVersionTopics = [] }: { topic:
   const groups = topic === 'dataset' ? datasetFilters : topic === 'skill' ? skillFilters : topic === 'mcp' ? mcpFilters : topic === 'prompt' ? promptFilters : modelFilters;
   const basePath = topic === 'dataset' ? '/datasets' : topic === 'skill' ? '/skills' : topic === 'mcp' ? '/mcps' : topic === 'prompt' ? '/prompts' : '/models';
   const filterHref = (label: string) => `${basePath}?q=${encodeURIComponent(label.toLowerCase())}`;
+  const localize = (label: string) => ({
+    Main: 'メイン', Tasks: 'タスク', Libraries: 'ライブラリ', Languages: '言語', Licenses: 'ライセンス', Other: 'その他',
+    Parameters: 'パラメーター', Apps: 'アプリ', Modalities: 'モダリティ', 'Size (rows)': 'サイズ（行数）', Format: '形式', Type: '種類',
+    'Use cases': '用途', Clients: 'クライアント', Capabilities: '機能', 'Prompt families': 'プロンプト分類', 'Version tags': 'バージョンタグ',
+  } as Record<string, string>)[label] || label;
 
   return (
     <aside className="hidden border-r border-zinc-100 pr-5 lg:block">
@@ -177,7 +184,7 @@ export default function FilterRail({ topic, promptVersionTopics = [] }: { topic:
                   : 'shrink-0 py-1 text-xs text-zinc-500 hover:text-zinc-900'
               }
             >
-              {tab}
+              {ui(locale, localize(tab), tab)}
             </a>
           ))}
         </div>
@@ -185,7 +192,7 @@ export default function FilterRail({ topic, promptVersionTopics = [] }: { topic:
         <div className="space-y-8">
           {groups.map((group) => (
             <section key={group.title}>
-              <h2 className="mb-4 text-sm font-medium text-zinc-500">{group.title}</h2>
+              <h2 className="mb-4 text-sm font-medium text-zinc-500">{ui(locale, localize(group.title), group.title)}</h2>
               {group.range && (
                 <div>
                   <div className="mb-2 flex items-center justify-between gap-2 text-xs text-zinc-500">
@@ -207,12 +214,12 @@ export default function FilterRail({ topic, promptVersionTopics = [] }: { topic:
                     <div className="absolute left-1 right-1 top-2 h-1 rounded-full bg-zinc-950" />
                     <a
                       href={filterHref(`${group.title} ${group.range.start}`)}
-                      aria-label={`Filter ${group.title} ${group.range.start}`}
+                      aria-label={ui(locale, `${localize(group.title)}を${group.range.start}で絞り込む`, `Filter ${group.title} ${group.range.start}`)}
                       className="absolute left-0 top-0 h-5 w-5 rounded-full bg-zinc-950 ring-offset-2 hover:ring-2 hover:ring-zinc-300"
                     />
                     <a
                       href={filterHref(`${group.title} ${group.range.end}`)}
-                      aria-label={`Filter ${group.title} ${group.range.end}`}
+                      aria-label={ui(locale, `${localize(group.title)}を${group.range.end}で絞り込む`, `Filter ${group.title} ${group.range.end}`)}
                       className="absolute right-0 top-0 h-5 w-5 rounded-full bg-zinc-950 ring-offset-2 hover:ring-2 hover:ring-zinc-300"
                     />
                   </div>

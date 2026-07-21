@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { searchAllReposByTopicAndQuery, searchReposByTopicAndQuery, SortOption } from '@/lib/forgejo';
-import { timeAgoEn } from '@/lib/format';
+import { timeAgoEn, timeAgoJa } from '@/lib/format';
+import { getLocale } from '@/lib/i18n-server';
+import { ui } from '@/lib/i18n';
 import { getSpaceTheme } from '@/lib/space-theme';
 import HfIcon, { type HfIconName } from './HfIcon';
 import SpaceStatusBadge from './SpaceStatusBadge';
@@ -23,19 +25,19 @@ const compactName = (name: string) =>
 const withoutEmoji = (value: string) =>
   value.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').replace(/\s{2,}/g, ' ').trim();
 
-const categoryItems: Array<{ label: string; icon: HfIconName }> = [
-  { label: 'Image Generation', icon: 'image' },
-  { label: 'Video Generation', icon: 'video' },
-  { label: 'Text Generation', icon: 'filePen' },
-  { label: 'Language Translation', icon: 'globe' },
-  { label: 'Speech Synthesis', icon: 'microphone' },
-  { label: '3D Modeling', icon: 'cube' },
-  { label: 'Music Generation', icon: 'music' },
-  { label: 'Object Detection', icon: 'eye' },
-  { label: 'Text Analysis', icon: 'chart' },
-  { label: 'Image Editing', icon: 'sparkles' },
-  { label: 'Code Generation', icon: 'code' },
-  { label: 'Question Answering', icon: 'sliders' },
+const categoryItems: Array<{ label: string; ja: string; icon: HfIconName }> = [
+  { label: 'Image Generation', ja: '画像生成', icon: 'image' },
+  { label: 'Video Generation', ja: '動画生成', icon: 'video' },
+  { label: 'Text Generation', ja: '文章生成', icon: 'filePen' },
+  { label: 'Language Translation', ja: '翻訳', icon: 'globe' },
+  { label: 'Speech Synthesis', ja: '音声合成', icon: 'microphone' },
+  { label: '3D Modeling', ja: '3Dモデリング', icon: 'cube' },
+  { label: 'Music Generation', ja: '音楽生成', icon: 'music' },
+  { label: 'Object Detection', ja: '物体検出', icon: 'eye' },
+  { label: 'Text Analysis', ja: '文章分析', icon: 'chart' },
+  { label: 'Image Editing', ja: '画像編集', icon: 'sparkles' },
+  { label: 'Code Generation', ja: 'コード生成', icon: 'code' },
+  { label: 'Question Answering', ja: '質問応答', icon: 'sliders' },
 ];
 
 export default async function SpacesDirectoryPage({
@@ -43,6 +45,7 @@ export default async function SpacesDirectoryPage({
 }: {
   searchParams?: { q?: string; sort?: string; page?: string };
 }) {
+  const locale = await getLocale();
   const q = searchParams?.q?.trim() || undefined;
   const sort: SortOption = searchParams?.sort === 'stars' ? 'stars' : 'updated';
   const requestedPage = Number.parseInt(searchParams?.page || '1', 10);
@@ -69,7 +72,7 @@ export default async function SpacesDirectoryPage({
     ? rankedRepos.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
     : rankedRepos;
   const querySuffix = q ? `&q=${encodeURIComponent(q)}` : '';
-  const sortLabel = sort === 'stars' ? 'Most liked' : 'Relevance';
+  const sortLabel = sort === 'stars' ? ui(locale, 'いいね順', 'Most liked') : ui(locale, '関連度', 'Relevance');
   const totalPages = Math.max(1, Math.ceil(result.total_count / PAGE_SIZE));
   const pageStart = result.total_count === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const pageEnd = Math.min(page * PAGE_SIZE, result.total_count);
@@ -90,7 +93,7 @@ export default async function SpacesDirectoryPage({
             <HfIcon name="space" className="h-6 w-6 text-orange-500" />
             <span>Spaces</span>
             <span className="text-zinc-300 max-sm:text-lg">·</span>
-            <span className="text-zinc-500 max-sm:text-lg max-sm:font-medium">The AI App Directory</span>
+            <span className="text-zinc-500 max-sm:text-lg max-sm:font-medium">{ui(locale, 'AIアプリ一覧', 'The AI App Directory')}</span>
           </h1>
           <div className="ml-auto flex flex-wrap items-center gap-2 max-sm:ml-0 max-sm:flex-nowrap">
             <Link
@@ -98,7 +101,7 @@ export default async function SpacesDirectoryPage({
               className="inline-flex h-9 items-center gap-2 rounded-full bg-zinc-900 px-3.5 text-sm font-semibold text-white hover:bg-zinc-700"
             >
               <HfIcon name="plus" className="h-3.5 w-3.5" />
-              New Space
+              {ui(locale, '新規Space', 'New Space')}
             </Link>
             <a
               href="https://huggingface.co/docs/hub/spaces-overview"
@@ -107,7 +110,7 @@ export default async function SpacesDirectoryPage({
               className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-200 bg-white px-3.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
             >
               <HfIcon name="file" className="h-3.5 w-3.5" />
-              Learn more
+              {ui(locale, '詳しく見る', 'Learn more')}
             </a>
           </div>
         </div>
@@ -117,7 +120,7 @@ export default async function SpacesDirectoryPage({
             type="text"
             name="q"
             defaultValue={q}
-            placeholder="Ask anything you want to do with AI"
+            placeholder={ui(locale, 'AIでやりたいことを入力', 'Ask anything you want to do with AI')}
             className="h-12 w-full rounded-full border border-zinc-200 bg-white px-12 text-base text-zinc-700 shadow-sm placeholder:text-zinc-400 focus:border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100"
           />
           <HfIcon name="cube" className="absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-400" />
@@ -130,7 +133,7 @@ export default async function SpacesDirectoryPage({
               className="flex min-w-[92px] flex-col items-center justify-center gap-1.5 text-center text-[12px] leading-tight text-zinc-500 hover:text-zinc-900"
             >
               <HfIcon name={category.icon} className="h-5 w-5 text-zinc-400" />
-              <span className="select-none">{category.label}</span>
+              <span className="select-none">{ui(locale, category.ja, category.label)}</span>
             </Link>
           ))}
         </div>
@@ -138,7 +141,7 @@ export default async function SpacesDirectoryPage({
       <div className="mx-auto mb-7 flex max-w-[1536px] flex-wrap items-center gap-3 px-4 max-sm:mb-0 max-sm:gap-2">
         <h2 className="inline-flex h-[34px] min-w-0 items-center gap-2 rounded-full border border-rose-100 bg-rose-50 px-4 text-sm font-bold text-zinc-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] max-sm:order-1 max-sm:px-3">
           <HfIcon name="fire" className="h-3.5 w-3.5 text-orange-500" />
-          <span className="truncate">Spaces of the week</span>
+          <span className="truncate">{ui(locale, '今週のSpaces', 'Spaces of the week')}</span>
         </h2>
         <span className="inline-flex h-[34px] min-w-0 items-center justify-center gap-3 whitespace-nowrap rounded-full border border-zinc-100 px-3 text-sm text-zinc-500 max-sm:order-4 max-sm:ml-auto">
           <HfIcon name="arrowLeft" className="h-3 w-3 text-zinc-300" />
@@ -150,7 +153,7 @@ export default async function SpacesDirectoryPage({
             type="text"
             name="q"
             defaultValue={q}
-            placeholder="Filter by name"
+            placeholder={ui(locale, '名前で絞り込む', 'Filter by name')}
             className="h-[34px] w-full rounded-full border border-zinc-200 px-3 pl-9 text-xs placeholder-zinc-400 shadow-sm sm:px-4 sm:pl-10 sm:text-sm"
           />
           <HfIcon name="search" className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
@@ -158,30 +161,30 @@ export default async function SpacesDirectoryPage({
         <details name="spaces-toolbar-menu" className="group relative shrink-0 max-sm:order-2 max-sm:ml-auto">
           <summary className="inline-flex h-[34px] cursor-pointer list-none items-center justify-center gap-2 rounded-full border border-zinc-200 px-3 text-xs text-zinc-700 shadow-sm marker:hidden max-sm:w-8 max-sm:px-0 sm:text-sm [&::-webkit-details-marker]:hidden">
             <HfIcon name="filter" className="h-3.5 w-3.5" />
-            <span className="max-sm:hidden">Filters (0)</span>
+            <span className="max-sm:hidden">{ui(locale, 'フィルター (0)', 'Filters (0)')}</span>
           </summary>
           <div className="absolute right-0 z-20 mt-2 hidden w-56 rounded-lg border border-zinc-200 bg-white p-2 text-sm shadow-lg group-open:grid max-sm:left-0 max-sm:right-auto max-sm:w-56">
-            <a href="/spaces" className="block rounded-lg px-3 py-2 font-medium text-zinc-800 hover:bg-zinc-50">All Spaces</a>
-            <a href={`/spaces?q=voice&sort=${sort}`} className="block rounded-lg px-3 py-2 text-zinc-600 hover:bg-zinc-50">Voice apps</a>
-            <a href={`/spaces?q=image&sort=${sort}`} className="block rounded-lg px-3 py-2 text-zinc-600 hover:bg-zinc-50">Image apps</a>
-            <a href={`/spaces?q=document&sort=${sort}`} className="block rounded-lg px-3 py-2 text-zinc-600 hover:bg-zinc-50">Document apps</a>
+            <a href="/spaces" className="block rounded-lg px-3 py-2 font-medium text-zinc-800 hover:bg-zinc-50">{ui(locale, 'すべてのSpaces', 'All Spaces')}</a>
+            <a href={`/spaces?q=voice&sort=${sort}`} className="block rounded-lg px-3 py-2 text-zinc-600 hover:bg-zinc-50">{ui(locale, '音声アプリ', 'Voice apps')}</a>
+            <a href={`/spaces?q=image&sort=${sort}`} className="block rounded-lg px-3 py-2 text-zinc-600 hover:bg-zinc-50">{ui(locale, '画像アプリ', 'Image apps')}</a>
+            <a href={`/spaces?q=document&sort=${sort}`} className="block rounded-lg px-3 py-2 text-zinc-600 hover:bg-zinc-50">{ui(locale, '文書アプリ', 'Document apps')}</a>
           </div>
         </details>
         <details name="spaces-toolbar-menu" className="group relative shrink-0 max-sm:order-3">
           <summary className="inline-flex h-[34px] min-w-0 cursor-pointer list-none items-center gap-1.5 rounded-full border border-zinc-200 px-2.5 text-xs text-zinc-700 shadow-sm marker:hidden sm:gap-2 sm:px-3 sm:text-sm [&::-webkit-details-marker]:hidden">
             <HfIcon name="sort" className="h-3.5 w-3.5" />
-            <span className="truncate">Sort: {sortLabel}</span>
+            <span className="truncate">{ui(locale, '並び順', 'Sort')}: {sortLabel}</span>
           </summary>
           <div className="absolute right-0 z-20 mt-2 hidden w-52 rounded-lg border border-zinc-200 bg-white p-2 text-sm shadow-lg group-open:grid max-sm:left-0 max-sm:right-auto max-sm:w-52">
-                <a href={`/spaces?sort=updated${querySuffix}`} className="block rounded-lg px-3 py-2 font-medium text-zinc-800 hover:bg-zinc-50">Relevance</a>
-            <a href={`/spaces?sort=stars${querySuffix}`} className="block rounded-lg px-3 py-2 text-zinc-600 hover:bg-zinc-50">Most liked</a>
+                <a href={`/spaces?sort=updated${querySuffix}`} className="block rounded-lg px-3 py-2 font-medium text-zinc-800 hover:bg-zinc-50">{ui(locale, '関連度', 'Relevance')}</a>
+            <a href={`/spaces?sort=stars${querySuffix}`} className="block rounded-lg px-3 py-2 text-zinc-600 hover:bg-zinc-50">{ui(locale, 'いいね順', 'Most liked')}</a>
           </div>
         </details>
       </div>
 
       {!result.ok ? (
         <div className="rounded-lg border border-dashed border-zinc-300 p-10 text-center text-zinc-500">
-          Could not connect to Forgejo. Please try again shortly.
+          {ui(locale, 'Forgejoに接続できませんでした。しばらくしてから再度お試しください。', 'Could not connect to Forgejo. Please try again shortly.')}
         </div>
       ) : (
         <SpaceStatusProvider initialStatuses={spaceStatuses}>
@@ -197,14 +200,14 @@ export default async function SpacesDirectoryPage({
                 key={repo.id ?? repo.full_name}
                 className={`group relative flex h-[168px] cursor-pointer flex-col overflow-hidden rounded-xl bg-gradient-to-br ${spaceTheme.gradient} text-white shadow-[0_1px_3px_rgba(0,0,0,0.10),0_1px_2px_rgba(0,0,0,0.10)] ring-1 ring-black/10 transition hover:-translate-y-0.5 hover:shadow-lg focus-within:ring-2 focus-within:ring-zinc-950 focus-within:ring-offset-2`}
               >
-                <Link href={spaceHref} className="absolute inset-0 z-0 rounded-xl" aria-label={`Open ${repo.full_name}`} />
+                <Link href={spaceHref} className="absolute inset-0 z-0 rounded-xl" aria-label={ui(locale, `${repo.full_name}を開く`, `Open ${repo.full_name}`)} />
                 <div className="pointer-events-none relative z-10 flex min-h-0 flex-1 flex-col px-4 pb-2 pt-2.5">
                   <div className="mb-[18px] flex items-start gap-1.5 text-[11px] font-semibold leading-none text-white/90">
                     <SpaceStatusBadge owner={owner} repo={repo.name} />
                     {agents ? <Link href="/spaces?q=agents" className="pointer-events-auto hidden rounded bg-white/15 px-1.5 py-1 shadow-sm ring-1 ring-white/10 backdrop-blur hover:bg-white/25 min-[390px]:inline">Agents</Link> : null}
                     <Link href="/spaces?sort=stars" className="pointer-events-auto ml-auto inline-flex items-center gap-1 rounded bg-white/15 px-1.5 py-1 shadow-sm ring-1 ring-white/10 backdrop-blur hover:bg-white/25">
                       <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
-                      Featured
+                      {ui(locale, '注目', 'Featured')}
                     </Link>
                     <a href={`/git/${owner}/${repo.name}`} className="pointer-events-auto inline-flex items-center gap-1 rounded bg-white/15 px-1.5 py-1 shadow-sm ring-1 ring-white/10 backdrop-blur hover:bg-white/25">
                       <HfIcon name="heart" className="h-3 w-3" />
@@ -216,7 +219,7 @@ export default async function SpacesDirectoryPage({
                     <span className="truncate">{withoutEmoji(compactName(repo.name))}</span>
                   </div>
                   <p className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-white/85">
-                    {withoutEmoji(repo.description || 'AI application running on OpenFace')}
+                    {withoutEmoji(repo.description || ui(locale, 'OpenFaceで動作するAIアプリ', 'AI application running on OpenFace'))}
                   </p>
                 </div>
                 <div className="pointer-events-none relative z-10 mt-auto flex h-[33px] items-center justify-between gap-3 bg-black/10 px-4 text-xs font-medium text-white/85 backdrop-blur-sm">
@@ -229,7 +232,7 @@ export default async function SpacesDirectoryPage({
                       <HfIcon name="eye" className="h-3 w-3" />
                       {agentMetrics.views}
                     </span>
-                    <span>{timeAgoEn(repo.updated_at)}</span>
+                    <span>{locale === 'ja' ? timeAgoJa(repo.updated_at) : timeAgoEn(repo.updated_at)}</span>
                   </span>
                 </div>
               </article>
@@ -244,22 +247,22 @@ export default async function SpacesDirectoryPage({
           <div>
             <h2 className="inline-flex items-center gap-2 rounded-lg bg-zinc-50 px-4 py-2 text-sm font-bold text-zinc-800">
               <HfIcon name="bars" className="h-3.5 w-3.5 text-zinc-600" />
-              Public CPU apps, trending first
+              {ui(locale, '公開CPUアプリ（トレンド順）', 'Public CPU apps, trending first')}
             </h2>
             <p className="mt-2 pl-1 text-xs font-medium text-zinc-500">
-              Showing {pageStart.toLocaleString()}–{pageEnd.toLocaleString()} of {result.total_count.toLocaleString()} Spaces
+              {ui(locale, `${result.total_count.toLocaleString()}件中 ${pageStart.toLocaleString()}–${pageEnd.toLocaleString()}件を表示`, `Showing ${pageStart.toLocaleString()}–${pageEnd.toLocaleString()} of ${result.total_count.toLocaleString()} Spaces`)}
             </p>
           </div>
-          <nav aria-label="Spaces pagination" className="ml-auto flex items-center gap-2">
+          <nav aria-label={ui(locale, 'Spacesのページ送り', 'Spaces pagination')} className="ml-auto flex items-center gap-2">
             {page > 1 ? (
               <Link href={pageHref(page - 1)} className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 shadow-sm hover:border-zinc-300 hover:bg-zinc-50">
                 <HfIcon name="arrowLeft" className="h-3 w-3" />
-                Previous
+                {ui(locale, '前へ', 'Previous')}
               </Link>
             ) : (
               <span aria-disabled="true" className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-100 bg-zinc-50 px-4 text-sm font-semibold text-zinc-300">
                 <HfIcon name="arrowLeft" className="h-3 w-3" />
-                Previous
+                {ui(locale, '前へ', 'Previous')}
               </span>
             )}
             <span className="inline-flex h-9 min-w-24 items-center justify-center rounded-full bg-zinc-900 px-4 text-sm font-bold text-white">
@@ -267,12 +270,12 @@ export default async function SpacesDirectoryPage({
             </span>
             {page < totalPages ? (
               <Link href={pageHref(page + 1)} className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 shadow-sm hover:border-zinc-300 hover:bg-zinc-50">
-                Next
+                {ui(locale, '次へ', 'Next')}
                 <HfIcon name="arrowRight" className="h-3 w-3" />
               </Link>
             ) : (
               <span aria-disabled="true" className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-100 bg-zinc-50 px-4 text-sm font-semibold text-zinc-300">
-                Next
+                {ui(locale, '次へ', 'Next')}
                 <HfIcon name="arrowRight" className="h-3 w-3" />
               </span>
             )}

@@ -1,11 +1,10 @@
 import ListingPage from '@/components/ListingPage';
+import { getLocale } from '@/lib/i18n-server';
+import { ui } from '@/lib/i18n';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata = {
-  title: 'Datasets - OpenFace',
-  description: 'Explore datasets and benchmark assets shared on OpenFace.',
-};
+export async function generateMetadata() { const locale = await getLocale(); return { title: `${ui(locale, 'データセット', 'Datasets')} - OpenFace`, description: ui(locale, 'OpenFaceで共有されているデータセットとベンチマークを探せます。', 'Explore datasets and benchmark assets shared on OpenFace.') }; }
 
 export default async function DatasetsPage({
   searchParams,
@@ -13,12 +12,13 @@ export default async function DatasetsPage({
   searchParams: Promise<{ q?: string; sort?: string }>;
 }) {
   const resolvedSearchParams = await searchParams;
+  const locale = await getLocale();
   return (
     <ListingPage
       topic="dataset"
-      title="Datasets"
+      title={ui(locale, 'データセット', 'Datasets')}
       icon="dataset"
-      placeholder="Filter by name"
+      placeholder={ui(locale, '名前で絞り込む', 'Filter by name')}
       searchParams={resolvedSearchParams}
     />
   );
