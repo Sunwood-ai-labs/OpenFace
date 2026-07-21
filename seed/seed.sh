@@ -1463,7 +1463,7 @@ delete_legacy_space() {
 
 import_hf_space() {
   local source="$1" name="$2" description="$3"
-  local code clone_dir push_url
+  local code clone_dir push_url attempt cloned
 
   code=$(api GET "/repos/${ORG_NAME}/${name}")
   if [ "$code" = "200" ]; then
@@ -1477,9 +1477,22 @@ import_hf_space() {
   log "Cloning public CPU Space '${source}'..."
   # Forgejo rejects pushes from shallow repositories by default, so mirror the
   # complete (small, vetted) Space history rather than using --depth 1.
-  if ! git clone "https://huggingface.co/spaces/${source}" "$clone_dir"; then
-    log "ERROR: failed to clone '${source}'."
-    exit 1
+  cloned=0
+  for attempt in 1 2 3; do
+    if git clone "https://huggingface.co/spaces/${source}" "$clone_dir"; then
+      cloned=1
+      break
+    fi
+    rm -rf "$clone_dir"
+    log "WARNING: clone attempt ${attempt}/3 failed for '${source}'."
+    sleep $((attempt * 2))
+  done
+  if [ "$cloned" != "1" ]; then
+    # A temporary upstream outage must not prevent the local catalog, HTTPS
+    # gateway, or visual QA from starting. The next idempotent seed run retries
+    # this real public Space because no placeholder repository was created.
+    log "WARNING: skipping unavailable upstream Space '${source}' after 3 attempts."
+    return 0
   fi
 
   code=$(api POST "/orgs/${ORG_NAME}/repos" "$(jq -n \
