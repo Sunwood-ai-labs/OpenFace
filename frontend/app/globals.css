@@ -289,6 +289,20 @@ html[data-openface-theme="solarpunk"] .openface-theme-selector:hover {
   box-shadow: 0 4px 14px rgb(66 111 70 / 18%);
 }
 
+/* Solarpunk intentionally keeps its header light even when the OS requests
+   dark mode, so this control must not inherit the generic dark-mode text. */
+html[data-openface-theme="solarpunk"] .openface-language-selector {
+  border-color: #94b889;
+  background: #f5f8ef;
+  color: #24583b;
+}
+
+html[data-openface-theme="solarpunk"] .openface-language-selector:hover {
+  border-color: #527f55;
+  background: #e7f0dc;
+  color: #173b2c;
+}
+
 /* -------------------------------------------------------------------------
    Cyberpunk — ink-black panels over a restrained electric grid. Bright
    cyan and magenta are reserved for interactive accents and identity. */
