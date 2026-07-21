@@ -18,6 +18,8 @@ npm run docs:build  PASS
 browser console     0 errors / 0 warnings
 desktop overflow    false at 1440 × 1000
 mobile overflow     false at 390 × 844
+GitHub CI            PASS (run 29833110449)
+Docs + Pages deploy  PASS (run 29833110352)
 ```
 
 The mobile platform-map table uses a local horizontal scroll container; the page itself does not overflow.
@@ -35,5 +37,11 @@ The mobile platform-map table uses a local horizontal scroll container; the page
 | Knowledge node | Mobile navigation |
 |---|---|
 | ![Platform map knowledge node](wiki-platform-map.png) | ![Expanded Japanese mobile navigation](mobile-navigation-open.png) |
+
+### Published GitHub Pages
+
+![Published editorial home after the successful Pages deployment](production-home.png)
+
+The published home returned the expected `OpenFace Field Manual | OpenFace` title without horizontal overflow. Clicking **Open the knowledge atlas** navigated to `/OpenFace/wiki/` and rendered the atlas index.
 
 Additional captures preserve the scrolled Japanese home and the mobile Wiki table. The dark-theme switch and mobile navigation were clicked in the real VitePress site before the screenshots were recorded.
