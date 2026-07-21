@@ -44,7 +44,7 @@ function firstParagraph(markdown: string): string {
     .replace(/^#.*$/gm, '')
     .split(/\n\s*\n/)
     .map((block) => block.replace(/[`*_>#\[\]]/g, '').replace(/\s+/g, ' ').trim())
-    .find((block) => block.length > 30 && !block.startsWith('|')) || 'Open this entry to read the complete knowledge note.';
+    .find((block) => block.length > 30 && !block.startsWith('|')) || 'この記事を開いて、ナレッジの全文を確認してください。';
 }
 
 const formatEmoji: Record<KnowledgeFormat, string> = {
