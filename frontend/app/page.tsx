@@ -21,7 +21,7 @@ function CompactRepoList({
   href: string;
   label: string;
 }) {
-  const kind = label === 'Models' ? 'model' : label === 'Datasets' ? 'dataset' : label === 'Skills' ? 'skill' : label === 'MCPs' ? 'mcp' : label === 'Prompts' ? 'prompt' : 'space';
+  const kind = label === 'Models' ? 'model' : label === 'Datasets' ? 'dataset' : label === 'Skills' ? 'skill' : label === 'MCPs' ? 'mcp' : label === 'Prompts' ? 'prompt' : label === 'Docs' ? 'doc' : 'space';
   const theme = {
     model: {
       shell: 'border-zinc-200 bg-white',
@@ -71,6 +71,14 @@ function CompactRepoList({
       browse: 'text-orange-700 hover:text-orange-900',
       title: 'text-orange-800',
     },
+    doc: {
+      shell: 'border-teal-200/80 bg-gradient-to-b from-teal-50/80 via-white to-white shadow-teal-100/60',
+      icon: 'bg-teal-100 text-teal-800 ring-teal-200',
+      link: 'hover:bg-teal-50/80',
+      dot: 'bg-teal-700',
+      browse: 'text-teal-800 hover:text-teal-950',
+      title: 'text-teal-900',
+    },
   }[kind];
 
   return (
@@ -110,13 +118,14 @@ function CompactRepoList({
 }
 
 export default async function HomePage() {
-  const [models, datasets, spaces, skills, mcps, prompts] = await Promise.all([
+  const [models, datasets, spaces, skills, mcps, prompts, docs] = await Promise.all([
     searchRepos({ topic: 'model', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'dataset', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'space', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'skill', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'mcp', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'prompt', sort: 'updated', limit: 8 }),
+    searchRepos({ topic: 'doc', sort: 'updated', limit: 8 }),
   ]);
 
   return (
@@ -138,6 +147,16 @@ export default async function HomePage() {
             Browse models
           </Link>
         </div>
+      </section>
+
+      <section className="mx-auto mb-12 grid max-w-[1180px] gap-6 border-y border-zinc-200 py-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
+        <div>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-orange-700">Living knowledge</p>
+          <h2 className="mt-3 font-serif text-4xl leading-none text-zinc-950">Docs are part of the community.</h2>
+          <p className="mt-4 max-w-lg text-sm leading-6 text-zinc-600">Publish articles, Wiki nodes, guides, and reference as normal Forgejo repositories—versioned, discussable, and easy to fork.</p>
+          <Link href="/docs" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-teal-900 hover:underline">Enter the library <HfIcon name="arrowRight" className="h-3 w-3" /></Link>
+        </div>
+        <CompactRepoList repos={docs.data} href="/docs" label="Docs" />
       </section>
 
       <section className="mx-auto mb-12 max-w-[1180px]">

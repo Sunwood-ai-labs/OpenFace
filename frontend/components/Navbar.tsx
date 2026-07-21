@@ -14,7 +14,7 @@ const navItems = [
   { href: '/skills', label: 'Skills' },
   { href: '/mcps', label: 'MCPs' },
   { href: '/prompts', label: 'Prompts' },
-  { href: 'https://sunwood-ai-labs.github.io/OpenFace/', label: 'Docs' },
+  { href: '/docs', label: 'Docs' },
 ];
 
 export default function Navbar() {
@@ -53,7 +53,7 @@ export default function Navbar() {
                 <a href="/skills" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Skills</a>
                 <a href="/mcps" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">MCPs</a>
                 <a href="/prompts" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Prompts</a>
-                <a href="https://sunwood-ai-labs.github.io/OpenFace/" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Docs</a>
+                <a href="/docs" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Docs</a>
               </div>
               <div>
                 <h2 className="mb-2 text-xs font-semibold uppercase tracking-normal text-zinc-400">Community</h2>

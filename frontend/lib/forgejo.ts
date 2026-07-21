@@ -152,7 +152,7 @@ async function apiFetch(path: string): Promise<{ ok: boolean; status: number; js
 // ---------------------------------------------------------------------------
 // Repo search — topic-classified listing (models / datasets / spaces)
 // ---------------------------------------------------------------------------
-export type RepoKind = 'model' | 'dataset' | 'space' | 'skill' | 'mcp' | 'prompt';
+export type RepoKind = 'model' | 'dataset' | 'space' | 'skill' | 'mcp' | 'prompt' | 'doc';
 
 export interface SearchReposParams {
   topic?: RepoKind;
@@ -527,7 +527,7 @@ export function forgejoCommitsUrl(owner: string, repo: string, path = '', branch
   return `${forgejoRepoUrl(owner, repo)}/commits/branch/${branch}${cleanPath ? `/${cleanPath}` : ''}`;
 }
 
-const TYPE_TOPICS = new Set<string>(['model', 'dataset', 'space', 'skill', 'mcp', 'prompt']);
+const TYPE_TOPICS = new Set<string>(['model', 'dataset', 'space', 'skill', 'mcp', 'prompt', 'doc']);
 
 const VERSION_TOPIC = /^version-(v\d+(?:\.\d+)*)$/i;
 
@@ -550,5 +550,6 @@ export function repoKind(topics: string[] | undefined): RepoKind | null {
   if (topics.includes('skill')) return 'skill';
   if (topics.includes('mcp')) return 'mcp';
   if (topics.includes('prompt')) return 'prompt';
+  if (topics.includes('doc')) return 'doc';
   return null;
 }

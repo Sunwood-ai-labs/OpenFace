@@ -48,6 +48,12 @@ const repoTypes: Array<{
     icon: 'prompt',
     description: 'Versioned instructions for agents, workflows, and reusable commands.',
   },
+  {
+    label: 'Doc',
+    topic: 'doc',
+    icon: 'doc',
+    description: 'Articles, Wiki nodes, guides, and durable reference material.',
+  },
 ];
 
 const templates = [
@@ -58,6 +64,7 @@ const templates = [
   { label: 'Agent Skill', topic: 'skill', repo: 'my-agent-skill', slug: 'agent-skill' },
   { label: 'MCP server', topic: 'mcp', repo: 'my-mcp-server', slug: 'mcp-server' },
   { label: 'Versioned prompt', topic: 'prompt', repo: 'my-agent-prompt', slug: 'versioned-prompt' },
+  { label: 'Documentation', topic: 'doc', repo: 'my-team-handbook', slug: 'documentation' },
   { label: 'Empty repository', topic: 'model', repo: 'my-openface-repo', slug: 'empty-repository' },
 ];
 
@@ -68,6 +75,7 @@ const typeConfig: Record<string, { title: string; repoPlaceholder: string; cance
   skill: { title: 'Create a new Skill', repoPlaceholder: 'my-agent-skill', cancelHref: '/skills' },
   mcp: { title: 'Create a new MCP server', repoPlaceholder: 'my-mcp-server', cancelHref: '/mcps' },
   prompt: { title: 'Create a new Prompt', repoPlaceholder: 'my-agent-prompt', cancelHref: '/prompts' },
+  doc: { title: 'Create a new Doc', repoPlaceholder: 'my-team-handbook', cancelHref: '/docs' },
 };
 
 export default async function NewRepoGuidePage({
@@ -76,7 +84,7 @@ export default async function NewRepoGuidePage({
   searchParams?: Promise<{ type?: string; template?: string }>;
 }) {
   const resolvedSearchParams = await searchParams;
-  const requestedType = resolvedSearchParams?.type === 'model' || resolvedSearchParams?.type === 'dataset' || resolvedSearchParams?.type === 'space' || resolvedSearchParams?.type === 'skill' || resolvedSearchParams?.type === 'mcp' || resolvedSearchParams?.type === 'prompt'
+  const requestedType = resolvedSearchParams?.type === 'model' || resolvedSearchParams?.type === 'dataset' || resolvedSearchParams?.type === 'space' || resolvedSearchParams?.type === 'skill' || resolvedSearchParams?.type === 'mcp' || resolvedSearchParams?.type === 'prompt' || resolvedSearchParams?.type === 'doc'
     ? resolvedSearchParams.type
     : 'space';
   const config = typeConfig[requestedType];

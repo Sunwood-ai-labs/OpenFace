@@ -35,6 +35,8 @@ export default function DetailTabs({
           ? 'MCP card'
           : kind === 'prompt'
             ? 'Prompt card'
+          : kind === 'doc'
+            ? 'Document'
           : 'Model card';
   const tabClass = (tab: string) =>
     `inline-flex min-h-12 items-center gap-2 border-b-2 px-4 py-2 text-sm font-semibold ${
