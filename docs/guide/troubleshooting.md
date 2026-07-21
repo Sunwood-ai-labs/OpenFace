@@ -1,3 +1,16 @@
+---
+title: Troubleshooting
+type: reference
+description: Diagnose common startup, routing, repository, and Space runtime failures.
+readingTime: quick reference
+tags: [diagnostics, logs, recovery]
+related:
+  - title: Platform map
+    link: /wiki/platform-map
+  - title: Getting started
+    link: /guide/getting-started
+---
+
 # Troubleshooting
 
 ## The catalog is empty

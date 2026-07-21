@@ -1,3 +1,16 @@
+---
+title: 運用
+type: guide
+description: バックアップ、更新、セキュリティ確認、日常保守を実施します。
+readingTime: 9分
+tags: [運用, セキュリティ, バックアップ]
+related:
+  - title: プラットフォーム地図
+    link: /ja/wiki/platform-map
+  - title: トラブルシューティング
+    link: /ja/guide/troubleshooting
+---
+
 # 運用
 
 ## 設定

@@ -1,3 +1,16 @@
+---
+title: Docker Spaces
+type: guide
+description: Build, register, and run Docker-based Spaces across supported web stacks.
+readingTime: 8 min
+tags: [spaces, docker, apps]
+related:
+  - title: Runtime model
+    link: /wiki/runtime
+  - title: Docker as the common Space contract
+    link: /articles/docker-spaces
+---
+
 # Docker Spaces
 
 Every Space is a Forgejo repository with the `space` topic and a root `Dockerfile`. The container must listen on port `7860` and accept the path prefix supplied by OpenFace when the framework supports one.

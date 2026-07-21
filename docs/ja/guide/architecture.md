@@ -1,3 +1,16 @@
+---
+title: アーキテクチャ
+type: guide
+description: Composeサービス、信頼境界、永続化モデルを理解します。
+readingTime: 6分
+tags: [アーキテクチャ, compose, セキュリティ]
+related:
+  - title: プラットフォーム地図
+    link: /ja/wiki/platform-map
+  - title: ローカルAI Hubをつくる理由
+    link: /ja/articles/local-first-hub
+---
+
 # アーキテクチャ
 
 OpenFaceはHTTP/HTTPS gatewayだけを公開し、アプリケーションサービスをComposeのprivate networkに置きます。

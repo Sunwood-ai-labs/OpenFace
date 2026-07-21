@@ -1,3 +1,16 @@
+---
+title: Getting started
+type: guide
+description: Bring up a reproducible OpenFace environment and verify its core services.
+readingTime: 10 min
+tags: [install, compose, first-run]
+related:
+  - title: Platform map
+    link: /wiki/platform-map
+  - title: Troubleshooting
+    link: /guide/troubleshooting
+---
+
 # Getting started
 
 ## Prerequisites

@@ -1,3 +1,16 @@
+---
+title: OpenFace Pages
+type: guide
+description: Publish static sites and VitePress documentation through repository-backed Pages.
+readingTime: 7 min
+tags: [pages, vitepress, actions]
+related:
+  - title: Runtime model
+    link: /wiki/runtime
+  - title: Operations
+    link: /guide/operations
+---
+
 # OpenFace Pages
 
 OpenFace Pages serves static files from public repositories at:

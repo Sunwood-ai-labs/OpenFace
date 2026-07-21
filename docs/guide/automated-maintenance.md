@@ -1,3 +1,16 @@
+---
+title: Automated Claude Code /goal maintenance
+type: guide
+description: Operate specialist agents, independent review, and fail-closed auto-merge.
+readingTime: 16 min
+tags: [agents, claude-code, glm, review]
+related:
+  - title: Agent operations
+    link: /wiki/agent-operations
+  - title: Trustworthy auto-merge needs independent evidence
+    link: /articles/independent-review
+---
+
 # Automated Claude Code `/goal` maintenance
 
 OpenFace can turn a Forgejo Issue addressed to `@glm-maintainer` into a verified, automatically merged Pull Request by running Claude Code's built-in `/goal` command against the cloned repository. Claude Code connects directly to Z.AI's Anthropic-compatible endpoint and uses `glm-5.2`.

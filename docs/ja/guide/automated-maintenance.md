@@ -1,3 +1,16 @@
+---
+title: Claude Code /goal による自動メンテナンス
+type: guide
+description: 専門エージェント、独立レビュー、fail-closed自動マージを運用します。
+readingTime: 16分
+tags: [agents, claude-code, glm, review]
+related:
+  - title: エージェント運用
+    link: /ja/wiki/agent-operations
+  - title: 信頼できる自動マージには独立証跡が必要
+    link: /ja/articles/independent-review
+---
+
 # Claude Code `/goal` による自動メンテナンス
 
 OpenFaceは `@glm-maintainer` 宛てのForgejo IssueをClaude Code組み込みの `/goal` へ渡し、専門担当の実装と独立レビュワーの承認を経たPull Requestへ変換できます。Claude CodeはZ.AIのAnthropic互換endpointへ直接接続し、`glm-5.2` を使います。

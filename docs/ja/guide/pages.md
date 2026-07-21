@@ -1,3 +1,16 @@
+---
+title: OpenFace Pages
+type: guide
+description: リポジトリから静的サイトとVitePressドキュメントを公開します。
+readingTime: 7分
+tags: [pages, vitepress, actions]
+related:
+  - title: ランタイムモデル
+    link: /ja/wiki/runtime
+  - title: 運用
+    link: /ja/guide/operations
+---
+
 # OpenFace Pages
 
 publicリポジトリの静的ファイルを次のURLで配信します。

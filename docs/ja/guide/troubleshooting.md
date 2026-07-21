@@ -1,3 +1,16 @@
+---
+title: トラブルシューティング
+type: reference
+description: 起動、ルーティング、リポジトリ、Spaceランタイムの典型的な障害を診断します。
+readingTime: クイックリファレンス
+tags: [診断, ログ, 復旧]
+related:
+  - title: プラットフォーム地図
+    link: /ja/wiki/platform-map
+  - title: はじめに
+    link: /ja/guide/getting-started
+---
+
 # トラブルシューティング
 
 ## カタログが空

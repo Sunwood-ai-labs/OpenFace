@@ -1,3 +1,16 @@
+---
+title: Operations
+type: guide
+description: Run backups, upgrades, security checks, and day-two platform maintenance.
+readingTime: 9 min
+tags: [operations, security, backup]
+related:
+  - title: Platform map
+    link: /wiki/platform-map
+  - title: Troubleshooting
+    link: /guide/troubleshooting
+---
+
 # Operations
 
 ## Configuration

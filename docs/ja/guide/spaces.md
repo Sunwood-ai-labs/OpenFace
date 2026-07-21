@@ -1,3 +1,16 @@
+---
+title: Docker Spaces
+type: guide
+description: 複数のWebスタックでDockerベースのSpaceを構築・登録・実行します。
+readingTime: 8分
+tags: [spaces, docker, アプリ]
+related:
+  - title: ランタイムモデル
+    link: /ja/wiki/runtime
+  - title: DockerをSpace共通契約にする
+    link: /ja/articles/docker-spaces
+---
+
 # Docker Spaces
 
 Spaceは、`space` topicとroot `Dockerfile`を持つForgejoリポジトリです。コンテナはport `7860`でlistenし、frameworkが対応している場合はOpenFaceのpath prefixを受け入れます。

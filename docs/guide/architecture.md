@@ -1,3 +1,16 @@
+---
+title: Architecture
+type: guide
+description: Understand the Compose services, trust boundaries, and persistence model.
+readingTime: 6 min
+tags: [architecture, compose, security]
+related:
+  - title: Platform map
+    link: /wiki/platform-map
+  - title: Why a local AI hub matters
+    link: /articles/local-first-hub
+---
+
 # Architecture
 
 OpenFace exposes one HTTP/HTTPS gateway and keeps application services on a private Compose network.

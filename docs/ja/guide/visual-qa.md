@@ -1,3 +1,16 @@
+---
+title: 開発エージェント向けVisual QA
+type: guide
+description: レイアウト、テーマ、操作、レスポンシブ状態をスクリーンショット証跡で検証します。
+readingTime: 12分
+tags: [visual-qa, playwright, テーマ]
+related:
+  - title: エージェント運用
+    link: /ja/wiki/agent-operations
+  - title: トラブルシューティング
+    link: /ja/guide/troubleshooting
+---
+
 # 開発エージェント向けVisual QA
 
 OpenFaceでは、スクリーンショットを装飾ではなくテスト証跡として扱います。Visual QA workflowは実際のDocker Compose環境を起動し、シード完了を待ち、代表的なDocker Spaceを起動したうえで、主要な全ページ種別をデスクトップとモバイルで撮影します。

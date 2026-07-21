@@ -1,3 +1,16 @@
+---
+title: はじめに
+type: guide
+description: 再現可能なOpenFace環境を起動し、主要サービスを確認します。
+readingTime: 10分
+tags: [インストール, compose, 初回起動]
+related:
+  - title: プラットフォーム地図
+    link: /ja/wiki/platform-map
+  - title: トラブルシューティング
+    link: /ja/guide/troubleshooting
+---
+
 # はじめに
 
 ## 必要要件

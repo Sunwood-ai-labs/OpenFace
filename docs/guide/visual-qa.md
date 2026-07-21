@@ -1,3 +1,16 @@
+---
+title: Visual QA for development agents
+type: guide
+description: Verify layouts, themes, interactions, and responsive states with screenshot evidence.
+readingTime: 12 min
+tags: [visual-qa, playwright, themes]
+related:
+  - title: Agent operations
+    link: /wiki/agent-operations
+  - title: Troubleshooting
+    link: /guide/troubleshooting
+---
+
 # Visual QA for development agents
 
 OpenFace treats screenshots as test evidence, not decoration. The Visual QA workflow starts the real Docker Compose application, waits for the seed catalog, launches a representative Docker Space, and captures every major page type at desktop and mobile sizes.
