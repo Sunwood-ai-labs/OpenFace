@@ -52,7 +52,7 @@ const repoTypes: Array<{
     label: 'Doc',
     topic: 'doc',
     icon: 'doc',
-    description: 'Articles, Wiki nodes, guides, and durable reference material.',
+    description: 'One personal or team publication containing many Markdown entries.',
   },
 ];
 
@@ -64,7 +64,7 @@ const templates = [
   { label: 'Agent Skill', topic: 'skill', repo: 'my-agent-skill', slug: 'agent-skill' },
   { label: 'MCP server', topic: 'mcp', repo: 'my-mcp-server', slug: 'mcp-server' },
   { label: 'Versioned prompt', topic: 'prompt', repo: 'my-agent-prompt', slug: 'versioned-prompt' },
-  { label: 'Documentation', topic: 'doc', repo: 'my-team-handbook', slug: 'documentation' },
+  { label: 'Knowledge publication', topic: 'doc', repo: 'my-knowledge', slug: 'documentation' },
   { label: 'Empty repository', topic: 'model', repo: 'my-openface-repo', slug: 'empty-repository' },
 ];
 
@@ -75,7 +75,7 @@ const typeConfig: Record<string, { title: string; repoPlaceholder: string; cance
   skill: { title: 'Create a new Skill', repoPlaceholder: 'my-agent-skill', cancelHref: '/skills' },
   mcp: { title: 'Create a new MCP server', repoPlaceholder: 'my-mcp-server', cancelHref: '/mcps' },
   prompt: { title: 'Create a new Prompt', repoPlaceholder: 'my-agent-prompt', cancelHref: '/prompts' },
-  doc: { title: 'Create a new Doc', repoPlaceholder: 'my-team-handbook', cancelHref: '/docs' },
+  doc: { title: 'Create your knowledge publication', repoPlaceholder: 'my-knowledge', cancelHref: '/docs' },
 };
 
 export default async function NewRepoGuidePage({
@@ -98,6 +98,7 @@ export default async function NewRepoGuidePage({
     ...repoTypes.filter((type) => type.topic === effectiveType),
     ...repoTypes.filter((type) => type.topic !== effectiveType),
   ];
+  const isDoc = effectiveType === 'doc';
 
   return (
     <div className="mx-auto max-w-[1536px] py-5">
@@ -105,7 +106,9 @@ export default async function NewRepoGuidePage({
         <div>
           <h1 className="text-3xl font-extrabold tracking-normal text-zinc-950">{effectiveConfig.title}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-            Choose the OpenFace repository type first, then finish creation in Forgejo. The selected topic keeps the repository visible in its matching OpenFace directory.
+            {isDoc
+              ? 'Create this once for yourself or a team. Add articles/*.md afterward; OpenFace collects every published Markdown entry into Docs.'
+              : 'Choose the OpenFace repository type first, then finish creation in Forgejo. The selected topic keeps the repository visible in its matching OpenFace directory.'}
           </p>
           {duplicateSource ? (
             <p className="mt-2 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-semibold text-zinc-600">
@@ -254,17 +257,37 @@ export default async function NewRepoGuidePage({
 
           <section className="rounded-lg border border-zinc-200 bg-white p-4">
             <h2 className="mb-2 text-sm font-bold text-zinc-950">Required topic</h2>
-            <p className="text-sm leading-6 text-zinc-500">
-              After creation, add the matching topic such as <code className="rounded bg-zinc-100 px-1.5 py-0.5">prompt</code> in Forgejo so OpenFace can index it. Prompt versions use an additional topic such as <code className="rounded bg-zinc-100 px-1.5 py-0.5">version-v8</code>.
-            </p>
+            {isDoc ? (
+              <div className="space-y-3 text-sm leading-6 text-zinc-500">
+                <p>Add <code className="rounded bg-zinc-100 px-1.5 py-0.5">doc</code> to the repository. Put the format and subjects in each article&apos;s front matter.</p>
+                <div className="flex flex-wrap gap-1.5" aria-label="Doc topic example">
+                  {['doc', 'knowledge', 'markdown'].map((topic) => <code key={topic} className="rounded bg-zinc-100 px-2 py-1 text-xs text-zinc-700">{topic}</code>)}
+                </div>
+                <p><strong className="text-zinc-700">Article formats:</strong> article · wiki · guide · reference</p>
+                <a href="/openface/docs-publishing-quickstart" className="inline-flex items-center gap-1.5 font-semibold text-teal-800 hover:underline">Read the publishing quickstart <HfIcon name="arrowRight" className="h-3 w-3" /></a>
+              </div>
+            ) : (
+              <p className="text-sm leading-6 text-zinc-500">
+                After creation, add the matching topic such as <code className="rounded bg-zinc-100 px-1.5 py-0.5">prompt</code> in Forgejo so OpenFace can index it. Prompt versions use an additional topic such as <code className="rounded bg-zinc-100 px-1.5 py-0.5">version-v8</code>.
+              </p>
+            )}
           </section>
 
           <section className="rounded-lg border border-zinc-200 bg-white p-4">
             <h2 className="mb-2 text-sm font-bold text-zinc-950">Recommended files</h2>
             <ul className="space-y-2 text-sm text-zinc-500">
               <li className="flex items-center gap-2"><HfIcon name="file" className="h-3.5 w-3.5" />README.md</li>
-              <li className="flex items-center gap-2"><HfIcon name="folder" className="h-3.5 w-3.5" />app.py or Dockerfile for Spaces</li>
-              <li className="flex items-center gap-2"><HfIcon name="download" className="h-3.5 w-3.5" />Git LFS for large artifacts</li>
+              {isDoc ? (
+                <>
+                  <li className="flex items-center gap-2"><HfIcon name="folder" className="h-3.5 w-3.5" />articles/*.md for every knowledge entry</li>
+                  <li className="flex items-center gap-2"><HfIcon name="model" className="h-3.5 w-3.5" />images/ for shared article assets</li>
+                </>
+              ) : (
+                <>
+                  <li className="flex items-center gap-2"><HfIcon name="folder" className="h-3.5 w-3.5" />app.py or Dockerfile for Spaces</li>
+                  <li className="flex items-center gap-2"><HfIcon name="download" className="h-3.5 w-3.5" />Git LFS for large artifacts</li>
+                </>
+              )}
             </ul>
           </section>
         </aside>
