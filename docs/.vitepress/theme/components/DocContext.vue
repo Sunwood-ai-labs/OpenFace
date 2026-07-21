@@ -14,6 +14,14 @@ const typeLabel = computed(() => {
   const pair = labels[frontmatter.value.type] ?? ['Documentation', 'ドキュメント']
   return lang.value.startsWith('ja') ? pair[1] : pair[0]
 })
+const updatedLabel = computed(() => {
+  const value = frontmatter.value.updated
+  if (!value) return ''
+  const date = value instanceof Date
+    ? value.toISOString().slice(0, 10)
+    : String(value).slice(0, 10)
+  return lang.value.startsWith('ja') ? `更新 ${date}` : `Updated ${date}`
+})
 </script>
 
 <template>
@@ -21,7 +29,7 @@ const typeLabel = computed(() => {
     <div class="doc-context__line">
       <span class="doc-context__type">{{ typeLabel }}</span>
       <span v-if="frontmatter.readingTime" class="doc-context__time">{{ frontmatter.readingTime }}</span>
-      <span v-if="frontmatter.updated" class="doc-context__updated">{{ frontmatter.updated }}</span>
+      <span v-if="updatedLabel" class="doc-context__updated">{{ updatedLabel }}</span>
     </div>
     <p v-if="frontmatter.description" class="doc-context__description">
       {{ frontmatter.description }}
