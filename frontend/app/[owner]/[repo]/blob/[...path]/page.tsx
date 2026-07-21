@@ -11,6 +11,8 @@ import {
 } from '@/lib/forgejo';
 import { formatBytes } from '@/lib/format';
 import HfIcon from '@/components/HfIcon';
+import { getLocale } from '@/lib/i18n-server';
+import { ui } from '@/lib/i18n';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,6 +35,7 @@ export default async function FileViewPage({
   params: Promise<{ owner: string; repo: string; path: string[] }>;
 }) {
   const { owner, repo, path: pathSegments } = await params;
+  const locale = await getLocale();
   const path = pathSegments.map(decodeURIComponent).join('/');
 
   const contentsRes = await getContents(owner, repo, path);
@@ -66,7 +69,7 @@ export default async function FileViewPage({
           className="inline-flex items-center gap-1.5 hover:text-accent-dark hover:underline"
         >
           <HfIcon name="arrowLeft" className="h-3 w-3" />
-          Back to files
+          {ui(locale, 'ファイル一覧へ戻る', 'Back to files')}
         </Link>
       </div>
 
@@ -83,15 +86,15 @@ export default async function FileViewPage({
           <span>{formatBytes(entry.size)}</span>
           <a href={rawUrl} className="inline-flex items-center gap-1 rounded-lg border border-zinc-300 px-3 py-1.5 font-medium hover:border-accent dark:border-zinc-700">
             <HfIcon name="file" className="h-3 w-3" />
-            Raw
+            {ui(locale, '原文', 'Raw')}
           </a>
           <a href={rawUrl} download className="inline-flex items-center gap-1 rounded-lg border border-zinc-300 px-3 py-1.5 font-medium hover:border-accent dark:border-zinc-700">
             <HfIcon name="download" className="h-3 w-3" />
-            Download
+            {ui(locale, 'ダウンロード', 'Download')}
           </a>
           <a href={historyUrl} className="inline-flex items-center gap-1 rounded-lg border border-zinc-300 px-3 py-1.5 font-medium hover:border-accent dark:border-zinc-700">
             <HfIcon name="clock" className="h-3 w-3" />
-            History
+            {ui(locale, '履歴', 'History')}
           </a>
           <a href={forgejoFileUrl} className="inline-flex items-center gap-1 rounded-lg border border-zinc-300 px-3 py-1.5 font-medium hover:border-accent dark:border-zinc-700">
             <HfIcon name="link" className="h-3 w-3" />
@@ -103,14 +106,14 @@ export default async function FileViewPage({
       {lfs ? (
         <div className="rounded-lg border border-dashed border-amber-300 bg-amber-50 p-6 text-center dark:border-amber-800 dark:bg-amber-900/20">
           <p className="mb-3 text-sm text-zinc-700 dark:text-zinc-300">
-            This file is stored with Git LFS. Download the resolved file instead of the pointer.
+            {ui(locale, 'このファイルはGit LFSで保存されています。ポインターではなく実体ファイルをダウンロードしてください。', 'This file is stored with Git LFS. Download the resolved file instead of the pointer.')}
           </p>
           <a
             href={lfsMediaUrl(owner, repo, path)}
             className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-950"
           >
             <HfIcon name="download" className="h-3.5 w-3.5" />
-            Download LFS file
+            {ui(locale, 'LFSファイルをダウンロード', 'Download LFS file')}
           </a>
         </div>
       ) : textContent !== null ? (
@@ -119,10 +122,10 @@ export default async function FileViewPage({
         </pre>
       ) : (
         <div className="rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-          This file cannot be previewed.
+          {ui(locale, 'このファイルはプレビューできません。', 'This file cannot be previewed.')}
           <br />
           <a href={rawUrl} className="mt-2 inline-block text-accent-dark hover:underline">
-            Open raw file
+            {ui(locale, '原文ファイルを開く', 'Open raw file')}
           </a>
         </div>
       )}
