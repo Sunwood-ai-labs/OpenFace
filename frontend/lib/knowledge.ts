@@ -12,8 +12,11 @@ export interface KnowledgeArticle {
   topics: string[];
   owner: string;
   repository: string;
+  branch: string;
   path: string;
   updatedAt: string;
+  emoji: string;
+  readingMinutes: number;
   bodyHtml?: string;
   bodyMarkdown?: string;
 }
@@ -42,6 +45,19 @@ function firstParagraph(markdown: string): string {
     .split(/\n\s*\n/)
     .map((block) => block.replace(/[`*_>#\[\]]/g, '').replace(/\s+/g, ' ').trim())
     .find((block) => block.length > 30 && !block.startsWith('|')) || 'Open this entry to read the complete knowledge note.';
+}
+
+const formatEmoji: Record<KnowledgeFormat, string> = {
+  article: '✍️',
+  wiki: '🧭',
+  guide: '🛠️',
+  reference: '📚',
+};
+
+function readingMinutes(markdown: string): number {
+  const words = markdown.trim().split(/\s+/).filter(Boolean).length;
+  const japaneseCharacters = (markdown.match(/[\u3040-\u30ff\u3400-\u9fff]/g) || []).length;
+  return Math.max(1, Math.ceil(Math.max(words / 220, japaneseCharacters / 500)));
 }
 
 async function loadPublication(repo: Repo): Promise<KnowledgeArticle[]> {
@@ -75,8 +91,11 @@ async function loadPublication(repo: Repo): Promise<KnowledgeArticle[]> {
       topics,
       owner,
       repository: repo.name,
+      branch: repo.default_branch || 'main',
       path: entry.path,
       updatedAt: typeof parsed.frontmatter.updated === 'string' ? parsed.frontmatter.updated : repo.updated_at,
+      emoji: typeof parsed.frontmatter.emoji === 'string' ? parsed.frontmatter.emoji.trim() : formatEmoji[format],
+      readingMinutes: readingMinutes(parsed.bodyMarkdown),
       bodyHtml: parsed.bodyHtml,
       bodyMarkdown: parsed.bodyMarkdown,
     } satisfies KnowledgeArticle;

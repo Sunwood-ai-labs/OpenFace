@@ -510,6 +510,54 @@ html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-on
   color: #f4f7ff !important;
 }
 
+.openface-doc-row:hover {
+  background: color-mix(in srgb, #0f766e 5%, transparent);
+}
+
+.openface-doc-emoji,
+.openface-article-emoji {
+  box-shadow: inset 0 0 0 1px rgb(15 118 110 / 10%);
+}
+
+.openface-article-hero {
+  background: #edf5f4;
+}
+
+.openface-article-emoji {
+  background: #fff;
+  box-shadow: 0 16px 40px rgb(15 118 110 / 10%), inset 0 0 0 1px rgb(15 118 110 / 12%);
+}
+
+html[data-openface-theme="solarpunk"] .openface-doc-emoji,
+html[data-openface-theme="solarpunk"] .openface-article-emoji {
+  background: #f7f1d8;
+  box-shadow: 0 16px 40px rgb(55 94 64 / 12%), inset 0 0 0 1px rgb(55 94 64 / 16%);
+}
+
+html[data-openface-theme="solarpunk"] .openface-article-hero {
+  background: #e9efdb;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-doc-emoji,
+html[data-openface-theme="cyberpunk"] .openface-article-emoji {
+  background: #111a33;
+  box-shadow: 0 0 32px rgb(34 211 238 / 16%), inset 0 0 0 1px rgb(34 211 238 / 35%);
+}
+
+html[data-openface-theme="cyberpunk"] .openface-article-hero {
+  background: linear-gradient(135deg, #0b1023, #15102d 72%, #29112e);
+}
+
+html[data-openface-theme="cyberpunk"] .openface-doc-feature,
+html[data-openface-theme="cyberpunk"] .openface-doc-row {
+  border-color: #243555;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-doc-feature-art {
+  background: linear-gradient(145deg, #0b2941, #30113c);
+  color: #67e8f9;
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #18181b;
