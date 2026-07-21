@@ -6,9 +6,9 @@ const STORAGE_KEY = 'openface-theme-v2';
 const LEGACY_STORAGE_KEY = 'openface-theme';
 
 const themes = [
-  { value: 'standard', label: 'Standard' },
-  { value: 'solarpunk', label: 'Solarpunk' },
-  { value: 'cyberpunk', label: 'Cyberpunk' },
+  { value: 'standard', label: 'スタンダード' },
+  { value: 'solarpunk', label: 'ソーラーパンク' },
+  { value: 'cyberpunk', label: 'サイバーパンク' },
 ] as const;
 
 type ThemeName = (typeof themes)[number]['value'];
@@ -77,8 +77,8 @@ export default function ThemeSelector() {
       type="button"
       className="openface-theme-selector"
       data-theme={theme}
-      aria-label={`${themes[currentIndex].label} theme. Switch to ${nextTheme.label}.`}
-      title={`${themes[currentIndex].label} · switch to ${nextTheme.label}`}
+      aria-label={`現在は${themes[currentIndex].label}テーマ。${nextTheme.label}へ切り替える`}
+      title={`${themes[currentIndex].label} · ${nextTheme.label}へ切り替え`}
       onClick={() => {
         setTheme(nextTheme.value);
         applyTheme(nextTheme.value);

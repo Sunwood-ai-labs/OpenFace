@@ -28,7 +28,8 @@ export default function SearchForm({ className = '', compact = false }: { classN
         <input
           type="search"
           name="q"
-          placeholder="Search models, datasets, users..."
+          placeholder="モデル、データセット、ユーザーを検索…"
+          aria-label="OpenFaceを検索"
           className={
             compact
               ? 'h-9 w-full rounded-lg border border-zinc-200 bg-white px-3 pl-9 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-200'

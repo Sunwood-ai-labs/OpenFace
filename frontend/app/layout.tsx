@@ -4,13 +4,13 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'OpenFace - AI community hub',
-  description: 'A Forgejo-backed Hugging Face style platform for models, datasets, and Spaces.',
+  title: 'OpenFace - ローカルAIコミュニティハブ',
+  description: 'Forgejoを基盤に、モデル、データセット、Space、ナレッジを共有できるローカルAIプラットフォーム。',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="ja">
       <head>
         <script
           dangerouslySetInnerHTML={{
