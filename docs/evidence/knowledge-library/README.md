@@ -8,6 +8,10 @@
 |---|---|---|
 | ![日本語化したナレッジ一覧](ja/articles-mobile-ja.png) | ![日本語化した記事詳細](ja/article-mobile-ja.png) | ![日本語化した記事本文](ja/article-body-mobile-ja.png) |
 
+注目記事カードの絵文字まわりは、同心円装飾とタイルが重ならないよう単一の角丸タイルへ整理しました。
+
+![図形の重なりを解消した注目記事カード](ja/featured-card-mobile-fixed.png)
+
 OpenFace uses Zenn's reading hierarchy as a reference without copying its product identity. The implementation keeps the OpenFace typography and theme tokens while adopting the parts that make a publication easy to scan: a compact author/time line, an emoji cover, unboxed article rows, topic pills, a centered article header, and a narrow reading column.
 
 Reference pages: [Zenn Articles](https://zenn.dev/articles) and a live [Zenn article detail](https://zenn.dev/mk0bayashi/articles/2a6ee4123e671f).
