@@ -538,6 +538,16 @@ html[data-openface-theme="solarpunk"] .openface-article-hero {
   background: #e9efdb;
 }
 
+html[data-openface-theme="solarpunk"] .openface-docs-hero-actions > :first-child {
+  border-color: #1f583c !important;
+  background: #1f583c !important;
+  color: #fff !important;
+}
+
+html[data-openface-theme="solarpunk"] .openface-docs-onboarding .text-orange-700 {
+  color: #a6380a !important;
+}
+
 html[data-openface-theme="cyberpunk"] .openface-doc-emoji,
 html[data-openface-theme="cyberpunk"] .openface-article-emoji {
   background: #111a33;
@@ -556,6 +566,17 @@ html[data-openface-theme="cyberpunk"] .openface-doc-row {
 html[data-openface-theme="cyberpunk"] .openface-doc-feature-art {
   background: linear-gradient(145deg, #0b2941, #30113c);
   color: #67e8f9;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-openface-theme]) .openface-doc-emoji,
+  html[data-openface-theme="standard"] .openface-doc-emoji,
+  html:not([data-openface-theme]) .openface-article-emoji,
+  html[data-openface-theme="standard"] .openface-article-emoji {
+    background: #20252d;
+    color: #fff;
+    box-shadow: 0 16px 40px rgb(0 0 0 / 20%), inset 0 0 0 1px rgb(94 234 212 / 18%);
+  }
 }
 
 @media (max-width: 639px) {
