@@ -11,9 +11,9 @@ const cases = [
   { id: 'mobile', viewport: { width: 390, height: 844 } },
 ];
 const sequence = [
-  { active: 'standard', next: 'Solarpunk' },
-  { active: 'solarpunk', next: 'Cyberpunk' },
-  { active: 'cyberpunk', next: 'Standard' },
+  { active: 'standard', nextEn: 'Switch to Solarpunk', nextJa: 'ソーラーパンクへ切り替える' },
+  { active: 'solarpunk', nextEn: 'Switch to Cyberpunk', nextJa: 'サイバーパンクへ切り替える' },
+  { active: 'cyberpunk', nextEn: 'Switch to Standard', nextJa: 'スタンダードへ切り替える' },
 ];
 
 await rm(outputDir, { recursive: true, force: true });
@@ -115,7 +115,7 @@ for (const testCase of cases) {
       states.push(state);
       if (state.active !== expected.active) defects.push(`Expected ${expected.active}, received ${state.active}`);
       if (state.stored !== expected.active) defects.push(`Stored theme should be ${expected.active}, received ${state.stored}`);
-      if (!state.ariaLabel?.includes(`Switch to ${expected.next}`)) defects.push(`Unexpected aria-label: ${state.ariaLabel}`);
+      if (!state.ariaLabel?.includes(expected.nextEn) && !state.ariaLabel?.includes(expected.nextJa)) defects.push(`Unexpected aria-label: ${state.ariaLabel}`);
       if (Math.abs(state.width - 32) > 0.1 || Math.abs(state.height - 32) > 0.1) {
         defects.push(`Theme button is ${state.width}×${state.height}, expected 32×32 (±0.1px)`);
       }
