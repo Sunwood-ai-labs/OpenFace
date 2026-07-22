@@ -258,7 +258,7 @@ Prompts use a stable repository slug. Versions are represented by `version-v*` t
 
 ### 日本語／英語UI
 
-ヘッダーのコンパクトな言語切替で、日本語と英語を選択できます。選択はページ移動・再読み込み後も保持されます。主要11画面を両言語・PC／スマートフォンで撮影する監査は **44 / 44 成功**しています。実際の切替操作とスクリーンショットは[日本語／英語UI検証](docs/evidence/i18n/README.md)に記録しています。
+ヘッダーのコンパクトな言語切替で、日本語と英語を選択できます。選択はページ移動・再読み込み後も保持されます。グローバルナビゲーションは両言語とも `Models / Datasets / Spaces / Skills / MCPs / Prompts / Knowledge` に統一しています。主要11画面を両言語・PC／スマートフォンで撮影する監査は **44 / 44 成功**しています。実際の切替操作とスクリーンショットは[日本語／英語UI検証](docs/evidence/i18n/README.md)に記録しています。
 
 The theme selector stores Standard, Solarpunk, or Cyberpunk in `localStorage` and restores it before the first visible render.
 

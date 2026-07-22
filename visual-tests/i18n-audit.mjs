@@ -20,7 +20,7 @@ const routes = [
   ['files', '/openface/mystic-git-auto-commit?tab=files&revision=v4.2'],
 ];
 const locales = [
-  { id: 'ja', expected: ['モデル', 'データセット', 'ナレッジ'] },
+  { id: 'ja', expected: ['Models', 'Datasets', 'Knowledge'] },
   { id: 'en', expected: ['Models', 'Datasets', 'Knowledge'] },
 ];
 const viewports = [

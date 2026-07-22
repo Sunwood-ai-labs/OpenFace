@@ -15,13 +15,13 @@ export default function Navbar() {
   const { locale } = useLocale();
   const isCurrent = (href: string) => href.startsWith('/') && (pathname === href || pathname.startsWith(`${href}/`));
   const navItems = [
-    { href: '/models', label: ui(locale, 'モデル', 'Models') },
-    { href: '/datasets', label: ui(locale, 'データセット', 'Datasets') },
+    { href: '/models', label: 'Models' },
+    { href: '/datasets', label: 'Datasets' },
     { href: '/spaces', label: 'Spaces' },
-    { href: '/skills', label: ui(locale, 'スキル', 'Skills') },
+    { href: '/skills', label: 'Skills' },
     { href: '/mcps', label: 'MCPs' },
-    { href: '/prompts', label: ui(locale, 'プロンプト', 'Prompts') },
-    { href: '/docs', label: ui(locale, 'ナレッジ', 'Knowledge') },
+    { href: '/prompts', label: 'Prompts' },
+    { href: '/docs', label: 'Knowledge' },
   ];
 
   return (
@@ -50,13 +50,13 @@ export default function Navbar() {
             <div className="absolute right-0 z-40 mt-3 hidden w-[520px] grid-cols-3 gap-6 rounded-lg border border-zinc-200 bg-white p-5 text-sm shadow-xl group-open:grid">
               <div>
                 <h2 className="mb-2 text-xs font-semibold uppercase tracking-normal text-zinc-400">{ui(locale, 'コンテンツ', 'Content')}</h2>
-                <a href="/models" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'モデル', 'Models')}</a>
-                <a href="/datasets" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'データセット', 'Datasets')}</a>
+                <a href="/models" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Models</a>
+                <a href="/datasets" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Datasets</a>
                 <a href="/spaces" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Spaces</a>
-                <a href="/skills" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'スキル', 'Skills')}</a>
+                <a href="/skills" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Skills</a>
                 <a href="/mcps" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">MCPs</a>
-                <a href="/prompts" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'プロンプト', 'Prompts')}</a>
-                <a href="/docs" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'ナレッジ', 'Knowledge')}</a>
+                <a href="/prompts" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Prompts</a>
+                <a href="/docs" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Knowledge</a>
               </div>
               <div>
                 <h2 className="mb-2 text-xs font-semibold uppercase tracking-normal text-zinc-400">{ui(locale, 'コミュニティ', 'Community')}</h2>
