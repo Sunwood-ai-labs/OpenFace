@@ -105,6 +105,7 @@ export default function PuruPuruPreview({
           <button
             type="button"
             onClick={() => setPlaying((current) => !current)}
+            data-purupuru-toggle
             className="grid h-7 w-7 place-items-center rounded-full border border-white/20 bg-black/55 text-white backdrop-blur transition hover:border-cyan-200"
             aria-label={playing ? (locale === 'ja' ? 'アニメーションを停止' : 'Pause animation') : (locale === 'ja' ? 'アニメーションを再生' : 'Play animation')}
           >

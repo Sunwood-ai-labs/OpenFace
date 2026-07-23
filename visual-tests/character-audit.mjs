@@ -96,6 +96,19 @@ for (const theme of themes) {
         await directionButton.click();
         directionChanged = await page.locator('[data-purupuru-preview]').first().getAttribute('data-direction');
       }
+      if (route.animatedPreview) {
+        const pauseButton = page.locator('[data-purupuru-toggle]');
+        if (await pauseButton.count()) await pauseButton.first().click();
+      }
+      await page.evaluate(async () => {
+        const step = Math.max(480, Math.floor(window.innerHeight * 0.7));
+        for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
+          window.scrollTo(0, y);
+          await new Promise((resolve) => window.setTimeout(resolve, 80));
+        }
+        window.scrollTo(0, 0);
+      });
+      await page.waitForFunction(() => Array.from(document.images).every((image) => image.complete), undefined, { timeout: 15_000 }).catch(() => undefined);
       const state = await page.evaluate(() => ({
         theme: document.documentElement.getAttribute('data-openface-theme') || 'standard',
         text: document.body.innerText,
