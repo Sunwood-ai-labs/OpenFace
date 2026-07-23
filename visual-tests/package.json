@@ -11,7 +11,8 @@
     "audit:organization-edit": "node organization-edit-audit.mjs",
     "audit:interactions": "node interaction-audit.mjs",
     "audit:theme-selector": "node theme-selector-audit.mjs",
-    "audit:i18n": "node i18n-audit.mjs"
+    "audit:i18n": "node i18n-audit.mjs",
+    "audit:characters": "node character-audit.mjs"
   },
   "dependencies": {
     "playwright": "1.61.1"

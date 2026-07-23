@@ -126,6 +126,11 @@ jobs:
           VISUAL_QA_BASE_URL: https://localhost:8443
         run: npm run audit:theme-selector --prefix visual-tests
 
+      - name: Audit character formats and previews
+        env:
+          VISUAL_QA_BASE_URL: https://localhost:8443
+        run: npm run audit:characters --prefix visual-tests
+
       - name: Add capture report to job summary
         if: always()
         shell: bash

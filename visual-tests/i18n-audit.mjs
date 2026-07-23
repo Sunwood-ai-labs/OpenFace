@@ -15,13 +15,14 @@ const routes = [
   ['mcps', '/mcps'],
   ['prompts', '/prompts'],
   ['knowledge', '/docs'],
+  ['characters', '/characters'],
   ['new', '/new?type=doc'],
   ['repository', '/openface/repository-polish-skill'],
   ['files', '/openface/mystic-git-auto-commit?tab=files&revision=v4.2'],
 ];
 const locales = [
-  { id: 'ja', expected: ['Models', 'Datasets', 'Knowledge'] },
-  { id: 'en', expected: ['Models', 'Datasets', 'Knowledge'] },
+  { id: 'ja', expected: ['Models', 'Datasets', 'Knowledge', 'Characters'] },
+  { id: 'en', expected: ['Models', 'Datasets', 'Knowledge', 'Characters'] },
 ];
 const viewports = [
   { id: 'desktop', width: 1440, height: 1000 },
@@ -44,7 +45,7 @@ for (const locale of locales) {
       const response = await page.goto(`${baseUrl}${path}`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
       await page.waitForTimeout(500);
       if (viewport.id === 'mobile') {
-        const menu = page.locator('details.lg\\:hidden > summary');
+        const menu = page.locator('details.xl\\:hidden > summary');
         if (await menu.count()) await menu.first().click();
       }
       const audit = await page.evaluate(() => ({
