@@ -87,6 +87,7 @@ for (const theme of themes) {
         ? await page.locator('[data-purupuru-preview]').first().getAttribute('data-frame-path')
         : null;
       let alphaBlend = null;
+      let alphaBlendScreenshot = null;
       if (route.animatedPreview) {
         await page.waitForFunction(
           (initialFrame) => document.querySelector('[data-purupuru-preview]')?.getAttribute('data-frame-path') !== initialFrame,
@@ -104,6 +105,12 @@ for (const theme of themes) {
             currentOpacity: current ? Number.parseFloat(getComputedStyle(current).opacity) : null,
           };
         });
+        alphaBlendScreenshot = join(
+          outputDir,
+          'screenshots',
+          `${theme}-${viewport.id}-${route.id}-alpha-blend.png`,
+        );
+        await page.locator('[data-purupuru-preview]').first().screenshot({ path: alphaBlendScreenshot });
       }
       const previewAfter = route.animatedPreview
         ? await page.locator('[data-purupuru-preview]').first().getAttribute('data-frame-path')
@@ -162,6 +169,7 @@ for (const theme of themes) {
         petCards: state.petCards,
         animationChanged: route.animatedPreview ? previewBefore !== previewAfter : null,
         alphaBlend,
+        alphaBlendScreenshot,
         directionChanged,
         screenshot,
         passed:
