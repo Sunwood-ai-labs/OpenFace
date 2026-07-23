@@ -38,7 +38,7 @@ export default function CharacterRepositoryPanel({
   if (formats.length === 0) return null;
 
   return (
-    <section className="mb-7 overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-950 text-white shadow-sm dark:border-zinc-700">
+    <section className="openface-character-format-panel mb-7 overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-950 text-white shadow-sm dark:border-zinc-700">
       <div className="grid lg:grid-cols-[minmax(0,1.3fr)_minmax(280px,.7fr)]">
         <div className="relative min-h-72 overflow-hidden bg-[radial-gradient(circle_at_20%_10%,rgba(34,211,238,.24),transparent_38%),radial-gradient(circle_at_90%_90%,rgba(217,70,239,.18),transparent_35%),linear-gradient(145deg,#09090b,#18181b)]">
           <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.12)_1px,transparent_1px)] [background-size:24px_24px]" />
@@ -55,7 +55,7 @@ export default function CharacterRepositoryPanel({
         <div className="flex flex-col border-t border-white/10 p-6 lg:border-l lg:border-t-0">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-300">{ui(locale, '検出済み規格', 'Detected formats')}</p>
           <h2 className="mt-3 text-2xl font-extrabold tracking-tight">{ui(locale, '実ファイルから互換性を確認', 'Compatibility verified from files')}</h2>
-          <p className="mt-3 text-sm leading-6 text-zinc-300">{ui(locale, 'トピック名だけでなく、設定・状態画像・pet.json・spritesheet・QA成果物を読み取りました。', 'OpenFace inspected settings, state images, pet.json, spritesheets, and QA artifacts—not just repository topics.')}</p>
+          <p className="openface-character-panel-copy mt-3 text-sm leading-6 text-zinc-300">{ui(locale, 'トピック名だけでなく、設定・状態画像・pet.json・spritesheet・QA成果物を読み取りました。', 'OpenFace inspected settings, state images, pet.json, spritesheets, and QA artifacts—not just repository topics.')}</p>
           <div className="mt-5 grid gap-2">
             {formats.map((format) => (
               <div key={format.name} className={`rounded-xl border px-3 py-2.5 ${format.tone}`}>

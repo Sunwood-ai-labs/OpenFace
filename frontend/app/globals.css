@@ -260,6 +260,15 @@ html[data-openface-theme="solarpunk"] .bg-accent {
   background-color: #ffcb4f !important;
 }
 
+html[data-openface-theme="solarpunk"] .openface-character-primary-action {
+  background-color: #ffcb4f !important;
+  color: #173b2c !important;
+}
+
+html[data-openface-theme="solarpunk"] .openface-character-primary-action:hover {
+  background-color: #ffdc7d !important;
+}
+
 html[data-openface-theme="solarpunk"] header details[open] > .openface-mobile-menu-toggle {
   border-color: #2f6b47 !important;
   background: #24583b !important;
@@ -1141,10 +1150,29 @@ html[data-openface-theme="cyberpunk"] [class*="dark:bg-zinc-700"] {
   .prose-openface code {
     background-color: rgb(39 39 42);
   }
+  .prose-openface a {
+    color: #58a6ff;
+  }
   .prose-openface th,
   .prose-openface td {
     border-color: rgb(63 63 70);
   }
+}
+
+.openface-character-format-panel {
+  color: #fff !important;
+}
+
+.openface-character-format-panel .openface-character-panel-copy {
+  color: #d4d4d8 !important;
+}
+
+html[data-openface-theme="solarpunk"] .openface-character-format-panel {
+  background-color: #173b2c !important;
+}
+
+html[data-openface-theme="solarpunk"] .openface-character-format-panel .openface-character-panel-copy {
+  color: #e7f0dc !important;
 }
 
 /* Explicit portal themes must remain legible regardless of the device's OS

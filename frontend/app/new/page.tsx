@@ -279,7 +279,7 @@ export default async function NewRepoGuidePage({
                   <span className="min-w-0 truncate">
                     {ui(locale, template.labelJa, template.label)}
                   </span>
-                  <span className={selectedTemplate?.slug === template.slug ? 'shrink-0 rounded bg-white/10 px-1.5 py-0.5 text-xs text-white/70' : 'shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500'}>
+                  <span className={selectedTemplate?.slug === template.slug ? 'shrink-0 rounded bg-white/10 px-1.5 py-0.5 text-xs text-white' : 'shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500'}>
                     {template.topic}
                   </span>
                   <HfIcon name="arrowRight" className={selectedTemplate?.slug === template.slug ? 'h-3 w-3 text-white/70' : 'h-3 w-3 text-zinc-400'} />
