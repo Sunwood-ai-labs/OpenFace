@@ -126,9 +126,9 @@ See the [architecture guide](https://sunwood-ai-labs.github.io/OpenFace/guide/ar
 
 OpenFace reads repository contents rather than trusting labels alone. Directory cards show real previews, detail pages report detected compatibility, and the new-repository screen provides PuruPuru, Codex Pet, and character-sheet templates.
 
-| Standard mobile | Cyberpunk mobile | Codex Pet detail |
-|---|---|---|
-| <img src="docs/evidence/characters/standard-mobile-directory.png" alt="Characters directory in Standard theme on mobile" width="320"> | <img src="docs/evidence/characters/cyberpunk-mobile-directory.png" alt="Characters directory in Cyberpunk theme on mobile" width="320"> | <img src="docs/evidence/characters/standard-mobile-codex-pets.png" alt="Maki Codex Pet package detected from real files" width="320"> |
+| Standard mobile | Cyberpunk mobile |
+|---|---|
+| <img src="docs/evidence/characters/standard-mobile-directory.png" alt="Characters directory in Standard theme on mobile" width="320"> | <img src="docs/evidence/characters/cyberpunk-mobile-directory.png" alt="Characters directory in Cyberpunk theme on mobile" width="320"> |
 
 The [Characters verification record](docs/evidence/characters/README.md) contains all representative screenshots and the 24-case format audit, 48-case WCAG theme matrix, and 48-case bilingual audit results.
 

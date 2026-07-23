@@ -104,9 +104,9 @@ flowchart LR
 - `lumi-jelly-head-motion-pngtuber`: 頭部のみ・5方向30状態・PuruPuru用パッチ
 - `character-design-images`: 8キャラクターシート・8 pet package・Maki一式
 
-| Standard mobile | Cyberpunk mobile | Maki Codex Pet詳細 |
-|---|---|---|
-| <img src="docs/evidence/characters/standard-mobile-directory.png" alt="StandardテーマのCharacters一覧" width="320"> | <img src="docs/evidence/characters/cyberpunk-mobile-directory.png" alt="CyberpunkテーマのCharacters一覧" width="320"> | <img src="docs/evidence/characters/standard-mobile-codex-pets.png" alt="実ファイルから検出したMaki Codex Pet" width="320"> |
+| Standard mobile | Cyberpunk mobile |
+|---|---|
+| <img src="docs/evidence/characters/standard-mobile-directory.png" alt="StandardテーマのCharacters一覧" width="320"> | <img src="docs/evidence/characters/cyberpunk-mobile-directory.png" alt="CyberpunkテーマのCharacters一覧" width="320"> |
 
 [Characters検証記録](docs/evidence/characters/README.md)には、代表スクリーンショットと、規格監査24 / 24、WCAGテーマ監査48 / 48、日本語／英語監査48 / 48の結果を保存しています。
 
