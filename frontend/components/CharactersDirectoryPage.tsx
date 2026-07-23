@@ -158,7 +158,7 @@ export default async function CharactersDirectoryPage({
                     <img
                       src={forgejoRawUrl(owner, repo.name, previewPath, branch)}
                       alt={item.kind === 'pet' ? `${item.title} pet preview` : `${item.title} preview`}
-                      loading="lazy"
+                      loading="eager"
                       className="relative h-full w-full object-contain p-3 transition duration-500 group-hover:scale-[1.03]"
                     />
                   ) : (
