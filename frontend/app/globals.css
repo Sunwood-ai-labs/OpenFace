@@ -784,6 +784,10 @@ html body span.space-status-header.space-status-header--stopped.inline-flex {
 }
 
 .prose-openface {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-wrap: anywhere;
   line-height: 1.75;
 }
 
