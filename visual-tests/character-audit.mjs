@@ -15,28 +15,44 @@ const routes = [
   {
     id: 'directory',
     path: '/characters',
-    required: ['character-design-images', 'lumi-jelly-head-motion-pngtuber', 'lumi-jelly-pngtuber', 'Codex Pet · 8', 'PuruPuru · 30 states', 'PuruPuru · 6 states'],
-    imageMinimum: 3,
+    required: [
+      'Ayano Yukimura',
+      'Fuhyo',
+      'Hisha',
+      'Kakugyo',
+      'Kohaku',
+      'Maki',
+      'Momiji',
+      'Onizuka',
+      'PuruPuru · 30 states',
+      'PuruPuru · 6 states',
+    ],
+    imageMinimum: 11,
+    petCards: ['ayano-yukimura', 'fuhyo', 'hisha', 'kakugyo', 'kohaku', 'maki', 'momiji', 'onizuka'],
+    animatedPreview: true,
   },
   {
     id: 'purupuru-upper',
     path: '/openface/lumi-jelly-pngtuber',
     required: ['PuruPuru', '6状態', 'avatar/default-settings.json'],
     hrefs: ['/git/openface/lumi-jelly-pngtuber/src/branch/main/avatar/default-settings.json'],
+    animatedPreview: true,
   },
   {
     id: 'purupuru-head-motion',
     path: '/openface/lumi-jelly-head-motion-pngtuber',
     required: ['PuruPuru', '5方向・30状態', 'PuruPuru direction-control patch'],
     hrefs: ['/git/openface/lumi-jelly-head-motion-pngtuber/src/branch/main/integration/purupuru-lumi-jelly-head-motion.patch.gz'],
+    animatedPreview: true,
+    directionControl: true,
   },
   {
-    id: 'codex-pets',
-    path: '/openface/character-design-images',
-    required: ['Codex Pet', '8パッケージ・1536×1872', '8キャラクター'],
+    id: 'codex-pet-momiji',
+    path: '/openface/character-design-images?pet=momiji',
+    required: ['Momiji · Codex Pet', '8パッケージ・1536×1872', '8キャラクター'],
     hrefs: [
-      '/git/openface/character-design-images/src/branch/main/assets/pets/maki/pet.json',
-      '/git/openface/character-design-images/src/branch/main/assets/pets/maki/spritesheet.webp',
+      '/git/openface/character-design-images/src/branch/main/assets/pets/momiji/pet.json',
+      '/git/openface/character-design-images/src/branch/main/assets/pets/momiji/spritesheet.webp',
     ],
   },
 ];
@@ -52,7 +68,7 @@ for (const theme of themes) {
       viewport,
       ignoreHTTPSErrors: true,
       colorScheme: theme === 'cyberpunk' ? 'dark' : 'light',
-      reducedMotion: 'reduce',
+      reducedMotion: 'no-preference',
     });
     await context.addInitScript((selectedTheme) => {
       localStorage.setItem('openface-theme-v2', selectedTheme);
@@ -67,6 +83,19 @@ for (const theme of themes) {
       });
       const response = await page.goto(`${baseUrl}${route.path}`, { waitUntil: 'networkidle', timeout: 45_000 });
       await page.evaluate(() => document.fonts?.ready).catch(() => undefined);
+      const previewBefore = route.animatedPreview
+        ? await page.locator('[data-purupuru-preview]').first().getAttribute('data-frame-path')
+        : null;
+      if (route.animatedPreview) await page.waitForTimeout(800);
+      const previewAfter = route.animatedPreview
+        ? await page.locator('[data-purupuru-preview]').first().getAttribute('data-frame-path')
+        : null;
+      let directionChanged = null;
+      if (route.directionControl) {
+        const directionButton = page.locator('[data-purupuru-direction="right"]');
+        await directionButton.click();
+        directionChanged = await page.locator('[data-purupuru-preview]').first().getAttribute('data-direction');
+      }
       const state = await page.evaluate(() => ({
         theme: document.documentElement.getAttribute('data-openface-theme') || 'standard',
         text: document.body.innerText,
@@ -78,6 +107,7 @@ for (const theme of themes) {
           naturalWidth: image.naturalWidth,
         })),
         links: Array.from(document.querySelectorAll('a[href]')).map((link) => link.getAttribute('href')),
+        petCards: Array.from(document.querySelectorAll('[data-codex-pet-card]')).map((card) => card.getAttribute('data-codex-pet-card')),
       }));
       const missingText = route.required.filter((text) => !state.text.includes(text));
       const missingLinks = (route.hrefs || []).filter((href) => !state.links.includes(href));
@@ -97,6 +127,9 @@ for (const theme of themes) {
         brokenImages,
         horizontalOverflow: Math.max(0, state.scrollWidth - state.clientWidth),
         consoleErrors,
+        petCards: state.petCards,
+        animationChanged: route.animatedPreview ? previewBefore !== previewAfter : null,
+        directionChanged,
         screenshot,
         passed:
           response?.status() === 200
@@ -105,6 +138,9 @@ for (const theme of themes) {
           && missingLinks.length === 0
           && brokenImages.length === 0
           && characterImages.length >= (route.imageMinimum || 1)
+          && (!route.petCards || route.petCards.every((id) => state.petCards.includes(id)))
+          && (!route.animatedPreview || previewBefore !== previewAfter)
+          && (!route.directionControl || directionChanged === 'right')
           && state.scrollWidth - state.clientWidth <= 1
           && consoleErrors.length === 0,
       });
@@ -123,7 +159,7 @@ await writeFile(join(outputDir, 'README.md'), [
   '',
   `- Coverage: ${themes.length} themes × ${viewports.length} viewports × ${routes.length} routes = ${results.length} screenshots`,
   `- Result: ${failures.length === 0 ? 'PASS' : 'FAIL'} (${results.length - failures.length}/${results.length})`,
-  '- Checks: real preview loading, required format evidence, Maki package links, active theme, console errors, and horizontal overflow.',
+  '- Checks: eight distinct Codex Pet cards, selected-pet links, real PuruPuru frame changes, direction controls, active theme, console errors, and horizontal overflow.',
   '',
 ].join('\n'));
 console.log(JSON.stringify({ outputDir, cases: results.length, failures: failures.length }, null, 2));
