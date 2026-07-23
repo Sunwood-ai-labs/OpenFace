@@ -86,10 +86,29 @@ for (const theme of themes) {
       const previewBefore = route.animatedPreview
         ? await page.locator('[data-purupuru-preview]').first().getAttribute('data-frame-path')
         : null;
-      if (route.animatedPreview) await page.waitForTimeout(800);
+      let alphaBlend = null;
+      if (route.animatedPreview) {
+        await page.waitForFunction(
+          (initialFrame) => document.querySelector('[data-purupuru-preview]')?.getAttribute('data-frame-path') !== initialFrame,
+          previewBefore,
+          { timeout: 2_000 },
+        );
+        await page.waitForTimeout(90);
+        alphaBlend = await page.locator('[data-purupuru-preview]').first().evaluate((preview) => {
+          const previous = preview.querySelector('[data-purupuru-layer="previous"]');
+          const current = preview.querySelector('[data-purupuru-layer="current"]');
+          return {
+            active: preview.getAttribute('data-blend-active') === 'true',
+            layers: Number(Boolean(previous)) + Number(Boolean(current)),
+            previousOpacity: previous ? Number.parseFloat(getComputedStyle(previous).opacity) : null,
+            currentOpacity: current ? Number.parseFloat(getComputedStyle(current).opacity) : null,
+          };
+        });
+      }
       const previewAfter = route.animatedPreview
         ? await page.locator('[data-purupuru-preview]').first().getAttribute('data-frame-path')
         : null;
+      if (route.animatedPreview) await page.waitForTimeout(320);
       let directionChanged = null;
       if (route.directionControl) {
         const directionButton = page.locator('[data-purupuru-direction="right"]');
@@ -142,6 +161,7 @@ for (const theme of themes) {
         consoleErrors,
         petCards: state.petCards,
         animationChanged: route.animatedPreview ? previewBefore !== previewAfter : null,
+        alphaBlend,
         directionChanged,
         screenshot,
         passed:
@@ -153,6 +173,12 @@ for (const theme of themes) {
           && characterImages.length >= (route.imageMinimum || 1)
           && (!route.petCards || route.petCards.every((id) => state.petCards.includes(id)))
           && (!route.animatedPreview || previewBefore !== previewAfter)
+          && (!route.animatedPreview || (
+            alphaBlend?.active
+            && alphaBlend.layers === 2
+            && alphaBlend.previousOpacity > 0.05
+            && alphaBlend.currentOpacity > 0.05
+          ))
           && (!route.directionControl || directionChanged === 'right')
           && state.scrollWidth - state.clientWidth <= 1
           && consoleErrors.length === 0,
@@ -172,7 +198,7 @@ await writeFile(join(outputDir, 'README.md'), [
   '',
   `- Coverage: ${themes.length} themes × ${viewports.length} viewports × ${routes.length} routes = ${results.length} screenshots`,
   `- Result: ${failures.length === 0 ? 'PASS' : 'FAIL'} (${results.length - failures.length}/${results.length})`,
-  '- Checks: eight distinct Codex Pet cards, selected-pet links, real PuruPuru frame changes, direction controls, active theme, console errors, and horizontal overflow.',
+  '- Checks: eight distinct Codex Pet cards, selected-pet links, real PuruPuru frame changes, two-layer alpha crossfades, direction controls, active theme, console errors, and horizontal overflow.',
   '',
 ].join('\n'));
 console.log(JSON.stringify({ outputDir, cases: results.length, failures: failures.length }, null, 2));
