@@ -102,11 +102,13 @@ flowchart LR
 
 - `lumi-jelly-pngtuber`: 上半身・正面6状態
 - `lumi-jelly-head-motion-pngtuber`: 頭部のみ・5方向30状態・PuruPuru用パッチ
-- `character-design-images`: 8キャラクターシート・8 pet package・Maki一式
+- `character-design-images`: 8キャラクターシートと、個別に選択できる8体のPet package
 
 | Standard mobile | Cyberpunk mobile |
 |---|---|
 | <img src="docs/evidence/characters/standard-mobile-directory.png" alt="StandardテーマのCharacters一覧" width="320"> | <img src="docs/evidence/characters/cyberpunk-mobile-directory.png" alt="CyberpunkテーマのCharacters一覧" width="320"> |
+
+PetはAyano Yukimura、Fuhyo、Hisha、Kakugyo、Kohaku、Maki、Momiji、Onizukaをそれぞれ独立カードとして表示します。PuruPuruは実リポジトリの状態PNGを順番に切り替えてプレビューし、詳細画面では再生／停止と方向切替を操作できます。
 
 [Characters検証記録](docs/evidence/characters/README.md)には、代表スクリーンショットと、規格監査24 / 24、WCAGテーマ監査48 / 48、日本語／英語監査48 / 48の結果を保存しています。
 
