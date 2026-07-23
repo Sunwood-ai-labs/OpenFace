@@ -6,10 +6,28 @@ export interface PuruPuruProfile {
   directions: number;
   totalStates: number;
   motionPatchPath: string | null;
+  frames: PuruPuruFrame[];
+}
+
+export interface PuruPuruFrame {
+  path: string;
+  direction: string;
+  state: string;
+}
+
+export interface CodexPetPackage {
+  id: string;
+  displayName: string;
+  petJsonPath: string;
+  spritesheetPath: string;
+  previewPath: string | null;
+  qaPath: string | null;
+  atlasSize: string;
 }
 
 export interface CodexPetProfile {
   packageCount: number;
+  packages: CodexPetPackage[];
   firstPackageId: string;
   petJsonPath: string;
   spritesheetPath: string;
@@ -55,6 +73,44 @@ function expressionCount(items: ContentEntry[]) {
   return items.filter((item) => item.type === 'file' && /^eyes-(?:open|closed)-mouth-(?:closed|half|open)\.png$/i.test(item.name)).length;
 }
 
+const EXPRESSION_ORDER = [
+  'eyes-open-mouth-closed.png',
+  'eyes-open-mouth-half.png',
+  'eyes-open-mouth-open.png',
+  'eyes-closed-mouth-open.png',
+  'eyes-closed-mouth-half.png',
+  'eyes-closed-mouth-closed.png',
+];
+
+function expressionFrames(items: ContentEntry[], direction: string): PuruPuruFrame[] {
+  return items
+    .filter((item) => item.type === 'file' && /^eyes-(?:open|closed)-mouth-(?:closed|half|open)\.png$/i.test(item.name))
+    .sort((left, right) => EXPRESSION_ORDER.indexOf(left.name.toLowerCase()) - EXPRESSION_ORDER.indexOf(right.name.toLowerCase()))
+    .map((item) => ({
+      path: item.path,
+      direction,
+      state: item.name.replace(/\.png$/i, ''),
+    }));
+}
+
+function displayNameFromId(id: string) {
+  return id
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function petCatalogNames(raw: string | null) {
+  const names = new Map<string, string>();
+  if (!raw) return names;
+  for (const line of raw.split(/\r?\n/).slice(1)) {
+    const [characterId, petId, displayName] = line.split(',');
+    if (characterId && displayName) names.set(petId || characterId, displayName);
+  }
+  return names;
+}
+
 export async function inspectCharacterRepository(repo: Repo): Promise<CharacterRepositoryProfile> {
   const owner = repo.owner?.login || repo.full_name.split('/')[0];
   const ref = repo.default_branch || 'main';
@@ -71,11 +127,18 @@ export async function inspectCharacterRepository(repo: Repo): Promise<CharacterR
   ]);
 
   const frontalStates = expressionCount(avatar);
-  const directionDirs = directionRoots.filter((item) => item.type === 'dir');
+  const directionOrder = ['left', 'right', 'up', 'down'];
+  const directionDirs = directionRoots
+    .filter((item) => item.type === 'dir')
+    .sort((left, right) => directionOrder.indexOf(left.name) - directionOrder.indexOf(right.name));
   const directionEntries = await Promise.all(
     directionDirs.map((item) => directory(owner, repo.name, item.path, ref)),
   );
   const directionalStates = directionEntries.reduce((count, item) => count + expressionCount(item), 0);
+  const purupuruFrames = [
+    ...expressionFrames(avatar, 'front'),
+    ...directionEntries.flatMap((items, index) => expressionFrames(items, directionDirs[index]?.name || 'front')),
+  ];
   const purupuru = hasSettings && frontalStates > 0
     ? {
         settingsPath: 'avatar/default-settings.json',
@@ -83,6 +146,7 @@ export async function inspectCharacterRepository(repo: Repo): Promise<CharacterR
         directions: 1 + directionDirs.length,
         totalStates: frontalStates + directionalStates,
         motionPatchPath: hasMotionPatch ? 'integration/purupuru-lumi-jelly-head-motion.patch.gz' : null,
+        frames: purupuruFrames,
       }
     : null;
 
@@ -99,21 +163,18 @@ export async function inspectCharacterRepository(repo: Repo): Promise<CharacterR
     return petJson && spritesheet ? item : null;
   }));
   const validNestedPets = nestedPetPairs.filter((item): item is ContentEntry => Boolean(item));
-  // Maki is the canonical package called out by the catalog contract. Prefer
-  // it when a collection contains several valid pets, while keeping generic
-  // support for repositories that package other characters.
-  const firstPet = validNestedPets.find((item) => item.name === 'maki') || validNestedPets[0] || null;
-  const firstPackageId = firstPet?.name || (rootPetPair.every(Boolean) ? repo.name : '');
-  let codexPet: CodexPetProfile | null = null;
-  let petPreview: string | null = null;
-  if (firstPackageId) {
-    const petBase = firstPet?.path || '';
-    const [previewEntries, hasQa, validationRaw] = await Promise.all([
-      directory(owner, repo.name, petBase ? `${petBase}/preview` : 'preview', ref),
-      exists(owner, repo.name, petBase ? `${petBase}/qa/contact-sheet.png` : 'qa/contact-sheet.png', ref),
-      getTextFile(owner, repo.name, petBase ? `${petBase}/final/validation.json` : 'final/validation.json', ref),
+  const petNames = petCatalogNames(await getTextFile(owner, repo.name, 'metadata/pets.csv', ref));
+  const packageRoots = [
+    ...validNestedPets.map((item) => ({ id: item.name, base: item.path })),
+    ...(rootPetPair.every(Boolean) ? [{ id: repo.name, base: '' }] : []),
+  ];
+  const packages = await Promise.all(packageRoots.map(async ({ id, base }): Promise<CodexPetPackage> => {
+    const [previewEntries, hasQa, validationRaw, manifestRaw] = await Promise.all([
+      directory(owner, repo.name, base ? `${base}/preview` : 'preview', ref),
+      exists(owner, repo.name, base ? `${base}/qa/contact-sheet.png` : 'qa/contact-sheet.png', ref),
+      getTextFile(owner, repo.name, base ? `${base}/final/validation.json` : 'final/validation.json', ref),
+      getTextFile(owner, repo.name, base ? `${base}/pet.json` : 'pet.json', ref),
     ]);
-    petPreview = firstImage(previewEntries);
     let atlasSize = '1536×1872';
     if (validationRaw) {
       try {
@@ -125,14 +186,44 @@ export async function inspectCharacterRepository(repo: Repo): Promise<CharacterR
         // A paired package still satisfies the portable Codex Pet contract.
       }
     }
-    codexPet = {
-      packageCount: validNestedPets.length + (rootPetPair.every(Boolean) ? 1 : 0),
-      firstPackageId,
-      petJsonPath: petBase ? `${petBase}/pet.json` : 'pet.json',
-      spritesheetPath: petBase ? `${petBase}/spritesheet.webp` : 'spritesheet.webp',
-      previewPath: petPreview,
-      qaPath: hasQa ? (petBase ? `${petBase}/qa/contact-sheet.png` : 'qa/contact-sheet.png') : null,
+    let displayName = petNames.get(id) || displayNameFromId(id);
+    if (manifestRaw) {
+      try {
+        const manifest = JSON.parse(manifestRaw) as Record<string, unknown>;
+        if (typeof manifest.displayName === 'string' && manifest.displayName.trim()) {
+          displayName = manifest.displayName.trim();
+        }
+      } catch {
+        // Keep the catalog or slug-derived name when a manifest is malformed.
+      }
+    }
+    return {
+      id,
+      displayName,
+      petJsonPath: base ? `${base}/pet.json` : 'pet.json',
+      spritesheetPath: base ? `${base}/spritesheet.webp` : 'spritesheet.webp',
+      previewPath: firstImage(previewEntries),
+      qaPath: hasQa ? (base ? `${base}/qa/contact-sheet.png` : 'qa/contact-sheet.png') : null,
       atlasSize,
+    };
+  }));
+  // Maki remains the default selection because it is the package called out by
+  // the catalog contract, but every validated package is now exposed.
+  const firstPackage = packages.find((item) => item.id === 'maki') || packages[0] || null;
+  const firstPackageId = firstPackage?.id || '';
+  let codexPet: CodexPetProfile | null = null;
+  let petPreview: string | null = null;
+  if (firstPackage) {
+    petPreview = firstPackage.previewPath;
+    codexPet = {
+      packageCount: packages.length,
+      packages,
+      firstPackageId,
+      petJsonPath: firstPackage.petJsonPath,
+      spritesheetPath: firstPackage.spritesheetPath,
+      previewPath: firstPackage.previewPath,
+      qaPath: firstPackage.qaPath,
+      atlasSize: firstPackage.atlasSize,
     };
   }
 
