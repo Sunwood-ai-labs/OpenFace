@@ -124,7 +124,7 @@ See the [architecture guide](https://sunwood-ai-labs.github.io/OpenFace/guide/ar
 - `lumi-jelly-head-motion-pngtuber`: head-only PuruPuru avatar with five directions, 30 states, and a direction-control patch.
 - `character-design-images`: eight character sheets and eight independently selectable Codex Pet packages, each with its own manifest, spritesheet, QA evidence, and animated WebP.
 
-OpenFace reads repository contents rather than trusting labels alone. The directory expands the pet repository into eight distinct cards—Ayano Yukimura, Fuhyo, Hisha, Kakugyo, Kohaku, Maki, Momiji, and Onizuka. PuruPuru cards and detail pages animate by switching the repository's real state PNGs; detail controls can pause playback and select a direction.
+OpenFace reads repository contents rather than trusting labels alone. The directory expands the pet repository into eight distinct cards—Ayano Yukimura, Fuhyo, Hisha, Kakugyo, Kohaku, Maki, Momiji, and Onizuka. PuruPuru cards and detail pages animate the repository's real state PNGs with a two-layer alpha crossfade; detail controls can pause playback and select a direction.
 
 | Standard mobile | Cyberpunk mobile |
 |---|---|

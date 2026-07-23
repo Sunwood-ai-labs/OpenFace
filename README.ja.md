@@ -108,7 +108,7 @@ flowchart LR
 |---|---|
 | <img src="docs/evidence/characters/standard-mobile-directory.png" alt="StandardテーマのCharacters一覧" width="320"> | <img src="docs/evidence/characters/cyberpunk-mobile-directory.png" alt="CyberpunkテーマのCharacters一覧" width="320"> |
 
-PetはAyano Yukimura、Fuhyo、Hisha、Kakugyo、Kohaku、Maki、Momiji、Onizukaをそれぞれ独立カードとして表示します。PuruPuruは実リポジトリの状態PNGを順番に切り替えてプレビューし、詳細画面では再生／停止と方向切替を操作できます。
+PetはAyano Yukimura、Fuhyo、Hisha、Kakugyo、Kohaku、Maki、Momiji、Onizukaをそれぞれ独立カードとして表示します。PuruPuruは実リポジトリの状態PNGを2レイヤーのアルファクロスフェードで滑らかに切り替え、詳細画面では再生／停止と方向切替を操作できます。
 
 [Characters検証記録](docs/evidence/characters/README.md)には、代表スクリーンショットと、規格監査24 / 24、WCAGテーマ監査48 / 48、日本語／英語監査48 / 48の結果を保存しています。
 
