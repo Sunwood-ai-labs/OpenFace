@@ -5,6 +5,7 @@ import { getLocale } from '@/lib/i18n-server';
 import { ui } from '@/lib/i18n';
 import { timeAgoEn, timeAgoJa } from '@/lib/format';
 import HfIcon from './HfIcon';
+import PuruPuruPreview from './PuruPuruPreview';
 
 export default async function CharactersDirectoryPage({
   searchParams,
@@ -14,11 +15,60 @@ export default async function CharactersDirectoryPage({
   const locale = await getLocale();
   const q = searchParams?.q?.trim() || undefined;
   const sort: SortOption = searchParams?.sort === 'stars' ? 'stars' : 'updated';
-  const result = await searchReposByTopicAndQuery('character', q, sort, 50);
+  const result = await searchReposByTopicAndQuery('character', undefined, sort, 50);
   const profiled = await Promise.all(result.data.map(async (repo) => ({
     repo,
     profile: await inspectCharacterRepository(repo),
   })));
+  const allItems = profiled.flatMap(({ repo, profile }) => {
+    const owner = repo.owner?.login || repo.full_name.split('/')[0];
+    const branch = repo.default_branch || 'main';
+    return [
+      ...(profile.purupuru ? [{
+        kind: 'purupuru' as const,
+        id: repo.name,
+        title: repo.name,
+        description: repo.description,
+        href: `/${owner}/${repo.name}`,
+        repo,
+        profile,
+        owner,
+        branch,
+        searchText: `purupuru ${profile.purupuru.motionPatchPath ? 'head-motion motion-patch' : 'upper-body'} ${repo.topics?.join(' ') || ''}`,
+      }] : []),
+      ...(profile.codexPet?.packages.map((pet) => ({
+        kind: 'pet' as const,
+        id: pet.id,
+        title: pet.displayName,
+        description: ui(locale, `${pet.displayName}のインストール可能なCodex Petパッケージ`, `Installable Codex Pet package for ${pet.displayName}`),
+        href: `/${owner}/${repo.name}?pet=${encodeURIComponent(pet.id)}`,
+        repo,
+        profile,
+        pet,
+        owner,
+        branch,
+        searchText: `codex-pet pet ${pet.id} ${pet.displayName} ${repo.topics?.join(' ') || ''}`,
+      })) || []),
+      ...(profile.characterSheets ? [{
+        kind: 'sheets' as const,
+        id: `${repo.name}-sheets`,
+        title: ui(locale, 'キャラクターデザインシート', 'Character design sheets'),
+        description: ui(locale, `${profile.characterSheets.count}キャラクターの設定画と書き出しアセット`, `Design sheets and export assets for ${profile.characterSheets.count} characters`),
+        href: `/${owner}/${repo.name}#readme`,
+        repo,
+        profile,
+        owner,
+        branch,
+        searchText: `character-sheet design-sheet ${repo.topics?.join(' ') || ''}`,
+      }] : []),
+    ];
+  });
+  const normalizedQuery = q?.toLocaleLowerCase();
+  const catalogItems = normalizedQuery
+    ? allItems.filter((item) => `${item.title} ${item.description || ''} ${item.repo.name} ${item.searchText}`.toLocaleLowerCase().includes(normalizedQuery))
+    : allItems;
+  const purupuruStates = profiled.reduce((total, item) => total + (item.profile.purupuru?.totalStates || 0), 0);
+  const petPackages = profiled.reduce((total, item) => total + (item.profile.codexPet?.packageCount || 0), 0);
   const filters = [
     ['PuruPuru', 'purupuru'],
     ['Codex Pet', 'codex-pet'],
@@ -44,9 +94,9 @@ export default async function CharactersDirectoryPage({
             </p>
           </div>
           <div className="grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-200 text-center dark:border-zinc-700 dark:bg-zinc-700">
-            <div className="bg-white p-4 dark:bg-zinc-950"><strong className="block text-2xl">{result.total_count}</strong><span className="text-xs text-zinc-500">repos</span></div>
-            <div className="bg-white p-4 dark:bg-zinc-950"><strong className="block text-2xl">30</strong><span className="text-xs text-zinc-500">PuruPuru states</span></div>
-            <div className="bg-white p-4 dark:bg-zinc-950"><strong className="block text-2xl">8</strong><span className="text-xs text-zinc-500">pet packages</span></div>
+            <div className="bg-white p-4 dark:bg-zinc-950"><strong className="block text-2xl">{allItems.length}</strong><span className="text-xs text-zinc-500">entries</span></div>
+            <div className="bg-white p-4 dark:bg-zinc-950"><strong className="block text-2xl">{purupuruStates}</strong><span className="text-xs text-zinc-500">PuruPuru states</span></div>
+            <div className="bg-white p-4 dark:bg-zinc-950"><strong className="block text-2xl">{petPackages}</strong><span className="text-xs text-zinc-500">pet packages</span></div>
           </div>
         </div>
       </section>
@@ -71,24 +121,46 @@ export default async function CharactersDirectoryPage({
 
       {!result.ok ? (
         <div className="mt-8 rounded-xl border border-dashed border-zinc-300 p-10 text-center text-zinc-500">{ui(locale, 'Forgejoに接続できませんでした。', 'Could not connect to Forgejo.')}</div>
-      ) : profiled.length === 0 ? (
+      ) : catalogItems.length === 0 ? (
         <div className="mt-8 rounded-xl border border-dashed border-zinc-300 p-10 text-center text-zinc-500">{ui(locale, 'キャラクターリポジトリはまだありません。', 'No character repositories yet.')}</div>
       ) : (
         <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {profiled.map(({ repo, profile }) => {
-            const owner = repo.owner?.login || repo.full_name.split('/')[0];
-            const branch = repo.default_branch || 'main';
-            const formatLabels = [
-              profile.purupuru ? `PuruPuru · ${profile.purupuru.totalStates} states` : null,
-              profile.codexPet ? `Codex Pet · ${profile.codexPet.packageCount}` : null,
-              profile.characterSheets ? `${profile.characterSheets.count} character sheets` : null,
-            ].filter((label): label is string => Boolean(label));
+          {catalogItems.map((item) => {
+            const { repo, profile, owner, branch } = item;
+            const formatLabels = item.kind === 'purupuru'
+              ? [`PuruPuru · ${profile.purupuru?.totalStates || 0} states`]
+              : item.kind === 'pet'
+                ? ['Codex Pet', item.pet.atlasSize]
+                : [`${profile.characterSheets?.count || 0} character sheets`];
+            const previewPath = item.kind === 'pet'
+              ? item.pet.previewPath
+              : item.kind === 'sheets'
+                ? profile.characterSheets?.previewPath
+                : null;
             return (
-              <article key={repo.id ?? repo.full_name} className="group overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-fuchsia-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
-                <Link href={`/${owner}/${repo.name}`} className="relative block aspect-[16/10] overflow-hidden bg-zinc-950">
+              <article
+                key={`${repo.full_name}:${item.kind}:${item.id}`}
+                className="group overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-fuchsia-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
+                data-codex-pet-card={item.kind === 'pet' ? item.id : undefined}
+              >
+                <Link href={item.href} className="relative block aspect-[16/10] overflow-hidden bg-zinc-950">
                   <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(34,211,238,.25)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,.25)_1px,transparent_1px)] [background-size:22px_22px]" />
-                  {profile.previewPath ? (
-                    <img src={forgejoRawUrl(owner, repo.name, profile.previewPath, branch)} alt={`${repo.name} preview`} className="relative h-full w-full object-contain p-3 transition duration-500 group-hover:scale-[1.03]" />
+                  {item.kind === 'purupuru' && profile.purupuru?.frames.length ? (
+                    <PuruPuruPreview
+                      compact
+                      locale={locale}
+                      frames={profile.purupuru.frames.map((frame) => ({
+                        ...frame,
+                        src: forgejoRawUrl(owner, repo.name, frame.path, branch),
+                      }))}
+                    />
+                  ) : previewPath ? (
+                    <img
+                      src={forgejoRawUrl(owner, repo.name, previewPath, branch)}
+                      alt={item.kind === 'pet' ? `${item.title} pet preview` : `${item.title} preview`}
+                      loading="lazy"
+                      className="relative h-full w-full object-contain p-3 transition duration-500 group-hover:scale-[1.03]"
+                    />
                   ) : (
                     <span className="relative grid h-full place-items-center"><HfIcon name="character" className="h-14 w-14 text-cyan-300" /></span>
                   )}
@@ -97,13 +169,13 @@ export default async function CharactersDirectoryPage({
                   </span>
                 </Link>
                 <div className="p-5">
-                  <p className="font-mono text-xs text-zinc-500">{owner}/</p>
-                  <Link href={`/${owner}/${repo.name}`} className="mt-1 block break-words text-lg font-black tracking-tight text-zinc-950 hover:text-fuchsia-700 dark:text-white dark:hover:text-fuchsia-300">{repo.name}</Link>
-                  <p className="mt-2 line-clamp-2 min-h-10 text-sm leading-5 text-zinc-600 dark:text-zinc-400">{repo.description}</p>
+                  <p className="font-mono text-xs text-zinc-500">{item.kind === 'pet' ? `${repo.name} / pet` : `${owner}/`}</p>
+                  <Link href={item.href} className="mt-1 block break-words text-lg font-black tracking-tight text-zinc-950 hover:text-fuchsia-700 dark:text-white dark:hover:text-fuchsia-300">{item.title}</Link>
+                  <p className="mt-2 line-clamp-2 min-h-10 text-sm leading-5 text-zinc-600 dark:text-zinc-400">{item.description}</p>
                   <div className="mt-4 flex flex-wrap gap-1.5">
                     {formatLabels.map((label) => <span key={label} className="rounded-md bg-zinc-100 px-2 py-1 text-[11px] font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">{label}</span>)}
-                    {profile.purupuru?.motionPatchPath ? <span className="rounded-md bg-fuchsia-100 px-2 py-1 text-[11px] font-semibold text-fuchsia-800 dark:bg-fuchsia-950 dark:text-fuchsia-200">motion patch</span> : null}
-                    {profile.codexPet?.qaPath ? <span className="rounded-md bg-cyan-100 px-2 py-1 text-[11px] font-semibold text-cyan-800 dark:bg-cyan-950 dark:text-cyan-200">QA verified</span> : null}
+                    {item.kind === 'purupuru' && profile.purupuru?.motionPatchPath ? <span className="rounded-md bg-fuchsia-100 px-2 py-1 text-[11px] font-semibold text-fuchsia-800 dark:bg-fuchsia-950 dark:text-fuchsia-200">motion patch</span> : null}
+                    {item.kind === 'pet' && item.pet.qaPath ? <span className="rounded-md bg-cyan-100 px-2 py-1 text-[11px] font-semibold text-cyan-800 dark:bg-cyan-950 dark:text-cyan-200">QA verified</span> : null}
                   </div>
                   <div className="mt-5 flex items-center gap-3 border-t border-zinc-100 pt-4 text-xs text-zinc-500 dark:border-zinc-800">
                     <span>{locale === 'ja' ? timeAgoJa(repo.updated_at) : timeAgoEn(repo.updated_at)}</span>

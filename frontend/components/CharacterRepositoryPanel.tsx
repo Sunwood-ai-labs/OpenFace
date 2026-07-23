@@ -3,6 +3,7 @@ import { CharacterRepositoryProfile } from '@/lib/character-format';
 import { forgejoRawUrl, forgejoTreeUrl } from '@/lib/forgejo';
 import { Locale, ui } from '@/lib/i18n';
 import HfIcon from './HfIcon';
+import PuruPuruPreview from './PuruPuruPreview';
 
 export default function CharacterRepositoryPanel({
   owner,
@@ -10,13 +11,19 @@ export default function CharacterRepositoryPanel({
   branch,
   profile,
   locale,
+  selectedPetId,
 }: {
   owner: string;
   repo: string;
   branch: string;
   profile: CharacterRepositoryProfile;
   locale: Locale;
+  selectedPetId?: string | null;
 }) {
+  const selectedPet = profile.codexPet?.packages.find((item) => item.id === selectedPetId)
+    || profile.codexPet?.packages.find((item) => item.id === profile.codexPet?.firstPackageId)
+    || profile.codexPet?.packages[0]
+    || null;
   const formats = [
     profile.purupuru ? {
       name: 'PuruPuru',
@@ -42,7 +49,21 @@ export default function CharacterRepositoryPanel({
       <div className="grid lg:grid-cols-[minmax(0,1.3fr)_minmax(280px,.7fr)]">
         <div className="relative min-h-72 overflow-hidden bg-[radial-gradient(circle_at_20%_10%,rgba(34,211,238,.24),transparent_38%),radial-gradient(circle_at_90%_90%,rgba(217,70,239,.18),transparent_35%),linear-gradient(145deg,#09090b,#18181b)]">
           <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.12)_1px,transparent_1px)] [background-size:24px_24px]" />
-          {profile.previewPath ? (
+          {profile.purupuru?.frames.length ? (
+            <PuruPuruPreview
+              frames={profile.purupuru.frames.map((frame) => ({
+                ...frame,
+                src: forgejoRawUrl(owner, repo, frame.path, branch),
+              }))}
+              locale={locale}
+            />
+          ) : selectedPet?.previewPath ? (
+            <img
+              src={forgejoRawUrl(owner, repo, selectedPet.previewPath, branch)}
+              alt={ui(locale, `${selectedPet.displayName}のCodex Petアニメーション`, `${selectedPet.displayName} Codex Pet animation`)}
+              className="relative h-full max-h-[440px] min-h-72 w-full object-contain p-5"
+            />
+          ) : profile.previewPath ? (
             <img
               src={forgejoRawUrl(owner, repo, profile.previewPath, branch)}
               alt={ui(locale, `${repo}のキャラクタープレビュー`, `${repo} character preview`)}
@@ -54,7 +75,11 @@ export default function CharacterRepositoryPanel({
         </div>
         <div className="flex flex-col border-t border-white/10 p-6 lg:border-l lg:border-t-0">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-300">{ui(locale, '検出済み規格', 'Detected formats')}</p>
-          <h2 className="mt-3 text-2xl font-extrabold tracking-tight">{ui(locale, '実ファイルから互換性を確認', 'Compatibility verified from files')}</h2>
+          <h2 className="mt-3 text-2xl font-extrabold tracking-tight">
+            {selectedPet
+              ? `${selectedPet.displayName} · Codex Pet`
+              : ui(locale, '実ファイルから互換性を確認', 'Compatibility verified from files')}
+          </h2>
           <p className="openface-character-panel-copy mt-3 text-sm leading-6 text-zinc-300">{ui(locale, 'トピック名だけでなく、設定・状態画像・pet.json・spritesheet・QA成果物を読み取りました。', 'OpenFace inspected settings, state images, pet.json, spritesheets, and QA artifacts—not just repository topics.')}</p>
           <div className="mt-5 grid gap-2">
             {formats.map((format) => (
@@ -77,10 +102,26 @@ export default function CharacterRepositoryPanel({
             </div>
           ) : null}
           {profile.codexPet ? (
-            <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-              <Link href={forgejoTreeUrl(owner, repo, profile.codexPet.petJsonPath, branch)} className="rounded-lg border border-white/15 px-3 py-2 hover:bg-white/5">pet.json</Link>
-              <Link href={forgejoTreeUrl(owner, repo, profile.codexPet.spritesheetPath, branch)} className="rounded-lg border border-white/15 px-3 py-2 hover:bg-white/5">spritesheet.webp</Link>
-            </div>
+            <>
+              <div className="mt-4 grid grid-cols-2 gap-1.5" aria-label={ui(locale, 'Petを選択', 'Select pet')}>
+                {profile.codexPet.packages.map((pet) => (
+                  <Link
+                    key={pet.id}
+                    href={`/${owner}/${repo}?pet=${encodeURIComponent(pet.id)}`}
+                    className={`truncate rounded-lg border px-2.5 py-2 text-xs font-semibold transition ${pet.id === selectedPet?.id ? 'border-cyan-200 bg-cyan-200 text-zinc-950' : 'border-white/15 text-zinc-200 hover:border-cyan-300 hover:bg-white/5'}`}
+                    aria-current={pet.id === selectedPet?.id ? 'true' : undefined}
+                  >
+                    {pet.displayName}
+                  </Link>
+                ))}
+              </div>
+              {selectedPet ? (
+                <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                  <Link href={forgejoTreeUrl(owner, repo, selectedPet.petJsonPath, branch)} className="rounded-lg border border-white/15 px-3 py-2 hover:bg-white/5">pet.json</Link>
+                  <Link href={forgejoTreeUrl(owner, repo, selectedPet.spritesheetPath, branch)} className="rounded-lg border border-white/15 px-3 py-2 hover:bg-white/5">spritesheet.webp</Link>
+                </div>
+              ) : null}
+            </>
           ) : null}
         </div>
       </div>
