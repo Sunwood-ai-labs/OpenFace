@@ -64,7 +64,7 @@ export default async function CharactersDirectoryPage({
             </Link>
           ))}
         </nav>
-        <Link href="/new?type=character" className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-zinc-950 px-4 text-sm font-bold text-white hover:bg-zinc-800 dark:!bg-cyan-300 dark:!text-zinc-950 dark:hover:!bg-cyan-200">
+        <Link href="/new?type=character" className="openface-character-primary-action inline-flex h-10 items-center justify-center gap-2 rounded-full bg-zinc-950 px-4 text-sm font-bold text-white hover:bg-zinc-800 dark:bg-cyan-300 dark:text-zinc-950 dark:hover:bg-cyan-200">
           <HfIcon name="plus" className="h-3 w-3" /> {ui(locale, 'キャラクターを追加', 'Add character')}
         </Link>
       </div>

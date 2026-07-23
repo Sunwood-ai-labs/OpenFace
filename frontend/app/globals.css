@@ -385,6 +385,15 @@ html[data-openface-theme="cyberpunk"] .bg-zinc-950 {
   background-color: #1b1035 !important;
 }
 
+html[data-openface-theme="cyberpunk"] .openface-character-primary-action {
+  background-color: #67e8f9 !important;
+  color: #08111f !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-character-primary-action:hover {
+  background-color: #a5f3fc !important;
+}
+
 html[data-openface-theme="cyberpunk"] .bg-accent {
   background-color: #25e1c9 !important;
 }
