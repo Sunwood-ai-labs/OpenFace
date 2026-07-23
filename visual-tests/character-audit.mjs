@@ -127,4 +127,7 @@ await writeFile(join(outputDir, 'README.md'), [
   '',
 ].join('\n'));
 console.log(JSON.stringify({ outputDir, cases: results.length, failures: failures.length }, null, 2));
+if (failures.length) {
+  console.error(JSON.stringify({ characterAuditFailures: failures }, null, 2));
+}
 if (failures.length) process.exitCode = 1;
