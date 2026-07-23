@@ -21,23 +21,23 @@ OpenFaceの`Characters`は、単なるtopic分類ではなく、Forgejoへ取り
     <th>Cyberpunk mobile</th>
   </tr>
   <tr>
-    <td valign="top"><img src="standard-mobile-directory.png" alt="Standard mobile Characters directory"></td>
-    <td valign="top"><img src="solarpunk-desktop-directory.png" alt="Solarpunk desktop Characters directory"></td>
-    <td valign="top"><img src="cyberpunk-mobile-directory.png" alt="Cyberpunk mobile Characters directory"></td>
+    <td valign="top"><img src="./standard-mobile-directory.png" alt="Standard mobile Characters directory"></td>
+    <td valign="top"><img src="./solarpunk-desktop-directory.png" alt="Solarpunk desktop Characters directory"></td>
+    <td valign="top"><img src="./cyberpunk-mobile-directory.png" alt="Cyberpunk mobile Characters directory"></td>
   </tr>
 </table>
 
 ### PuruPuru upper body: 6 states
 
-<img src="standard-mobile-purupuru-upper.png" alt="PuruPuru upper body detail" width="390">
+<img src="./standard-mobile-purupuru-upper.png" alt="PuruPuru upper body detail" width="390">
 
 ### PuruPuru head motion: 5 directions / 30 states
 
-<img src="cyberpunk-mobile-purupuru-head-motion.png" alt="PuruPuru head motion detail" width="390">
+<img src="./cyberpunk-mobile-purupuru-head-motion.png" alt="PuruPuru head motion detail" width="390">
 
 ### Codex Pet: Maki package
 
-<img src="standard-mobile-codex-pets.png" alt="Codex Pet Maki detail" width="390">
+<img src="./standard-mobile-codex-pets.png" alt="Codex Pet Maki detail" width="390">
 
 ## 自動監査
 
