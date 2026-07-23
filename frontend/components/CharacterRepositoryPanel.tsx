@@ -64,10 +64,17 @@ export default function CharacterRepositoryPanel({
               </div>
             ))}
           </div>
-          {profile.purupuru?.motionPatchPath ? (
-            <Link href={forgejoTreeUrl(owner, repo, profile.purupuru.motionPatchPath, branch)} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-fuchsia-300 hover:underline">
-              <HfIcon name="download" className="h-3.5 w-3.5" /> PuruPuru direction-control patch
-            </Link>
+          {profile.purupuru ? (
+            <div className="mt-4 grid gap-2 text-xs">
+              <Link href={forgejoTreeUrl(owner, repo, profile.purupuru.settingsPath, branch)} className="rounded-lg border border-white/15 px-3 py-2 hover:bg-white/5">
+                avatar/default-settings.json
+              </Link>
+              {profile.purupuru.motionPatchPath ? (
+                <Link href={forgejoTreeUrl(owner, repo, profile.purupuru.motionPatchPath, branch)} className="inline-flex items-center gap-2 rounded-lg border border-fuchsia-400/30 px-3 py-2 font-semibold text-fuchsia-300 hover:bg-fuchsia-400/10">
+                  <HfIcon name="download" className="h-3.5 w-3.5" /> PuruPuru direction-control patch
+                </Link>
+              ) : null}
+            </div>
           ) : null}
           {profile.codexPet ? (
             <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
@@ -80,4 +87,3 @@ export default function CharacterRepositoryPanel({
     </section>
   );
 }
-
