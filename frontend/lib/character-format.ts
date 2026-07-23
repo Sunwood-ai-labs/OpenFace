@@ -99,7 +99,10 @@ export async function inspectCharacterRepository(repo: Repo): Promise<CharacterR
     return petJson && spritesheet ? item : null;
   }));
   const validNestedPets = nestedPetPairs.filter((item): item is ContentEntry => Boolean(item));
-  const firstPet = validNestedPets[0] || null;
+  // Maki is the canonical package called out by the catalog contract. Prefer
+  // it when a collection contains several valid pets, while keeping generic
+  // support for repositories that package other characters.
+  const firstPet = validNestedPets.find((item) => item.name === 'maki') || validNestedPets[0] || null;
   const firstPackageId = firstPet?.name || (rootPetPair.every(Boolean) ? repo.name : '');
   let codexPet: CodexPetProfile | null = null;
   let petPreview: string | null = null;
@@ -172,4 +175,3 @@ export async function inspectCharacterRepository(repo: Repo): Promise<CharacterR
     evidencePaths,
   };
 }
-
