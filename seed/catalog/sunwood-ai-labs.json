@@ -95,6 +95,30 @@
     { "name": "ideagram-mcp-server", "kind": "mcp", "description": "Generate visual ideas and images through an MCP server", "source": "https://github.com/Sunwood-ai-labs/ideagram-mcp-server.git", "branch": "main" },
     { "name": "mcp-voicevox", "kind": "mcp", "description": "Generate Japanese speech with VOICEVOX through MCP", "source": "https://github.com/Sunwood-ai-labs/mcp-voicevox.git", "branch": "main" },
     { "name": "mcp-weather-service-server", "kind": "mcp", "description": "Expose weather forecasts and observations as MCP tools", "source": "https://github.com/Sunwood-ai-labs/mcp-weather-service-server.git", "branch": "main" },
-    { "name": "source-sage-mcp-server", "kind": "mcp", "description": "Analyze and document source repositories through MCP", "source": "https://github.com/Sunwood-ai-labs/source-sage-mcp-server.git", "branch": "master" }
+    { "name": "source-sage-mcp-server", "kind": "mcp", "description": "Analyze and document source repositories through MCP", "source": "https://github.com/Sunwood-ai-labs/source-sage-mcp-server.git", "branch": "master" },
+    {
+      "name": "lumi-jelly-pngtuber",
+      "kind": "character",
+      "description": "Lumi Jelly upper-body PuruPuru PNGtuber with six frontal expression states",
+      "source": "https://github.com/Sunwood-ai-labs/lumi-jelly-pngtuber.git",
+      "branch": "main",
+      "topics": ["purupuru", "pngtuber", "upper-body", "six-state"]
+    },
+    {
+      "name": "lumi-jelly-head-motion-pngtuber",
+      "kind": "character",
+      "description": "Lumi Jelly head-only PuruPuru model with five directions, 30 states, and a direction-control patch",
+      "source": "https://github.com/Sunwood-ai-labs/lumi-jelly-head-motion-pngtuber.git",
+      "branch": "main",
+      "topics": ["purupuru", "pngtuber", "head-motion", "five-direction", "thirty-state", "motion-patch"]
+    },
+    {
+      "name": "character-design-images",
+      "kind": "character",
+      "description": "Eight character sheets and installable Codex pet packages with spritesheets and QA evidence",
+      "source": "https://github.com/Sunwood-ai-labs/character-design-images.git",
+      "branch": "main",
+      "topics": ["codex-pet", "character-sheet", "pet-package", "eight-characters", "qa"]
+    }
   ]
 }

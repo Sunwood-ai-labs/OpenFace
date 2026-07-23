@@ -1523,14 +1523,16 @@ import_hf_space() {
 # the upstream commit graph. Existing repositories are never overwritten.
 # ------------------------------------------------------------------------
 import_github_catalog_repo() {
-  local source="$1" name="$2" kind="$3" branch="$4" description="$5"
+  local source="$1" name="$2" kind="$3" branch="$4" description="$5" extra_topics_json="${6:-[]}"
   local code clone_dir push_url
+  local -a extra_topics=()
+  mapfile -t extra_topics < <(printf '%s' "$extra_topics_json" | jq -r '.[]')
 
   code=$(api GET "/repos/${ORG_NAME}/${name}")
   if [ "$code" = "200" ]; then
     log "GitHub sample '${ORG_NAME}/${name}' already exists; keeping local changes."
     api PATCH "/repos/${ORG_NAME}/${name}" "$(jq -n --arg desc "$description" '{description:$desc}')" >/dev/null
-    set_topics "$name" "$kind" "sunwood-ai-labs" "github-import"
+    set_topics "$name" "$kind" "sunwood-ai-labs" "github-import" "${extra_topics[@]}"
     return 0
   fi
 
@@ -1560,7 +1562,7 @@ import_github_catalog_repo() {
     exit 1
   fi
 
-  set_topics "$name" "$kind" "sunwood-ai-labs" "github-import"
+  set_topics "$name" "$kind" "sunwood-ai-labs" "github-import" "${extra_topics[@]}"
   log "Imported '${source}' as '${ORG_NAME}/${name}' (${kind})."
 }
 
@@ -1570,7 +1572,7 @@ import_sunwood_catalog() {
     exit 1
   fi
 
-  local encoded entry source name kind branch description metadata_file
+  local encoded entry source name kind branch description metadata_file extra_topics_json
   while IFS= read -r encoded; do
     entry=$(printf '%s' "$encoded" | base64 -d)
     source=$(printf '%s' "$entry" | jq -r '.source')
@@ -1578,7 +1580,8 @@ import_sunwood_catalog() {
     kind=$(printf '%s' "$entry" | jq -r '.kind')
     branch=$(printf '%s' "$entry" | jq -r '.branch')
     description=$(printf '%s' "$entry" | jq -r '.description')
-    import_github_catalog_repo "$source" "$name" "$kind" "$branch" "$description"
+    extra_topics_json=$(printf '%s' "$entry" | jq -c '.topics // []')
+    import_github_catalog_repo "$source" "$name" "$kind" "$branch" "$description" "$extra_topics_json"
     if [ "$kind" = "skill" ]; then
       metadata_file="${WORKDIR}/${name}-skill.json"
       printf '%s' "$entry" | jq '{schemaVersion: 2, dependencies: (.dependencies // [])}' > "$metadata_file"
