@@ -33,6 +33,8 @@ import { getRepoMetrics } from '@/lib/agent-metrics';
 import RepoViewCount from '@/components/RepoViewCount';
 import PromptRevisionSwitcher from '@/components/PromptRevisionSwitcher';
 import SkillRelationshipMap from '@/components/SkillRelationshipMap';
+import CharacterRepositoryPanel from '@/components/CharacterRepositoryPanel';
+import { inspectCharacterRepository } from '@/lib/character-format';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,7 +47,7 @@ export async function generateMetadata({
   const locale = await getLocale();
   const repoInfo = await getRepo(owner, repo);
   const kind = repoInfo ? repoKind(repoInfo.topics) : null;
-  const label = kind === 'space' ? 'Space' : kind === 'dataset' ? ui(locale, 'データセット', 'Dataset') : kind === 'skill' ? ui(locale, 'スキル', 'Skill') : kind === 'mcp' ? 'MCP server' : kind === 'prompt' ? ui(locale, 'プロンプト', 'Prompt') : kind === 'doc' ? ui(locale, 'ナレッジ', 'Knowledge') : ui(locale, 'モデル', 'Model');
+  const label = kind === 'space' ? 'Space' : kind === 'dataset' ? ui(locale, 'データセット', 'Dataset') : kind === 'skill' ? ui(locale, 'スキル', 'Skill') : kind === 'mcp' ? 'MCP server' : kind === 'prompt' ? ui(locale, 'プロンプト', 'Prompt') : kind === 'doc' ? ui(locale, 'ナレッジ', 'Knowledge') : kind === 'character' ? ui(locale, 'キャラクター', 'Character') : ui(locale, 'モデル', 'Model');
   const repoName = repoInfo?.full_name || `${owner}/${repo}`;
   return {
     title: `${repoName} - ${label} - OpenFace`,
@@ -61,6 +63,7 @@ const KIND_ICON: Record<string, HfIconName> = {
   mcp: 'mcp',
   prompt: 'prompt',
   doc: 'doc',
+  character: 'character',
 };
 
 export default async function RepoDetailPage({
@@ -94,18 +97,19 @@ export default async function RepoDetailPage({
   const topicBadges = nonTypeTopics(repoInfo.topics);
   const promptVersion = kind === 'prompt' ? repoPromptVersion(repoInfo.topics) : null;
   const isSpace = kind === 'space';
-  const [agentMetrics, pagesSource, promptTags, skillCatalog] = await Promise.all([
+  const [agentMetrics, pagesSource, promptTags, skillCatalog, characterProfile] = await Promise.all([
     isSpace ? getRepoMetrics(owner, repo) : Promise.resolve(null),
     getPagesSource(owner, repo, repoInfo.default_branch || 'main'),
     kind === 'prompt' ? getRepoTags(owner, repo) : Promise.resolve([]),
     kind === 'skill' ? searchRepos({ topic: 'skill', limit: 100 }) : Promise.resolve(null),
+    kind === 'character' ? inspectCharacterRepository(repoInfo) : Promise.resolve(null),
   ]);
   const requestedRevision = resolvedSearchParams.revision?.trim() || null;
   const selectedRevision = requestedRevision && promptTags.some((tag) => tag.name === requestedRevision)
     ? requestedRevision
     : null;
-  const kindLabel = isSpace ? 'Spaces' : kind === 'dataset' ? ui(locale, 'データセット', 'Datasets') : kind === 'skill' ? ui(locale, 'スキル', 'Skills') : kind === 'mcp' ? 'MCPs' : kind === 'prompt' ? ui(locale, 'プロンプト', 'Prompts') : kind === 'doc' ? ui(locale, 'ナレッジ', 'Knowledge') : ui(locale, 'モデル', 'Models');
-  const kindHref = isSpace ? '/spaces' : kind === 'dataset' ? '/datasets' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : kind === 'doc' ? '/docs' : '/models';
+  const kindLabel = isSpace ? 'Spaces' : kind === 'dataset' ? ui(locale, 'データセット', 'Datasets') : kind === 'skill' ? ui(locale, 'スキル', 'Skills') : kind === 'mcp' ? 'MCPs' : kind === 'prompt' ? ui(locale, 'プロンプト', 'Prompts') : kind === 'doc' ? ui(locale, 'ナレッジ', 'Knowledge') : kind === 'character' ? 'Characters' : ui(locale, 'モデル', 'Models');
+  const kindHref = isSpace ? '/spaces' : kind === 'dataset' ? '/datasets' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : kind === 'doc' ? '/docs' : kind === 'character' ? '/characters' : '/models';
   const kindIcon = kind ? KIND_ICON[kind] : 'box';
   const isSpaceApp = isSpace && tab === 'card';
 
@@ -202,6 +206,7 @@ export default async function RepoDetailPage({
               revision={selectedRevision}
               skillRepo={kind === 'skill' ? repoInfo : null}
               skillCatalog={skillCatalog?.data || []}
+              characterProfile={characterProfile}
               locale={locale}
             />
           ) : (
@@ -224,7 +229,7 @@ export default async function RepoDetailPage({
           ) : null}
           <div className="rounded-lg border border-zinc-200 bg-white p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              {isSpace ? ui(locale, 'Spaceの操作', 'Space actions') : kind === 'dataset' ? ui(locale, 'データセットの操作', 'Dataset actions') : kind === 'skill' ? ui(locale, 'スキルの操作', 'Skill actions') : kind === 'mcp' ? ui(locale, 'MCPの操作', 'MCP actions') : kind === 'prompt' ? ui(locale, 'プロンプトの操作', 'Prompt actions') : kind === 'doc' ? ui(locale, 'ナレッジの操作', 'Knowledge actions') : ui(locale, 'モデルの操作', 'Model actions')}
+              {isSpace ? ui(locale, 'Spaceの操作', 'Space actions') : kind === 'dataset' ? ui(locale, 'データセットの操作', 'Dataset actions') : kind === 'skill' ? ui(locale, 'スキルの操作', 'Skill actions') : kind === 'mcp' ? ui(locale, 'MCPの操作', 'MCP actions') : kind === 'prompt' ? ui(locale, 'プロンプトの操作', 'Prompt actions') : kind === 'doc' ? ui(locale, 'ナレッジの操作', 'Knowledge actions') : kind === 'character' ? ui(locale, 'キャラクターの操作', 'Character actions') : ui(locale, 'モデルの操作', 'Model actions')}
             </p>
             <div className="grid gap-2">
               {isSpace ? (
@@ -293,6 +298,17 @@ export default async function RepoDetailPage({
                     {ui(locale, 'このナレッジを編集', 'Edit this knowledge')}
                   </a>
                 </>
+              ) : kind === 'character' ? (
+                <>
+                  <a href={`/${owner}/${repo}?tab=files`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-fuchsia-700 px-3 text-sm font-semibold text-white hover:bg-fuchsia-800">
+                    <HfIcon name="character" className="h-3.5 w-3.5" />
+                    {ui(locale, 'アセットを確認', 'Inspect assets')}
+                  </a>
+                  <a href={`/new?type=character&template=${encodeURIComponent(`${owner}/${repo}`)}`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
+                    <HfIcon name="fork" className="h-3.5 w-3.5" />
+                    {ui(locale, 'キャラクターを複製', 'Duplicate character')}
+                  </a>
+                </>
               ) : (
                 <>
                   <a href={forgejoRepoUrl(owner, repo)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-zinc-950 px-3 text-sm font-semibold text-white hover:bg-zinc-800">
@@ -357,6 +373,7 @@ async function CardTabContent({
   revision,
   skillRepo,
   skillCatalog,
+  characterProfile,
   locale,
 }: {
   owner: string;
@@ -366,6 +383,7 @@ async function CardTabContent({
   revision?: string | null;
   skillRepo: import('@/lib/forgejo').Repo | null;
   skillCatalog: import('@/lib/forgejo').Repo[];
+  characterProfile: import('@/lib/character-format').CharacterRepositoryProfile | null;
   locale: Locale;
 }) {
   const ref = revision || defaultBranch;
@@ -399,13 +417,16 @@ async function CardTabContent({
 
   return (
     <div>
+      {kind === 'character' && characterProfile ? (
+        <CharacterRepositoryPanel owner={owner} repo={repo} branch={defaultBranch} profile={characterProfile} locale={locale} />
+      ) : null}
       {kind === 'prompt' && revision ? (
         <div className="mb-5 flex items-center gap-3 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900 dark:border-orange-950 dark:bg-orange-950/20 dark:text-orange-200">
           <HfIcon name="prompt" className="h-4 w-4 shrink-0" />
           <span>{ui(locale, <><strong className="font-mono">{revision}</strong> のGit tagに保存された <code>PROMPT.md</code> 原文を表示しています。</>, <>Showing the original <code>PROMPT.md</code> stored in Git tag <strong className="font-mono">{revision}</strong>.</>)}</span>
         </div>
       ) : null}
-      <CardBadges frontmatter={frontmatter} basePath={kind === 'dataset' ? '/datasets' : kind === 'space' ? '/spaces' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : kind === 'doc' ? '/docs' : '/models'} />
+      <CardBadges frontmatter={frontmatter} basePath={kind === 'dataset' ? '/datasets' : kind === 'space' ? '/spaces' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : kind === 'doc' ? '/docs' : kind === 'character' ? '/characters' : '/models'} />
       {kind === 'skill' && skillRepo ? (
         <div className="mb-7 lg:hidden">
           <SkillRelationshipMap repo={skillRepo} catalog={skillCatalog} placement="mobile" locale={locale} />

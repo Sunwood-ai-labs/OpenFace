@@ -22,6 +22,7 @@ export default function Navbar() {
     { href: '/mcps', label: 'MCPs' },
     { href: '/prompts', label: 'Prompts' },
     { href: '/docs', label: 'Knowledge' },
+    { href: '/characters', label: 'Characters' },
   ];
 
   return (
@@ -37,7 +38,7 @@ export default function Navbar() {
 
         <SearchForm className="ml-auto hidden flex-1 sm:ml-6 sm:block sm:max-w-[325px]" />
 
-        <nav className="ml-auto hidden items-center gap-4 text-sm font-medium text-zinc-900 lg:flex">
+        <nav className="ml-auto hidden items-center gap-3 text-sm font-medium text-zinc-900 xl:flex">
           {navItems.map((item) => (
             <Link key={item.href} href={item.href} className="inline-flex items-center gap-1.5 hover:text-zinc-600">
               {item.label}
@@ -57,6 +58,7 @@ export default function Navbar() {
                 <a href="/mcps" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">MCPs</a>
                 <a href="/prompts" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Prompts</a>
                 <a href="/docs" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Knowledge</a>
+                <a href="/characters" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Characters</a>
               </div>
               <div>
                 <h2 className="mb-2 text-xs font-semibold uppercase tracking-normal text-zinc-400">{ui(locale, 'コミュニティ', 'Community')}</h2>
@@ -74,12 +76,12 @@ export default function Navbar() {
           </details>
         </nav>
 
-        <div className="hidden lg:block">
+        <div className="hidden xl:block">
           <ThemeSelector />
         </div>
-        <div className="hidden lg:block"><LanguageSelector /></div>
+        <div className="hidden xl:block"><LanguageSelector /></div>
 
-        <div className="hidden shrink-0 items-center gap-4 text-sm font-semibold lg:flex">
+        <div className="hidden shrink-0 items-center gap-4 text-sm font-semibold xl:flex">
           <a href="/git/user/login" className="text-zinc-900 hover:text-zinc-600">
             {ui(locale, 'ログイン', 'Log in')}
           </a>
@@ -88,7 +90,7 @@ export default function Navbar() {
           </a>
         </div>
 
-        <details className="group relative ml-auto lg:hidden">
+        <details className="group relative ml-auto xl:hidden">
           <summary className="openface-mobile-menu-toggle flex h-9 w-9 shrink-0 cursor-pointer list-none items-center justify-center rounded-lg border border-transparent text-zinc-700 hover:bg-zinc-100 marker:hidden dark:text-zinc-300 dark:hover:bg-zinc-800 [&::-webkit-details-marker]:hidden">
             <HfIcon name="bars" className="h-4 w-4" />
           </summary>

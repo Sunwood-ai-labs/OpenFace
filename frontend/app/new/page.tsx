@@ -73,6 +73,14 @@ const repoTypes: Array<{
     description: 'One personal or team publication containing many Markdown entries.',
     descriptionJa: '個人またはチームの記事をまとめるMarkdown出版リポジトリです。',
   },
+  {
+    label: 'Character',
+    labelJa: 'キャラクター',
+    topic: 'character',
+    icon: 'character',
+    description: 'PuruPuru PNGtubers, Codex Pets, character sheets, and their QA evidence.',
+    descriptionJa: 'PuruPuru PNGtuber、Codex Pet、キャラクターシート、QA証跡を管理します。',
+  },
 ];
 
 const templates = [
@@ -84,6 +92,9 @@ const templates = [
   { label: 'MCP server', labelJa: 'MCPサーバー', topic: 'mcp', repo: 'my-mcp-server', slug: 'mcp-server' },
   { label: 'Versioned prompt', labelJa: '版管理プロンプト', topic: 'prompt', repo: 'my-agent-prompt', slug: 'versioned-prompt' },
   { label: 'Knowledge publication', labelJa: 'ナレッジ出版', topic: 'doc', repo: 'my-knowledge', slug: 'documentation' },
+  { label: 'PuruPuru PNGtuber', labelJa: 'PuruPuru PNGtuber', topic: 'character', repo: 'my-purupuru-character', slug: 'purupuru-pngtuber' },
+  { label: 'Codex Pet package', labelJa: 'Codex Petパッケージ', topic: 'character', repo: 'my-codex-pet', slug: 'codex-pet' },
+  { label: 'Character sheets', labelJa: 'キャラクターシート集', topic: 'character', repo: 'my-character-sheets', slug: 'character-sheets' },
   { label: 'Empty repository', labelJa: '空のリポジトリ', topic: 'model', repo: 'my-openface-repo', slug: 'empty-repository' },
 ];
 
@@ -95,6 +106,7 @@ const typeConfig: Record<string, { title: string; titleJa: string; repoPlacehold
   mcp: { title: 'Create a new MCP server', titleJa: '新しいMCPサーバーを作成', repoPlaceholder: 'my-mcp-server', cancelHref: '/mcps' },
   prompt: { title: 'Create a new Prompt', titleJa: '新しいプロンプトを作成', repoPlaceholder: 'my-agent-prompt', cancelHref: '/prompts' },
   doc: { title: 'Create your knowledge publication', titleJa: 'ナレッジ出版を作成', repoPlaceholder: 'my-knowledge', cancelHref: '/docs' },
+  character: { title: 'Create a new character repository', titleJa: '新しいキャラクターリポジトリを作成', repoPlaceholder: 'my-character-assets', cancelHref: '/characters' },
 };
 
 export default async function NewRepoGuidePage({
@@ -104,7 +116,7 @@ export default async function NewRepoGuidePage({
 }) {
   const resolvedSearchParams = await searchParams;
   const locale = await getLocale();
-  const requestedType = resolvedSearchParams?.type === 'model' || resolvedSearchParams?.type === 'dataset' || resolvedSearchParams?.type === 'space' || resolvedSearchParams?.type === 'skill' || resolvedSearchParams?.type === 'mcp' || resolvedSearchParams?.type === 'prompt' || resolvedSearchParams?.type === 'doc'
+  const requestedType = resolvedSearchParams?.type === 'model' || resolvedSearchParams?.type === 'dataset' || resolvedSearchParams?.type === 'space' || resolvedSearchParams?.type === 'skill' || resolvedSearchParams?.type === 'mcp' || resolvedSearchParams?.type === 'prompt' || resolvedSearchParams?.type === 'doc' || resolvedSearchParams?.type === 'character'
     ? resolvedSearchParams.type
     : 'space';
   const config = typeConfig[requestedType];
@@ -119,6 +131,7 @@ export default async function NewRepoGuidePage({
     ...repoTypes.filter((type) => type.topic !== effectiveType),
   ];
   const isDoc = effectiveType === 'doc';
+  const isCharacter = effectiveType === 'character';
 
   return (
     <div className="mx-auto max-w-[1536px] py-5">
@@ -286,6 +299,13 @@ export default async function NewRepoGuidePage({
                 <p><strong className="text-zinc-700">{ui(locale, '記事形式:', 'Article formats:')}</strong> article · wiki · guide · reference</p>
                 <a href="/openface/docs-publishing-quickstart" className="inline-flex items-center gap-1.5 font-semibold text-teal-800 hover:underline">{ui(locale, '公開クイックスタートを読む', 'Read the publishing quickstart')} <HfIcon name="arrowRight" className="h-3 w-3" /></a>
               </div>
+            ) : isCharacter ? (
+              <div className="space-y-3 text-sm leading-6 text-zinc-500">
+                <p>{ui(locale, 'リポジトリに', 'Add the ')} <code className="rounded bg-zinc-100 px-1.5 py-0.5">character</code> {ui(locale, 'トピックを追加し、対応形式もトピックで表します。OpenFaceは実ファイルも検証します。', 'topic and describe supported formats with additional topics. OpenFace also verifies the actual files.')}</p>
+                <div className="flex flex-wrap gap-1.5" aria-label="Character topic examples">
+                  {['purupuru', 'codex-pet', 'character-sheet', 'head-motion'].map((topic) => <code key={topic} className="rounded bg-zinc-100 px-2 py-1 text-xs text-zinc-700">{topic}</code>)}
+                </div>
+              </div>
             ) : (
               <p className="text-sm leading-6 text-zinc-500">
                 {ui(locale, '作成後、OpenFaceが索引できるようForgejoで', 'After creation, add the matching topic such as ')} <code className="rounded bg-zinc-100 px-1.5 py-0.5">prompt</code> {ui(locale, 'など対応トピックを追加します。プロンプトの版には', 'in Forgejo so OpenFace can index it. Prompt versions use an additional topic such as ')} <code className="rounded bg-zinc-100 px-1.5 py-0.5">version-v8</code>{ui(locale, 'のような追加トピックを使います。', '.')}
@@ -301,6 +321,28 @@ export default async function NewRepoGuidePage({
                 <>
                   <li className="flex items-center gap-2"><HfIcon name="folder" className="h-3.5 w-3.5" />{ui(locale, '各ナレッジ記事の articles/*.md', 'articles/*.md for every knowledge entry')}</li>
                   <li className="flex items-center gap-2"><HfIcon name="model" className="h-3.5 w-3.5" />{ui(locale, '共有記事素材の images/', 'images/ for shared article assets')}</li>
+                </>
+              ) : isCharacter ? (
+                <>
+                  {selectedTemplate?.slug === 'purupuru-pngtuber' ? (
+                    <>
+                      <li className="flex items-center gap-2"><HfIcon name="gear" className="h-3.5 w-3.5" />avatar/default-settings.json</li>
+                      <li className="flex items-center gap-2"><HfIcon name="image" className="h-3.5 w-3.5" />{ui(locale, '正面6表情のeyes-*.png', 'Six frontal eyes-*.png states')}</li>
+                      <li className="flex items-center gap-2"><HfIcon name="folder" className="h-3.5 w-3.5" />{ui(locale, '任意: avatar/directions/ と方向制御パッチ', 'Optional: avatar/directions/ and a direction-control patch')}</li>
+                    </>
+                  ) : selectedTemplate?.slug === 'character-sheets' ? (
+                    <>
+                      <li className="flex items-center gap-2"><HfIcon name="table" className="h-3.5 w-3.5" />metadata/characters.csv</li>
+                      <li className="flex items-center gap-2"><HfIcon name="image" className="h-3.5 w-3.5" />assets/exports/</li>
+                      <li className="flex items-center gap-2"><HfIcon name="image" className="h-3.5 w-3.5" />assets/thumbnails/</li>
+                    </>
+                  ) : (
+                    <>
+                      <li className="flex items-center gap-2"><HfIcon name="file" className="h-3.5 w-3.5" />pet.json</li>
+                      <li className="flex items-center gap-2"><HfIcon name="image" className="h-3.5 w-3.5" />spritesheet.webp · 1536×1872</li>
+                      <li className="flex items-center gap-2"><HfIcon name="table" className="h-3.5 w-3.5" />{ui(locale, '推奨: QA contact sheet と validation.json', 'Recommended: QA contact sheet and validation.json')}</li>
+                    </>
+                  )}
                 </>
               ) : (
                 <>

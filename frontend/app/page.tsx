@@ -28,7 +28,7 @@ function CompactRepoList({
   label: string;
   locale: Locale;
 }) {
-  const kind = label === 'Models' ? 'model' : label === 'Datasets' ? 'dataset' : label === 'Skills' ? 'skill' : label === 'MCPs' ? 'mcp' : label === 'Prompts' ? 'prompt' : label === 'Docs' ? 'doc' : 'space';
+  const kind = label === 'Models' ? 'model' : label === 'Datasets' ? 'dataset' : label === 'Skills' ? 'skill' : label === 'MCPs' ? 'mcp' : label === 'Prompts' ? 'prompt' : label === 'Docs' ? 'doc' : label === 'Characters' ? 'character' : 'space';
   const theme = {
     model: {
       shell: 'border-zinc-200 bg-white',
@@ -86,8 +86,16 @@ function CompactRepoList({
       browse: 'text-teal-800 hover:text-teal-950 dark:text-teal-300 dark:hover:text-teal-200',
       title: 'text-teal-900',
     },
+    character: {
+      shell: 'border-fuchsia-200/80 bg-gradient-to-b from-fuchsia-50/70 via-white to-white shadow-fuchsia-100/60',
+      icon: 'bg-fuchsia-100 text-fuchsia-800 ring-fuchsia-200',
+      link: 'hover:bg-fuchsia-50/80',
+      dot: 'bg-fuchsia-500',
+      browse: 'text-fuchsia-800 hover:text-fuchsia-950 dark:text-fuchsia-300 dark:hover:text-fuchsia-200',
+      title: 'text-fuchsia-900',
+    },
   }[kind];
-  const displayLabel = ({ Models: 'モデル', Datasets: 'データセット', Spaces: 'Spaces', Skills: 'スキル', MCPs: 'MCPs', Prompts: 'プロンプト', Docs: 'ナレッジ' } as Record<string, string>)[label] || label;
+  const displayLabel = ({ Models: 'モデル', Datasets: 'データセット', Spaces: 'Spaces', Skills: 'スキル', MCPs: 'MCPs', Prompts: 'プロンプト', Docs: 'ナレッジ', Characters: 'キャラクター' } as Record<string, string>)[label] || label;
 
   return (
     <section className="min-w-0">
@@ -127,7 +135,7 @@ function CompactRepoList({
 
 export default async function HomePage() {
   const locale = await getLocale();
-  const [models, datasets, spaces, skills, mcps, prompts, docs] = await Promise.all([
+  const [models, datasets, spaces, skills, mcps, prompts, docs, characters] = await Promise.all([
     searchRepos({ topic: 'model', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'dataset', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'space', sort: 'updated', limit: 8 }),
@@ -135,6 +143,7 @@ export default async function HomePage() {
     searchRepos({ topic: 'mcp', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'prompt', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'doc', sort: 'updated', limit: 8 }),
+    searchRepos({ topic: 'character', sort: 'updated', limit: 8 }),
   ]);
 
   return (
@@ -156,6 +165,16 @@ export default async function HomePage() {
             {ui(locale, 'モデルを見る', 'Browse models')}
           </Link>
         </div>
+      </section>
+
+      <section className="mx-auto mb-12 grid max-w-[1180px] gap-6 border-y border-zinc-200 py-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
+        <div>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-fuchsia-700 dark:text-fuchsia-300">PuruPuru · Codex Pet</p>
+          <h2 className="mt-3 font-serif text-4xl leading-none text-zinc-950 dark:text-white">{ui(locale, 'キャラクターも、実行形式ごと共有。', 'Share characters with their runtime format.')}</h2>
+          <p className="mt-4 max-w-lg text-sm leading-6 text-zinc-600 dark:text-zinc-300">{ui(locale, '正面表情、方向別状態、PuruPuruパッチ、pet.json、spritesheet、QA結果をひとつのGit履歴で管理します。', 'Keep frontal expressions, directional states, PuruPuru patches, pet.json, spritesheets, and QA evidence in one Git history.')}</p>
+          <Link href="/characters" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-fuchsia-900 hover:underline dark:text-fuchsia-300">{ui(locale, 'キャラクターを見る', 'Browse characters')} <HfIcon name="arrowRight" className="h-3 w-3" /></Link>
+        </div>
+        <CompactRepoList repos={characters.data} href="/characters" label="Characters" locale={locale} />
       </section>
 
       <section className="mx-auto mb-12 grid max-w-[1180px] gap-6 border-y border-zinc-200 py-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">

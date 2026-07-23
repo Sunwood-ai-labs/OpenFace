@@ -5,6 +5,7 @@ function searchTarget(rawQuery: string) {
   const strip = (pattern: RegExp) => query.replace(pattern, '').trim();
   if (/^datasets?:/i.test(query)) return { path: '/datasets', query: strip(/^datasets?:\s*/i) };
   if (/^spaces?:/i.test(query)) return { path: '/spaces', query: strip(/^spaces?:\s*/i) };
+  if (/^characters?:/i.test(query)) return { path: '/characters', query: strip(/^characters?:\s*/i) };
   if (/^users?:/i.test(query)) return { path: '/git/explore/users', query: strip(/^users?:\s*/i) };
   if (/^repos?:/i.test(query)) return { path: '/git/explore/repos', query: strip(/^repos?:\s*/i) };
   return { path: '/models', query };
