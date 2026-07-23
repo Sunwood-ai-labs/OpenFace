@@ -747,6 +747,17 @@ html[data-openface-theme="cyberpunk"] details[open] > summary {
   }
 }
 
+/* Character compatibility panels deliberately use a dark technical surface.
+   Keep their supporting copy independent from utility recoloring performed by
+   portal themes and OS color-scheme rules. */
+html body .openface-character-format-panel .openface-character-panel-copy {
+  color: #d4d4d8 !important;
+}
+
+html[data-openface-theme="solarpunk"] body .openface-character-format-panel .openface-character-panel-copy {
+  color: #e7f0dc !important;
+}
+
 /* Final cascade guard for status badges across explicit and OS-driven themes. */
 html body span.space-status-header.space-status-header--running.inline-flex {
   border-color: #a7f3d0 !important;
