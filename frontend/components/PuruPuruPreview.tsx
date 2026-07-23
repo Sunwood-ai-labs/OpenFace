@@ -96,7 +96,7 @@ export default function PuruPuruPreview({
               type="button"
               onClick={() => setDirection(item)}
               data-purupuru-direction={item}
-              className={`rounded-full border px-2.5 py-1 text-xs font-semibold backdrop-blur transition ${item === direction ? 'border-cyan-200 bg-cyan-200 text-zinc-950' : 'border-white/20 bg-black/55 text-white hover:border-cyan-200'}`}
+              className={`rounded-full border px-2.5 py-1 text-xs font-semibold backdrop-blur transition ${item === direction ? 'openface-character-selection-active border-cyan-200 bg-cyan-200' : 'border-white/20 bg-black/55 text-white hover:border-cyan-200'}`}
               aria-pressed={item === direction}
             >
               {directionLabel(item, locale)}
