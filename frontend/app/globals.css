@@ -1178,24 +1178,45 @@ html[data-openface-theme="cyberpunk"] [class*="dark:bg-zinc-700"] {
   color: #fff !important;
 }
 
-@keyframes openface-purupuru-frame-in {
+@keyframes openface-purupuru-frame-crossfade-in {
   from {
-    opacity: .35;
-    transform: scale(.985) translateY(2px);
+    opacity: 0;
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes openface-purupuru-frame-crossfade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }
 
 .openface-purupuru-frame {
-  animation: openface-purupuru-frame-in 180ms ease-out both;
+  backface-visibility: hidden;
+  will-change: opacity;
+}
+
+.openface-purupuru-frame-current {
+  animation: openface-purupuru-frame-crossfade-in 360ms ease-in-out both;
+}
+
+.openface-purupuru-frame-previous {
+  animation: openface-purupuru-frame-crossfade-out 360ms ease-in-out both;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .openface-purupuru-frame {
+  .openface-purupuru-frame-current {
     animation: none;
+    opacity: 1;
+  }
+
+  .openface-purupuru-frame-previous {
+    display: none;
   }
 }
 

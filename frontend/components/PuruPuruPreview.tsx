@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import HfIcon from './HfIcon';
 
 export interface PuruPuruPreviewFrame {
@@ -46,8 +46,14 @@ export default function PuruPuruPreview({
   const [direction, setDirection] = useState(directions[0] || 'front');
   const [frameIndex, setFrameIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
+  const [previousFrame, setPreviousFrame] = useState<PuruPuruPreviewFrame | null>(null);
   const sequence = compact ? frames : frames.filter((frame) => frame.direction === direction);
   const activeFrame = sequence[frameIndex % Math.max(sequence.length, 1)] || frames[0];
+  const activeFrameRef = useRef(activeFrame);
+
+  useEffect(() => {
+    activeFrameRef.current = activeFrame;
+  }, [activeFrame]);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -55,18 +61,35 @@ export default function PuruPuruPreview({
   }, []);
 
   useEffect(() => {
-    setFrameIndex(0);
-  }, [direction]);
+    frames.forEach((frame) => {
+      const image = new Image();
+      image.src = frame.src;
+    });
+  }, [frames]);
 
   useEffect(() => {
     if (!playing || sequence.length < 2) return undefined;
     const timer = window.setInterval(() => {
+      setPreviousFrame(activeFrameRef.current || null);
       setFrameIndex((current) => (current + 1) % sequence.length);
     }, compact ? 640 : 520);
     return () => window.clearInterval(timer);
   }, [compact, playing, sequence.length]);
 
+  useEffect(() => {
+    if (!previousFrame) return undefined;
+    const timer = window.setTimeout(() => setPreviousFrame(null), 380);
+    return () => window.clearTimeout(timer);
+  }, [activeFrame?.src, previousFrame]);
+
   if (!activeFrame) return null;
+
+  const changeDirection = (nextDirection: string) => {
+    if (nextDirection === direction) return;
+    setPreviousFrame(activeFrameRef.current || null);
+    setDirection(nextDirection);
+    setFrameIndex(0);
+  };
 
   return (
     <div
@@ -75,14 +98,26 @@ export default function PuruPuruPreview({
       data-frame-path={activeFrame.src}
       data-frame-index={frameIndex}
       data-direction={activeFrame.direction}
+      data-blend-active={previousFrame ? 'true' : 'false'}
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(103,232,249,.18),transparent_44%),linear-gradient(145deg,#09090b,#111827)]" />
       <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.12)_1px,transparent_1px)] [background-size:24px_24px]" />
+      {previousFrame ? (
+        <img
+          key={`previous-${previousFrame.src}`}
+          src={previousFrame.src}
+          alt=""
+          aria-hidden="true"
+          data-purupuru-layer="previous"
+          className={`openface-purupuru-frame openface-purupuru-frame-previous absolute inset-0 z-10 h-full w-full object-contain ${compact ? 'p-3' : 'max-h-[440px] min-h-72 p-5'}`}
+        />
+      ) : null}
       <img
         key={activeFrame.src}
         src={activeFrame.src}
         alt={`${directionLabel(activeFrame.direction, locale)} ${stateLabel(activeFrame.state, locale)} PuruPuru animated preview`}
-        className={`openface-purupuru-frame relative z-10 h-full w-full object-contain ${compact ? 'p-3' : 'max-h-[440px] min-h-72 p-5'}`}
+        data-purupuru-layer="current"
+        className={`openface-purupuru-frame openface-purupuru-frame-current relative z-10 h-full w-full object-contain ${compact ? 'p-3' : 'max-h-[440px] min-h-72 p-5'}`}
       />
       <div className={`absolute z-20 flex items-center gap-2 rounded-full border border-white/15 bg-black/65 font-mono text-[10px] font-bold uppercase tracking-wider text-cyan-100 backdrop-blur ${compact ? 'bottom-3 left-3 px-2.5 py-1' : 'bottom-4 left-4 px-3 py-1.5'}`}>
         <span className={`h-1.5 w-1.5 rounded-full ${playing ? 'animate-pulse bg-emerald-300' : 'bg-zinc-400'}`} />
@@ -94,7 +129,7 @@ export default function PuruPuruPreview({
             <button
               key={item}
               type="button"
-              onClick={() => setDirection(item)}
+              onClick={() => changeDirection(item)}
               data-purupuru-direction={item}
               className={`rounded-full border px-2.5 py-1 text-xs font-semibold backdrop-blur transition ${item === direction ? 'openface-character-selection-active border-cyan-200 bg-cyan-200' : 'border-white/20 bg-black/55 text-white hover:border-cyan-200'}`}
               aria-pressed={item === direction}
