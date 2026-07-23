@@ -7,7 +7,7 @@
 <p align="center"><strong>The AI community building locally.</strong></p>
 
 <p align="center">
-  A local-first, Forgejo-backed hub for models, datasets, Docker Spaces, Skills, MCPs, versioned Prompts, living Docs, and static Pages.
+  A local-first, Forgejo-backed hub for models, datasets, Docker Spaces, Characters, Skills, MCPs, versioned Prompts, living Docs, and static Pages.
 </p>
 
 <p align="center">
@@ -30,6 +30,7 @@ OpenFace turns one Docker host into a self-contained AI collaboration platform. 
 ## ✨ Highlights
 
 - **Real repositories:** models, datasets, Skills, MCPs, and Prompts keep their files, commits, tags, clone URLs, and repository permissions.
+- **Format-aware Characters:** import PuruPuru PNGTubers, direction-control patches, character sheets, and Codex Pet packages; OpenFace inspects their real settings, state images, manifests, and spritesheets.
 - **Dockerfile-first Spaces:** run Gradio, static HTML, React, Vue, Next.js, Streamlit, FastAPI, Node.js, or another CPU web application on port `7860`.
 - **Always-on CPU mode:** `IDLE_TIMEOUT_MINUTES=0` keeps CPU Spaces running; a least-recently-used cap prevents unbounded growth.
 - **OpenFace Pages:** serve `gh-pages` or default-branch `docs/`, with a seeded VitePress workflow on an isolated Forgejo Actions runner.
@@ -114,6 +115,22 @@ flowchart LR
 ```
 
 See the [architecture guide](https://sunwood-ai-labs.github.io/OpenFace/guide/architecture) for routing, storage, and trust boundaries.
+
+## 🎭 Characters: portable runtime assets
+
+[`/characters`](https://localhost:8443/characters) is a format-aware catalog backed by real Forgejo repositories. The seed imports three public Sunwood AI Labs repositories with their history and assets:
+
+- `lumi-jelly-pngtuber`: PuruPuru upper-body avatar with six frontal states.
+- `lumi-jelly-head-motion-pngtuber`: head-only PuruPuru avatar with five directions, 30 states, and a direction-control patch.
+- `character-design-images`: eight character sheets and eight Codex Pet packages, including Maki's `assets/pets/maki/pet.json` and `spritesheet.webp`.
+
+OpenFace reads repository contents rather than trusting labels alone. Directory cards show real previews, detail pages report detected compatibility, and the new-repository screen provides PuruPuru, Codex Pet, and character-sheet templates.
+
+| Standard mobile | Cyberpunk mobile | Codex Pet detail |
+|---|---|---|
+| <img src="docs/evidence/characters/standard-mobile-directory.png" alt="Characters directory in Standard theme on mobile" width="320"> | <img src="docs/evidence/characters/cyberpunk-mobile-directory.png" alt="Characters directory in Cyberpunk theme on mobile" width="320"> | <img src="docs/evidence/characters/standard-mobile-codex-pets.png" alt="Maki Codex Pet package detected from real files" width="320"> |
+
+The [Characters verification record](docs/evidence/characters/README.md) contains all representative screenshots and the 24-case format audit, 48-case WCAG theme matrix, and 48-case bilingual audit results.
 
 ## 🏛️ Editable organizations
 
@@ -258,7 +275,7 @@ Prompts use a stable repository slug. Versions are represented by `version-v*` t
 
 ### 日本語／英語UI
 
-ヘッダーのコンパクトな言語切替で、日本語と英語を選択できます。選択はページ移動・再読み込み後も保持されます。グローバルナビゲーションは両言語とも `Models / Datasets / Spaces / Skills / MCPs / Prompts / Knowledge` に統一しています。主要11画面を両言語・PC／スマートフォンで撮影する監査は **44 / 44 成功**しています。実際の切替操作とスクリーンショットは[日本語／英語UI検証](docs/evidence/i18n/README.md)に記録しています。
+ヘッダーのコンパクトな言語切替で、日本語と英語を選択できます。選択はページ移動・再読み込み後も保持されます。グローバルナビゲーションは両言語とも `Models / Datasets / Spaces / Characters / Skills / MCPs / Prompts / Knowledge` に統一しています。主要12画面を両言語・PC／スマートフォンで撮影する監査は **48 / 48 成功**しています。実際の切替操作とスクリーンショットは[日本語／英語UI検証](docs/evidence/i18n/README.md)に記録しています。
 
 The theme selector stores Standard, Solarpunk, or Cyberpunk in `localStorage` and restores it before the first visible render.
 

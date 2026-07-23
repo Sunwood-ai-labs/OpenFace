@@ -96,6 +96,20 @@ flowchart LR
 
 テーマセレクタの実操作・永続化・各画面の確認結果は [Theme verification evidence](docs/evidence/themes/README.md) に記録しています。
 
+### Characters（PuruPuru／Codex Pet）
+
+[`/characters`](https://localhost:8443/characters)は、キャラクターをtopicだけで分類する一覧ではありません。Forgejoへ履歴ごと取り込んだ実リポジトリを読み取り、PuruPuruの設定・状態画像・方向制御パッチ、Codex Petの`pet.json`・`spritesheet.webp`、キャラクターシートを規格として検出します。
+
+- `lumi-jelly-pngtuber`: 上半身・正面6状態
+- `lumi-jelly-head-motion-pngtuber`: 頭部のみ・5方向30状態・PuruPuru用パッチ
+- `character-design-images`: 8キャラクターシート・8 pet package・Maki一式
+
+| Standard mobile | Cyberpunk mobile | Maki Codex Pet詳細 |
+|---|---|---|
+| <img src="docs/evidence/characters/standard-mobile-directory.png" alt="StandardテーマのCharacters一覧" width="320"> | <img src="docs/evidence/characters/cyberpunk-mobile-directory.png" alt="CyberpunkテーマのCharacters一覧" width="320"> | <img src="docs/evidence/characters/standard-mobile-codex-pets.png" alt="実ファイルから検出したMaki Codex Pet" width="320"> |
+
+[Characters検証記録](docs/evidence/characters/README.md)には、代表スクリーンショットと、規格監査24 / 24、WCAGテーマ監査48 / 48、日本語／英語監査48 / 48の結果を保存しています。
+
 ### Docs（記事＋Wiki）
 
 内部の [`/docs`](https://localhost:8443/docs) は、運用マニュアル用VitePressとは別の、Gitリポジトリを土台にしたナレッジカテゴリです。topicへ `doc` と、形式を表す `article` / `wiki` / `guide` / `reference` のいずれかを追加すると、READMEを記事として公開しながら、実ファイル・コミット履歴・clone URL・権限をそのまま保持できます。再構築直後から確認できる6件の関連ドキュメントもseedします。
