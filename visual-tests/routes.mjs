@@ -18,7 +18,7 @@ export const routes = [
   { id: 'skills', label: 'Skills directory', path: '/skills', focus: 'Skill repository cards, evidence-backed workflow-link counts, source labels, and filters' },
   { id: 'mcps', label: 'MCPs directory', path: '/mcps', focus: 'MCP repository cards, source labels, and filters' },
   { id: 'prompts', label: 'Prompts directory', path: '/prompts', focus: 'Prompt cards, version labels, and filters' },
-  { id: 'docs', label: 'Docs library', path: '/docs', focus: 'Editorial hero, article and Wiki taxonomy, search, filters, and responsive reading index' },
+  { id: 'docs', label: 'Knowledge directory', path: '/docs', focus: 'Spaces-style compact directory, composable roles, topic rail, search, filters, sorting, card density, and responsive layout' },
   { id: 'characters', label: 'Characters directory', path: '/characters', focus: 'Real character previews, PuruPuru and Codex Pet format badges, repository counts, and responsive discovery controls' },
   { id: 'character-purupuru-detail', label: 'PuruPuru character detail', path: '/openface/lumi-jelly-head-motion-pngtuber', scrollSelectors: [{ id: 'format-panel', selector: '.openface-character-format-panel' }], focus: 'Five-direction 30-state detection, motion patch link, imported README, and format evidence' },
   { id: 'character-pet-detail', label: 'Independent Codex Pet detail', path: '/openface/momiji-codex-pet', scrollSelectors: [{ id: 'format-panel', selector: '.openface-character-format-panel' }], focus: 'One repository-backed installable pet package, manifest, spritesheet, QA evidence, and animated preview rendering' },
