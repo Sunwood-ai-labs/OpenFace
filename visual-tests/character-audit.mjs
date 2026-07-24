@@ -100,9 +100,18 @@ for (const theme of themes) {
       const response = await page.goto(`${baseUrl}${route.path}`, { waitUntil: 'networkidle', timeout: 45_000 });
       await page.evaluate(() => document.fonts?.ready).catch(() => undefined);
       const previewBefore = route.animatedPreview
-        ? await page.locator('[data-purupuru-preview]').first().getAttribute('data-frame-path')
+        ? await (async () => {
+            await page.locator('[data-purupuru-preview]').first().waitFor({ state: 'visible' });
+            await page.waitForFunction(
+              () => document.querySelector('[data-purupuru-preview]')?.getAttribute('data-frames-ready') === 'true',
+              undefined,
+              { timeout: 15_000 },
+            );
+            return page.locator('[data-purupuru-preview]').first().getAttribute('data-frame-path');
+          })()
         : null;
       let alphaBlend = null;
+      let minimumCoverage = null;
       let alphaBlendScreenshot = null;
       if (route.animatedPreview) {
         await page.waitForFunction(
@@ -120,6 +129,23 @@ for (const theme of themes) {
             previousOpacity: previous ? Number.parseFloat(getComputedStyle(previous).opacity) : null,
             currentOpacity: current ? Number.parseFloat(getComputedStyle(current).opacity) : null,
           };
+        });
+        minimumCoverage = await page.locator('[data-purupuru-preview]').first().evaluate(async (preview) => {
+          let minimum = 1;
+          const started = performance.now();
+          while (performance.now() - started < 1_200) {
+            const previous = preview.querySelector('[data-purupuru-layer="previous"]');
+            const current = preview.querySelector('[data-purupuru-layer="current"]');
+            const previousOpacity = previous ? Number.parseFloat(getComputedStyle(previous).opacity) : 0;
+            const currentOpacity = current ? Number.parseFloat(getComputedStyle(current).opacity) : 0;
+            // Incoming alpha is composited over a fully opaque outgoing frame.
+            const compositeCoverage = previous
+              ? 1 - ((1 - previousOpacity) * (1 - currentOpacity))
+              : currentOpacity;
+            minimum = Math.min(minimum, compositeCoverage);
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+          }
+          return minimum;
         });
         alphaBlendScreenshot = join(
           outputDir,
@@ -187,6 +213,7 @@ for (const theme of themes) {
         petCards: state.petCards,
         animationChanged: route.animatedPreview ? previewBefore !== previewAfter : null,
         alphaBlend,
+        minimumCoverage,
         alphaBlendScreenshot,
         directionChanged,
         screenshot,
@@ -206,6 +233,7 @@ for (const theme of themes) {
             && alphaBlend.previousOpacity > 0.05
             && alphaBlend.currentOpacity > 0.05
           ))
+          && (!route.animatedPreview || minimumCoverage >= 0.995)
           && (!route.directionControl || directionChanged === 'right')
           && state.scrollWidth - state.clientWidth <= 1
           && consoleErrors.length === 0,
@@ -225,7 +253,7 @@ await writeFile(join(outputDir, 'README.md'), [
   '',
   `- Coverage: ${themes.length} themes × ${viewports.length} viewports × ${routes.length} routes = ${results.length} screenshots`,
   `- Result: ${failures.length === 0 ? 'PASS' : 'FAIL'} (${results.length - failures.length}/${results.length})`,
-  '- Checks: eight independent Codex Pet repositories, independent character-sheet links, no legacy query-param cards, real PuruPuru frame changes, two-layer alpha crossfades, direction controls, active theme, console errors, and horizontal overflow.',
+  '- Checks: eight independent Codex Pet repositories, independent character-sheet links, no legacy query-param cards, decoded PuruPuru frames, real frame changes, two-layer alpha blends with no background exposure, direction controls, active theme, console errors, and horizontal overflow.',
   '',
 ].join('\n'));
 console.log(JSON.stringify({ outputDir, cases: results.length, failures: failures.length }, null, 2));
