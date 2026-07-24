@@ -23,6 +23,7 @@ export default async function DocsPage({
     q?: string;
     sort?: string;
     tag?: string;
+    tagSorts?: string;
     type?: string;
     wikiSort?: string;
   }>;
