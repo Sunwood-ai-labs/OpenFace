@@ -9,6 +9,8 @@ import KnowledgeViewCount from './KnowledgeViewCount';
 
 type DocFormat = KnowledgeFormat;
 type DocSort = 'updated' | 'trending';
+type SectionKey = 'overall' | DocFormat;
+type SectionSorts = Record<SectionKey, DocSort>;
 
 type FormatDefinition = {
   value: DocFormat;
@@ -65,6 +67,14 @@ function cardTone(format: DocFormat) {
     return 'from-[#0f766e] via-[#0d9488] to-[#22a99a]';
   }
   return 'from-[#334e8f] via-[#4f63b8] to-[#7c5ad6]';
+}
+
+function sortArticles(articles: KnowledgeArticle[], sort: DocSort) {
+  return [...articles].sort((left, right) => (
+    sort === 'trending'
+      ? right.views - left.views || right.updatedAt.localeCompare(left.updatedAt)
+      : right.updatedAt.localeCompare(left.updatedAt)
+  ));
 }
 
 function DocCard({
@@ -151,10 +161,110 @@ function DocCard({
   );
 }
 
+function KnowledgeSection({
+  articles,
+  count,
+  format,
+  formats,
+  hrefForSort,
+  locale,
+  sort,
+  title,
+}: {
+  articles: KnowledgeArticle[];
+  count: number;
+  format?: DocFormat;
+  formats: FormatDefinition[];
+  hrefForSort: (sort: DocSort) => string;
+  locale: Locale;
+  sort: DocSort;
+  title: string;
+}) {
+  const definition = format ? formats.find((candidate) => candidate.value === format) : undefined;
+
+  return (
+    <section className="scroll-mt-24" id={`knowledge-${format || 'overall'}`}>
+      <div className="mb-3 flex min-w-0 items-end gap-3 border-b border-zinc-200 pb-2 dark:border-zinc-800">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+            format === 'news'
+              ? 'bg-pink-50 text-pink-700 dark:bg-pink-950/40 dark:text-pink-300'
+              : format === 'article'
+                ? 'bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300'
+                : format === 'procedure'
+                  ? 'bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-300'
+                  : format === 'wiki'
+                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300'
+                    : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200'
+          }`}>
+            <HfIcon name={definition?.icon || 'bars'} className="h-4 w-4" />
+          </span>
+          <div className="min-w-0">
+            <h2 className="truncate text-lg font-bold tracking-tight text-zinc-950 dark:text-zinc-50">{title}</h2>
+            <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+              {definition?.description || ui(locale, 'すべての公開ナレッジ', 'All public knowledge')} · {count}
+            </p>
+          </div>
+        </div>
+        <nav
+          aria-label={ui(locale, `${title}の並び順`, `${title} sort order`)}
+          className="ml-auto flex shrink-0 items-center rounded-full bg-zinc-100 p-0.5 text-xs font-semibold dark:bg-zinc-800"
+        >
+          <Link
+            href={hrefForSort('updated')}
+            aria-current={sort === 'updated' ? 'page' : undefined}
+            className={`rounded-full px-2.5 py-1.5 transition ${
+              sort === 'updated'
+                ? 'bg-white text-zinc-950 shadow-sm dark:bg-zinc-700 dark:text-white'
+                : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'
+            }`}
+          >
+            {ui(locale, '新着', 'Latest')}
+          </Link>
+          <Link
+            href={hrefForSort('trending')}
+            aria-current={sort === 'trending' ? 'page' : undefined}
+            className={`rounded-full px-2.5 py-1.5 transition ${
+              sort === 'trending'
+                ? 'bg-white text-zinc-950 shadow-sm dark:bg-zinc-700 dark:text-white'
+                : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'
+            }`}
+          >
+            {ui(locale, '人気', 'Popular')}
+          </Link>
+        </nav>
+        {format ? (
+          <Link
+            href={`/docs?type=${format}&sort=${sort}`}
+            className="hidden shrink-0 text-xs font-semibold text-teal-700 hover:underline sm:inline dark:text-teal-300"
+          >
+            {ui(locale, 'すべて見る →', 'View all →')}
+          </Link>
+        ) : null}
+      </div>
+      <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 xl:grid-cols-[repeat(4,minmax(0,1fr))]">
+        {articles.slice(0, 4).map((article) => (
+          <DocCard key={`${format || 'overall'}-${article.id}`} article={article} locale={locale} formats={formats} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default async function DocsDirectoryPage({
   searchParams,
 }: {
-  searchParams?: { q?: string; sort?: string; type?: string; tag?: string };
+  searchParams?: {
+    articleSort?: string;
+    newsSort?: string;
+    overallSort?: string;
+    procedureSort?: string;
+    q?: string;
+    sort?: string;
+    tag?: string;
+    type?: string;
+    wikiSort?: string;
+  };
 }) {
   const locale = await getLocale();
   const formats = knowledgeFormats(locale);
@@ -178,11 +288,15 @@ export default async function DocsDirectoryPage({
     (!selectedFormat || article.formats.includes(selectedFormat))
     && (!selectedTag || article.topics.includes(selectedTag))
   ));
-  const docs = [...filtered].sort((left, right) => (
-    sort === 'trending'
-      ? right.views - left.views || right.updatedAt.localeCompare(left.updatedAt)
-      : right.updatedAt.localeCompare(left.updatedAt)
-  ));
+  const docs = sortArticles(filtered, sort);
+  const isOverview = !q && !selectedFormat && !selectedTag;
+  const sectionSorts: SectionSorts = {
+    overall: searchParams?.overallSort === 'trending' ? 'trending' : 'updated',
+    article: searchParams?.articleSort === 'trending' ? 'trending' : 'updated',
+    procedure: searchParams?.procedureSort === 'trending' ? 'trending' : 'updated',
+    wiki: searchParams?.wikiSort === 'trending' ? 'trending' : 'updated',
+    news: searchParams?.newsSort === 'trending' ? 'trending' : 'updated',
+  };
   const topicEntries = [...enriched.flatMap((article) => article.topics).reduce((counts, topic) => {
     counts.set(topic, (counts.get(topic) || 0) + 1);
     return counts;
@@ -208,10 +322,45 @@ export default async function DocsDirectoryPage({
     return `/docs${suffix ? `?${suffix}` : ''}`;
   };
 
+  const buildSectionHref = (section: SectionKey, nextSort: DocSort) => {
+    const params = new URLSearchParams();
+    const parameterNames: Record<SectionKey, string> = {
+      overall: 'overallSort',
+      article: 'articleSort',
+      procedure: 'procedureSort',
+      wiki: 'wikiSort',
+      news: 'newsSort',
+    };
+    (Object.keys(sectionSorts) as SectionKey[]).forEach((key) => {
+      const value = key === section ? nextSort : sectionSorts[key];
+      if (value === 'trending') params.set(parameterNames[key], value);
+    });
+    const suffix = params.toString();
+    return `/docs${suffix ? `?${suffix}` : ''}#knowledge-${section}`;
+  };
+
   const sortLabel = sort === 'trending'
     ? ui(locale, '閲覧数', 'Most viewed')
     : ui(locale, '更新順', 'Recently updated');
   const activeFilterCount = Number(Boolean(selectedFormat)) + Number(Boolean(selectedTag));
+  const overviewSections: Array<{
+    key: SectionKey;
+    format?: DocFormat;
+    title: string;
+    articles: KnowledgeArticle[];
+  }> = [
+    {
+      key: 'overall',
+      title: ui(locale, 'すべてのナレッジ', 'All knowledge'),
+      articles: enriched,
+    },
+    ...formats.map((format) => ({
+      key: format.value,
+      format: format.value,
+      title: format.label,
+      articles: enriched.filter((article) => article.formats.includes(format.value)),
+    })),
+  ];
 
   return (
     <div className="openface-docs-directory w-full overflow-x-hidden px-0 pt-8 [box-sizing:border-box]">
@@ -259,6 +408,15 @@ export default async function DocsDirectoryPage({
         </form>
 
         <div className="mt-2 flex gap-7 overflow-x-auto pb-5 pt-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <Link
+            href="/docs"
+            aria-current={isOverview ? 'page' : undefined}
+            className={`flex min-w-[112px] flex-col items-center justify-center gap-1.5 text-center text-[12px] leading-tight transition ${isOverview ? 'font-bold text-teal-700 dark:text-teal-300' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'}`}
+          >
+            <HfIcon name="bars" className="h-5 w-5" />
+            <span className="select-none">{ui(locale, '全体', 'All')} · {enriched.length}</span>
+            <span className="max-w-[128px] truncate text-[10px] opacity-70">{ui(locale, 'カテゴリ別ホーム', 'Category home')}</span>
+          </Link>
           {formats.map((format) => {
             const count = enriched.filter((article) => article.formats.includes(format.value)).length;
             return (
@@ -289,6 +447,7 @@ export default async function DocsDirectoryPage({
         </div>
       </section>
 
+      {!isOverview ? (
       <div className="mx-auto mb-7 flex max-w-[1536px] flex-wrap items-center gap-3 px-4 max-sm:mb-0 max-sm:gap-2">
         <h2 className="openface-docs-section-pill inline-flex h-[34px] min-w-0 items-center gap-2 rounded-full border border-amber-100 bg-amber-50 px-4 text-sm font-bold text-zinc-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] max-sm:order-1 max-sm:px-3 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-zinc-100">
           <HfIcon name="fire" className="h-3.5 w-3.5 text-orange-500" />
@@ -341,10 +500,30 @@ export default async function DocsDirectoryPage({
           </div>
         </details>
       </div>
+      ) : null}
 
       {!result.ok ? (
         <div className="mx-auto max-w-[1536px] rounded-lg border border-dashed border-zinc-300 p-10 text-center text-zinc-500 dark:border-zinc-700">
           {ui(locale, 'Forgejoに接続できませんでした。しばらくしてから再度お試しください。', 'Could not connect to Forgejo. Please try again shortly.')}
+        </div>
+      ) : isOverview ? (
+        <div className="mx-auto grid max-w-[1536px] gap-10 px-4 pb-4">
+          {overviewSections.map((section) => {
+            const sectionSort = sectionSorts[section.key];
+            return (
+              <KnowledgeSection
+                key={section.key}
+                articles={sortArticles(section.articles, sectionSort)}
+                count={section.articles.length}
+                format={section.format}
+                formats={formats}
+                hrefForSort={(nextSort) => buildSectionHref(section.key, nextSort)}
+                locale={locale}
+                sort={sectionSort}
+                title={section.title}
+              />
+            );
+          })}
         </div>
       ) : docs.length === 0 ? (
         <div className="mx-auto max-w-[1536px] rounded-lg border border-dashed border-zinc-300 p-12 text-center dark:border-zinc-700">
@@ -362,7 +541,7 @@ export default async function DocsDirectoryPage({
         </div>
       )}
 
-      {result.ok ? (
+      {result.ok && !isOverview ? (
         <div className="mx-auto mt-7 flex max-w-[1536px] flex-wrap items-center gap-3 px-4 pb-10">
           <div>
             <h2 className="inline-flex items-center gap-2 rounded-lg bg-zinc-50 px-4 py-2 text-sm font-bold text-zinc-800 dark:bg-zinc-900 dark:text-zinc-200">

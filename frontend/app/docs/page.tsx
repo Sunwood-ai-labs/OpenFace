@@ -15,7 +15,17 @@ export async function generateMetadata() {
 export default async function DocsPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ q?: string; sort?: string; type?: string; tag?: string }>;
+  searchParams?: Promise<{
+    articleSort?: string;
+    newsSort?: string;
+    overallSort?: string;
+    procedureSort?: string;
+    q?: string;
+    sort?: string;
+    tag?: string;
+    type?: string;
+    wikiSort?: string;
+  }>;
 }) {
   return <DocsDirectoryPage searchParams={await searchParams} />;
 }
