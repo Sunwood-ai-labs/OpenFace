@@ -1361,6 +1361,7 @@ html[data-openface-theme="solarpunk"] .skill-relationship-panel {
 }
 
 @media (prefers-color-scheme: dark) {
+  html:not([data-openface-theme]) .openface-global-explore > summary > span,
   html[data-openface-theme] .openface-global-explore > summary > span {
     color: #fafafa !important;
   }
