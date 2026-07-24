@@ -2283,6 +2283,7 @@ Store each file in a convenient directory, then attach every reader-facing role 
 - `articles/{slug}.md` for essays, reports, and field notes
 - `procedures/{slug}.md` for repeatable steps and checklists
 - `wiki/{slug}.md` for shared concepts, specifications, and references
+- `news/{slug}.md` for release notes, updates, and community briefs
 
 Add front matter to every file:
 
@@ -2297,7 +2298,7 @@ published: true
 ```
 
 OpenFaceは公開対象のファイルを`/docs`へ集約します。`formats`には
-`article`、`procedure`、`wiki`を複数指定できます。保存先は整理用で、
+`article`、`procedure`、`wiki`、`news`を複数指定できます。保存先は整理用で、
 通常のGitとプルリクエストの流れで編集・レビューできます。
 EOF
 put_file "openface-knowledge" "README.md" "${WORKDIR}/knowledge_repo_readme.md" "Explain the knowledge publication format"
@@ -2309,6 +2310,7 @@ create_doc_fixture() {
   local directory="articles"
   if [ "$format" = "procedure" ]; then directory="procedures"; fi
   if [ "$format" = "wiki" ]; then directory="wiki"; fi
+  if [ "$format" = "news" ]; then directory="news"; fi
   awk -v format="$format" -v format_list="$format_list" -v description="$description" '
     NR == 1 && $0 == "---" {
       print
@@ -2349,6 +2351,50 @@ OpenFaceはGit履歴を信頼できる情報源とし、Dockerを実行境界と
 > ローカルファーストは孤立ではありません。所有権の境界を自分たちで決める設計です。
 EOF
 create_doc_fixture "local-first-ai-hub" "Gitで管理する知識が、ローカルAIコミュニティを長く支える理由" "article" "architecture" "local-first" "${WORKDIR}/doc_local_first.md" "[article, wiki]"
+
+cat > "${WORKDIR}/doc_news_knowledge_directory.md" <<'EOF'
+---
+license: MIT
+emoji: "📰"
+tags: [news, release, knowledge]
+---
+
+# Knowledge一覧をSpaces型のカードUIへ刷新
+
+OpenFaceのKnowledge一覧を、Spacesと同じ情報密度で探せるディレクトリへ刷新しました。
+
+## 今回の更新
+
+- 大型ヒーローを廃止し、検索・カテゴリ・並び順・カード一覧を上部へ集約
+- 記事、手順、Wikiに加えて、更新情報を扱うニュースカテゴリを追加
+- 記事ごとの絵文字をカード背景の透かしとして表示
+- Standard、Solarpunk、Cyberpunkの各テーマでコントラストを検証
+
+公開済みナレッジは、形式、トピック、閲覧数、更新日時から探せます。ニュースも通常のMarkdownとGit履歴で編集・レビューできます。
+EOF
+create_doc_fixture "knowledge-directory-refresh" "Knowledge一覧のカードUI、ニュースカテゴリ、記事別絵文字を公開" "news" "news" "release" "${WORKDIR}/doc_news_knowledge_directory.md" "[news, article]"
+
+cat > "${WORKDIR}/doc_news_agent_workflow.md" <<'EOF'
+---
+license: MIT
+emoji: "📣"
+tags: [news, agents, automation]
+---
+
+# 専門エージェント連携の更新
+
+OpenFaceの自動メンテナンスでは、メンテナーがデザイン、コーディング、ドキュメント、レビューの専門エージェントへ作業を委任できます。
+
+## 変わったこと
+
+- 専門エージェントは独立アカウントとして会話とコミットを記録
+- Issueのメンションから担当作業を開始
+- 実装者とは別のレビューエージェントが現在のhead SHAを検証
+- 条件を満たしたプルリクエストは自動マージ可能
+
+誰が何を判断したかをIssueとプルリクエストから追跡でき、見えない自動処理にしないことを重視しています。
+EOF
+create_doc_fixture "specialist-agent-workflow-update" "専門エージェントの委任、レビュー、自動マージ運用を更新" "news" "news" "agents" "${WORKDIR}/doc_news_agent_workflow.md"
 
 cat > "${WORKDIR}/doc_platform_atlas.md" <<'EOF'
 ---
