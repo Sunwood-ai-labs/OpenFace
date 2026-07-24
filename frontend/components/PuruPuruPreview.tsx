@@ -46,7 +46,9 @@ export default function PuruPuruPreview({
   const [direction, setDirection] = useState(directions[0] || 'front');
   const [frameIndex, setFrameIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
+  const [framesReady, setFramesReady] = useState(false);
   const [previousFrame, setPreviousFrame] = useState<PuruPuruPreviewFrame | null>(null);
+  const preloadedImagesRef = useRef<HTMLImageElement[]>([]);
   const sequence = compact ? frames : frames.filter((frame) => frame.direction === direction);
   const activeFrame = sequence[frameIndex % Math.max(sequence.length, 1)] || frames[0];
   const activeFrameRef = useRef(activeFrame);
@@ -61,20 +63,42 @@ export default function PuruPuruPreview({
   }, []);
 
   useEffect(() => {
-    frames.forEach((frame) => {
+    let cancelled = false;
+    setFramesReady(false);
+    const images = frames.map((frame) => {
       const image = new Image();
       image.src = frame.src;
+      return image;
     });
+    preloadedImagesRef.current = images;
+    Promise.all(images.map(async (image) => {
+      if (image.complete && image.naturalWidth > 0) return;
+      try {
+        await image.decode();
+      } catch {
+        if (image.complete) return;
+        await new Promise<void>((resolve) => {
+          image.addEventListener('load', () => resolve(), { once: true });
+          image.addEventListener('error', () => resolve(), { once: true });
+        });
+      }
+    })).then(() => {
+      if (!cancelled) setFramesReady(true);
+    });
+    return () => {
+      cancelled = true;
+      preloadedImagesRef.current = [];
+    };
   }, [frames]);
 
   useEffect(() => {
-    if (!playing || sequence.length < 2) return undefined;
+    if (!playing || !framesReady || sequence.length < 2) return undefined;
     const timer = window.setInterval(() => {
       setPreviousFrame(activeFrameRef.current || null);
       setFrameIndex((current) => (current + 1) % sequence.length);
     }, compact ? 640 : 520);
     return () => window.clearInterval(timer);
-  }, [compact, playing, sequence.length]);
+  }, [compact, framesReady, playing, sequence.length]);
 
   useEffect(() => {
     if (!previousFrame) return undefined;
@@ -98,6 +122,7 @@ export default function PuruPuruPreview({
       data-frame-path={activeFrame.src}
       data-frame-index={frameIndex}
       data-direction={activeFrame.direction}
+      data-frames-ready={framesReady ? 'true' : 'false'}
       data-blend-active={previousFrame ? 'true' : 'false'}
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(103,232,249,.18),transparent_44%),linear-gradient(145deg,#09090b,#111827)]" />
@@ -117,7 +142,7 @@ export default function PuruPuruPreview({
         src={activeFrame.src}
         alt={`${directionLabel(activeFrame.direction, locale)} ${stateLabel(activeFrame.state, locale)} PuruPuru animated preview`}
         data-purupuru-layer="current"
-        className={`openface-purupuru-frame openface-purupuru-frame-current relative z-10 h-full w-full object-contain ${compact ? 'p-3' : 'max-h-[440px] min-h-72 p-5'}`}
+        className={`openface-purupuru-frame openface-purupuru-frame-current relative z-10 h-full w-full object-contain ${previousFrame ? 'openface-purupuru-frame-incoming' : ''} ${compact ? 'p-3' : 'max-h-[440px] min-h-72 p-5'}`}
       />
       <div className={`absolute z-20 flex items-center gap-2 rounded-full border border-white/15 bg-black/65 font-mono text-[10px] font-bold uppercase tracking-wider text-cyan-100 backdrop-blur ${compact ? 'bottom-3 left-3 px-2.5 py-1' : 'bottom-4 left-4 px-3 py-1.5'}`}>
         <span className={`h-1.5 w-1.5 rounded-full ${playing ? 'animate-pulse bg-emerald-300' : 'bg-zinc-400'}`} />

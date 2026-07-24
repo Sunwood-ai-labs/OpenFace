@@ -1219,30 +1219,26 @@ html[data-openface-theme="cyberpunk"] [class*="dark:bg-zinc-700"] {
   }
 }
 
-@keyframes openface-purupuru-frame-crossfade-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
 .openface-purupuru-frame {
   backface-visibility: hidden;
+  transform: translateZ(0);
   will-change: opacity;
 }
 
 .openface-purupuru-frame-current {
+  opacity: 1;
+}
+
+.openface-purupuru-frame-incoming {
   animation: openface-purupuru-frame-crossfade-in 360ms ease-in-out both;
 }
 
 .openface-purupuru-frame-previous {
-  animation: openface-purupuru-frame-crossfade-out 360ms ease-in-out both;
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .openface-purupuru-frame-current {
+  .openface-purupuru-frame-incoming {
     animation: none;
     opacity: 1;
   }
