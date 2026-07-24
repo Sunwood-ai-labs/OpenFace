@@ -128,7 +128,7 @@ PetはAyano Yukimura、Fuhyo、Hisha、Kakugyo、Kohaku、Maki、Momiji、Onizuk
 
 ### Knowledge（記事・手順・Wiki）
 
-内部の [`/docs`](https://localhost:8443/docs) は、運用マニュアル用VitePressとは別の、Gitリポジトリを土台にしたナレッジカテゴリです。topicへ `doc` を追加し、Markdownは整理用に `articles/`、`procedures/`、`wiki/`へ保存します。表示上の役割は複合指定でき、`formats: [article, wiki]`ならひとつのナレッジが読みもの兼Wikiになります。実ファイル、コミット履歴、clone URL、権限はそのまま保持され、実閲覧数によるトレンド順とタグ単位の閲覧を利用できます。
+内部の [`/docs`](https://localhost:8443/docs) は、運用マニュアル用VitePressとは別の、Gitリポジトリを土台にしたナレッジカテゴリです。topicへ `doc` を追加し、Markdownは整理用に `articles/`、`procedures/`、`wiki/`へ保存します。表示上の役割は複合指定でき、`formats: [article, wiki]`ならひとつのナレッジが読みもの兼Wikiになります。frontmatterの`emoji`は記事の識別アイコンとカード背景の薄い透かしになり、未指定時はトピックに応じた絵文字を安定して自動選択します。実ファイル、コミット履歴、clone URL、権限はそのまま保持され、実閲覧数によるトレンド順とタグ単位の閲覧を利用できます。
 
 | PCのKnowledge一覧 | モバイルのKnowledge一覧 |
 |---|---|

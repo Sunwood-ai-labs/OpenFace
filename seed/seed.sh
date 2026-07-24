@@ -2289,6 +2289,7 @@ Add front matter to every file:
 ```yaml
 ---
 title: 私の調査メモ
+emoji: "🔬"
 formats: [article, wiki]
 topics: [research, local-ai]
 published: true
