@@ -704,10 +704,6 @@ html[data-openface-theme="cyberpunk"] .openface-doc-feature-art {
     margin-top: 1.15rem;
   }
 
-  .openface-docs-hero-actions > :first-child {
-    display: none;
-  }
-
   .openface-docs-hero-stats {
     padding-block: .75rem;
   }

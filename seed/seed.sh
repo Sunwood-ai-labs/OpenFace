@@ -642,6 +642,29 @@ put_file() {
 }
 
 # ------------------------------------------------------------------------
+# Helper: remove an obsolete file after a content-layout migration.
+# Missing paths are already in the desired state.
+# ------------------------------------------------------------------------
+delete_file() {
+  local name="$1" path="$2" message="$3"
+  local get_code sha payload code
+  get_code=$(api GET "/repos/${ORG_NAME}/${name}/contents/${path}")
+  if [ "$get_code" != "200" ] || ! jq -e 'type == "object" and (.sha | type == "string" and length > 0)' /tmp/api_resp.json >/dev/null 2>&1; then
+    return 0
+  fi
+  sha=$(jq -r '.sha' /tmp/api_resp.json)
+  payload=$(jq -n --arg msg "$message" --arg sha "$sha" \
+    '{message:$msg, sha:$sha, branch:"main"}')
+  code=$(api DELETE "/repos/${ORG_NAME}/${name}/contents/${path}" "$payload")
+  if [ "$code" = "200" ]; then
+    log "Removed obsolete ${name}/${path}."
+  else
+    log "WARNING: delete ${name}/${path} returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+  fi
+}
+
+# ------------------------------------------------------------------------
 # Helper: create a Pages source branch from the repository's default branch.
 # A 409 means the branch already exists, which is the expected idempotent
 # result when the seed container runs again.
@@ -2295,6 +2318,9 @@ create_doc_fixture() {
     { print }
   ' "$source_file" > "$staged_file"
   put_file "openface-knowledge" "${directory}/${name}.md" "$staged_file" "Publish ${format}: ${name}"
+  if [ "$directory" != "articles" ]; then
+    delete_file "openface-knowledge" "articles/${name}.md" "Move ${format} into ${directory}/"
+  fi
 }
 
 cat > "${WORKDIR}/doc_local_first.md" <<'EOF'
