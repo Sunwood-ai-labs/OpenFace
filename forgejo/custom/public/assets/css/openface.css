@@ -20331,3 +20331,58 @@ html body[data-openface-pull-view="files"] .diff-file-header-actions {
     max-width: none !important;
   }
 }
+
+/* layout-safe-area1: Forgejo is rendered outside the Next.js shell, so it
+   needs the same explicit viewport safe area. Keep backgrounds full bleed,
+   while repository, explore, auth, user, and utility content share a stable
+   reading rail. Organization pages intentionally retain their wider 24px
+   mobile gutter. */
+@media (min-width: 768px) {
+  html body .page-content {
+    box-sizing: border-box !important;
+    width: min(var(--openface-page-max), calc(100vw - 64px)) !important;
+    max-width: min(var(--openface-page-max), calc(100vw - 64px)) !important;
+    margin-inline: auto !important;
+  }
+
+  html body .page-content > .ui.container,
+  html body .page-content > .secondary-nav,
+  html body .page-content > .secondary-nav > .ui.container {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: auto !important;
+  }
+}
+
+@media (max-width: 767px) {
+  html body:not([data-openface-org]):not([data-openface-user-profile])
+    .page-content {
+    box-sizing: border-box !important;
+    width: calc(100vw - 40px) !important;
+    max-width: calc(100vw - 40px) !important;
+    margin-inline: auto !important;
+  }
+
+  html body .page-content > .ui.container,
+  html body .page-content > .secondary-nav,
+  html body .page-content > .secondary-nav > .ui.container {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: auto !important;
+  }
+
+  html body[data-openface-community-page="detail"]
+    .page-content.repository.view.issue > .ui.container,
+  html body[data-openface-community-page="detail"]
+    .page-content.repository.view.issue > .secondary-nav,
+  html body[data-openface-community-page="detail"]
+    .page-content.repository.view.issue > .secondary-nav > .ui.container,
+  html body[data-openface-community-page="detail"] .comment-container,
+  html body[data-openface-community-page="detail"] .merge-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: auto !important;
+  }
+}
