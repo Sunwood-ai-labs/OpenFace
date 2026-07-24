@@ -31,6 +31,7 @@ MAINTENANCE_WEBHOOK_URL="${MAINTENANCE_WEBHOOK_URL:-http://maintenance-agent:801
 ORG_NAME="openface"
 SUNWOOD_CATALOG="${SUNWOOD_CATALOG:-/catalog/sunwood-ai-labs.json}"
 PROMPT_CATALOG="${PROMPT_CATALOG:-/catalog/prompts.json}"
+BENCHMARK_CATALOG="${BENCHMARK_CATALOG:-/catalog/benchmarks.json}"
 
 log() { echo "[seed] $*"; }
 
@@ -1546,7 +1547,7 @@ import_hf_space() {
 # the upstream commit graph. Existing repositories are never overwritten.
 # ------------------------------------------------------------------------
 import_github_catalog_repo() {
-  local source="$1" name="$2" kind="$3" branch="$4" description="$5" extra_topics_json="${6:-[]}"
+  local source="$1" name="$2" kind="$3" branch="$4" description="$5" extra_topics_json="${6:-[]}" source_topic="${7:-sunwood-ai-labs}"
   local code clone_dir push_url
   local -a extra_topics=()
   mapfile -t extra_topics < <(printf '%s' "$extra_topics_json" | jq -r '.[]')
@@ -1555,7 +1556,7 @@ import_github_catalog_repo() {
   if [ "$code" = "200" ]; then
     log "GitHub sample '${ORG_NAME}/${name}' already exists; keeping local changes."
     api PATCH "/repos/${ORG_NAME}/${name}" "$(jq -n --arg desc "$description" '{description:$desc}')" >/dev/null
-    set_topics "$name" "$kind" "sunwood-ai-labs" "github-import" "${extra_topics[@]}"
+    set_topics "$name" "$kind" "$source_topic" "github-import" "${extra_topics[@]}"
     return 0
   fi
 
@@ -1585,7 +1586,7 @@ import_github_catalog_repo() {
     exit 1
   fi
 
-  set_topics "$name" "$kind" "sunwood-ai-labs" "github-import" "${extra_topics[@]}"
+  set_topics "$name" "$kind" "$source_topic" "github-import" "${extra_topics[@]}"
   log "Imported '${source}' as '${ORG_NAME}/${name}' (${kind})."
 }
 
@@ -1740,6 +1741,29 @@ import_sunwood_catalog() {
       put_file "$name" "skill.json" "$metadata_file" "Describe Skill relationships"
     fi
   done < <(jq -r '.entries[] | @base64' "$SUNWOOD_CATALOG")
+}
+
+# ------------------------------------------------------------------------
+# Import public, CPU-runnable benchmark suites with their complete history.
+# The catalog is separate from the Sunwood collection so provenance remains
+# explicit and additional benchmark families can be added without UI changes.
+# ------------------------------------------------------------------------
+import_benchmark_catalog() {
+  if [ ! -f "$BENCHMARK_CATALOG" ]; then
+    log "ERROR: benchmark catalog not found at '${BENCHMARK_CATALOG}'."
+    exit 1
+  fi
+
+  local encoded entry source name branch description extra_topics_json
+  while IFS= read -r encoded; do
+    entry=$(printf '%s' "$encoded" | base64 -d)
+    source=$(printf '%s' "$entry" | jq -r '.source')
+    name=$(printf '%s' "$entry" | jq -r '.name')
+    branch=$(printf '%s' "$entry" | jq -r '.branch')
+    description=$(printf '%s' "$entry" | jq -r '.description')
+    extra_topics_json=$(printf '%s' "$entry" | jq -c '.topics // []')
+    import_github_catalog_repo "$source" "$name" "benchmark" "$branch" "$description" "$extra_topics_json" "upstream-benchmark"
+  done < <(jq -r '.entries[] | @base64' "$BENCHMARK_CATALOG")
 }
 
 # ------------------------------------------------------------------------
@@ -2894,6 +2918,9 @@ put_file "vitepress-pages-starter" ".forgejo/workflows/publish-pages.yml" "/temp
 
 # Real Skill and MCP samples selected from Sunwood-ai-labs on GitHub.
 import_sunwood_catalog
+
+# CPU-runnable public CAD and SVG evaluation suites.
+import_benchmark_catalog
 
 # Vetted, versioned prompts from MysticLibrary plus public goal-command
 # patterns.  Each source URL is pinned in catalog/prompts.json.
