@@ -182,7 +182,10 @@ async def event(
     worker_id = _credential["worker_id"]
     response = await client.post(
         f"{OPENFACE_URL}{OPENFACE_API_PREFIX}/v1/workers/{worker_id}/jobs/{job_id}/events",
-        headers=auth_headers(),
+        headers={
+            **auth_headers(),
+            "Idempotency-Key": f"{job_id}:{kind}",
+        },
         json={"kind": kind, "details": details or {}},
     )
     response.raise_for_status()

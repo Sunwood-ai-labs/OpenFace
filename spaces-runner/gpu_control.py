@@ -61,9 +61,16 @@ CREATE TABLE IF NOT EXISTS gpu_job_events (
     job_id uuid NOT NULL REFERENCES gpu_jobs(id) ON DELETE CASCADE,
     worker_id uuid REFERENCES gpu_workers(id),
     kind text NOT NULL,
+    idempotency_key text,
     details jsonb NOT NULL DEFAULT '{}'::jsonb,
-    created_at timestamptz NOT NULL DEFAULT now()
+    created_at timestamptz NOT NULL DEFAULT now(),
+    UNIQUE(job_id, idempotency_key)
 );
+ALTER TABLE gpu_job_events
+    ADD COLUMN IF NOT EXISTS idempotency_key text;
+CREATE UNIQUE INDEX IF NOT EXISTS gpu_job_events_idempotency
+    ON gpu_job_events(job_id, idempotency_key)
+    WHERE idempotency_key IS NOT NULL;
 """
 
 ACTIVE_STATUSES = ("leased", "building", "running", "stopping")
@@ -277,7 +284,11 @@ def renew_lease(worker_id: str, job_id: str) -> dict[str, Any] | None:
 
 
 def record_event(
-    worker_id: str, job_id: str, kind: str, details: dict[str, Any]
+    worker_id: str,
+    job_id: str,
+    kind: str,
+    details: dict[str, Any],
+    idempotency_key: str | None = None,
 ) -> dict[str, Any] | None:
     next_status = EVENT_TO_STATUS.get(kind)
     runtime_url = details.get("runtime_url") if kind == "running" else None
@@ -285,12 +296,24 @@ def record_event(
     error = details.get("error") if kind == "failed" else None
     safe_details = {key: value for key, value in details.items() if key != "runtime_token"}
     with _connect() as conn:
+        if idempotency_key:
+            existing = conn.execute(
+                """
+                SELECT 1 FROM gpu_job_events
+                 WHERE job_id = %s AND idempotency_key = %s
+                """,
+                (job_id, idempotency_key),
+            ).fetchone()
+            if existing:
+                return get_job(job_id, conn)
         conn.execute(
             """
-            INSERT INTO gpu_job_events(job_id, worker_id, kind, details)
-            VALUES (%s, %s, %s, %s::jsonb)
+            INSERT INTO gpu_job_events(
+                job_id, worker_id, kind, idempotency_key, details
+            )
+            VALUES (%s, %s, %s, %s, %s::jsonb)
             """,
-            (job_id, worker_id, kind, json.dumps(safe_details)),
+            (job_id, worker_id, kind, idempotency_key, json.dumps(safe_details)),
         )
         if not next_status:
             return get_job(job_id, conn)
@@ -377,6 +400,29 @@ def list_workers() -> list[dict[str, Any]]:
               FROM gpu_workers ORDER BY created_at
             """
         ).fetchall()
+
+
+def revoke_worker(worker_id: str) -> dict[str, Any] | None:
+    with _connect() as conn:
+        worker = conn.execute(
+            """
+            UPDATE gpu_workers
+               SET revoked_at = now(), status = 'revoked'
+             WHERE id = %s AND revoked_at IS NULL
+         RETURNING id, name, status, revoked_at
+            """,
+            (worker_id,),
+        ).fetchone()
+        if worker:
+            conn.execute(
+                """
+                UPDATE gpu_jobs SET status = 'unavailable', updated_at = now()
+                 WHERE worker_id = %s
+                   AND status IN ('leased', 'building', 'running', 'stopping')
+                """,
+                (worker_id,),
+            )
+        return worker
 
 
 def reap_expired() -> dict[str, int]:

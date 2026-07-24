@@ -318,12 +318,18 @@ async def api_worker_job_event(
     job_id: str,
     payload: WorkerEventRequest,
     authorization: str | None = Header(default=None),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ):
     worker = authenticated_worker(authorization)
     if str(worker["id"]) != worker_id:
         raise HTTPException(status_code=403, detail="Worker identity does not match credential")
     result = await asyncio.to_thread(
-        gpu_control.record_event, worker_id, job_id, payload.kind, payload.details
+        gpu_control.record_event,
+        worker_id,
+        job_id,
+        payload.kind,
+        payload.details,
+        idempotency_key,
     )
     if not result:
         raise HTTPException(status_code=404, detail="Job is not assigned to this worker")
@@ -351,6 +357,18 @@ async def api_list_gpu_workers(
 ):
     require_frontend_control(x_openface_control_token)
     return await asyncio.to_thread(gpu_control.list_workers)
+
+
+@app.delete("/api/v1/workers/{worker_id}")
+async def api_revoke_gpu_worker(
+    worker_id: str,
+    x_openface_control_token: str | None = Header(default=None),
+):
+    require_frontend_control(x_openface_control_token)
+    worker = await asyncio.to_thread(gpu_control.revoke_worker, worker_id)
+    if not worker:
+        raise HTTPException(status_code=404, detail="Worker not found or already revoked")
+    return worker
 
 
 @app.post("/api/v1/gpu/jobs")
