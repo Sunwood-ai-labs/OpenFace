@@ -642,6 +642,11 @@ html[data-openface-theme="solarpunk"] .openface-article-hero {
   background: #e9efdb;
 }
 
+html[data-openface-theme="solarpunk"] .openface-knowledge-article .openface-article-hero .text-teal-800,
+html[data-openface-theme="solarpunk"] .openface-knowledge-article .openface-article-hero [class*="dark:text-teal-300"] {
+  color: #1f583c !important;
+}
+
 html[data-openface-theme="solarpunk"] .openface-docs-hero-actions > :first-child {
   border-color: #1f583c !important;
   background: #1f583c !important;
