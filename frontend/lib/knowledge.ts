@@ -69,6 +69,38 @@ const formatEmoji: Record<KnowledgeFormat, string> = {
   procedure: '🛠️',
 };
 
+const topicEmoji: Array<{ topics: string[]; emoji: string }> = [
+  { topics: ['community', 'design', 'accessibility'], emoji: '🧩' },
+  { topics: ['cpu', 'inference'], emoji: '🧠' },
+  { topics: ['visual-qa', 'themes'], emoji: '🔎' },
+  { topics: ['spaces', 'docker'], emoji: '🐳' },
+  { topics: ['recovery', 'operations'], emoji: '🛟' },
+  { topics: ['agents', 'automation', 'review'], emoji: '🤖' },
+  { topics: ['identity', 'permissions', 'security'], emoji: '🔐' },
+  { topics: ['metrics', 'api'], emoji: '📊' },
+  { topics: ['catalog', 'topics', 'metadata'], emoji: '🗂️' },
+  { topics: ['routes'], emoji: '🗺️' },
+  { topics: ['services'], emoji: '🏗️' },
+  { topics: ['docs', 'publishing'], emoji: '📚' },
+  { topics: ['local-first'], emoji: '🏡' },
+  { topics: ['forgejo', 'git'], emoji: '🌿' },
+  { topics: ['configuration'], emoji: '⚙️' },
+];
+
+const fallbackEmoji: Record<KnowledgeFormat, string[]> = {
+  article: ['✍️', '💡', '📝', '🔭', '🧪', '🪶'],
+  procedure: ['🛠️', '🧰', '🧭', '✅', '🚦', '🪜'],
+  wiki: ['🧭', '📚', '🗺️', '🔖', '🧱', '🧬'],
+};
+
+function publicationEmoji(slug: string, topics: string[], format: KnowledgeFormat): string {
+  const topicMatch = topicEmoji.find((candidate) => candidate.topics.some((topic) => topics.includes(topic)));
+  if (topicMatch) return topicMatch.emoji;
+  const hash = [...slug].reduce((total, character) => ((total * 31) + character.codePointAt(0)!) >>> 0, 0);
+  const palette = fallbackEmoji[format] || [formatEmoji[format]];
+  return palette[hash % palette.length];
+}
+
 function readingMinutes(markdown: string): number {
   const words = markdown.trim().split(/\s+/).filter(Boolean).length;
   const japaneseCharacters = (markdown.match(/[\u3040-\u30ff\u3400-\u9fff]/g) || []).length;
@@ -121,7 +153,9 @@ async function loadPublication(repo: Repo): Promise<KnowledgeArticle[]> {
       branch: repo.default_branch || 'main',
       path: entry.path,
       updatedAt: typeof parsed.frontmatter.updated === 'string' ? parsed.frontmatter.updated : repo.updated_at,
-      emoji: typeof parsed.frontmatter.emoji === 'string' ? parsed.frontmatter.emoji.trim() : formatEmoji[format],
+      emoji: typeof parsed.frontmatter.emoji === 'string' && parsed.frontmatter.emoji.trim()
+        ? parsed.frontmatter.emoji.trim()
+        : publicationEmoji(slug, topics, format),
       readingMinutes: readingMinutes(parsed.bodyMarkdown),
       views: 0,
       bodyHtml: parsed.bodyHtml,

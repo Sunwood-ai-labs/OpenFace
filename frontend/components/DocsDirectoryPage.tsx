@@ -79,6 +79,12 @@ function DocCard({
         className="absolute inset-0 z-0 rounded-xl"
       />
       <div className="pointer-events-none absolute inset-0 opacity-[0.13] [background-image:linear-gradient(rgba(255,255,255,.55)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.55)_1px,transparent_1px)] [background-size:22px_22px]" />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-6 -right-4 z-0 select-none text-[112px] leading-none opacity-[0.10] grayscale-[0.15] transition duration-300 group-hover:scale-105 group-hover:opacity-[0.14]"
+      >
+        {article.emoji}
+      </span>
       <div className="pointer-events-none relative z-10 flex min-h-0 flex-1 flex-col px-4 pb-2 pt-2.5">
         <div className="mb-4 flex min-w-0 items-start gap-1.5 text-[10px] font-semibold leading-none text-white/90">
           <div className="flex min-w-0 flex-wrap gap-1.5">
