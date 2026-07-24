@@ -137,7 +137,7 @@ try {
         return $status.status -eq "running"
     } "real NVIDIA GPU job"
 
-    $runtime = Invoke-RestMethod http://localhost:18001/demo/gpu-fixture/
+    $runtime = Invoke-RestMethod http://localhost:18001/demo/gpu-fixture/api
     if ($runtime.status -ne "ok" -or $runtime.gpus.Count -lt 1) {
         throw "The Space container did not report an NVIDIA GPU"
     }
