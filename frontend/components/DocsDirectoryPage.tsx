@@ -424,7 +424,7 @@ export default async function DocsDirectoryPage({
           <Link
             href={buildHref({ nextFormat: 'news', nextTag: undefined })}
             aria-current={selectedFormat === 'news' ? 'page' : undefined}
-            className={`flex min-w-[112px] flex-col items-center justify-center gap-1.5 text-center text-[12px] leading-tight transition ${selectedFormat === 'news' ? 'font-bold text-pink-700 dark:text-pink-300' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'}`}
+            className={`flex min-w-[112px] flex-col items-center justify-center gap-1.5 text-center text-[12px] leading-tight transition ${selectedFormat === 'news' ? 'openface-docs-news-active font-bold text-pink-700 dark:text-pink-300' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'}`}
           >
             <HfIcon name="clock" className="h-5 w-5" />
             <span className="select-none">

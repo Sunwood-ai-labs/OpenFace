@@ -540,6 +540,10 @@ html[data-openface-theme="solarpunk"] .openface-docs-directory .openface-docs-fo
   color: #fffdf3 !important;
 }
 
+html[data-openface-theme="solarpunk"] .openface-docs-directory .openface-docs-news-active {
+  color: #8b1644 !important;
+}
+
 html[data-openface-theme="solarpunk"] .openface-docs-directory .openface-docs-onboarding {
   background: #f0edda !important;
   color: #173b2c !important;
@@ -609,6 +613,10 @@ html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-fo
   border-color: #45e4e7 !important;
   background: #45e4e7 !important;
   color: #061014 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-news-active {
+  color: #ff83bd !important;
 }
 
 html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-onboarding {
