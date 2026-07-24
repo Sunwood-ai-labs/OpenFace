@@ -18910,13 +18910,13 @@ html[data-openface-theme="cyberpunk"] body[data-openface-org-page] overflow-menu
 }
 
 /* Organization navigation stays AA-readable regardless of the host OS color scheme. */
-html[data-openface-theme="cyberpunk"] body[data-openface-org-page]
+html[data-openface-theme="cyberpunk"] body:is([data-openface-org], [data-openface-org-page])
   overflow-menu.ui.secondary.pointing.tabular.menu
   .overflow-menu-items > a.item {
   color: #a9cddd !important;
 }
 
-html[data-openface-theme="solarpunk"] body[data-openface-org-page]
+html[data-openface-theme="solarpunk"] body:is([data-openface-org], [data-openface-org-page])
   overflow-menu.ui.secondary.pointing.tabular.menu
   .overflow-menu-items > a.item {
   color: #46614f !important;
