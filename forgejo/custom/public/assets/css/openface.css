@@ -20339,7 +20339,7 @@ html body[data-openface-pull-view="files"] .diff-file-header-actions {
    mobile gutter. */
 @media (min-width: 768px) {
   html body
-    .page-content.page-content.page-content.page-content.page-content.page-content {
+    .page-content:not(#openface-safe-area) {
     box-sizing: border-box !important;
     width: min(var(--openface-page-max), calc(100vw - 64px)) !important;
     max-width: min(var(--openface-page-max), calc(100vw - 64px)) !important;
@@ -20347,11 +20347,11 @@ html body[data-openface-pull-view="files"] .diff-file-header-actions {
   }
 
   html body
-    .page-content.page-content.page-content.page-content.page-content.page-content > .ui.container,
+    .page-content:not(#openface-safe-area) > .ui.container,
   html body
-    .page-content.page-content.page-content.page-content.page-content.page-content > .secondary-nav,
+    .page-content:not(#openface-safe-area) > .secondary-nav,
   html body
-    .page-content.page-content.page-content.page-content.page-content.page-content > .secondary-nav > .ui.container {
+    .page-content:not(#openface-safe-area) > .secondary-nav > .ui.container {
     box-sizing: border-box !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -20361,7 +20361,7 @@ html body[data-openface-pull-view="files"] .diff-file-header-actions {
 
 @media (max-width: 767px) {
   html body
-    .page-content.page-content.page-content.page-content.page-content.page-content {
+    .page-content:not(#openface-safe-area) {
     box-sizing: border-box !important;
     width: calc(100vw - 40px) !important;
     max-width: calc(100vw - 40px) !important;
@@ -20369,11 +20369,11 @@ html body[data-openface-pull-view="files"] .diff-file-header-actions {
   }
 
   html body
-    .page-content.page-content.page-content.page-content.page-content.page-content > .ui.container,
+    .page-content:not(#openface-safe-area) > .ui.container,
   html body
-    .page-content.page-content.page-content.page-content.page-content.page-content > .secondary-nav,
+    .page-content:not(#openface-safe-area) > .secondary-nav,
   html body
-    .page-content.page-content.page-content.page-content.page-content.page-content > .secondary-nav > .ui.container {
+    .page-content:not(#openface-safe-area) > .secondary-nav > .ui.container {
     box-sizing: border-box !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -20381,9 +20381,9 @@ html body[data-openface-pull-view="files"] .diff-file-header-actions {
   }
 
   html body[data-openface-org]
-    .page-content.page-content.page-content.page-content.page-content.page-content,
+    .page-content:not(#openface-safe-area),
   html body[data-openface-user-profile]
-    .page-content.page-content.page-content.page-content.page-content.page-content {
+    .page-content:not(#openface-safe-area) {
     width: calc(100vw - 48px) !important;
     max-width: calc(100vw - 48px) !important;
   }
