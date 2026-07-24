@@ -230,7 +230,7 @@ export default async function RepoDetailPage({
           ) : null}
           <div className="rounded-lg border border-zinc-200 bg-white p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              {isSpace ? ui(locale, 'Spaceの操作', 'Space actions') : kind === 'dataset' ? ui(locale, 'データセットの操作', 'Dataset actions') : kind === 'skill' ? ui(locale, 'スキルの操作', 'Skill actions') : kind === 'mcp' ? ui(locale, 'MCPの操作', 'MCP actions') : kind === 'prompt' ? ui(locale, 'プロンプトの操作', 'Prompt actions') : kind === 'doc' ? ui(locale, 'ナレッジの操作', 'Knowledge actions') : kind === 'character' ? ui(locale, 'キャラクターの操作', 'Character actions') : ui(locale, 'モデルの操作', 'Model actions')}
+              {isSpace ? ui(locale, 'Spaceの操作', 'Space actions') : kind === 'dataset' ? ui(locale, 'データセットの操作', 'Dataset actions') : kind === 'skill' ? ui(locale, 'スキルの操作', 'Skill actions') : kind === 'mcp' ? ui(locale, 'MCPの操作', 'MCP actions') : kind === 'prompt' ? ui(locale, 'プロンプトの操作', 'Prompt actions') : kind === 'doc' ? ui(locale, 'ナレッジの操作', 'Knowledge actions') : kind === 'character' ? ui(locale, 'キャラクターの操作', 'Character actions') : kind === 'benchmark' ? ui(locale, 'ベンチマークの操作', 'Benchmark actions') : ui(locale, 'モデルの操作', 'Model actions')}
             </p>
             <div className="grid gap-2">
               {isSpace ? (
@@ -308,6 +308,17 @@ export default async function RepoDetailPage({
                   <a href={`/new?type=character&template=${encodeURIComponent(`${owner}/${repo}`)}`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
                     <HfIcon name="fork" className="h-3.5 w-3.5" />
                     {ui(locale, 'キャラクターを複製', 'Duplicate character')}
+                  </a>
+                </>
+              ) : kind === 'benchmark' ? (
+                <>
+                  <a href={`/${owner}/${repo}?tab=files`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-sky-700 px-3 text-sm font-semibold text-white hover:bg-sky-800">
+                    <HfIcon name="benchmark" className="h-3.5 w-3.5" />
+                    {ui(locale, '評価コードを見る', 'Browse evaluation code')}
+                  </a>
+                  <a href={forgejoRepoUrl(owner, repo)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
+                    <HfIcon name="fork" className="h-3.5 w-3.5" />
+                    {ui(locale, 'Forgejoで管理', 'Manage in Forgejo')}
                   </a>
                 </>
               ) : (
