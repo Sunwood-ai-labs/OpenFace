@@ -54,7 +54,7 @@ export default async function KnowledgeArticlePage({ params }: { params: Promise
       </header>
       <div className="mx-auto max-w-[1040px] px-5 sm:px-8">
         <div className="flex gap-2 overflow-x-auto border-b border-zinc-200 py-5 dark:border-zinc-800">
-          {article.topics.map((topic) => <Link key={topic} href={`/docs?q=${encodeURIComponent(topic)}`} className="shrink-0 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 hover:border-teal-700 hover:text-teal-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-teal-300 dark:hover:text-teal-300">#{topic}</Link>)}
+          {article.topics.map((topic) => <Link key={topic} href={`/docs?tag=${encodeURIComponent(topic)}`} className="shrink-0 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 hover:border-teal-700 hover:text-teal-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-teal-300 dark:hover:text-teal-300">#{topic}</Link>)}
         </div>
         <div className="grid gap-10 py-10 lg:grid-cols-[minmax(0,760px)_190px] lg:justify-center lg:py-14">
           <div className="github-markdown-body prose-openface min-w-0 bg-transparent dark:bg-transparent" dangerouslySetInnerHTML={{ __html: article.bodyHtml || '' }} />

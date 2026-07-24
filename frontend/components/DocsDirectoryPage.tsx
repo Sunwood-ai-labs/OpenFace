@@ -227,7 +227,7 @@ export default async function DocsDirectoryPage({
                     <KnowledgeViewCount owner={featured.owner} repo={featured.repository} slug={featured.slug} initialViews={featured.views} />
                   </p>
                   <Link href={docHref(featured)} className="openface-docs-primary-action mt-8 inline-flex h-11 items-center gap-3 bg-zinc-950 px-5 text-sm font-bold text-white transition hover:bg-teal-900 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-teal-300">
-                    {ui(locale, '記事を開く', 'Open article')} <HfIcon name="arrowRight" className="h-3.5 w-3.5" />
+                    {ui(locale, 'ナレッジを開く', 'Open knowledge')} <HfIcon name="arrowRight" className="h-3.5 w-3.5" />
                   </Link>
                 </div>
                 <div className="openface-doc-feature-art relative min-h-52 overflow-hidden border-t border-zinc-200 bg-[#153c3b] text-[#f3d28f] dark:border-zinc-800 lg:border-l lg:border-t-0">
@@ -285,7 +285,7 @@ export default async function DocsDirectoryPage({
                   <span className="font-mono text-xs text-zinc-500">{ui(locale, `${docs.length}件`, `${docs.length} items`)}</span>
                 </div>
                 <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                  {(remaining.length ? remaining : docs).map((article) => <DocCard key={article.id} article={article} locale={locale} formats={formats} />)}
+                  {remaining.map((article) => <DocCard key={article.id} article={article} locale={locale} formats={formats} />)}
                 </div>
               </div>
             </section>
