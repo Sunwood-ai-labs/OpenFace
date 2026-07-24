@@ -34,7 +34,7 @@ export const routes = [
   { id: 'skill-files-direct', label: 'Skill repository files', path: '/git/openface/repository-polish-skill/src/branch/main', focus: 'Cyberpunk file names, latest-commit surface, toolbar controls, and a single continuous tree edge' },
   { id: 'mcp-detail', label: 'MCP detail', path: '/openface/aira-mcp-server', focus: 'Imported MCP README, provenance, clone control, and tabs' },
   { id: 'prompt-detail', label: 'Prompt detail', path: '/openface/mystic-git-auto-commit?revision=v4.2', focus: 'Immutable revision selector, prompt source, and direct-link state' },
-    { id: 'doc-detail', label: 'Knowledge article detail', path: '/docs/openface/community-design-principles', focus: 'OpenFace editorial article header, topics, real view count, readable Markdown, repository source actions, responsive width, and theme contrast' },
+  { id: 'doc-detail', label: 'Composable knowledge detail', path: '/docs/openface/local-first-ai-hub', focus: 'OpenFace editorial header with article and Wiki roles, topics, real view count, readable Markdown, repository source actions, responsive width, and theme contrast' },
   { id: 'repository-files', label: 'Repository files', path: '/openface/mystic-git-auto-commit?tab=files&revision=v4.2', focus: 'Unblurred repository header, file list columns, and tabs' },
   { id: 'space-app', label: 'Embedded Space app', path: '/openface/qr-code-generator', allowFullBleed: true, focus: 'OpenFace navigation, Space header, runtime state, and embedded live application', settleMs: 2000 },
   { id: 'space-files', label: 'Space files', path: '/openface/qr-code-generator?tab=files', focus: 'Space repository file list, header clarity, tabs, and Pages card' },
