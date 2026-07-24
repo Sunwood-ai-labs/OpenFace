@@ -28,7 +28,7 @@ function CompactRepoList({
   label: string;
   locale: Locale;
 }) {
-  const kind = label === 'Models' ? 'model' : label === 'Datasets' ? 'dataset' : label === 'Skills' ? 'skill' : label === 'MCPs' ? 'mcp' : label === 'Prompts' ? 'prompt' : label === 'Docs' ? 'doc' : label === 'Characters' ? 'character' : 'space';
+  const kind = label === 'Models' ? 'model' : label === 'Datasets' ? 'dataset' : label === 'Skills' ? 'skill' : label === 'MCPs' ? 'mcp' : label === 'Prompts' ? 'prompt' : label === 'Docs' ? 'doc' : label === 'Characters' ? 'character' : label === 'Benchmarks' ? 'benchmark' : 'space';
   const theme = {
     model: {
       shell: 'border-zinc-200 bg-white',
@@ -94,8 +94,16 @@ function CompactRepoList({
       browse: 'text-fuchsia-800 hover:text-fuchsia-950 dark:text-fuchsia-300 dark:hover:text-fuchsia-200',
       title: 'text-fuchsia-900',
     },
+    benchmark: {
+      shell: 'border-sky-200/80 bg-gradient-to-b from-sky-50/80 via-white to-white shadow-sky-100/60',
+      icon: 'bg-sky-100 text-sky-800 ring-sky-200',
+      link: 'hover:bg-sky-50/80',
+      dot: 'bg-sky-500',
+      browse: 'text-sky-800 hover:text-sky-950 dark:text-sky-300 dark:hover:text-sky-200',
+      title: 'text-sky-900',
+    },
   }[kind];
-  const displayLabel = ({ Models: 'モデル', Datasets: 'データセット', Spaces: 'Spaces', Skills: 'スキル', MCPs: 'MCPs', Prompts: 'プロンプト', Docs: 'ナレッジ', Characters: 'キャラクター' } as Record<string, string>)[label] || label;
+  const displayLabel = ({ Models: 'モデル', Datasets: 'データセット', Spaces: 'Spaces', Skills: 'スキル', MCPs: 'MCPs', Prompts: 'プロンプト', Docs: 'ナレッジ', Characters: 'キャラクター', Benchmarks: 'ベンチマーク' } as Record<string, string>)[label] || label;
 
   return (
     <section className="min-w-0">
@@ -135,7 +143,7 @@ function CompactRepoList({
 
 export default async function HomePage() {
   const locale = await getLocale();
-  const [models, datasets, spaces, skills, mcps, prompts, docs, characters] = await Promise.all([
+  const [models, datasets, spaces, skills, mcps, prompts, docs, characters, benchmarks] = await Promise.all([
     searchRepos({ topic: 'model', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'dataset', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'space', sort: 'updated', limit: 8 }),
@@ -144,6 +152,7 @@ export default async function HomePage() {
     searchRepos({ topic: 'prompt', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'doc', sort: 'updated', limit: 8 }),
     searchRepos({ topic: 'character', sort: 'updated', limit: 8 }),
+    searchRepos({ topic: 'benchmark', sort: 'updated', limit: 8 }),
   ]);
 
   return (
@@ -196,6 +205,16 @@ export default async function HomePage() {
           <Link href="/docs" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-teal-900 hover:underline dark:text-teal-300">{ui(locale, 'ライブラリを開く', 'Enter the library')} <HfIcon name="arrowRight" className="h-3 w-3" /></Link>
         </div>
         <CompactRepoList repos={docs.data} href="/docs" label="Docs" locale={locale} />
+      </section>
+
+      <section className="mx-auto mb-12 grid max-w-[1180px] gap-6 border-y border-sky-200 py-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
+        <div>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-sky-700 dark:text-sky-300">Evaluation lab · Reproducible</p>
+          <h2 className="mt-3 font-serif text-4xl leading-none text-zinc-950 dark:text-white">{ui(locale, '生成AIを、再現可能な基準で測る。', 'Measure generative AI with reproducible benchmarks.')}</h2>
+          <p className="mt-4 max-w-lg text-sm leading-6 text-zinc-600 dark:text-zinc-300">{ui(locale, 'CADの実行可能テストやSVGの理解・編集・生成を、課題、実行コード、評価指標、結果と一緒にGitで共有します。', 'Share CAD executable tests and SVG understanding, editing, and generation with tasks, runners, metrics, and results in Git.')}</p>
+          <Link href="/benchmarks" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-sky-900 hover:underline dark:text-sky-300">{ui(locale, '評価ラボを開く', 'Open the evaluation lab')} <HfIcon name="arrowRight" className="h-3 w-3" /></Link>
+        </div>
+        <CompactRepoList repos={benchmarks.data} href="/benchmarks" label="Benchmarks" locale={locale} />
       </section>
 
       <section className="mx-auto mb-12 max-w-[1180px]">

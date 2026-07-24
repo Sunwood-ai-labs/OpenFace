@@ -22,6 +22,7 @@ export default function Navbar() {
     { href: '/mcps', icon: 'mcp', label: 'MCPs' },
     { href: '/prompts', icon: 'prompt', label: 'Prompts' },
     { href: '/docs', icon: 'doc', label: 'Knowledge' },
+    { href: '/benchmarks', icon: 'benchmark', label: 'Benchmarks' },
     { href: '/characters', icon: 'character', label: 'Characters' },
   ];
   const primaryNavItems = allNavItems.filter((item) => ['/models', '/datasets', '/spaces', '/docs'].includes(item.href));
@@ -77,7 +78,9 @@ export default function Navbar() {
                       key={item.href}
                       href={item.href}
                       aria-current={isCurrent(item.href) ? 'page' : undefined}
-                      className={`group/item flex min-h-24 items-center gap-3 rounded-xl border p-3 text-zinc-800 transition hover:-translate-y-0.5 hover:border-teal-300 hover:bg-white hover:shadow-sm dark:text-zinc-100 dark:hover:border-teal-700 dark:hover:bg-zinc-800 ${
+                      className={`group/item flex items-center gap-3 rounded-xl border p-3 text-zinc-800 transition hover:-translate-y-0.5 hover:border-teal-300 hover:bg-white hover:shadow-sm dark:text-zinc-100 dark:hover:border-teal-700 dark:hover:bg-zinc-800 ${
+                        item.href === '/benchmarks' ? 'col-span-2 min-h-20' : 'min-h-24'
+                      } ${
                         isCurrent(item.href)
                           ? 'border-teal-300 bg-teal-50/80 ring-1 ring-teal-200 dark:border-teal-700 dark:bg-teal-950/30 dark:ring-teal-900'
                           : 'border-zinc-200 bg-zinc-50/70 dark:border-zinc-700 dark:bg-zinc-800/70'

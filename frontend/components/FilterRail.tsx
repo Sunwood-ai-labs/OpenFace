@@ -148,6 +148,34 @@ const promptFamilyFilters: FilterGroup[] = [
   },
 ];
 
+const benchmarkFilters: FilterGroup[] = [
+  {
+    title: 'Domains',
+    items: [
+      { label: 'CAD', icon: 'cube', tone: 'text-blue-600' },
+      { label: 'SVG', icon: 'code', tone: 'text-cyan-600' },
+      { label: '3D', icon: 'cube', tone: 'text-indigo-600' },
+    ],
+  },
+  {
+    title: 'Tasks',
+    items: [
+      { label: 'Generation', icon: 'sparkles', tone: 'text-sky-600' },
+      { label: 'Editing', icon: 'filePen', tone: 'text-violet-600' },
+      { label: 'Understanding', icon: 'eye', tone: 'text-emerald-600' },
+    ],
+  },
+  {
+    title: 'Runners',
+    items: [
+      { label: 'CPU', icon: 'benchmark', tone: 'text-sky-700' },
+      { label: 'Docker', icon: 'box', tone: 'text-blue-700' },
+      { label: 'Python', icon: 'code', tone: 'text-amber-600' },
+      { label: 'Executable tests', icon: 'gear', tone: 'text-zinc-600' },
+    ],
+  },
+];
+
 export default function FilterRail({ topic, promptVersionTopics = [], locale }: { topic: Exclude<RepoKind, 'space'>; promptVersionTopics?: string[]; locale: Locale }) {
   const promptFilters: FilterGroup[] = [
     ...promptFamilyFilters,
@@ -161,13 +189,14 @@ export default function FilterRail({ topic, promptVersionTopics = [], locale }: 
       })),
     }] : []),
   ];
-  const groups = topic === 'dataset' ? datasetFilters : topic === 'skill' ? skillFilters : topic === 'mcp' ? mcpFilters : topic === 'prompt' ? promptFilters : modelFilters;
-  const basePath = topic === 'dataset' ? '/datasets' : topic === 'skill' ? '/skills' : topic === 'mcp' ? '/mcps' : topic === 'prompt' ? '/prompts' : '/models';
+  const groups = topic === 'dataset' ? datasetFilters : topic === 'skill' ? skillFilters : topic === 'mcp' ? mcpFilters : topic === 'prompt' ? promptFilters : topic === 'benchmark' ? benchmarkFilters : modelFilters;
+  const basePath = topic === 'dataset' ? '/datasets' : topic === 'skill' ? '/skills' : topic === 'mcp' ? '/mcps' : topic === 'prompt' ? '/prompts' : topic === 'benchmark' ? '/benchmarks' : '/models';
   const filterHref = (label: string) => `${basePath}?q=${encodeURIComponent(label.toLowerCase())}`;
   const localize = (label: string) => ({
     Main: 'メイン', Tasks: 'タスク', Libraries: 'ライブラリ', Languages: '言語', Licenses: 'ライセンス', Other: 'その他',
     Parameters: 'パラメーター', Apps: 'アプリ', Modalities: 'モダリティ', 'Size (rows)': 'サイズ（行数）', Format: '形式', Type: '種類',
     'Use cases': '用途', Clients: 'クライアント', Capabilities: '機能', 'Prompt families': 'プロンプト分類', 'Version tags': 'バージョンタグ',
+    Domains: '対象領域', Runners: '実行環境', Generation: '生成', Editing: '編集', Understanding: '理解',
   } as Record<string, string>)[label] || label;
 
   return (

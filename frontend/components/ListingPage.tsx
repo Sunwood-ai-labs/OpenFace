@@ -32,8 +32,8 @@ export default async function ListingPage({
     ? Array.from(new Set(result.data.flatMap((repo) => (repo.topics || []).filter((repoTopic) => /^version-v\d+(?:\.\d+)*$/i.test(repoTopic)))))
       .sort((left, right) => left.localeCompare(right, undefined, { numeric: true, sensitivity: 'base' }))
     : [];
-  const iconTone = topic === 'dataset' ? 'text-emerald-600' : topic === 'skill' ? 'text-violet-600' : topic === 'mcp' ? 'text-cyan-600' : topic === 'prompt' ? 'text-orange-600' : 'text-amber-600';
-  const createLabel = topic === 'dataset' ? ui(locale, 'データセット', 'Dataset') : topic === 'space' ? 'Space' : topic === 'skill' ? ui(locale, 'スキル', 'Skill') : topic === 'mcp' ? 'MCP server' : topic === 'prompt' ? ui(locale, 'プロンプト', 'Prompt') : ui(locale, 'モデル', 'Model');
+  const iconTone = topic === 'dataset' ? 'text-emerald-600' : topic === 'skill' ? 'text-violet-600' : topic === 'mcp' ? 'text-cyan-600' : topic === 'prompt' ? 'text-orange-600' : topic === 'benchmark' ? 'text-sky-600' : 'text-amber-600';
+  const createLabel = topic === 'dataset' ? ui(locale, 'データセット', 'Dataset') : topic === 'space' ? 'Space' : topic === 'skill' ? ui(locale, 'スキル', 'Skill') : topic === 'mcp' ? 'MCP server' : topic === 'prompt' ? ui(locale, 'プロンプト', 'Prompt') : topic === 'benchmark' ? ui(locale, 'ベンチマーク', 'Benchmark') : ui(locale, 'モデル', 'Model');
   const mobileFilters: Array<{ label: string; query?: string }> = topic === 'dataset'
     ? ['Audio', 'Image', 'Text', 'Tabular', 'parquet', 'Benchmark'].map((label) => ({ label }))
     : topic === 'skill'
@@ -45,6 +45,8 @@ export default async function ListingPage({
               ...['Goal command', 'Coding agent', 'Workflow'].map((label) => ({ label })),
               ...promptVersionTopics.map((versionTopic) => ({ label: versionTopic.replace(/^version-/, ''), query: versionTopic })),
             ]
+        : topic === 'benchmark'
+          ? ['CAD', 'SVG', 'Text-to-CAD', 'Generation', 'Editing', 'CPU', 'Executable tests'].map((label) => ({ label }))
         : ['Text Generation', 'Image-to-Text', 'Safetensors', 'Transformers', 'GGUF', 'vLLM'].map((label) => ({ label }));
 
   return (
@@ -122,7 +124,7 @@ export default async function ListingPage({
         ) : (
           <RepoSearchList
             repos={result.data}
-            kind={topic === 'dataset' ? 'dataset' : topic === 'skill' ? 'skill' : topic === 'mcp' ? 'mcp' : topic === 'prompt' ? 'prompt' : 'model'}
+            kind={topic === 'dataset' ? 'dataset' : topic === 'skill' ? 'skill' : topic === 'mcp' ? 'mcp' : topic === 'prompt' ? 'prompt' : topic === 'benchmark' ? 'benchmark' : 'model'}
             emptyMessage={ui(locale, `${title}はまだありません。`, `No ${title.toLowerCase()} yet.`)}
             locale={locale}
           />

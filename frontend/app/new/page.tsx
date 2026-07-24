@@ -81,6 +81,14 @@ const repoTypes: Array<{
     description: 'PuruPuru PNGtubers, Codex Pets, character sheets, and their QA evidence.',
     descriptionJa: 'PuruPuru PNGtuber、Codex Pet、キャラクターシート、QA証跡を管理します。',
   },
+  {
+    label: 'Benchmark',
+    labelJa: 'ベンチマーク',
+    topic: 'benchmark',
+    icon: 'benchmark',
+    description: 'Reproducible evaluation suites, task data, runners, and result reports.',
+    descriptionJa: '再現可能な評価スイート、課題データ、実行環境、結果レポートを管理します。',
+  },
 ];
 
 const templates = [
@@ -95,6 +103,7 @@ const templates = [
   { label: 'PuruPuru PNGtuber', labelJa: 'PuruPuru PNGtuber', topic: 'character', repo: 'my-purupuru-character', slug: 'purupuru-pngtuber' },
   { label: 'Codex Pet package', labelJa: 'Codex Petパッケージ', topic: 'character', repo: 'my-codex-pet', slug: 'codex-pet' },
   { label: 'Character sheets', labelJa: 'キャラクターシート集', topic: 'character', repo: 'my-character-sheets', slug: 'character-sheets' },
+  { label: 'Benchmark suite', labelJa: 'ベンチマークスイート', topic: 'benchmark', repo: 'my-benchmark', slug: 'benchmark-suite' },
   { label: 'Empty repository', labelJa: '空のリポジトリ', topic: 'model', repo: 'my-openface-repo', slug: 'empty-repository' },
 ];
 
@@ -107,6 +116,7 @@ const typeConfig: Record<string, { title: string; titleJa: string; repoPlacehold
   prompt: { title: 'Create a new Prompt', titleJa: '新しいプロンプトを作成', repoPlaceholder: 'my-agent-prompt', cancelHref: '/prompts' },
   doc: { title: 'Create your knowledge publication', titleJa: 'ナレッジ出版を作成', repoPlaceholder: 'my-knowledge', cancelHref: '/docs' },
   character: { title: 'Create a new character repository', titleJa: '新しいキャラクターリポジトリを作成', repoPlaceholder: 'my-character-assets', cancelHref: '/characters' },
+  benchmark: { title: 'Create a new benchmark', titleJa: '新しいベンチマークを作成', repoPlaceholder: 'my-evaluation-suite', cancelHref: '/benchmarks' },
 };
 
 export default async function NewRepoGuidePage({
@@ -116,7 +126,7 @@ export default async function NewRepoGuidePage({
 }) {
   const resolvedSearchParams = await searchParams;
   const locale = await getLocale();
-  const requestedType = resolvedSearchParams?.type === 'model' || resolvedSearchParams?.type === 'dataset' || resolvedSearchParams?.type === 'space' || resolvedSearchParams?.type === 'skill' || resolvedSearchParams?.type === 'mcp' || resolvedSearchParams?.type === 'prompt' || resolvedSearchParams?.type === 'doc' || resolvedSearchParams?.type === 'character'
+  const requestedType = resolvedSearchParams?.type === 'model' || resolvedSearchParams?.type === 'dataset' || resolvedSearchParams?.type === 'space' || resolvedSearchParams?.type === 'skill' || resolvedSearchParams?.type === 'mcp' || resolvedSearchParams?.type === 'prompt' || resolvedSearchParams?.type === 'doc' || resolvedSearchParams?.type === 'character' || resolvedSearchParams?.type === 'benchmark'
     ? resolvedSearchParams.type
     : 'space';
   const config = typeConfig[requestedType];

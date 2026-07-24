@@ -12,7 +12,7 @@ export default function RepoSearchList({
   locale,
 }: {
   repos: Repo[];
-  kind: 'model' | 'dataset' | 'skill' | 'mcp' | 'prompt';
+  kind: 'model' | 'dataset' | 'skill' | 'mcp' | 'prompt' | 'benchmark';
   emptyMessage?: string;
   locale: Locale;
 }) {
@@ -31,8 +31,8 @@ export default function RepoSearchList({
         const badges = nonTypeTopics(repo.topics).slice(0, 2);
         const promptVersion = kind === 'prompt' ? repoPromptVersion(repo.topics) : null;
         const dependencyCount = kind === 'skill' ? repo.skill_relationships?.dependencies.length || 0 : 0;
-        const basePath = kind === 'dataset' ? '/datasets' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : '/models';
-        const primaryBadge = badges[0] || (kind === 'dataset' ? 'Viewer' : kind === 'skill' ? 'Codex skill' : kind === 'mcp' ? 'MCP server' : kind === 'prompt' ? 'Prompt' : 'Text Generation');
+        const basePath = kind === 'dataset' ? '/datasets' : kind === 'skill' ? '/skills' : kind === 'mcp' ? '/mcps' : kind === 'prompt' ? '/prompts' : kind === 'benchmark' ? '/benchmarks' : '/models';
+        const primaryBadge = badges[0] || (kind === 'dataset' ? 'Viewer' : kind === 'skill' ? 'Codex skill' : kind === 'mcp' ? 'MCP server' : kind === 'prompt' ? 'Prompt' : kind === 'benchmark' ? 'Evaluation suite' : 'Text Generation');
         const secondaryBadge = badges[1];
         const iconTheme = kind === 'dataset'
           ? 'rounded bg-emerald-50 text-emerald-700'
@@ -42,11 +42,15 @@ export default function RepoSearchList({
               ? 'rounded-lg bg-cyan-50 text-cyan-700'
               : kind === 'prompt'
                 ? 'rounded-lg bg-orange-50 text-orange-700'
+              : kind === 'benchmark'
+                ? 'rounded-lg bg-sky-50 text-sky-700'
               : 'rounded-full bg-amber-50 text-amber-700';
         return (
           <article
             key={repo.id ?? repo.full_name}
-            className="block h-[62px] overflow-hidden rounded-lg border border-zinc-100 bg-white px-3 py-2 transition hover:border-zinc-200 hover:bg-zinc-50 hover:shadow-sm"
+            className={`block overflow-hidden rounded-lg border bg-white px-3 py-2 transition hover:bg-zinc-50 hover:shadow-sm ${
+              kind === 'benchmark' ? 'h-[76px] border-sky-100 hover:border-sky-200' : 'h-[62px] border-zinc-100 hover:border-zinc-200'
+            }`}
           >
             <div className="flex min-w-0 items-center gap-2.5">
               <span className={`inline-flex h-5 w-5 items-center justify-center ${iconTheme}`}>
