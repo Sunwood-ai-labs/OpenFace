@@ -2,7 +2,7 @@
 
 Result: **24/24 passed**  
 Coverage: **3 themes × 2 OS color schemes × 2 viewports × 2 routes = 24 screenshots**
-Audited text nodes: **4076** · Image-backed text reviewed visually: **220** · Minimum WCAG margin: **1.01× required ratio**
+Audited text nodes: **3668** · Image-backed text reviewed visually: **628** · Minimum WCAG margin: **1.01× required ratio**
 
 | Result | Theme | OS scheme | Viewport | Route | Overflow | Contrast risks | Screenshot |
 |---|---|---|---|---|---:|---:|---|
