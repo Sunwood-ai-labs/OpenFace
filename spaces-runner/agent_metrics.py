@@ -84,6 +84,21 @@ def initialize() -> None:
         db.execute("CREATE INDEX IF NOT EXISTS browser_views_target ON browser_views(owner, repo)")
         db.execute(
             """
+            CREATE TABLE IF NOT EXISTS knowledge_views (
+                id BIGSERIAL PRIMARY KEY,
+                owner TEXT NOT NULL,
+                repo TEXT NOT NULL,
+                slug TEXT NOT NULL,
+                idempotency_key TEXT NOT NULL UNIQUE,
+                created_at TIMESTAMPTZ NOT NULL
+            )
+            """
+        )
+        db.execute(
+            "CREATE INDEX IF NOT EXISTS knowledge_views_target ON knowledge_views(owner, repo, slug)"
+        )
+        db.execute(
+            """
             CREATE TABLE IF NOT EXISTS repo_likes (
                 agent_id BIGINT NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
                 owner TEXT NOT NULL,
@@ -253,6 +268,55 @@ def record_browser_view(owner: str, repo: str, idempotency_key: str) -> tuple[bo
             (owner, repo, idempotency_key, _now()),
         ).fetchone()
     return bool(row), metrics(owner, repo)
+
+
+def knowledge_metrics(owner: str, repo: str, slug: str) -> dict[str, Any]:
+    with _connect() as db:
+        views = db.execute(
+            """SELECT COUNT(*) AS count FROM knowledge_views
+               WHERE owner = %s AND repo = %s AND slug = %s""",
+            (owner, repo, slug),
+        ).fetchone()["count"]
+    return {"owner": owner, "repo": repo, "slug": slug, "views": views}
+
+
+def knowledge_metrics_batch(targets: list[tuple[str, str, str]]) -> dict[str, dict[str, Any]]:
+    unique_targets = list(dict.fromkeys(targets))
+    result = {
+        f"{owner}/{repo}/{slug}": {
+            "owner": owner,
+            "repo": repo,
+            "slug": slug,
+            "views": 0,
+        }
+        for owner, repo, slug in unique_targets
+    }
+    if not unique_targets:
+        return result
+
+    keys = [f"{owner}/{repo}/{slug}" for owner, repo, slug in unique_targets]
+    with _connect() as db:
+        rows = db.execute(
+            """SELECT owner, repo, slug, COUNT(*) AS count FROM knowledge_views
+               WHERE owner || '/' || repo || '/' || slug = ANY(%s)
+               GROUP BY owner, repo, slug""",
+            (keys,),
+        ).fetchall()
+    for row in rows:
+        result[f"{row['owner']}/{row['repo']}/{row['slug']}"]["views"] = row["count"]
+    return result
+
+
+def record_knowledge_view(
+    owner: str, repo: str, slug: str, idempotency_key: str
+) -> tuple[bool, dict[str, Any]]:
+    with _connect() as db:
+        row = db.execute(
+            """INSERT INTO knowledge_views(owner, repo, slug, idempotency_key, created_at)
+               VALUES(%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING RETURNING id""",
+            (owner, repo, slug, idempotency_key, _now()),
+        ).fetchone()
+    return bool(row), knowledge_metrics(owner, repo, slug)
 
 
 def set_like(agent_id: int, owner: str, repo: str, liked: bool) -> tuple[bool, dict[str, Any]]:

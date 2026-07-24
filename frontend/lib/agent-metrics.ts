@@ -13,6 +13,13 @@ export interface RepoAgentMetrics {
   }>;
 }
 
+export interface KnowledgeMetrics {
+  owner: string;
+  repo: string;
+  slug: string;
+  views: number;
+}
+
 const RUNNER_API = (process.env.RUNNER_API || 'http://spaces-runner:8000/api').replace(/\/$/, '');
 
 export async function getRepoMetrics(owner: string, repo: string): Promise<RepoAgentMetrics> {
@@ -45,6 +52,27 @@ export async function getRepoMetricsBatch(
     return Object.fromEntries(repos.map(({ owner, repo }) => [
       `${owner}/${repo}`,
       { owner, repo, views: 0, likes: 0, recent_agents: [] },
+    ]));
+  }
+}
+
+export async function getKnowledgeMetricsBatch(
+  items: Array<{ owner: string; repo: string; slug: string }>,
+): Promise<Record<string, KnowledgeMetrics>> {
+  if (items.length === 0) return {};
+  try {
+    const response = await fetch(`${RUNNER_API}/metrics/knowledge/batch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items }),
+      cache: 'no-store',
+    });
+    if (!response.ok) throw new Error(`knowledge metrics HTTP ${response.status}`);
+    return await response.json() as Record<string, KnowledgeMetrics>;
+  } catch {
+    return Object.fromEntries(items.map(({ owner, repo, slug }) => [
+      `${owner}/${repo}/${slug}`,
+      { owner, repo, slug, views: 0 },
     ]));
   }
 }

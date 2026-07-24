@@ -58,6 +58,16 @@ class RepoMetricsBatchRequest(BaseModel):
     repos: list[RepoMetricsTarget] = Field(max_length=48)
 
 
+class KnowledgeMetricsTarget(BaseModel):
+    owner: str = Field(min_length=1, max_length=100)
+    repo: str = Field(min_length=1, max_length=100)
+    slug: str = Field(min_length=1, max_length=180)
+
+
+class KnowledgeMetricsBatchRequest(BaseModel):
+    items: list[KnowledgeMetricsTarget] = Field(max_length=200)
+
+
 def authenticated_agent(authorization: str | None):
     prefix = "Bearer "
     api_key = authorization[len(prefix):].strip() if authorization and authorization.startswith(prefix) else None
@@ -206,6 +216,35 @@ async def api_browser_view(
         raise HTTPException(status_code=400, detail="Idempotency-Key must be 200 characters or fewer")
     created, result = await asyncio.to_thread(
         agent_metrics.record_browser_view, owner, repo, idempotency_key
+    )
+    return {"ok": True, "created": created, "source": "browser", "metrics": result}
+
+
+@app.post("/api/metrics/knowledge/batch")
+async def api_knowledge_metrics_batch(payload: KnowledgeMetricsBatchRequest):
+    targets = [(item.owner, item.repo, item.slug) for item in payload.items]
+    return await asyncio.to_thread(agent_metrics.knowledge_metrics_batch, targets)
+
+
+@app.get("/api/metrics/knowledge/{owner}/{repo}/{slug}")
+async def api_knowledge_metrics(owner: str, repo: str, slug: str):
+    return await asyncio.to_thread(agent_metrics.knowledge_metrics, owner, repo, slug)
+
+
+@app.post("/api/metrics/knowledge/{owner}/{repo}/{slug}/views")
+async def api_knowledge_browser_view(
+    owner: str,
+    repo: str,
+    slug: str,
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+):
+    await verify_repo(owner, repo)
+    if not idempotency_key:
+        raise HTTPException(status_code=400, detail="Idempotency-Key is required")
+    if len(idempotency_key) > 200:
+        raise HTTPException(status_code=400, detail="Idempotency-Key must be 200 characters or fewer")
+    created, result = await asyncio.to_thread(
+        agent_metrics.record_knowledge_view, owner, repo, slug, idempotency_key
     )
     return {"ok": True, "created": created, "source": "browser", "metrics": result}
 
