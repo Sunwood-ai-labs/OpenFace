@@ -23,13 +23,16 @@ Copy `.env.example` to `.env`. The most important settings are:
 | `OPENFACE_ADMIN_PASSWORD` | Bootstrap password; change it before shared use |
 | `PUBLIC_BASE_URL` | Canonical gateway URL used by Forgejo and embedded links |
 | `OPENFACE_HTTPS_PORT` | Host HTTPS port |
+| `POSTGRES_USER` / `POSTGRES_PASSWORD` | Credentials shared by the three internal PostgreSQL databases |
 | `DISABLE_REGISTRATION` | Keeps public self-registration closed when `true` |
 | `MAX_RUNNING_SPACES` | Maximum simultaneous Space containers |
 | `IDLE_TIMEOUT_MINUTES` | Optional inactivity shutdown; `0` disables it |
 
 ## Backups
 
-Back up the named volumes `openface_forgejo-data`, `openface_agent-metrics-data`, `openface_shared-token`, and `openface_forgejo-runner-data`. Test restore procedures before relying on the backup.
+Create PostgreSQL dumps for `forgejo`, `openface_metrics`, and `openface_maintenance`. Also back up the named volumes `openface_forgejo-data`, `openface_agent-metrics-data`, `openface_maintenance-agent-data`, `openface_shared-token`, and `openface_forgejo-runner-data`. Test restore procedures before relying on the backup.
+
+For a Proxmox deployment, follow [Proxmox LXC deployment](./proxmox-lxc).
 
 ## TLS
 

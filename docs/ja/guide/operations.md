@@ -23,13 +23,16 @@ related:
 | `OPENFACE_ADMIN_PASSWORD` | 初期password。共有前に変更必須 |
 | `PUBLIC_BASE_URL` | Forgejoと埋め込みlinkが使うgateway URL |
 | `OPENFACE_HTTPS_PORT` | ホストのHTTPS port |
+| `POSTGRES_USER` / `POSTGRES_PASSWORD` | 内部PostgreSQL 3 DBが使うcredential |
 | `DISABLE_REGISTRATION` | `true` でpublic self-registrationを停止 |
 | `MAX_RUNNING_SPACES` | Spaceの最大同時起動数 |
 | `IDLE_TIMEOUT_MINUTES` | 無操作停止。`0` で無効 |
 
 ## バックアップ
 
-`openface_forgejo-data`、`openface_agent-metrics-data`、`openface_shared-token`、`openface_forgejo-runner-data` のnamed volumeをバックアップします。実運用前にrestoreも試してください。
+`forgejo`、`openface_metrics`、`openface_maintenance` のPostgreSQL dumpを作成します。さらに `openface_forgejo-data`、`openface_agent-metrics-data`、`openface_maintenance-agent-data`、`openface_shared-token`、`openface_forgejo-runner-data` のnamed volumeをバックアップします。実運用前にrestoreも試してください。
+
+Proxmox環境では [Proxmox LXCへの配備](./proxmox-lxc) も参照してください。
 
 ## TLS
 

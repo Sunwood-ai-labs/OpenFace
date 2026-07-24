@@ -18,7 +18,7 @@ OpenFace can turn a Forgejo Issue addressed to `@glm-maintainer` into a verified
 ## Flow
 
 1. Forgejo signs and sends the organization `issues`, `issue_comment`, or `pull_request_comment` webhook.
-2. `maintenance-agent` validates the HMAC signature and records the delivery in SQLite.
+2. `maintenance-agent` validates the HMAC signature and records the delivery in PostgreSQL.
 3. `glm-maintainer` classifies the request and posts a visible `@specialist` delegation comment.
 4. Only after that comment succeeds, the service clones the repository and creates `agent/issue-N`.
 5. Claude Code 2.1.205 receives `/goal` followed by the Issue, the selected specialist contract, and explicit completion conditions.

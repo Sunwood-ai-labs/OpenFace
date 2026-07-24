@@ -93,6 +93,7 @@ The seed job should finish successfully. Long-running services should be healthy
 | `gateway` | nginx routing, TLS, WebSockets, single web entrypoint | `8090`, `8443` |
 | `frontend` | Next.js discovery portal and repository pages | internal `3000` |
 | `forgejo` | Git, LFS, authentication, ACLs, Issues, Pull Requests, Actions | internal `3000`, host SSH `2222` |
+| `postgres` | Forgejo, metrics, and maintenance persistence | internal `5432` |
 | `spaces-runner` | Space build/run/proxy, Pages, views, likes, agent API | internal `8000` |
 | `seed` | Idempotent admin, token, organization, catalog, examples, and Prompt tags | one-shot |
 | `forgejo-actions-runner` | Pages workflow jobs | internal |
@@ -107,6 +108,9 @@ flowchart LR
     Gateway --> Runner["FastAPI Space runner"]
     Frontend --> Forgejo
     Frontend --> Runner
+    Forgejo --> Postgres["PostgreSQL"]
+    Runner --> Postgres
+    Maintenance["Maintenance agent"] --> Postgres
     Runner --> Space["CPU Docker Spaces"]
     Runner --> Pages["Static Pages"]
     Seed["Idempotent seed"] --> Forgejo
@@ -115,6 +119,20 @@ flowchart LR
 ```
 
 See the [architecture guide](https://sunwood-ai-labs.github.io/OpenFace/guide/architecture) for routing, storage, and trust boundaries.
+
+### Verified Proxmox LXC deployment
+
+OpenFace was migrated with its existing Forgejo, metrics, maintenance, token, and
+repository data into a dedicated Ubuntu 24.04 Proxmox LXC. PostgreSQL retains
+application metadata while named Docker volumes retain Git repositories, LFS
+objects, credentials, and runner state. The full stack and a CPU Space returned
+automatically after an LXC reboot.
+
+| LAN home | Running Space |
+|---|---|
+| ![OpenFace served from a Proxmox LXC](docs/evidence/proxmox-lxc/home-lan.png) | ![QR Code Generator running after migration](docs/evidence/proxmox-lxc/qr-space-running.png) |
+
+See [Proxmox LXC deployment](https://sunwood-ai-labs.github.io/OpenFace/guide/proxmox-lxc).
 
 ## 🎭 Characters: portable runtime assets
 
@@ -397,7 +415,7 @@ The live hand-off is retained as [Issue #21](https://madesk.tail8be30.ts.net/git
 
 Issue reactions provide a compact progress signal: 👍 records human support, 👀 means `glm-maintainer` accepted and is processing the request, 🚀 means the verified PR or follow-up commit was published, and 😕 marks a stopped or failed run that needs log inspection.
 
-The service validates the Forgejo HMAC signature and deduplicates deliveries in SQLite. Claude Code runs as an unprivileged user inside the maintenance container: it has no host Docker socket and cannot read the Forgejo bot token, while retaining normal repository-level tools and test execution. The root wrapper alone commits and pushes after `git diff --check`. It never merges on the implementer's self-assessment. The independent reviewer must return a schema-valid approval for the exact current PR head SHA; failed requirements, any finding, missing reviewer evidence, a changed head, merge conflict, or rejected merge fails closed. With `MAINTENANCE_AUTO_MERGE=true`, the wrapper sends that approved SHA as Forgejo's `head_commit_id` and deletes the source branch only after merge succeeds. Set the variable to `false` to keep approved PRs for human merge. See [Automated Claude Code maintenance](https://sunwood-ai-labs.github.io/OpenFace/guide/automated-maintenance).
+The service validates the Forgejo HMAC signature and deduplicates deliveries in PostgreSQL. Claude Code runs as an unprivileged user inside the maintenance container: it has no host Docker socket and cannot read the Forgejo bot token, while retaining normal repository-level tools and test execution. The root wrapper alone commits and pushes after `git diff --check`. It never merges on the implementer's self-assessment. The independent reviewer must return a schema-valid approval for the exact current PR head SHA; failed requirements, any finding, missing reviewer evidence, a changed head, merge conflict, or rejected merge fails closed. With `MAINTENANCE_AUTO_MERGE=true`, the wrapper sends that approved SHA as Forgejo's `head_commit_id` and deletes the source branch only after merge succeeds. Set the variable to `false` to keep approved PRs for human merge. See [Automated Claude Code maintenance](https://sunwood-ai-labs.github.io/OpenFace/guide/automated-maintenance).
 
 UI and application changes have two evidence gates. First, the implementer must run the real app, list the interactions and browser checks it performed, and attach real mobile (≤480px) and desktop (≥1024px) PNG screenshots. Then `review-agent` independently starts the reviewed SHA, repeats the interaction and viewport checks, and attaches its own captures and requirement/test tables. The wrapper validates PNG signatures and actual dimensions for both accounts. Missing viewport coverage, failed checks, console/page errors reported as failures, or a reviewer finding prevents merge. Chromium, Japanese CJK fonts, and color emoji are included in the maintenance image so the captured Japanese UI remains readable.
 

@@ -21,6 +21,7 @@ OpenFace は次のサービスで構成されています。
 | `gateway` | nginx リバースプロキシ（唯一の公開口） | 80/443 (公開: 8090/8443) |
 | `frontend` | HF風ポータル (Next.js + Tailwind) | 3000 |
 | `forgejo` | 改造版 Forgejo（Git + LFS + API + 認証） | 3000 (http), 22 (ssh) |
+| `postgres` | Forgejo・閲覧metrics・自動保守jobの永続化 | 5432（内部のみ） |
 | `spaces-runner` | Docker Space のビルド・起動・プロキシ (FastAPI + Docker SDK) | 8000 |
 | `seed` | 初回起動時に admin ユーザーとサンプルrepoを作成する one-shot ジョブ | - |
 | `forgejo-actions-runner` | VitePressなどの静的サイトをビルドする Forgejo Actions Runner | - |
@@ -85,6 +86,19 @@ flowchart LR
 | ホーム | リポジトリの Files 画面 |
 |---|---|
 | <img src="docs/images/openface-home.png" alt="モデル、Space、データセットを表示する OpenFace のホーム画面" width="100%"> | <img src="docs/images/openface-files.png" alt="OpenFace の Space リポジトリにある Files 画面" width="100%"> |
+
+### Proxmox LXC実機配備
+
+既存のForgejo、閲覧metrics、自動保守job、token、Git repositoryをUbuntu 24.04
+の専用Proxmox LXCへ移行しました。metadataはPostgreSQL、repository本体・LFS・
+credential・runner状態はnamed Docker volumeへ保存します。LXCの完全再起動後も
+全Compose serviceとCPU Spaceが自動復帰することを確認しています。
+
+| LAN上のホーム | 移行後に実行中のSpace |
+|---|---|
+| <img src="docs/evidence/proxmox-lxc/home-lan.png" alt="Proxmox LXCから配信中のOpenFaceホーム" width="100%"> | <img src="docs/evidence/proxmox-lxc/qr-space-running.png" alt="LXC内で実行中のQR Code Generator Space" width="100%"> |
+
+構築・復元・バックアップ手順は[Proxmox LXCへの配備](docs/ja/guide/proxmox-lxc.md)を参照してください。
 
 ### テーマ切替
 
@@ -234,7 +248,7 @@ Prompt詳細の **Revision history** では、`Latest` と実在するGit tagを
 
 ## ⚙️ Spacesのスケーラビリティ
 
-サービスやDBを増やさず、現在のDocker Compose・Forgejo・SQLite構成のまま、リポジトリ数が増えても一覧処理量がほぼ一定になるようにしています。
+Docker Compose・Forgejo・PostgreSQL構成で、リポジトリ数が増えても一覧処理量がほぼ一定になるようにしています。Forgejo、閲覧metrics、自動保守jobは用途別のPostgreSQL databaseへ保存します。
 
 - 一覧は **48件単位**。`/spaces?page=2` の形式で前後移動できます。
 - カードの閲覧数・いいね数は **1回のバッチAPI**、Docker状態は **`/runner-api/spaces` 1回**で取得します。

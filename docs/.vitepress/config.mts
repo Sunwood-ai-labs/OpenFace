@@ -73,6 +73,7 @@ function enNav() {
       items: [
         { text: 'Automated maintenance', link: '/guide/automated-maintenance' },
         { text: 'Visual QA', link: '/guide/visual-qa' },
+        { text: 'Proxmox LXC', link: '/guide/proxmox-lxc' },
         { text: 'Operations', link: '/guide/operations' },
         { text: 'Troubleshooting', link: '/guide/troubleshooting' }
       ]
@@ -97,6 +98,7 @@ function jaNav() {
       items: [
         { text: '自動メンテナンス', link: '/ja/guide/automated-maintenance' },
         { text: 'Visual QA', link: '/ja/guide/visual-qa' },
+        { text: 'Proxmox LXC', link: '/ja/guide/proxmox-lxc' },
         { text: '運用', link: '/ja/guide/operations' },
         { text: 'トラブルシューティング', link: '/ja/guide/troubleshooting' }
       ]
@@ -159,6 +161,7 @@ function guideSidebar(prefix: string, ja = false) {
       { text: 'Docker Spaces', link: `${prefix}/guide/spaces` },
       { text: 'OpenFace Pages', link: `${prefix}/guide/pages` },
       { text: 'Visual QA', link: `${prefix}/guide/visual-qa` },
+      { text: ja ? 'Proxmox LXCへの配備' : 'Proxmox LXC deployment', link: `${prefix}/guide/proxmox-lxc` },
       { text: ja ? '自動メンテナンス' : 'Automated maintenance', link: `${prefix}/guide/automated-maintenance` },
       { text: ja ? '運用' : 'Operations', link: `${prefix}/guide/operations` },
       { text: ja ? 'トラブルシューティング' : 'Troubleshooting', link: `${prefix}/guide/troubleshooting` }

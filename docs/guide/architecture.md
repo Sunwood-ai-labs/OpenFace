@@ -20,6 +20,7 @@ OpenFace exposes one HTTP/HTTPS gateway and keeps application services on a priv
 | `gateway` | nginx routing, TLS termination, WebSocket proxying, and the single public web entrypoint |
 | `frontend` | Next.js discovery portal and repository presentation layer |
 | `forgejo` | Git, LFS, authentication, permissions, issues, pull requests, and Actions metadata |
+| `postgres` | PostgreSQL persistence for Forgejo, metrics, and maintenance state |
 | `spaces-runner` | Space validation, clone, Docker build/run, metrics API, proxy, and Pages file serving |
 | `seed` | Idempotent bootstrap of the admin, token, organization, examples, catalogs, and prompt tags |
 | `forgejo-actions-runner` | Executes Pages workflows against an isolated Docker-in-Docker daemon |
@@ -34,7 +35,7 @@ OpenFace exposes one HTTP/HTTPS gateway and keeps application services on a priv
 
 ## State
 
-Forgejo repositories and configuration, the runner registration, shared control tokens, and agent metrics live in named Docker volumes. Application images and build cache live in Docker. The Git checkout itself contains configuration, UI code, templates, and documentation but no production secrets.
+Forgejo metadata, metrics, and maintenance jobs live in three PostgreSQL databases. Git repository files, LFS objects, the runner registration, shared control tokens, and agent credentials live in named Docker volumes. Application images and build cache live in Docker. The Git checkout itself contains configuration, UI code, templates, and documentation but no production secrets.
 
 ## Trust model
 
