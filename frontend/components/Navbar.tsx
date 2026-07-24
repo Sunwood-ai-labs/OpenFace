@@ -135,9 +135,11 @@ export default function Navbar() {
                 key={item.href}
                 href={item.href}
                 aria-current={isCurrent(item.href) ? 'page' : undefined}
-                className="openface-mobile-nav-link flex items-center gap-3"
+                className="openface-mobile-nav-link"
               >
-                <HfIcon name={item.icon} className="h-4 w-4 text-zinc-400" />
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                  <HfIcon name={item.icon} className="h-4 w-4" />
+                </span>
                 {item.label}
               </Link>
             ))}
@@ -145,12 +147,22 @@ export default function Navbar() {
               href="/git/explore/repos"
               aria-current={isCurrent('/git/explore/repos') ? 'page' : undefined}
               className="openface-mobile-nav-link"
-            >{ui(locale, 'リポジトリ', 'Repositories')}</a>
+            >
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                <HfIcon name="folder" className="h-4 w-4" />
+              </span>
+              {ui(locale, 'リポジトリ', 'Repositories')}
+            </a>
             <a
               href="/git/explore/users"
               aria-current={isCurrent('/git/explore/users') ? 'page' : undefined}
               className="openface-mobile-nav-link"
-            >{ui(locale, 'ユーザー', 'Users')}</a>
+            >
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                <HfIcon name="users" className="h-4 w-4" />
+              </span>
+              {ui(locale, 'ユーザー', 'Users')}
+            </a>
           </div>
         </details>
       </div>

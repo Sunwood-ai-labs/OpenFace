@@ -40,6 +40,7 @@ import {
   faStar,
   faTableCells,
   faTrophy,
+  faUsers,
   faVideo,
   faWandMagicSparkles,
 } from '@fortawesome/free-solid-svg-icons';
@@ -87,6 +88,7 @@ const icons = {
   star: faStar,
   table: faTableCells,
   trophy: faTrophy,
+  users: faUsers,
   video: faVideo,
 } satisfies Record<string, IconDefinition>;
 

@@ -82,7 +82,10 @@ header details[open] > .openface-mobile-menu-toggle {
    sticky touch-hover. This avoids iOS leaving a white hover rectangle behind
    after navigation, especially when the cyberpunk palette is active. */
 .openface-mobile-nav-link {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
   border: 1px solid transparent;
   border-radius: 8px;
   padding: 8px 12px;
