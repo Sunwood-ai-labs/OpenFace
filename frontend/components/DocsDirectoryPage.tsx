@@ -34,44 +34,52 @@ function formatLabel(value: DocFormat, formats: ReturnType<typeof knowledgeForma
 function DocCard({ article, locale, formats }: { article: KnowledgeArticle; locale: Locale; formats: ReturnType<typeof knowledgeFormats> }) {
   const format = article.format;
   const topics = article.topics.slice(0, 3);
+  const coverTone = format === 'article'
+    ? 'from-[#f7d9c4] via-[#f2a878] to-[#da6b43] text-[#4d2115]'
+    : format === 'procedure'
+      ? 'from-[#c8ebe4] via-[#73cabb] to-[#267d72] text-[#123f39]'
+      : 'from-[#dce3f6] via-[#9caed8] to-[#566ea7] text-[#17284d]';
 
   return (
-    <article className="openface-doc-row group relative grid min-w-0 grid-cols-[68px_minmax(0,1fr)] gap-4 border-t border-zinc-200 py-5 transition-colors dark:border-zinc-800 sm:grid-cols-[80px_minmax(0,1fr)_auto] sm:gap-5 sm:px-2">
-      <Link href={docHref(article)} aria-hidden="true" tabIndex={-1} className="openface-doc-emoji grid h-[68px] w-[68px] place-items-center rounded-2xl bg-[#e7f2f0] text-3xl transition-transform group-hover:-translate-y-0.5 sm:h-20 sm:w-20 sm:text-4xl">
-        {article.emoji}
-      </Link>
-      <div className="min-w-0">
-        <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em]">
-          <span className="text-teal-800 dark:text-teal-300">{formatLabel(format, formats)}</span>
-          <span className="text-zinc-300 dark:text-zinc-700">/</span>
-          <span className="text-zinc-500 dark:text-zinc-400">{ui(locale, `読了 ${article.readingMinutes}分`, `${article.readingMinutes} min read`)}</span>
-        </div>
-        <Link href={docHref(article)} className="block text-[17px] font-bold leading-snug text-zinc-950 transition group-hover:text-teal-900 dark:text-zinc-100 dark:group-hover:text-teal-200 sm:text-xl">
-          {article.title}
-        </Link>
-        <p className="mt-1 hidden max-w-3xl text-sm leading-6 text-zinc-600 dark:text-zinc-400 sm:line-clamp-1 sm:block">
-          {article.description}
-        </p>
-        <p className="mt-2 flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+    <article className="openface-doc-card group relative flex min-w-0 flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_8px_24px_rgba(24,24,27,0.04)] transition duration-200 hover:-translate-y-1 hover:border-teal-700 hover:shadow-[0_18px_38px_rgba(15,118,110,0.12)] dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-teal-400">
+      <Link href={docHref(article)} aria-label={ui(locale, `${article.title}を読む`, `Read ${article.title}`)} className="absolute inset-0 z-10" />
+      <div className={`relative flex min-h-32 items-start justify-between overflow-hidden bg-gradient-to-br p-5 ${coverTone}`}>
+        <div className="pointer-events-none absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,.55)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.55)_1px,transparent_1px)] [background-size:22px_22px]" />
+        <span className="relative rounded-full border border-current/20 bg-white/65 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.14em] backdrop-blur-sm">
+          {formatLabel(format, formats)}
+        </span>
+        <span className="relative grid h-16 w-16 place-items-center rounded-2xl border border-white/50 bg-white/55 text-4xl shadow-sm backdrop-blur-sm transition-transform duration-200 group-hover:scale-105 group-hover:-rotate-2">
+          {article.emoji}
+        </span>
+      </div>
+      <div className="relative flex flex-1 flex-col p-5">
+        <div className="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-[0.1em] text-zinc-500 dark:text-zinc-400">
           <strong className="text-zinc-700 dark:text-zinc-300">{article.owner}</strong>
           <span>·</span>
           <span>{locale === 'ja' ? timeAgoJa(article.updatedAt) : timeAgoEn(article.updatedAt)}</span>
           <span>·</span>
           <KnowledgeViewCount owner={article.owner} repo={article.repository} slug={article.slug} initialViews={article.views} />
+        </div>
+        <h3 className="mt-3 text-xl font-bold leading-snug text-zinc-950 transition group-hover:text-teal-900 dark:text-zinc-100 dark:group-hover:text-teal-200">
+          {article.title}
+        </h3>
+        <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+          {article.description}
         </p>
         {topics.length > 0 ? (
-          <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
+          <div className="relative z-20 mt-auto flex flex-wrap gap-2 pt-5">
             {topics.map((topic) => (
-              <Link key={topic} href={`/docs?q=${encodeURIComponent(topic)}`} className="font-mono text-[11px] uppercase tracking-wide text-zinc-500 hover:text-teal-800 hover:underline dark:text-zinc-400 dark:hover:text-teal-300">
+              <Link key={topic} href={`/docs?tag=${encodeURIComponent(topic)}`} className="rounded-full bg-zinc-100 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wide text-zinc-600 hover:bg-teal-100 hover:text-teal-900 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-teal-950 dark:hover:text-teal-200">
                 #{topic}
               </Link>
             ))}
           </div>
         ) : null}
+        <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-4 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+          <span>{ui(locale, `読了 ${article.readingMinutes}分`, `${article.readingMinutes} min read`)}</span>
+          <span className="inline-flex items-center gap-1 font-bold text-teal-800 dark:text-teal-300">{ui(locale, '読む', 'Read')} <HfIcon name="arrowRight" className="h-3 w-3" /></span>
+        </div>
       </div>
-      <Link href={docHref(article)} aria-label={ui(locale, `${article.title}を読む`, `Read ${article.title}`)} className="hidden h-9 items-center gap-2 self-center px-3 text-xs font-bold text-zinc-500 transition hover:text-teal-800 dark:text-zinc-400 dark:hover:text-teal-300 sm:inline-flex">
-        {ui(locale, '読む', 'Read')} <HfIcon name="arrowRight" className="h-3 w-3" />
-      </Link>
     </article>
   );
 }
@@ -258,7 +266,7 @@ export default async function DocsDirectoryPage({
                   </div>
                   <span className="font-mono text-xs text-zinc-500">{ui(locale, `${docs.length}件`, `${docs.length} items`)}</span>
                 </div>
-                <div>
+                <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                   {(remaining.length ? remaining : docs).map((article) => <DocCard key={article.id} article={article} locale={locale} formats={formats} />)}
                 </div>
               </div>
