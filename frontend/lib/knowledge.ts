@@ -8,6 +8,7 @@ export interface KnowledgeArticle {
   slug: string;
   title: string;
   description: string;
+  formats: KnowledgeFormat[];
   format: KnowledgeFormat;
   topics: string[];
   owner: string;
@@ -39,6 +40,15 @@ function list(value: unknown): string[] {
   if (Array.isArray(value)) return value.map(String).map((item) => item.trim()).filter(Boolean);
   if (typeof value === 'string') return value.split(',').map((item) => item.trim()).filter(Boolean);
   return [];
+}
+
+function normalizeFormat(value: string): KnowledgeFormat | null {
+  const normalized = value.toLowerCase() === 'guide'
+    ? 'procedure'
+    : value.toLowerCase() === 'reference'
+      ? 'wiki'
+      : value.toLowerCase();
+  return formats.has(normalized as KnowledgeFormat) ? normalized as KnowledgeFormat : null;
 }
 
 function firstHeading(markdown: string, fallback: string): string {
@@ -83,11 +93,12 @@ async function loadPublication(repo: Repo): Promise<KnowledgeArticle[]> {
     if (!raw) return null;
     const parsed = parseReadme(raw);
     if (parsed.frontmatter.published === false) return null;
-    const rawFormat = String(parsed.frontmatter.format || parsed.frontmatter.type || 'article').toLowerCase();
-    const normalizedFormat = rawFormat === 'guide' ? 'procedure' : rawFormat === 'reference' ? 'wiki' : rawFormat;
-    const format = formats.has(normalizedFormat as KnowledgeFormat)
-      ? normalizedFormat as KnowledgeFormat
-      : directory.format;
+    const declaredFormats = [
+      ...list(parsed.frontmatter.formats),
+      ...list(parsed.frontmatter.format || parsed.frontmatter.type),
+    ].map(normalizeFormat).filter(Boolean) as KnowledgeFormat[];
+    const articleFormats = [...new Set(declaredFormats.length ? declaredFormats : [directory.format])];
+    const format = articleFormats[0] || directory.format;
     const slug = entry.name.replace(/\.md$/i, '');
     const title = typeof parsed.frontmatter.title === 'string'
       ? parsed.frontmatter.title.trim()
@@ -102,6 +113,7 @@ async function loadPublication(repo: Repo): Promise<KnowledgeArticle[]> {
       slug,
       title,
       description,
+      formats: articleFormats,
       format,
       topics,
       owner,
@@ -134,7 +146,7 @@ export async function searchKnowledgeArticles(
   let articles = (await Promise.all(publications.data.map(loadPublication))).flat();
   if (query) {
     const needle = query.toLocaleLowerCase();
-    articles = articles.filter((article) => [article.title, article.description, article.owner, article.repository, ...article.topics]
+    articles = articles.filter((article) => [article.title, article.description, article.owner, article.repository, ...article.formats, ...article.topics]
       .some((value) => value.toLocaleLowerCase().includes(needle)));
   }
   articles.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));

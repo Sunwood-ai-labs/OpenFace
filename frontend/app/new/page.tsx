@@ -296,7 +296,7 @@ export default async function NewRepoGuidePage({
                 <div className="flex flex-wrap gap-1.5" aria-label="Doc topic example">
                   {['doc', 'knowledge', 'markdown'].map((topic) => <code key={topic} className="rounded bg-zinc-100 px-2 py-1 text-xs text-zinc-700">{topic}</code>)}
                 </div>
-                <p><strong className="text-zinc-700">{ui(locale, '記事形式:', 'Article formats:')}</strong> article · wiki · guide · reference</p>
+                <p><strong className="text-zinc-700">{ui(locale, '表示形式（複数可）:', 'Display roles (composable):')}</strong> article · procedure · wiki</p>
                 <a href="/openface/docs-publishing-quickstart" className="inline-flex items-center gap-1.5 font-semibold text-teal-800 hover:underline">{ui(locale, '公開クイックスタートを読む', 'Read the publishing quickstart')} <HfIcon name="arrowRight" className="h-3 w-3" /></a>
               </div>
             ) : isCharacter ? (

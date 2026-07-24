@@ -2278,7 +2278,7 @@ OpenFaceチームがGitで管理するナレッジ公開リポジトリです。
 
 ## 記事を追加する
 
-Store each file in the directory that matches how readers will use it:
+Store each file in a convenient directory, then attach every reader-facing role it serves:
 
 - `articles/{slug}.md` for essays, reports, and field notes
 - `procedures/{slug}.md` for repeatable steps and checklists
@@ -2289,28 +2289,30 @@ Add front matter to every file:
 ```yaml
 ---
 title: 私の調査メモ
-format: article
+formats: [article, wiki]
 topics: [research, local-ai]
 published: true
 ---
 ```
 
-OpenFaceは公開対象のファイルを`/docs`へ集約します。形式には`article`、
-`procedure`、`wiki`を使用します。通常のGitとプルリクエストの
-流れで、記事を編集・レビューできます。
+OpenFaceは公開対象のファイルを`/docs`へ集約します。`formats`には
+`article`、`procedure`、`wiki`を複数指定できます。保存先は整理用で、
+通常のGitとプルリクエストの流れで編集・レビューできます。
 EOF
 put_file "openface-knowledge" "README.md" "${WORKDIR}/knowledge_repo_readme.md" "Explain the knowledge publication format"
 
 create_doc_fixture() {
   local name="$1" description="$2" format="$3" tag1="$4" tag2="$5" source_file="$6"
+  local format_list="${7:-[$format]}"
   local staged_file="${WORKDIR}/knowledge_${name}.md"
   local directory="articles"
   if [ "$format" = "procedure" ]; then directory="procedures"; fi
   if [ "$format" = "wiki" ]; then directory="wiki"; fi
-  awk -v format="$format" -v description="$description" '
+  awk -v format="$format" -v format_list="$format_list" -v description="$description" '
     NR == 1 && $0 == "---" {
       print
       print "format: " format
+      print "formats: " format_list
       print "description: \"" description "\""
       print "published: true"
       next
@@ -2345,7 +2347,7 @@ OpenFaceはGit履歴を信頼できる情報源とし、Dockerを実行境界と
 
 > ローカルファーストは孤立ではありません。所有権の境界を自分たちで決める設計です。
 EOF
-create_doc_fixture "local-first-ai-hub" "Gitで管理する知識が、ローカルAIコミュニティを長く支える理由" "article" "architecture" "local-first" "${WORKDIR}/doc_local_first.md"
+create_doc_fixture "local-first-ai-hub" "Gitで管理する知識が、ローカルAIコミュニティを長く支える理由" "article" "architecture" "local-first" "${WORKDIR}/doc_local_first.md" "[article, wiki]"
 
 cat > "${WORKDIR}/doc_platform_atlas.md" <<'EOF'
 ---
@@ -2393,7 +2395,7 @@ CPUまたは通常のDockerワークロードとして、アプリをOpenFace内
 
 Gradio、Streamlit、FastAPI、Node.js、静的HTML、React、Vue、Next.jsは同じルールで動かせます。フレームワーク固有のベースパス対応は、カタログではなくアプリのイメージ側で行います。
 EOF
-create_doc_fixture "docker-space-field-guide" "DockerfileからOpenFace Spaceを起動するまでの実践手順" "procedure" "spaces" "docker" "${WORKDIR}/doc_docker_spaces.md"
+create_doc_fixture "docker-space-field-guide" "DockerfileからOpenFace Spaceを起動するまでの実践手順" "procedure" "spaces" "docker" "${WORKDIR}/doc_docker_spaces.md" "[procedure, wiki]"
 
 cat > "${WORKDIR}/doc_agent_ops.md" <<'EOF'
 ---
@@ -2467,7 +2469,7 @@ tags: [visual-qa, themes, mobile]
 
 URL、画面サイズ、テーマ、操作、期待結果、実際の結果、画像パスを記録します。対応する画面証跡がないテスト成功だけでは、UIを承認しません。
 EOF
-create_doc_fixture "visual-qa-field-notes" "スクリーンショットを再現可能なUIレビュー証跡にする方法" "article" "visual-qa" "themes" "${WORKDIR}/doc_visual_qa.md"
+create_doc_fixture "visual-qa-field-notes" "スクリーンショットを再現可能なUIレビュー証跡にする方法" "article" "visual-qa" "themes" "${WORKDIR}/doc_visual_qa.md" "[article, procedure]"
 
 cat > "${WORKDIR}/doc_cpu_first.md" <<'EOF'
 ---
@@ -2632,7 +2634,7 @@ Forgejoで`doc`、`knowledge`、`markdown`トピックを追加します。
 ```yaml
 ---
 title: 最初の調査メモ
-format: article
+formats: [article, wiki]
 topics: [local-ai, research]
 published: true
 ---

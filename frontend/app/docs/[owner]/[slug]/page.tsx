@@ -25,11 +25,11 @@ export default async function KnowledgeArticlePage({ params }: { params: Promise
   if (!article) notFound();
   const metrics = await getKnowledgeMetricsBatch([{ owner: article.owner, repo: article.repository, slug: article.slug }]);
   const views = metrics[`${article.owner}/${article.repository}/${article.slug}`]?.views || 0;
-  const formatLabel = article.format === 'article'
+  const formatLabels = article.formats.map((format) => format === 'article'
     ? ui(locale, '記事', 'Article')
-    : article.format === 'procedure'
+    : format === 'procedure'
       ? ui(locale, '手順', 'Procedure')
-      : 'Wiki';
+      : 'Wiki');
 
   return (
     <article className="openface-knowledge-article min-h-screen">
@@ -41,7 +41,9 @@ export default async function KnowledgeArticlePage({ params }: { params: Promise
       </div>
       <header className="openface-article-hero border-y border-zinc-200 px-5 py-12 text-center dark:border-zinc-800 sm:px-8 sm:py-16">
         <div className="openface-article-emoji mx-auto grid h-28 w-28 place-items-center rounded-[2rem] text-6xl sm:h-36 sm:w-36 sm:text-7xl">{article.emoji}</div>
-        <p className="mt-7 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-teal-800 dark:text-teal-300">{formatLabel}</p>
+        <div className="mt-7 flex flex-wrap justify-center gap-2">
+          {formatLabels.map((label) => <span key={label} className="rounded-full border border-teal-800/30 px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-teal-800 dark:border-teal-300/40 dark:text-teal-300">{label}</span>)}
+        </div>
         <h1 className="mx-auto mt-8 max-w-[820px] font-serif text-[clamp(2.25rem,6vw,4.5rem)] font-semibold leading-[1.08] tracking-[-0.035em] text-zinc-950 dark:text-zinc-100">{article.title}</h1>
         <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400 sm:text-lg">{article.description}</p>
         <p className="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
