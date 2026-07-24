@@ -16,6 +16,20 @@ body {
   background-color: #fafafa;
 }
 
+/* One predictable safe area for every portal page. Individual page
+   components may add their own editorial spacing, but no content begins at
+   the viewport edge. Full-screen Space apps opt out below. */
+.openface-page-frame {
+  box-sizing: border-box;
+  padding-inline: 32px;
+}
+
+@media (max-width: 767px) {
+  .openface-page-frame {
+    padding-inline: 20px;
+  }
+}
+
 /* The image-generated cat identity is shared by the navbar, hero, footer,
    favicon, and touch icon. The wrapper only supplies crisp UI framing. */
 .openface-brand-mark {
@@ -1494,13 +1508,11 @@ body:has(.openface-space-app-page) > footer {
 
 body:has(.openface-space-app-page) > main {
   max-width: none;
-  padding: 0;
+  padding-inline: 0;
 }
 
 body:has(.openface-spaces-directory) > main {
-  max-width: none;
-  padding-left: 0;
-  padding-right: 0;
+  max-width: 1600px;
 }
 
 /* Keep repository identity and status crisp above tabs and embedded content. */

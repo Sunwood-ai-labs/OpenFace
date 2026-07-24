@@ -37,7 +37,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="min-h-screen bg-white text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
         <LocaleProvider initialLocale={locale}>
           <Navbar />
-          <main className="mx-auto w-full max-w-[1544px] px-0 py-0">{children}</main>
+          <main
+            data-openface-page-frame
+            className="openface-page-frame mx-auto w-full max-w-[1600px] py-0"
+          >
+            {children}
+          </main>
           <Footer />
         </LocaleProvider>
       </body>
