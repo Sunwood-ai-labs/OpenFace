@@ -1,7 +1,7 @@
 import { getContents, getTextFile, Repo, searchReposByTopicAndQuery, SortOption } from './forgejo';
 import { parseReadme } from './markdown';
 
-export type KnowledgeFormat = 'article' | 'procedure' | 'wiki';
+export type KnowledgeFormat = 'article' | 'procedure' | 'wiki' | 'news';
 
 export interface KnowledgeArticle {
   id: string;
@@ -29,11 +29,12 @@ export interface KnowledgeSearchResult {
   totalCount: number;
 }
 
-const formats = new Set<KnowledgeFormat>(['article', 'procedure', 'wiki']);
+const formats = new Set<KnowledgeFormat>(['article', 'procedure', 'wiki', 'news']);
 const contentDirectories: Array<{ path: string; format: KnowledgeFormat }> = [
   { path: 'articles', format: 'article' },
   { path: 'procedures', format: 'procedure' },
   { path: 'wiki', format: 'wiki' },
+  { path: 'news', format: 'news' },
 ];
 
 function list(value: unknown): string[] {
@@ -67,9 +68,11 @@ const formatEmoji: Record<KnowledgeFormat, string> = {
   article: '✍️',
   wiki: '🧭',
   procedure: '🛠️',
+  news: '📰',
 };
 
 const topicEmoji: Array<{ topics: string[]; emoji: string }> = [
+  { topics: ['news', 'release'], emoji: '📰' },
   { topics: ['recovery'], emoji: '🛟' },
   { topics: ['configuration'], emoji: '⚙️' },
   { topics: ['services'], emoji: '🏗️' },
@@ -92,6 +95,7 @@ const fallbackEmoji: Record<KnowledgeFormat, string[]> = {
   article: ['✍️', '💡', '📝', '🔭', '🧪', '🪶'],
   procedure: ['🛠️', '🧰', '🧭', '✅', '🚦', '🪜'],
   wiki: ['🧭', '📚', '🗺️', '🔖', '🧱', '🧬'],
+  news: ['📰', '📣', '⚡', '🗞️', '📡', '🔔'],
 };
 
 function publicationEmoji(slug: string, topics: string[], format: KnowledgeFormat): string {

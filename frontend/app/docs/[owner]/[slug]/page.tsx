@@ -29,7 +29,9 @@ export default async function KnowledgeArticlePage({ params }: { params: Promise
     ? ui(locale, '記事', 'Article')
     : format === 'procedure'
       ? ui(locale, '手順', 'Procedure')
-      : 'Wiki');
+      : format === 'news'
+        ? ui(locale, 'ニュース', 'News')
+        : 'Wiki');
 
   return (
     <article className="openface-knowledge-article min-h-screen">

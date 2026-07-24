@@ -37,6 +37,12 @@ function knowledgeFormats(locale: Locale): FormatDefinition[] {
       description: ui(locale, '育ち続ける共有ページ', 'Living shared pages'),
       icon: 'model',
     },
+    {
+      value: 'news',
+      label: ui(locale, 'ニュース', 'News'),
+      description: ui(locale, '更新情報とコミュニティ速報', 'Updates and community briefs'),
+      icon: 'clock',
+    },
   ];
 }
 
@@ -49,6 +55,9 @@ function formatLabel(value: DocFormat, formats: FormatDefinition[]) {
 }
 
 function cardTone(format: DocFormat) {
+  if (format === 'news') {
+    return 'from-[#9f1239] via-[#db2777] to-[#f97316]';
+  }
   if (format === 'article') {
     return 'from-[#b84a20] via-[#d36b2e] to-[#ef9a3d]';
   }
