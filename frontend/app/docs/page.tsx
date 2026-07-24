@@ -8,14 +8,14 @@ export async function generateMetadata() {
   const locale = await getLocale();
   return {
     title: `${ui(locale, 'ナレッジ', 'Knowledge')} - OpenFace`,
-    description: ui(locale, 'Gitで管理された記事、Wiki、ガイド、リファレンスを閲覧できます。', 'Browse Git-backed articles, Wiki nodes, guides, and reference material on OpenFace.'),
+    description: ui(locale, 'Gitで管理された記事、手順、Wikiを閲覧できます。', 'Browse Git-backed articles, procedures, and Wiki pages on OpenFace.'),
   };
 }
 
 export default async function DocsPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ q?: string; sort?: string; type?: string }>;
+  searchParams?: Promise<{ q?: string; sort?: string; type?: string; tag?: string }>;
 }) {
   return <DocsDirectoryPage searchParams={await searchParams} />;
 }

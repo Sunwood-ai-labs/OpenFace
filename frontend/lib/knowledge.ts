@@ -1,7 +1,7 @@
 import { getContents, getTextFile, Repo, searchReposByTopicAndQuery, SortOption } from './forgejo';
 import { parseReadme } from './markdown';
 
-export type KnowledgeFormat = 'article' | 'wiki' | 'guide' | 'reference';
+export type KnowledgeFormat = 'article' | 'procedure' | 'wiki';
 
 export interface KnowledgeArticle {
   id: string;
@@ -17,6 +17,7 @@ export interface KnowledgeArticle {
   updatedAt: string;
   emoji: string;
   readingMinutes: number;
+  views: number;
   bodyHtml?: string;
   bodyMarkdown?: string;
 }
@@ -27,7 +28,12 @@ export interface KnowledgeSearchResult {
   totalCount: number;
 }
 
-const formats = new Set<KnowledgeFormat>(['article', 'wiki', 'guide', 'reference']);
+const formats = new Set<KnowledgeFormat>(['article', 'procedure', 'wiki']);
+const contentDirectories: Array<{ path: string; format: KnowledgeFormat }> = [
+  { path: 'articles', format: 'article' },
+  { path: 'procedures', format: 'procedure' },
+  { path: 'wiki', format: 'wiki' },
+];
 
 function list(value: unknown): string[] {
   if (Array.isArray(value)) return value.map(String).map((item) => item.trim()).filter(Boolean);
@@ -50,8 +56,7 @@ function firstParagraph(markdown: string): string {
 const formatEmoji: Record<KnowledgeFormat, string> = {
   article: '✍️',
   wiki: '🧭',
-  guide: '🛠️',
-  reference: '📚',
+  procedure: '🛠️',
 };
 
 function readingMinutes(markdown: string): number {
@@ -62,17 +67,27 @@ function readingMinutes(markdown: string): number {
 
 async function loadPublication(repo: Repo): Promise<KnowledgeArticle[]> {
   const owner = repo.owner?.login || repo.full_name.split('/')[0];
-  const entries = await getContents(owner, repo.name, 'articles', repo.default_branch);
-  if (!entries.ok || !Array.isArray(entries.data)) return [];
-
-  const markdownFiles = entries.data.filter((entry) => entry.type === 'file' && /\.md$/i.test(entry.name));
-  const loaded = await Promise.all(markdownFiles.map(async (entry) => {
+  const directoryEntries = await Promise.all(contentDirectories.map(async (directory) => ({
+    directory,
+    result: await getContents(owner, repo.name, directory.path, repo.default_branch),
+  })));
+  const markdownFiles = directoryEntries.flatMap(({ directory, result }) => (
+    result.ok && Array.isArray(result.data)
+      ? result.data
+        .filter((entry) => entry.type === 'file' && /\.md$/i.test(entry.name))
+        .map((entry) => ({ entry, directory }))
+      : []
+  ));
+  const loaded = await Promise.all(markdownFiles.map(async ({ entry, directory }) => {
     const raw = await getTextFile(owner, repo.name, entry.path, repo.default_branch);
     if (!raw) return null;
     const parsed = parseReadme(raw);
     if (parsed.frontmatter.published === false) return null;
     const rawFormat = String(parsed.frontmatter.format || parsed.frontmatter.type || 'article').toLowerCase();
-    const format = formats.has(rawFormat as KnowledgeFormat) ? rawFormat as KnowledgeFormat : 'article';
+    const normalizedFormat = rawFormat === 'guide' ? 'procedure' : rawFormat === 'reference' ? 'wiki' : rawFormat;
+    const format = formats.has(normalizedFormat as KnowledgeFormat)
+      ? normalizedFormat as KnowledgeFormat
+      : directory.format;
     const slug = entry.name.replace(/\.md$/i, '');
     const title = typeof parsed.frontmatter.title === 'string'
       ? parsed.frontmatter.title.trim()
@@ -96,11 +111,18 @@ async function loadPublication(repo: Repo): Promise<KnowledgeArticle[]> {
       updatedAt: typeof parsed.frontmatter.updated === 'string' ? parsed.frontmatter.updated : repo.updated_at,
       emoji: typeof parsed.frontmatter.emoji === 'string' ? parsed.frontmatter.emoji.trim() : formatEmoji[format],
       readingMinutes: readingMinutes(parsed.bodyMarkdown),
+      views: 0,
       bodyHtml: parsed.bodyHtml,
       bodyMarkdown: parsed.bodyMarkdown,
     } satisfies KnowledgeArticle;
   }));
-  return loaded.filter(Boolean) as KnowledgeArticle[];
+  const unique = new Map<string, KnowledgeArticle>();
+  for (const article of loaded.filter(Boolean) as KnowledgeArticle[]) {
+    const existing = unique.get(article.slug);
+    const expectedDirectory = contentDirectories.find((item) => item.format === article.format)?.path;
+    if (!existing || article.path.startsWith(`${expectedDirectory}/`)) unique.set(article.slug, article);
+  }
+  return [...unique.values()];
 }
 
 export async function searchKnowledgeArticles(
