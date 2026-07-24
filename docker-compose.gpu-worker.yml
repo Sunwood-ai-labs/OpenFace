@@ -20,6 +20,7 @@ services:
       WORKER_NAME: ${WORKER_NAME:-local-gpu-01}
       WORKER_PUBLIC_URL: ${WORKER_PUBLIC_URL:?Set the Tailscale URL of this worker}
       WORKER_DOCKER_NETWORK: openface-gpu-worker
+      WORKER_ENROLLMENT_TOKEN: ${WORKER_ENROLLMENT_TOKEN:-}
       WORKER_ENROLLMENT_TOKEN_FILE: /run/secrets/openface-worker-enrollment-token
       MAX_GPU_JOBS: ${MAX_GPU_JOBS:-1}
       OPENFACE_VERIFY_TLS: ${OPENFACE_VERIFY_TLS:-true}
