@@ -81,7 +81,7 @@ function DocCard({
       <div className="pointer-events-none absolute inset-0 opacity-[0.13] [background-image:linear-gradient(rgba(255,255,255,.55)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.55)_1px,transparent_1px)] [background-size:22px_22px]" />
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-6 -right-4 z-0 select-none text-[112px] leading-none opacity-[0.10] grayscale-[0.15] transition duration-300 group-hover:scale-105 group-hover:opacity-[0.14]"
+        className="pointer-events-none absolute -bottom-6 -right-4 z-0 select-none text-[112px] leading-none opacity-[0.16] grayscale-[0.15] transition duration-300 group-hover:scale-105 group-hover:opacity-[0.21]"
       >
         {article.emoji}
       </span>
