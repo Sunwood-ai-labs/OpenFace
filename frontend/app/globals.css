@@ -4,7 +4,8 @@
 
 html {
   scroll-behavior: smooth;
-  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --openface-ui-font: "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", "Meiryo UI", Meiryo, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--openface-ui-font);
 }
 
 details > summary {
@@ -27,7 +28,8 @@ textarea {
 
 /* Editorial serif is retained for English, while Japanese headings use one
    consistent UI Gothic face across navigation, cards, and long-form pages. */
-.font-serif:lang(ja) {
+.font-serif:lang(ja),
+.font-mono:lang(ja) {
   font-family: inherit;
   letter-spacing: normal;
 }
@@ -1062,7 +1064,7 @@ html[data-openface-theme="cyberpunk"] [class*="dark:bg-zinc-700"] {
   max-width: 100%;
   overflow-wrap: break-word;
   color: #1f2328;
-  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--openface-ui-font);
   font-size: 16px;
   line-height: 1.5;
 }
