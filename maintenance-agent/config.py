@@ -36,6 +36,7 @@ class Settings:
     max_workers: int
     agent_token_dir: Path
     auto_merge: bool
+    database_url: str
 
     @classmethod
     def load(cls) -> "Settings":
@@ -55,6 +56,7 @@ class Settings:
             max_workers=max(1, min(_integer("MAINTENANCE_MAX_WORKERS", 2), 4)),
             agent_token_dir=Path(os.getenv("MAINTENANCE_AGENT_TOKEN_DIR", "/shared/agent-tokens")),
             auto_merge=_boolean("MAINTENANCE_AUTO_MERGE"),
+            database_url=os.getenv("DATABASE_URL", ""),
         )
 
     def agent_token_file(self, username: str) -> Path:

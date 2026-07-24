@@ -15,8 +15,30 @@ volumes:
     name: openface_forgejo-runner-data
   maintenance-agent-data:
     name: openface_maintenance-agent-data
+  postgres-data:
+    name: openface_postgres-data
 
 services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: openface-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-openface}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-openface-postgres}
+      POSTGRES_DB: forgejo
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - openface
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-openface} -d forgejo"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
   gateway:
     build:
       context: ./gateway
@@ -78,12 +100,20 @@ services:
       FORGEJO__session__COOKIE_NAME: openface_session
       FORGEJO__webhook__ALLOWED_HOST_LIST: "*"
       FORGEJO__security__INSTALL_LOCK: "true"
-      FORGEJO__database__DB_TYPE: sqlite3
+      FORGEJO__database__DB_TYPE: postgres
+      FORGEJO__database__HOST: postgres:5432
+      FORGEJO__database__NAME: forgejo
+      FORGEJO__database__USER: ${POSTGRES_USER:-openface}
+      FORGEJO__database__PASSWD: ${POSTGRES_PASSWORD:-openface-postgres}
+      FORGEJO__database__SSL_MODE: disable
       FORGEJO__actions__ENABLED: "true"
     volumes:
       - forgejo-data:/data
     networks:
       - openface
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:3000/api/healthz"]
       interval: 10s
@@ -106,6 +136,7 @@ services:
       IDLE_TIMEOUT_MINUTES: ${IDLE_TIMEOUT_MINUTES:-0}
       MAX_RUNNING_SPACES: ${MAX_RUNNING_SPACES:-24}
       AGENT_DATA_DIR: /data/agents
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openface}:${POSTGRES_PASSWORD:-openface-postgres}@postgres:5432/openface_metrics
     volumes:
       - shared-token:/shared:ro
       - agent-metrics-data:/data/agents
@@ -114,6 +145,8 @@ services:
       - openface
     depends_on:
       forgejo:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
 
   seed:
@@ -165,6 +198,7 @@ services:
       MAINTENANCE_DATA_DIR: /data
       MAINTENANCE_WORKSPACE_DIR: /work
       MAINTENANCE_AGENT_TOKEN_DIR: /shared/agent-tokens
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openface}:${POSTGRES_PASSWORD:-openface-postgres}@postgres:5432/openface_maintenance
     volumes:
       - shared-token:/shared:ro
       - maintenance-agent-data:/data
@@ -173,6 +207,8 @@ services:
     depends_on:
       seed:
         condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8010/health', timeout=3)"]
       interval: 15s

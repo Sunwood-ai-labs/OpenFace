@@ -37,7 +37,10 @@ MEMORY_LIMIT = "2g"
 REAPER_INTERVAL_SECONDS = 60
 
 AGENT_DATA_DIR: str = os.environ.get("AGENT_DATA_DIR", "/data/agents")
-AGENT_DB_PATH: str = os.path.join(AGENT_DATA_DIR, "metrics.sqlite3")
+DATABASE_URL: str = os.environ.get(
+    "DATABASE_URL",
+    "postgresql://openface:openface-postgres@postgres:5432/openface_metrics",
+)
 AGENT_CREDENTIALS_FILE: str = os.path.join(AGENT_DATA_DIR, "credentials.json")
 
 

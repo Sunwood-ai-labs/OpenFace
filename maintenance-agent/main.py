@@ -4,17 +4,16 @@ import hashlib
 import hmac
 import json
 import logging
-import sqlite3
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import closing
 from datetime import datetime, timezone
-from pathlib import Path
 from threading import Lock
 from collections.abc import Callable
 from typing import Any
 
+import psycopg
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import JSONResponse
+from psycopg.rows import dict_row
 
 from agents import (
     AGENTS,
@@ -36,7 +35,7 @@ logger = logging.getLogger("openface-maintenance")
 settings = Settings.load()
 settings.data_dir.mkdir(parents=True, exist_ok=True)
 settings.workspace_dir.mkdir(parents=True, exist_ok=True)
-database_path = settings.data_dir / "jobs.sqlite3"
+database_url = settings.database_url
 database_lock = Lock()
 executor = ThreadPoolExecutor(max_workers=settings.max_workers, thread_name_prefix="claude-goal-maintenance")
 worker = MaintenanceWorker(settings)
@@ -47,8 +46,14 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def connect_database() -> psycopg.Connection:
+    if not database_url:
+        raise RuntimeError("DATABASE_URL is required")
+    return psycopg.connect(database_url, row_factory=dict_row)
+
+
 def initialize_database() -> None:
-    with closing(sqlite3.connect(database_path)) as db, db:
+    with connect_database() as db:
         db.execute(
             """
             CREATE TABLE IF NOT EXISTS jobs (
@@ -59,30 +64,36 @@ def initialize_database() -> None:
                 status TEXT NOT NULL,
                 detail TEXT NOT NULL DEFAULT '',
                 pull_url TEXT NOT NULL DEFAULT '',
-                created_at TEXT NOT NULL,
-                updated_at TEXT NOT NULL,
+                created_at TIMESTAMPTZ NOT NULL,
+                updated_at TIMESTAMPTZ NOT NULL,
                 agent TEXT NOT NULL DEFAULT 'coding-agent',
                 UNIQUE(owner, repo, issue_number)
             )
             """
         )
-        columns = {row[1] for row in db.execute("PRAGMA table_info(jobs)")}
+        columns = {
+            row["column_name"]
+            for row in db.execute(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema='public' AND table_name='jobs'"
+            )
+        }
         if "agent" not in columns:
             db.execute("ALTER TABLE jobs ADD COLUMN agent TEXT NOT NULL DEFAULT 'coding-agent'")
         db.execute(
             "UPDATE jobs SET status='interrupted', detail='Service restarted before the Claude Code /goal run completed', "
-            "updated_at=? WHERE status IN ('queued', 'running')",
+            "updated_at=%s WHERE status IN ('queued', 'running')",
             (utc_now(),),
         )
 
-
-initialize_database()
+if database_url:
+    initialize_database()
 
 
 def update_job(delivery_id: str, status: str, detail: str = "", pull_url: str = "") -> None:
-    with database_lock, closing(sqlite3.connect(database_path)) as db, db:
+    with database_lock, connect_database() as db:
         db.execute(
-            "UPDATE jobs SET status=?, detail=?, pull_url=?, updated_at=? WHERE delivery_id=?",
+            "UPDATE jobs SET status=%s, detail=%s, pull_url=%s, updated_at=%s WHERE delivery_id=%s",
             (status, detail[:4000], pull_url, utc_now(), delivery_id),
         )
 
@@ -199,31 +210,31 @@ def enqueue(
     announce: Callable[[], None] | None = None,
 ) -> bool:
     now = utc_now()
-    with database_lock, closing(sqlite3.connect(database_path)) as db, db:
+    with database_lock, connect_database() as db:
         row = db.execute(
-            "SELECT delivery_id, status FROM jobs WHERE owner=? AND repo=? AND issue_number=?",
+            "SELECT delivery_id, status FROM jobs WHERE owner=%s AND repo=%s AND issue_number=%s",
             (task.owner, task.repo, task.issue_number),
         ).fetchone()
         if row:
-            if not allow_retry or row[1] in {"queued", "running"}:
+            if not allow_retry or row["status"] in {"queued", "running"}:
                 return False
             db.execute(
-                "UPDATE jobs SET delivery_id=?, status='queued', detail='', pull_url='', created_at=?, updated_at=?, agent=? "
-                "WHERE owner=? AND repo=? AND issue_number=?",
+                "UPDATE jobs SET delivery_id=%s, status='queued', detail='', pull_url='', created_at=%s, updated_at=%s, agent=%s "
+                "WHERE owner=%s AND repo=%s AND issue_number=%s",
                 (delivery_id, now, now, AGENTS[task.agent_key].username, task.owner, task.repo, task.issue_number),
             )
         else:
             db.execute(
                 "INSERT INTO jobs(delivery_id, owner, repo, issue_number, status, created_at, updated_at, agent) "
-                "VALUES(?, ?, ?, ?, 'queued', ?, ?, ?)",
+                "VALUES(%s, %s, %s, %s, 'queued', %s, %s, %s)",
                 (delivery_id, task.owner, task.repo, task.issue_number, now, now, AGENTS[task.agent_key].username),
             )
     try:
         if announce:
             announce()
     except Exception:
-        with database_lock, closing(sqlite3.connect(database_path)) as db, db:
-            db.execute("DELETE FROM jobs WHERE delivery_id=? AND status='queued'", (delivery_id,))
+        with database_lock, connect_database() as db:
+            db.execute("DELETE FROM jobs WHERE delivery_id=%s AND status='queued'", (delivery_id,))
         raise
     executor.submit(process_job, delivery_id, task)
     return True
@@ -232,6 +243,11 @@ def enqueue(
 @app.get("/health")
 def health() -> JSONResponse:
     ready = settings.readiness()
+    try:
+        with connect_database() as db:
+            ready["database"] = db.execute("SELECT 1 AS ok").fetchone()["ok"] == 1
+    except Exception:
+        ready["database"] = False
     status = 200 if all(ready.values()) else 503
     return JSONResponse(
         status_code=status,
@@ -246,8 +262,7 @@ def health() -> JSONResponse:
 
 @app.get("/api/jobs")
 def jobs() -> dict[str, Any]:
-    with database_lock, closing(sqlite3.connect(database_path)) as db, db:
-        db.row_factory = sqlite3.Row
+    with database_lock, connect_database() as db:
         rows = db.execute(
             "SELECT delivery_id, owner, repo, issue_number, status, detail, pull_url, agent, created_at, updated_at "
             "FROM jobs ORDER BY created_at DESC LIMIT 50"

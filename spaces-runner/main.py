@@ -283,4 +283,11 @@ async def http_proxy_root(request: Request, owner: str, repo: str):
 
 @app.get("/healthz")
 async def healthz():
-    return JSONResponse({"status": "ok"})
+    try:
+        database_ok = await asyncio.to_thread(agent_metrics.database_ready)
+    except Exception:
+        database_ok = False
+    return JSONResponse(
+        {"status": "ok" if database_ok else "degraded", "database": database_ok},
+        status_code=200 if database_ok else 503,
+    )

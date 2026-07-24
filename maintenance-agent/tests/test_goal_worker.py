@@ -9,7 +9,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -165,11 +165,14 @@ class GoalWorkerTests(unittest.TestCase):
         import main
         from worker import IssueTask
 
-        main.database_path = Path(self.temp.name) / "enqueue-order.sqlite3"
-        main.initialize_database()
         events: list[str] = []
         task = IssueTask("openface", "demo", 42, "README", "更新", "main", "https://example/42", agent_key="docs")
-        with patch.object(main.executor, "submit", side_effect=lambda *args: events.append("submit")):
+        database = MagicMock()
+        database.__enter__.return_value = database
+        database.execute.return_value.fetchone.return_value = None
+        with patch.object(main, "connect_database", return_value=database), patch.object(
+            main.executor, "submit", side_effect=lambda *args: events.append("submit")
+        ):
             queued = main.enqueue(
                 task,
                 "delivery-order",
