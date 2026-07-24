@@ -19,6 +19,22 @@ export default function CharacterRepositoryPanel({
   locale: Locale;
 }) {
   const selectedPet = profile.codexPet?.packages[0] || null;
+  const sheetDisplayName = repo
+    .replace(/-character-sheet$/i, '')
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+  const panelTitle = selectedPet
+    ? `${selectedPet.displayName} · Codex Pet`
+    : profile.characterSheets
+      ? `${sheetDisplayName} · ${ui(locale, 'キャラクターシート', 'Character Sheet')}`
+      : ui(locale, 'PuruPuru実行形式', 'PuruPuru runtime format');
+  const panelCopy = selectedPet
+    ? ui(locale, 'pet.json、spritesheet、アニメーションフレーム、QA成果物をこのリポジトリだけで確認できます。', 'This repository contains its own pet.json, spritesheet, animation frames, and QA evidence.')
+    : profile.characterSheets
+      ? ui(locale, '設定画の書き出し画像、一覧用サムネイル、権利メタデータをこのリポジトリだけで確認できます。', 'This repository contains its own exported character sheet, catalog thumbnail, and rights metadata.')
+      : ui(locale, '設定、状態画像、方向制御パッチを実ファイルから検出しました。', 'OpenFace detected settings, state images, and the direction-control patch from real files.');
   const formats = [
     profile.purupuru ? {
       name: 'PuruPuru',
@@ -70,12 +86,8 @@ export default function CharacterRepositoryPanel({
         </div>
         <div className="flex flex-col border-t border-white/10 p-6 lg:border-l lg:border-t-0">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-300">{ui(locale, '検出済み規格', 'Detected formats')}</p>
-          <h2 className="mt-3 text-2xl font-extrabold tracking-tight">
-            {selectedPet
-              ? `${selectedPet.displayName} · Codex Pet`
-              : ui(locale, '実ファイルから互換性を確認', 'Compatibility verified from files')}
-          </h2>
-          <p className="openface-character-panel-copy mt-3 text-sm leading-6 text-zinc-300">{ui(locale, 'トピック名だけでなく、設定・状態画像・pet.json・spritesheet・QA成果物を読み取りました。', 'OpenFace inspected settings, state images, pet.json, spritesheets, and QA artifacts—not just repository topics.')}</p>
+          <h2 className="mt-3 text-2xl font-extrabold tracking-tight">{panelTitle}</h2>
+          <p className="openface-character-panel-copy mt-3 text-sm leading-6 text-zinc-300">{panelCopy}</p>
           <div className="mt-5 grid gap-2">
             {formats.map((format) => (
               <div key={format.name} className={`rounded-xl border px-3 py-2.5 ${format.tone}`}>
