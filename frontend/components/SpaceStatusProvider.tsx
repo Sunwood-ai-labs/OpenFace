@@ -1,15 +1,15 @@
 'use client';
 
 import { createContext, useEffect, useState } from 'react';
-import type { SpaceStatus, SpaceStatusRow } from '@/lib/space-status';
+import type { SpaceStatusInfo, SpaceStatusRow } from '@/lib/space-status';
 
-export const SpaceStatusContext = createContext<Record<string, SpaceStatus> | null>(null);
+export const SpaceStatusContext = createContext<Record<string, SpaceStatusInfo> | null>(null);
 
 export default function SpaceStatusProvider({
   initialStatuses,
   children,
 }: {
-  initialStatuses: Record<string, SpaceStatus>;
+  initialStatuses: Record<string, SpaceStatusInfo>;
   children: React.ReactNode;
 }) {
   const [statuses, setStatuses] = useState(initialStatuses);
@@ -22,7 +22,10 @@ export default function SpaceStatusProvider({
         if (!response.ok) return;
         const rows = await response.json() as SpaceStatusRow[];
         if (active) {
-          setStatuses(Object.fromEntries(rows.map((row) => [`${row.owner}/${row.repo}`, row.status])));
+          setStatuses(Object.fromEntries(rows.map((row) => [
+            `${row.owner}/${row.repo}`,
+            { status: row.status, execution: row.execution || 'local-cpu' },
+          ])));
         }
       } catch {
         // Keep the last known status during a transient runner outage.

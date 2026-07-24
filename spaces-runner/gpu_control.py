@@ -358,6 +358,20 @@ def get_repo_job(owner: str, repo: str) -> dict[str, Any] | None:
         ).fetchone()
 
 
+def list_repo_jobs() -> list[dict[str, Any]]:
+    """Return the newest visible remote job for each repository."""
+    with _connect() as conn:
+        return conn.execute(
+            """
+            SELECT DISTINCT ON (owner, repo)
+                   owner, repo, status, worker_id, error, updated_at
+              FROM gpu_jobs
+             WHERE status NOT IN ('completed', 'cancelled')
+          ORDER BY owner, repo, created_at DESC
+            """
+        ).fetchall()
+
+
 def cancel_repo_job(owner: str, repo: str) -> dict[str, Any] | None:
     with _connect() as conn:
         return conn.execute(

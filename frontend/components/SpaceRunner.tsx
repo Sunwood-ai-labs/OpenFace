@@ -6,6 +6,7 @@ import { useLocale } from './LocaleProvider';
 import { ui } from '@/lib/i18n';
 
 type SpaceStatus = 'unknown' | 'stopped' | 'starting' | 'running' | 'error';
+type SpaceExecution = 'local-cpu' | 'remote-gpu';
 
 interface StatusResponse {
   status?: string;
@@ -34,6 +35,7 @@ export default function SpaceRunner({
   const { locale } = useLocale();
   const [status, setStatus] = useState<SpaceStatus>('unknown');
   const [busy, setBusy] = useState(false);
+  const [execution, setExecution] = useState<SpaceExecution>('local-cpu');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -54,6 +56,7 @@ export default function SpaceRunner({
         return 'unknown';
       }
       const json = (await res.json().catch(() => null)) as StatusResponse | null;
+      setExecution(json?.execution === 'remote-gpu' ? 'remote-gpu' : 'local-cpu');
       const nextStatus = normalizeStatus(json);
       setStatus(nextStatus);
       return nextStatus;
@@ -126,7 +129,7 @@ export default function SpaceRunner({
           <HfIcon name="space" className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
           <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">App</span>
           <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${statusColor[status]}`}>
-            {statusLabel[status]}
+            {execution === 'remote-gpu' ? 'GPU' : 'CPU'} · {statusLabel[status]}
           </span>
         </div>
 

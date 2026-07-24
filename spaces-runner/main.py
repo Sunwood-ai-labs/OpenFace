@@ -238,7 +238,28 @@ async def api_stop_space(
 
 @app.get("/api/spaces")
 async def api_list_spaces():
-    return await asyncio.to_thread(spaces.list_spaces)
+    local_spaces = await asyncio.to_thread(spaces.list_spaces)
+    if not config.GPU_WORKERS_ENABLED:
+        return local_spaces
+    remote_jobs = await asyncio.to_thread(gpu_control.list_repo_jobs)
+    remote_keys = {(job["owner"], job["repo"]) for job in remote_jobs}
+    result = [
+        {**item, "execution": "local-cpu"}
+        for item in local_spaces
+        if (item["owner"], item["repo"]) not in remote_keys
+    ]
+    result.extend(
+        {
+            "owner": job["owner"],
+            "repo": job["repo"],
+            "status": job["status"],
+            "execution": "remote-gpu",
+            "worker_id": str(job["worker_id"]) if job["worker_id"] else None,
+            "error": job["error"],
+        }
+        for job in remote_jobs
+    )
+    return result
 
 
 # ---------------------------------------------------------------------------
