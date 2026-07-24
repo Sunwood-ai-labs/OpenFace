@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import BrandMark from './BrandMark';
-import HfIcon from './HfIcon';
+import HfIcon, { HfIconName } from './HfIcon';
 import SearchForm from './SearchForm';
 import ThemeSelector from './ThemeSelector';
 import LanguageSelector from './LanguageSelector';
@@ -14,16 +14,19 @@ export default function Navbar() {
   const pathname = usePathname();
   const { locale } = useLocale();
   const isCurrent = (href: string) => href.startsWith('/') && (pathname === href || pathname.startsWith(`${href}/`));
-  const navItems = [
-    { href: '/models', label: 'Models' },
-    { href: '/datasets', label: 'Datasets' },
-    { href: '/spaces', label: 'Spaces' },
-    { href: '/skills', label: 'Skills' },
-    { href: '/mcps', label: 'MCPs' },
-    { href: '/prompts', label: 'Prompts' },
-    { href: '/docs', label: 'Knowledge' },
-    { href: '/characters', label: 'Characters' },
+  const allNavItems: Array<{ href: string; icon: HfIconName; label: string }> = [
+    { href: '/models', icon: 'model', label: 'Models' },
+    { href: '/datasets', icon: 'dataset', label: 'Datasets' },
+    { href: '/spaces', icon: 'space', label: 'Spaces' },
+    { href: '/skills', icon: 'skill', label: 'Skills' },
+    { href: '/mcps', icon: 'mcp', label: 'MCPs' },
+    { href: '/prompts', icon: 'prompt', label: 'Prompts' },
+    { href: '/docs', icon: 'doc', label: 'Knowledge' },
+    { href: '/characters', icon: 'character', label: 'Characters' },
   ];
+  const primaryNavItems = allNavItems.filter((item) => ['/models', '/datasets', '/spaces', '/docs'].includes(item.href));
+  const exploreNavItems = allNavItems.filter((item) => !primaryNavItems.includes(item));
+  const exploreIsCurrent = exploreNavItems.some((item) => isCurrent(item.href));
 
   return (
     <header className="sticky top-0 z-30 border-b border-zinc-100 bg-white dark:border-zinc-800 dark:bg-zinc-950">
@@ -38,39 +41,69 @@ export default function Navbar() {
 
         <SearchForm className="ml-auto hidden flex-1 sm:ml-6 sm:block sm:max-w-[325px]" />
 
-        <nav className="ml-auto hidden items-center gap-3 text-sm font-medium text-zinc-900 xl:flex">
-          {navItems.map((item) => (
-            <Link key={item.href} href={item.href} className="inline-flex items-center gap-1.5 hover:text-zinc-600">
+        <nav className="ml-auto hidden items-center gap-4 text-sm font-medium text-zinc-900 xl:flex dark:text-zinc-100">
+          {primaryNavItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={isCurrent(item.href) ? 'page' : undefined}
+              className={`relative inline-flex h-8 items-center gap-1.5 whitespace-nowrap transition ${
+                isCurrent(item.href)
+                  ? 'font-bold text-zinc-950 after:absolute after:inset-x-0 after:-bottom-[9px] after:h-0.5 after:rounded-full after:bg-teal-500 dark:text-white'
+                  : 'text-zinc-700 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white'
+              }`}
+            >
+              <HfIcon name={item.icon} className="h-3.5 w-3.5 text-zinc-400" />
               {item.label}
             </Link>
           ))}
-          <details className="group relative">
-            <summary className="inline-flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-50 marker:hidden [&::-webkit-details-marker]:hidden">
+          <details className="openface-global-explore group relative">
+            <summary
+              className={`inline-flex h-8 cursor-pointer list-none items-center justify-center gap-2 rounded-full px-3 text-xs font-semibold transition marker:hidden [&::-webkit-details-marker]:hidden ${
+                exploreIsCurrent
+                  ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950'
+                  : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700'
+              }`}
+            >
               <HfIcon name="bars" className="h-3.5 w-3.5" />
+              <span>Explore</span>
             </summary>
-            <div className="absolute right-0 z-40 mt-3 hidden w-[520px] grid-cols-3 gap-6 rounded-lg border border-zinc-200 bg-white p-5 text-sm shadow-xl group-open:grid">
+            <div className="absolute right-0 z-40 mt-3 hidden w-[640px] grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] gap-6 rounded-xl border border-zinc-200 bg-white p-5 text-sm shadow-xl group-open:grid dark:border-zinc-700 dark:bg-zinc-900">
               <div>
-                <h2 className="mb-2 text-xs font-semibold uppercase tracking-normal text-zinc-400">{ui(locale, 'コンテンツ', 'Content')}</h2>
-                <a href="/models" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Models</a>
-                <a href="/datasets" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Datasets</a>
-                <a href="/spaces" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Spaces</a>
-                <a href="/skills" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Skills</a>
-                <a href="/mcps" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">MCPs</a>
-                <a href="/prompts" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Prompts</a>
-                <a href="/docs" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Knowledge</a>
-                <a href="/characters" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">Characters</a>
+                <h2 className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">{ui(locale, '開発ツール', 'Build tools')}</h2>
+                <div className="grid grid-cols-2 gap-2">
+                  {exploreNavItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      aria-current={isCurrent(item.href) ? 'page' : undefined}
+                      className={`group/item flex min-h-24 items-center gap-3 rounded-xl border p-3 text-zinc-800 transition hover:-translate-y-0.5 hover:border-teal-300 hover:bg-white hover:shadow-sm dark:text-zinc-100 dark:hover:border-teal-700 dark:hover:bg-zinc-800 ${
+                        isCurrent(item.href)
+                          ? 'border-teal-300 bg-teal-50/80 ring-1 ring-teal-200 dark:border-teal-700 dark:bg-teal-950/30 dark:ring-teal-900'
+                          : 'border-zinc-200 bg-zinc-50/70 dark:border-zinc-700 dark:bg-zinc-800/70'
+                      }`}
+                    >
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-teal-700 shadow-sm ring-1 ring-zinc-200 transition group-hover/item:scale-105 dark:bg-zinc-900 dark:text-teal-300 dark:ring-zinc-700">
+                        <HfIcon name={item.icon} className="h-6 w-6" />
+                      </span>
+                      <span className="font-bold">{item.label}</span>
+                    </Link>
+                  ))}
+                </div>
               </div>
-              <div>
-                <h2 className="mb-2 text-xs font-semibold uppercase tracking-normal text-zinc-400">{ui(locale, 'コミュニティ', 'Community')}</h2>
-                <a href="/git/explore/repos" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'リポジトリ', 'Repositories')}</a>
-                <a href="/git/explore/users" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'ユーザー', 'Users')}</a>
-                <a href="https://github.com/Sunwood-ai-labs/OpenFace/issues" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, '議論', 'Discussions')}</a>
-              </div>
-              <div>
-                <h2 className="mb-2 text-xs font-semibold uppercase tracking-normal text-zinc-400">{ui(locale, 'セルフホスト', 'Self-host')}</h2>
-                <a href="/git/repo/create" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, 'リポジトリを作成', 'Create repository')}</a>
-                <a href="/git/user/settings" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, '設定', 'Settings')}</a>
-                <a href="/git/admin" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50">{ui(locale, '管理', 'Administration')}</a>
+              <div className="grid content-start gap-5">
+                <div>
+                  <h2 className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">{ui(locale, 'コミュニティ', 'Community')}</h2>
+                  <a href="/git/explore/repos" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800">{ui(locale, 'リポジトリ', 'Repositories')}</a>
+                  <a href="/git/explore/users" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800">{ui(locale, 'ユーザー', 'Users')}</a>
+                  <a href="https://github.com/Sunwood-ai-labs/OpenFace/issues" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800">{ui(locale, '議論', 'Discussions')}</a>
+                </div>
+                <div>
+                  <h2 className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">{ui(locale, 'セルフホスト', 'Self-host')}</h2>
+                  <a href="/git/repo/create" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800">{ui(locale, 'リポジトリを作成', 'Create repository')}</a>
+                  <a href="/git/user/settings" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800">{ui(locale, '設定', 'Settings')}</a>
+                  <a href="/git/admin" className="block rounded-lg px-2 py-1.5 text-zinc-700 hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800">{ui(locale, '管理', 'Administration')}</a>
+                </div>
               </div>
             </div>
           </details>
@@ -97,13 +130,14 @@ export default function Navbar() {
           <div className="absolute right-0 z-40 mt-3 hidden w-[min(88vw,320px)] gap-1 rounded-lg border border-zinc-200 bg-white p-3 text-sm shadow-xl group-open:grid">
             <SearchForm className="mb-1" compact />
             <div className="mb-1 flex items-center gap-2 px-3 pt-1"><ThemeSelector /><LanguageSelector /></div>
-            {navItems.map((item) => (
+            {allNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 aria-current={isCurrent(item.href) ? 'page' : undefined}
-                className="openface-mobile-nav-link"
+                className="openface-mobile-nav-link flex items-center gap-3"
               >
+                <HfIcon name={item.icon} className="h-4 w-4 text-zinc-400" />
                 {item.label}
               </Link>
             ))}
