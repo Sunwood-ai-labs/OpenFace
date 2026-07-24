@@ -207,7 +207,6 @@ export default async function RepoDetailPage({
               skillRepo={kind === 'skill' ? repoInfo : null}
               skillCatalog={skillCatalog?.data || []}
               characterProfile={characterProfile}
-              selectedPetId={resolvedSearchParams.pet}
               locale={locale}
             />
           ) : (
@@ -375,7 +374,6 @@ async function CardTabContent({
   skillRepo,
   skillCatalog,
   characterProfile,
-  selectedPetId,
   locale,
 }: {
   owner: string;
@@ -386,7 +384,6 @@ async function CardTabContent({
   skillRepo: import('@/lib/forgejo').Repo | null;
   skillCatalog: import('@/lib/forgejo').Repo[];
   characterProfile: import('@/lib/character-format').CharacterRepositoryProfile | null;
-  selectedPetId?: string | null;
   locale: Locale;
 }) {
   const ref = revision || defaultBranch;
@@ -421,7 +418,7 @@ async function CardTabContent({
   return (
     <div>
       {kind === 'character' && characterProfile ? (
-        <CharacterRepositoryPanel owner={owner} repo={repo} branch={defaultBranch} profile={characterProfile} locale={locale} selectedPetId={selectedPetId} />
+        <CharacterRepositoryPanel owner={owner} repo={repo} branch={defaultBranch} profile={characterProfile} locale={locale} />
       ) : null}
       {kind === 'prompt' && revision ? (
         <div className="mb-5 flex items-center gap-3 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900 dark:border-orange-950 dark:bg-orange-950/20 dark:text-orange-200">

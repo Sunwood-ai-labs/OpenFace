@@ -1,11 +1,25 @@
 import Link from 'next/link';
-import { inspectCharacterRepository } from '@/lib/character-format';
-import { forgejoRawUrl, nonTypeTopics, searchReposByTopicAndQuery, SortOption } from '@/lib/forgejo';
+import { CharacterRepositoryProfile, CodexPetPackage, inspectCharacterRepository } from '@/lib/character-format';
+import { forgejoRawUrl, nonTypeTopics, Repo, searchReposByTopicAndQuery, SortOption } from '@/lib/forgejo';
 import { getLocale } from '@/lib/i18n-server';
 import { ui } from '@/lib/i18n';
 import { timeAgoEn, timeAgoJa } from '@/lib/format';
 import HfIcon from './HfIcon';
 import PuruPuruPreview from './PuruPuruPreview';
+
+type CharacterCatalogItem = {
+  kind: 'purupuru' | 'pet' | 'sheets';
+  id: string;
+  title: string;
+  description: string | null;
+  href: string;
+  repo: Repo;
+  profile: CharacterRepositoryProfile;
+  pet?: CodexPetPackage;
+  owner: string;
+  branch: string;
+  searchText: string;
+};
 
 export default async function CharactersDirectoryPage({
   searchParams,
@@ -20,11 +34,11 @@ export default async function CharactersDirectoryPage({
     repo,
     profile: await inspectCharacterRepository(repo),
   })));
-  const allItems = profiled.flatMap(({ repo, profile }) => {
+  const allItems = profiled.flatMap<CharacterCatalogItem>(({ repo, profile }) => {
     const owner = repo.owner?.login || repo.full_name.split('/')[0];
     const branch = repo.default_branch || 'main';
-    return [
-      ...(profile.purupuru ? [{
+    if (profile.purupuru) {
+      return [{
         kind: 'purupuru' as const,
         id: repo.name,
         title: repo.name,
@@ -35,33 +49,39 @@ export default async function CharactersDirectoryPage({
         owner,
         branch,
         searchText: `purupuru ${profile.purupuru.motionPatchPath ? 'head-motion motion-patch' : 'upper-body'} ${repo.topics?.join(' ') || ''}`,
-      }] : []),
-      ...(profile.codexPet?.packages.map((pet) => ({
+      }];
+    }
+    const pet = profile.codexPet?.packages[0];
+    if (pet) {
+      return [{
         kind: 'pet' as const,
         id: pet.id,
-        title: pet.displayName,
+        title: repo.name,
         description: ui(locale, `${pet.displayName}のインストール可能なCodex Petパッケージ`, `Installable Codex Pet package for ${pet.displayName}`),
-        href: `/${owner}/${repo.name}?pet=${encodeURIComponent(pet.id)}`,
+        href: `/${owner}/${repo.name}`,
         repo,
         profile,
         pet,
         owner,
         branch,
         searchText: `codex-pet pet ${pet.id} ${pet.displayName} ${repo.topics?.join(' ') || ''}`,
-      })) || []),
-      ...(profile.characterSheets ? [{
+      }];
+    }
+    if (profile.characterSheets) {
+      return [{
         kind: 'sheets' as const,
-        id: `${repo.name}-sheets`,
-        title: ui(locale, 'キャラクターデザインシート', 'Character design sheets'),
-        description: ui(locale, `${profile.characterSheets.count}キャラクターの設定画と書き出しアセット`, `Design sheets and export assets for ${profile.characterSheets.count} characters`),
-        href: `/${owner}/${repo.name}#readme`,
+        id: repo.name,
+        title: repo.name,
+        description: repo.description || ui(locale, '独立したキャラクター設定画リポジトリ', 'Independent character-sheet repository'),
+        href: `/${owner}/${repo.name}`,
         repo,
         profile,
         owner,
         branch,
         searchText: `character-sheet design-sheet ${repo.topics?.join(' ') || ''}`,
-      }] : []),
-    ];
+      }];
+    }
+    return [];
   });
   const normalizedQuery = q?.toLocaleLowerCase();
   const catalogItems = normalizedQuery
@@ -130,10 +150,10 @@ export default async function CharactersDirectoryPage({
             const formatLabels = item.kind === 'purupuru'
               ? [`PuruPuru · ${profile.purupuru?.totalStates || 0} states`]
               : item.kind === 'pet'
-                ? ['Codex Pet', item.pet.atlasSize]
-                : [`${profile.characterSheets?.count || 0} character sheets`];
+                ? ['Codex Pet', item.pet?.atlasSize || profile.codexPet?.atlasSize || '']
+                : [ui(locale, 'Character Sheet', 'Character Sheet')];
             const previewPath = item.kind === 'pet'
-              ? item.pet.previewPath
+              ? item.pet?.previewPath
               : item.kind === 'sheets'
                 ? profile.characterSheets?.previewPath
                 : null;
@@ -169,13 +189,13 @@ export default async function CharactersDirectoryPage({
                   </span>
                 </Link>
                 <div className="p-5">
-                  <p className="font-mono text-xs text-zinc-500">{item.kind === 'pet' ? `${repo.name} / pet` : `${owner}/`}</p>
+                  <p className="font-mono text-xs text-zinc-500">{owner}/</p>
                   <Link href={item.href} className="mt-1 block break-words text-lg font-black tracking-tight text-zinc-950 hover:text-fuchsia-700 dark:text-white dark:hover:text-fuchsia-300">{item.title}</Link>
                   <p className="mt-2 line-clamp-2 min-h-10 text-sm leading-5 text-zinc-600 dark:text-zinc-400">{item.description}</p>
                   <div className="mt-4 flex flex-wrap gap-1.5">
                     {formatLabels.map((label) => <span key={label} className="rounded-md bg-zinc-100 px-2 py-1 text-[11px] font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">{label}</span>)}
                     {item.kind === 'purupuru' && profile.purupuru?.motionPatchPath ? <span className="rounded-md bg-fuchsia-100 px-2 py-1 text-[11px] font-semibold text-fuchsia-800 dark:bg-fuchsia-950 dark:text-fuchsia-200">motion patch</span> : null}
-                    {item.kind === 'pet' && item.pet.qaPath ? <span className="rounded-md bg-cyan-100 px-2 py-1 text-[11px] font-semibold text-cyan-800 dark:bg-cyan-950 dark:text-cyan-200">QA verified</span> : null}
+                    {item.kind === 'pet' && item.pet?.qaPath ? <span className="rounded-md bg-cyan-100 px-2 py-1 text-[11px] font-semibold text-cyan-800 dark:bg-cyan-950 dark:text-cyan-200">QA verified</span> : null}
                   </div>
                   <div className="mt-5 flex items-center gap-3 border-t border-zinc-100 pt-4 text-xs text-zinc-500 dark:border-zinc-800">
                     <span>{locale === 'ja' ? timeAgoJa(repo.updated_at) : timeAgoEn(repo.updated_at)}</span>

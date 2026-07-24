@@ -11,19 +11,14 @@ export default function CharacterRepositoryPanel({
   branch,
   profile,
   locale,
-  selectedPetId,
 }: {
   owner: string;
   repo: string;
   branch: string;
   profile: CharacterRepositoryProfile;
   locale: Locale;
-  selectedPetId?: string | null;
 }) {
-  const selectedPet = profile.codexPet?.packages.find((item) => item.id === selectedPetId)
-    || profile.codexPet?.packages.find((item) => item.id === profile.codexPet?.firstPackageId)
-    || profile.codexPet?.packages[0]
-    || null;
+  const selectedPet = profile.codexPet?.packages[0] || null;
   const formats = [
     profile.purupuru ? {
       name: 'PuruPuru',
@@ -32,12 +27,12 @@ export default function CharacterRepositoryPanel({
     } : null,
     profile.codexPet ? {
       name: 'Codex Pet',
-      detail: ui(locale, `${profile.codexPet.packageCount}パッケージ・${profile.codexPet.atlasSize}`, `${profile.codexPet.packageCount} packages · ${profile.codexPet.atlasSize}`),
+      detail: ui(locale, `独立パッケージ・${profile.codexPet.atlasSize}`, `Independent package · ${profile.codexPet.atlasSize}`),
       tone: 'border-cyan-200 bg-cyan-50 text-cyan-900 dark:border-cyan-900 dark:bg-cyan-950/30 dark:text-cyan-200',
     } : null,
     profile.characterSheets ? {
       name: ui(locale, 'キャラクターシート', 'Character sheets'),
-      detail: ui(locale, `${profile.characterSheets.count}キャラクター`, `${profile.characterSheets.count} characters`),
+      detail: ui(locale, '独立リポジトリ', 'Independent repository'),
       tone: 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200',
     } : null,
   ].filter((format): format is NonNullable<typeof format> => Boolean(format));
@@ -102,26 +97,12 @@ export default function CharacterRepositoryPanel({
             </div>
           ) : null}
           {profile.codexPet ? (
-            <>
-              <div className="mt-4 grid grid-cols-2 gap-1.5" aria-label={ui(locale, 'Petを選択', 'Select pet')}>
-                {profile.codexPet.packages.map((pet) => (
-                  <Link
-                    key={pet.id}
-                    href={`/${owner}/${repo}?pet=${encodeURIComponent(pet.id)}`}
-                    className={`truncate rounded-lg border px-2.5 py-2 text-xs font-semibold transition ${pet.id === selectedPet?.id ? 'openface-character-selection-active border-cyan-200 bg-cyan-200' : 'border-white/15 text-zinc-200 hover:border-cyan-300 hover:bg-white/5'}`}
-                    aria-current={pet.id === selectedPet?.id ? 'true' : undefined}
-                  >
-                    {pet.displayName}
-                  </Link>
-                ))}
+            selectedPet ? (
+              <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+                <Link href={forgejoTreeUrl(owner, repo, selectedPet.petJsonPath, branch)} className="rounded-lg border border-white/15 px-3 py-2 hover:bg-white/5">pet.json</Link>
+                <Link href={forgejoTreeUrl(owner, repo, selectedPet.spritesheetPath, branch)} className="rounded-lg border border-white/15 px-3 py-2 hover:bg-white/5">spritesheet.webp</Link>
               </div>
-              {selectedPet ? (
-                <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                  <Link href={forgejoTreeUrl(owner, repo, selectedPet.petJsonPath, branch)} className="rounded-lg border border-white/15 px-3 py-2 hover:bg-white/5">pet.json</Link>
-                  <Link href={forgejoTreeUrl(owner, repo, selectedPet.spritesheetPath, branch)} className="rounded-lg border border-white/15 px-3 py-2 hover:bg-white/5">spritesheet.webp</Link>
-                </div>
-              ) : null}
-            </>
+            ) : null
           ) : null}
         </div>
       </div>
