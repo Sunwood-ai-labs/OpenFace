@@ -126,9 +126,9 @@ PetはAyano Yukimura、Fuhyo、Hisha、Kakugyo、Kohaku、Maki、Momiji、Onizuk
 
 [Characters検証記録](docs/evidence/characters/README.md)には、代表スクリーンショットと、規格監査24 / 24、WCAGテーマ監査48 / 48、日本語／英語監査48 / 48の結果を保存しています。
 
-### Docs（記事＋Wiki）
+### Knowledge（記事・手順・Wiki）
 
-内部の [`/docs`](https://localhost:8443/docs) は、運用マニュアル用VitePressとは別の、Gitリポジトリを土台にしたナレッジカテゴリです。topicへ `doc` と、形式を表す `article` / `wiki` / `guide` / `reference` のいずれかを追加すると、READMEを記事として公開しながら、実ファイル・コミット履歴・clone URL・権限をそのまま保持できます。再構築直後から確認できる6件の関連ドキュメントもseedします。
+内部の [`/docs`](https://localhost:8443/docs) は、運用マニュアル用VitePressとは別の、Gitリポジトリを土台にしたナレッジカテゴリです。topicへ `doc` を追加し、読みものは `articles/*.md`、再現可能な作業は `procedures/*.md`、共同で育てる概念・仕様は `wiki/*.md` に分けます。実ファイル、コミット履歴、clone URL、権限はそのまま保持され、各ページの実閲覧数からトレンドを表示し、タグ単位でも探せます。
 
 | エディトリアルなDocs一覧 | モバイルのWiki詳細 |
 |---|---|

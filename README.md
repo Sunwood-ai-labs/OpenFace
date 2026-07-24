@@ -185,15 +185,15 @@ Topics classify the repository itself. README frontmatter `tags` add multiple co
 
 ## 📚 Git-backed knowledge publishing
 
-The internal [`/docs`](https://localhost:8443/docs) category is a repository-backed publication library, separate from the VitePress operator manual. Like a Zenn publication, one person or team owns one repository. Add the `doc` repository topic and place Markdown in `articles/*.md`; OpenFace aggregates every published file into the shared Articles, Wiki, Guides, and Reference index while Git keeps authorship and history intact.
+The internal [`/docs`](https://localhost:8443/docs) category is a repository-backed publication library, separate from the VitePress operator manual. One person or team owns one repository. Add the `doc` repository topic and separate Markdown by reader intent: `articles/*.md` for readable publications, `procedures/*.md` for repeatable instructions, and `wiki/*.md` for living shared knowledge. OpenFace aggregates all three while Git keeps authorship and history intact.
 
-The seed publication contains 18 useful sample entries. Each entry supports `title`, `description`, `emoji`, `format`, `topics`, `published`, and `updated` front matter, plus automatic reading-time calculation.
+The seed publication contains 18 useful sample entries. Each entry supports `title`, `description`, `emoji`, `format`, `topics`, `published`, and `updated` front matter, plus automatic reading-time calculation. Each knowledge page records real browser views; the directory uses those counts for its trending feature and groups publications by reusable tags.
 
-| Zenn reference | OpenFace Standard | OpenFace Cyberpunk |
-|---|---|---|
-| <img src="docs/evidence/knowledge-library/reference-zenn-articles-mobile.png" alt="Zenn article timeline used as a layout reference" width="320"> | <img src="docs/evidence/knowledge-library/openface-articles-mobile-standard.png" alt="OpenFace knowledge publications in the Standard theme" width="320"> | <img src="docs/evidence/knowledge-library/openface-articles-mobile-cyberpunk.png" alt="OpenFace knowledge publications in the Cyberpunk theme" width="320"> |
+| OpenFace Standard | OpenFace Cyberpunk |
+|---|---|
+| <img src="docs/evidence/knowledge-library/openface-articles-mobile-standard.png" alt="OpenFace knowledge publications in the Standard theme" width="320"> | <img src="docs/evidence/knowledge-library/openface-articles-mobile-cyberpunk.png" alt="OpenFace knowledge publications in the Cyberpunk theme" width="320"> |
 
-The [Zenn comparison and knowledge-library verification](docs/evidence/knowledge-library/README.md) includes article-detail comparisons and the complete **24/24 passing** theme matrix across all three platform themes, light/dark OS schemes, mobile/desktop viewports, horizontal-overflow checks, and computed WCAG text contrast.
+The [knowledge-library verification](docs/evidence/knowledge-library/README.md) includes article-detail captures and the complete theme matrix across all three platform themes, light/dark OS schemes, mobile/desktop viewports, horizontal-overflow checks, and computed WCAG text contrast.
 
 ```yaml
 ---

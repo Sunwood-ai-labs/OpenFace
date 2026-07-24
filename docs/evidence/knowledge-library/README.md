@@ -1,4 +1,4 @@
-# Knowledge library — Zenn comparison and theme QA
+# Knowledge library — theme and interaction QA
 
 ## 日本語表示の確認
 
@@ -12,18 +12,9 @@
 
 ![図形の重なりを解消した注目記事カード](ja/featured-card-mobile-fixed.png)
 
-OpenFace uses Zenn's reading hierarchy as a reference without copying its product identity. The implementation keeps the OpenFace typography and theme tokens while adopting the parts that make a publication easy to scan: a compact author/time line, an emoji cover, unboxed article rows, topic pills, a centered article header, and a narrow reading column.
+OpenFace uses its own editorial reading hierarchy: a compact author/time line, an emoji cover, unboxed knowledge rows, topic pills, a centered title, and a narrow reading column.
 
-Reference pages: [Zenn Articles](https://zenn.dev/articles) and a live [Zenn article detail](https://zenn.dev/mk0bayashi/articles/2a6ee4123e671f).
-
-## Side-by-side comparison
-
-| Zenn reference | OpenFace Standard |
-|---|---|
-| ![Zenn article timeline on mobile](reference-zenn-articles-mobile.png) | ![OpenFace publication rows on mobile](openface-articles-mobile-standard.png) |
-| ![Zenn article detail on mobile](reference-zenn-article-mobile.png) | ![OpenFace article detail on mobile](openface-article-mobile-standard.png) |
-
-The layout comparison led to two deliberate changes:
+The focused review led to two deliberate changes:
 
 - the setup guide moved below the reading index so articles are no longer pushed out of the first browsing flow;
 - the repository source panel follows the Markdown body on mobile instead of interrupting the article before it starts.
@@ -54,6 +45,4 @@ Open the [full theme matrix](theme-matrix/THEME_MATRIX.md) for every screenshot 
 
 ## GitHub README render
 
-The pushed public README was opened again on GitHub. Both comparison columns render their real PNGs at the intended size; no broken-image placeholder or Markdown fallback is present.
-
-![Rendered Zenn and OpenFace comparison in the public GitHub README](github-readme-comparison-render.png)
+The public README is verified using OpenFace-owned screenshots only. External product screenshots are intentionally excluded.
