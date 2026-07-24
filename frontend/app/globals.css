@@ -1360,6 +1360,12 @@ html[data-openface-theme="solarpunk"] .skill-relationship-panel {
   color: inherit !important;
 }
 
+@media (prefers-color-scheme: dark) {
+  html[data-openface-theme] .openface-global-explore > summary > span {
+    color: #fafafa !important;
+  }
+}
+
 html[data-openface-theme="solarpunk"] .skill-relationship-header {
   border-color: #b9cfad !important;
   background: #edf3e7;
