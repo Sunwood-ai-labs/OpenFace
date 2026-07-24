@@ -205,11 +205,11 @@ export default async function DocsDirectoryPage({
     <div className="openface-docs-directory w-full overflow-x-hidden px-0 pt-8 [box-sizing:border-box]">
       <section className="mx-auto mb-[18px] max-w-[1536px] border-b border-zinc-100 px-4 pb-4 dark:border-zinc-800">
         <div className="flex flex-wrap items-start gap-3">
-          <h1 className="flex min-w-0 flex-nowrap items-center gap-x-2 gap-y-1 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+          <h1 className="flex min-w-0 flex-nowrap items-center gap-x-2 gap-y-1 text-3xl font-bold tracking-tight text-zinc-900 max-sm:text-[26px] dark:text-zinc-100">
             <HfIcon name="doc" className="h-6 w-6 text-teal-600 dark:text-teal-400" />
             <span>Knowledge</span>
             <span className="text-zinc-300 max-sm:text-lg dark:text-zinc-700">·</span>
-            <span className="text-zinc-500 max-sm:text-lg max-sm:font-medium dark:text-zinc-400">
+            <span className="whitespace-nowrap text-zinc-500 max-sm:text-lg max-sm:font-medium dark:text-zinc-400">
               {ui(locale, 'ナレッジ一覧', 'Knowledge Directory')}
             </span>
           </h1>
