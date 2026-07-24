@@ -216,7 +216,7 @@ export default async function DocsDirectoryPage({
           <div className="ml-auto flex flex-wrap items-center gap-2 max-sm:ml-0 max-sm:flex-nowrap">
             <Link
               href="/new?type=doc"
-              className="inline-flex h-9 items-center gap-2 rounded-full bg-zinc-900 px-3.5 text-sm font-semibold text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-950"
+              className="openface-docs-create inline-flex h-9 items-center gap-2 rounded-full bg-zinc-900 px-3.5 text-sm font-semibold text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-950"
             >
               <HfIcon name="plus" className="h-3.5 w-3.5" />
               {ui(locale, '新規ナレッジ', 'New knowledge')}
@@ -278,7 +278,7 @@ export default async function DocsDirectoryPage({
       </section>
 
       <div className="mx-auto mb-7 flex max-w-[1536px] flex-wrap items-center gap-3 px-4 max-sm:mb-0 max-sm:gap-2">
-        <h2 className="inline-flex h-[34px] min-w-0 items-center gap-2 rounded-full border border-amber-100 bg-amber-50 px-4 text-sm font-bold text-zinc-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] max-sm:order-1 max-sm:px-3 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-zinc-100">
+        <h2 className="openface-docs-section-pill inline-flex h-[34px] min-w-0 items-center gap-2 rounded-full border border-amber-100 bg-amber-50 px-4 text-sm font-bold text-zinc-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] max-sm:order-1 max-sm:px-3 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-zinc-100">
           <HfIcon name="fire" className="h-3.5 w-3.5 text-orange-500" />
           <span className="truncate">{sort === 'trending' ? ui(locale, 'よく読まれている', 'Trending knowledge') : ui(locale, '新着ナレッジ', 'Latest knowledge')}</span>
         </h2>

@@ -523,6 +523,11 @@ html[data-openface-theme="solarpunk"] .openface-docs-directory .openface-docs-pr
   color: #fffdf3 !important;
 }
 
+html[data-openface-theme="solarpunk"] .openface-docs-directory .openface-docs-create {
+  background: #173b2c !important;
+  color: #fffdf3 !important;
+}
+
 html[data-openface-theme="solarpunk"] .openface-docs-directory .text-teal-800,
 html[data-openface-theme="solarpunk"] .openface-docs-directory .text-teal-900,
 html[data-openface-theme="solarpunk"] .openface-docs-directory [class*="dark:text-teal-300"] {
@@ -587,6 +592,17 @@ html[data-openface-theme="cyberpunk"] .openface-docs-directory [class*="dark:tex
 html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-primary-action {
   background: #45e4e7 !important;
   color: #061014 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-create {
+  background: #45e4e7 !important;
+  color: #061014 !important;
+}
+
+html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-section-pill {
+  border-color: rgb(69 228 231 / 28%) !important;
+  background: #0d1327 !important;
+  color: #f4f7ff !important;
 }
 
 html[data-openface-theme="cyberpunk"] .openface-docs-directory .openface-docs-format-active {
