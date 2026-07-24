@@ -297,49 +297,60 @@ async def run_claimed_job(client: httpx.AsyncClient, job: dict[str, Any]) -> Non
 
 
 async def poll_loop() -> None:
-    async with httpx.AsyncClient(timeout=30.0, verify=VERIFY_TLS) as client:
-        await ensure_enrolled(client)
-        capabilities = discover_capabilities()
-        register = await client.post(
-            f"{OPENFACE_URL}{OPENFACE_API_PREFIX}/v1/workers/register",
-            headers=auth_headers(),
-            json={"capabilities": capabilities, "max_jobs": MAX_GPU_JOBS},
-        )
-        register.raise_for_status()
-        worker_id = _credential["worker_id"]
-        while True:
-            with _state_lock:
-                active_ids = list(_active_jobs)
-            heartbeat = await client.post(
-                f"{OPENFACE_URL}{OPENFACE_API_PREFIX}/v1/workers/{worker_id}/heartbeat",
-                headers=auth_headers(),
-                json={"capabilities": discover_capabilities(), "running_jobs": len(active_ids)},
-            )
-            heartbeat.raise_for_status()
-            for action in heartbeat.json().get("actions", []):
-                if action.get("action") == "stop":
-                    await asyncio.to_thread(stop_job, action["job_id"])
-                    await event(client, action["job_id"], "completed", {"reason": "cancelled"})
-            for job_id in active_ids:
-                lease = await client.post(
-                    f"{OPENFACE_URL}{OPENFACE_API_PREFIX}/v1/workers/{worker_id}/jobs/{job_id}/lease",
-                    headers=auth_headers(),
-                )
-                if lease.status_code == 409:
-                    await asyncio.to_thread(stop_job, job_id)
-            if len(active_ids) < MAX_GPU_JOBS:
-                claim = await client.post(
-                    f"{OPENFACE_URL}{OPENFACE_API_PREFIX}/v1/workers/{worker_id}/jobs/claim",
-                    headers=auth_headers(),
-                )
-                if claim.status_code == 200:
-                    claimed = claim.json()
-                    with _state_lock:
-                        _active_jobs.add(claimed["id"])
-                    asyncio.create_task(run_claimed_job(client, claimed))
-                elif claim.status_code != 204:
-                    claim.raise_for_status()
+    while True:
+        try:
+            async with httpx.AsyncClient(timeout=30.0, verify=VERIFY_TLS) as client:
+                await ensure_enrolled(client)
+                await poll_session(client)
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            print(f"control-plane connection failed; retrying: {exc}", flush=True)
             await asyncio.sleep(POLL_SECONDS)
+
+
+async def poll_session(client: httpx.AsyncClient) -> None:
+    capabilities = discover_capabilities()
+    register = await client.post(
+        f"{OPENFACE_URL}{OPENFACE_API_PREFIX}/v1/workers/register",
+        headers=auth_headers(),
+        json={"capabilities": capabilities, "max_jobs": MAX_GPU_JOBS},
+    )
+    register.raise_for_status()
+    worker_id = _credential["worker_id"]
+    while True:
+        with _state_lock:
+            active_ids = list(_active_jobs)
+        heartbeat = await client.post(
+            f"{OPENFACE_URL}{OPENFACE_API_PREFIX}/v1/workers/{worker_id}/heartbeat",
+            headers=auth_headers(),
+            json={"capabilities": discover_capabilities(), "running_jobs": len(active_ids)},
+        )
+        heartbeat.raise_for_status()
+        for action in heartbeat.json().get("actions", []):
+            if action.get("action") == "stop":
+                await asyncio.to_thread(stop_job, action["job_id"])
+                await event(client, action["job_id"], "completed", {"reason": "cancelled"})
+        for job_id in active_ids:
+            lease = await client.post(
+                f"{OPENFACE_URL}{OPENFACE_API_PREFIX}/v1/workers/{worker_id}/jobs/{job_id}/lease",
+                headers=auth_headers(),
+            )
+            if lease.status_code == 409:
+                await asyncio.to_thread(stop_job, job_id)
+        if len(active_ids) < MAX_GPU_JOBS:
+            claim = await client.post(
+                f"{OPENFACE_URL}{OPENFACE_API_PREFIX}/v1/workers/{worker_id}/jobs/claim",
+                headers=auth_headers(),
+            )
+            if claim.status_code == 200:
+                claimed = claim.json()
+                with _state_lock:
+                    _active_jobs.add(claimed["id"])
+                asyncio.create_task(run_claimed_job(client, claimed))
+            elif claim.status_code != 204:
+                claim.raise_for_status()
+        await asyncio.sleep(POLL_SECONDS)
 
 
 @asynccontextmanager
