@@ -106,12 +106,9 @@ function DocCard({
             {ui(locale, '注目', 'Featured')}
           </Link>
         </div>
-        <div className="flex min-w-0 items-center gap-2">
-          <span className="shrink-0 text-2xl" role="img" aria-label="">{article.emoji}</span>
-          <h3 className="line-clamp-2 text-[17px] font-bold leading-[22px] group-hover:underline">
-            {article.title}
-          </h3>
-        </div>
+        <h3 className="line-clamp-2 text-[17px] font-bold leading-[22px] group-hover:underline">
+          {article.title}
+        </h3>
         <p className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-white/85">
           {article.description}
         </p>
