@@ -128,7 +128,7 @@ PetはAyano Yukimura、Fuhyo、Hisha、Kakugyo、Kohaku、Maki、Momiji、Onizuk
 
 ### Knowledge（記事・手順・Wiki）
 
-内部の [`/docs`](https://localhost:8443/docs) は、運用マニュアル用VitePressとは別の、Gitリポジトリを土台にしたナレッジカテゴリです。topicへ `doc` を追加し、読みものは `articles/*.md`、再現可能な作業は `procedures/*.md`、共同で育てる概念・仕様は `wiki/*.md` に分けます。実ファイル、コミット履歴、clone URL、権限はそのまま保持され、各ページの実閲覧数からトレンドを表示し、タグ単位でも探せます。
+内部の [`/docs`](https://localhost:8443/docs) は、運用マニュアル用VitePressとは別の、Gitリポジトリを土台にしたナレッジカテゴリです。topicへ `doc` を追加し、Markdownは整理用に `articles/`、`procedures/`、`wiki/`へ保存します。表示上の役割は複合指定でき、`formats: [article, wiki]`ならひとつのナレッジが読みもの兼Wikiになります。実ファイル、コミット履歴、clone URL、権限はそのまま保持され、実閲覧数によるトレンド順とタグ単位の閲覧を利用できます。
 
 | PCのKnowledge一覧 | モバイルのKnowledge一覧 |
 |---|---|
@@ -298,7 +298,7 @@ docker compose up -d --build
 ### モデル / データセット / Skill / MCP / Prompt の公開手順
 
 1. Forgejo の Web UI（`/git/repo/create` 、またはトップページの「新規作成」導線）でリポジトリを作成します。
-2. リポジトリ設定画面から **topic** に `model`、`dataset`、`skill`、`mcp`、`prompt`、`doc` のいずれかを追加します（これで OpenFace 上での種別が決まります）。Docはさらに `article`、`wiki`、`guide`、`reference` のいずれかを追加します。Prompt はリポジトリ名を版なしの安定slugにし、個別版を表す `version-v1`、`version-v4.2` のような topic と、同名のGit tag（`v1`、`v4.2`）を追加します。
+2. リポジトリ設定画面から **topic** に `model`、`dataset`、`skill`、`mcp`、`prompt`、`doc` のいずれかを追加します（これで OpenFace 上での種別が決まります）。Doc内の各Markdownはフロントマターの `formats` に `article`、`procedure`、`wiki`を1つ以上指定します。Prompt はリポジトリ名を版なしの安定slugにし、個別版を表す `version-v1`、`version-v4.2` のような topic と、同名のGit tag（`v1`、`v4.2`）を追加します。
 3. `README.md` に HuggingFace 互換の YAML frontmatter（`license`, `tags`, `pipeline_tag`, `language` など）を書くと、frontend がバッジとして表示します。
 4. 大きなファイルは Git LFS でpushします。
 
