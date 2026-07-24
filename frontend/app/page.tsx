@@ -151,7 +151,18 @@ export default async function HomePage() {
       <section className="mx-auto max-w-5xl pb-8 pt-8 text-center sm:pt-10">
         <BrandMark className="mx-auto mb-5 h-14 w-14 rounded-[15px]" />
         <h1 className="mx-auto max-w-3xl text-3xl font-extrabold leading-tight tracking-normal text-zinc-950 sm:text-4xl">
-          {ui(locale, 'ローカルで育てるAIコミュニティ。', 'The AI community building locally.')}
+          {locale === 'ja' ? (
+            <>
+              <span className="sm:hidden">
+                ローカルで育てる
+                <br />
+                AIコミュニティ。
+              </span>
+              <span className="hidden sm:inline">ローカルで育てるAIコミュニティ。</span>
+            </>
+          ) : (
+            'The AI community building locally.'
+          )}
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-zinc-500">
           {ui(locale, 'モデル、データセット、アプリ、スキル、MCPサーバー、バージョン管理されたプロンプトをチームで共有できるプラットフォームです。', 'The platform where your team collaborates on models, datasets, applications, skills, MCP servers, and versioned prompts.')}
