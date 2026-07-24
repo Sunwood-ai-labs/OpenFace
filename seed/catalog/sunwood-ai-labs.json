@@ -114,11 +114,12 @@
     },
     {
       "name": "character-design-images",
-      "kind": "character",
+      "kind": "character-bundle",
       "description": "Eight character sheets and installable Codex pet packages with spritesheets and QA evidence",
       "source": "https://github.com/Sunwood-ai-labs/character-design-images.git",
       "branch": "main",
-      "topics": ["codex-pet", "character-sheet", "pet-package", "eight-characters", "qa"]
+      "topics": ["character-source", "eight-characters", "qa"],
+      "splitAssets": true
     }
   ]
 }

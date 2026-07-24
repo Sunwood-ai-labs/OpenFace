@@ -1566,6 +1566,131 @@ import_github_catalog_repo() {
   log "Imported '${source}' as '${ORG_NAME}/${name}' (${kind})."
 }
 
+# ------------------------------------------------------------------------
+# Split the existing character-design bundle into one Forgejo repository per
+# deliverable. Each character receives:
+#
+#   <id>-character-sheet  — one exported sheet, thumbnail, and metadata row
+#   <id>-codex-pet        — one installable pet package with frames and QA
+#
+# The upstream bundle remains available as provenance, but loses the
+# `character` topic so it cannot appear as a mixed virtual catalog entry.
+# ------------------------------------------------------------------------
+publish_split_character_repo() {
+  local repo_dir="$1" name="$2" description="$3" format_topic="$4"
+  local code push_url
+
+  code=$(api GET "/repos/${ORG_NAME}/${name}")
+  if [ "$code" = "200" ]; then
+    api PATCH "/repos/${ORG_NAME}/${name}" "$(jq -n --arg desc "$description" '{description:$desc}')" >/dev/null
+    set_topics "$name" "character" "$format_topic" "character-design-images" "split-repository" "qa"
+    log "Split character repository '${ORG_NAME}/${name}' already exists; keeping repository history."
+    return 0
+  fi
+
+  git -C "$repo_dir" init -b main >/dev/null
+  git -C "$repo_dir" add .
+  git -C "$repo_dir" \
+    -c user.name="OpenFace Catalog" \
+    -c user.email="catalog@openface.local" \
+    commit -m "Split ${name} from character-design-images" >/dev/null
+
+  code=$(api POST "/orgs/${ORG_NAME}/repos" "$(jq -n \
+    --arg name "$name" --arg desc "$description" \
+    '{name:$name,description:$desc,auto_init:false,private:false,default_branch:"main"}')")
+  if [ "$code" != "201" ]; then
+    log "ERROR: creating split character repository '${name}' returned HTTP ${code}:"
+    cat /tmp/api_resp.json
+    exit 1
+  fi
+
+  push_url="http://${OPENFACE_ADMIN_USER}:${TOKEN}@forgejo:3000/${ORG_NAME}/${name}.git"
+  git -C "$repo_dir" remote add openface "$push_url"
+  if ! git -C "$repo_dir" push openface main; then
+    log "ERROR: failed to push split character repository '${name}'."
+    api DELETE "/repos/${ORG_NAME}/${name}" >/dev/null || true
+    exit 1
+  fi
+  set_topics "$name" "character" "$format_topic" "character-design-images" "split-repository" "qa"
+  log "Published independent character repository '${ORG_NAME}/${name}'."
+}
+
+split_character_bundle() {
+  local source="$1" bundle_name="$2" branch="$3" description="$4" extra_topics_json="${5:-[]}"
+  local clone_dir code
+  clone_dir="${WORKDIR}/github-${bundle_name}"
+  rm -rf "$clone_dir"
+  log "Cloning character bundle '${source}' for repository-level separation..."
+  if ! git clone --branch "$branch" --single-branch "$source" "$clone_dir"; then
+    log "ERROR: failed to clone character bundle '${source}'."
+    exit 1
+  fi
+
+  # Preserve the original public source as provenance without presenting it as
+  # a character entry. Existing local edits are intentionally retained.
+  import_github_catalog_repo "$source" "$bundle_name" "character-bundle" "$branch" "$description" "$extra_topics_json"
+  set_topics "$bundle_name" "character-source" "sunwood-ai-labs" "github-import" "eight-characters" "qa"
+
+  local character_id display_name sheet_path sheet_repo pet_repo sheet_dir pet_dir sheet_description pet_description
+  while IFS=',' read -r character_id display_name _variant _view _version _status _artist _source _rights _usage_scope sheet_path _notes; do
+    [ "$character_id" = "character_id" ] && continue
+    [ -n "$character_id" ] || continue
+
+    sheet_repo="${character_id}-character-sheet"
+    pet_repo="${character_id}-codex-pet"
+    sheet_dir="${WORKDIR}/split-${sheet_repo}"
+    pet_dir="${WORKDIR}/split-${pet_repo}"
+    rm -rf "$sheet_dir" "$pet_dir"
+
+    mkdir -p \
+      "${sheet_dir}/assets/exports/${character_id}" \
+      "${sheet_dir}/assets/thumbnails/${character_id}" \
+      "${sheet_dir}/metadata"
+    cp "${clone_dir}/${sheet_path}" "${sheet_dir}/assets/exports/${character_id}/"
+    cp "${clone_dir}/assets/thumbnails/${character_id}/"* "${sheet_dir}/assets/thumbnails/${character_id}/"
+    {
+      head -n 1 "${clone_dir}/metadata/characters.csv"
+      awk -F',' -v id="$character_id" '$1 == id' "${clone_dir}/metadata/characters.csv"
+    } > "${sheet_dir}/metadata/characters.csv"
+    cat > "${sheet_dir}/README.md" <<EOF
+# ${display_name} Character Sheet
+
+Independent character-sheet repository split from
+[Sunwood AI Labs / character-design-images](${source%\.git}).
+
+- Character ID: \`${character_id}\`
+- Deliverable: character sheet
+- Metadata: \`metadata/characters.csv\`
+- Export: \`${sheet_path}\`
+EOF
+    sheet_description="${display_name} character sheet with export, thumbnail, and rights metadata"
+    publish_split_character_repo "$sheet_dir" "$sheet_repo" "$sheet_description" "character-sheet"
+
+    mkdir -p "$pet_dir"
+    cp -R "${clone_dir}/assets/pets/${character_id}/." "$pet_dir/"
+    mkdir -p "${pet_dir}/metadata"
+    {
+      head -n 1 "${clone_dir}/metadata/pets.csv"
+      awk -F',' -v id="$character_id" '$1 == id' "${clone_dir}/metadata/pets.csv" \
+        | sed "s#assets/pets/${character_id}/##g"
+    } > "${pet_dir}/metadata/pets.csv"
+    cat > "${pet_dir}/README.md" <<EOF
+# ${display_name} Codex Pet
+
+Independent installable Codex Pet repository split from
+[Sunwood AI Labs / character-design-images](${source%\.git}).
+
+- Character ID: \`${character_id}\`
+- Manifest: \`pet.json\`
+- Spritesheet: \`spritesheet.webp\`
+- QA evidence: \`qa/\`
+- Validation: \`final/validation.json\`
+EOF
+    pet_description="${display_name} installable Codex Pet with spritesheet, animation frames, and QA evidence"
+    publish_split_character_repo "$pet_dir" "$pet_repo" "$pet_description" "codex-pet"
+  done < "${clone_dir}/metadata/characters.csv"
+}
+
 import_sunwood_catalog() {
   if [ ! -f "$SUNWOOD_CATALOG" ]; then
     log "ERROR: Sunwood AI Labs catalog not found at '${SUNWOOD_CATALOG}'."
@@ -1581,6 +1706,10 @@ import_sunwood_catalog() {
     branch=$(printf '%s' "$entry" | jq -r '.branch')
     description=$(printf '%s' "$entry" | jq -r '.description')
     extra_topics_json=$(printf '%s' "$entry" | jq -c '.topics // []')
+    if [ "$kind" = "character-bundle" ] && [ "$(printf '%s' "$entry" | jq -r '.splitAssets // false')" = "true" ]; then
+      split_character_bundle "$source" "$name" "$branch" "$description" "$extra_topics_json"
+      continue
+    fi
     import_github_catalog_repo "$source" "$name" "$kind" "$branch" "$description" "$extra_topics_json"
     if [ "$kind" = "skill" ]; then
       metadata_file="${WORKDIR}/${name}-skill.json"
