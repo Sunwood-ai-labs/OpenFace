@@ -55,7 +55,7 @@ export default function CharacterRepositoryPanel({
           ) : selectedPet?.previewPath ? (
             <img
               src={forgejoRawUrl(owner, repo, selectedPet.previewPath, branch)}
-              alt={ui(locale, `${selectedPet.displayName}のCodex Petアニメーション`, `${selectedPet.displayName} Codex Pet animation`)}
+              alt={ui(locale, `${selectedPet.displayName}のCodex Petアニメーションプレビュー`, `${selectedPet.displayName} Codex Pet animation preview`)}
               className="relative h-full max-h-[440px] min-h-72 w-full object-contain p-5"
             />
           ) : profile.previewPath ? (
