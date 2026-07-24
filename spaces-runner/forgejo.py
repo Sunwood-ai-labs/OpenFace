@@ -85,6 +85,23 @@ async def verify_space_repo(owner: str, repo: str, token: str | None) -> None:
         raise ForgejoError(f"repository {owner}/{repo} does not have the 'space' topic")
 
 
+async def get_default_revision(owner: str, repo: str, token: str | None) -> str:
+    """Resolve the default branch to an immutable commit SHA."""
+    repo_info = await get_repo_info(owner, repo, token)
+    branch = repo_info.get("default_branch") or "main"
+    headers = {"Authorization": f"token {token}"} if token else {}
+    url = f"{config.FORGEJO_API}/repos/{owner}/{repo}/branches/{branch}"
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        response = await client.get(url, headers=headers)
+    if response.status_code != 200:
+        raise ForgejoError(f"could not resolve {owner}/{repo}@{branch}")
+    commit = response.json().get("commit") or {}
+    revision = commit.get("id") or commit.get("sha")
+    if not revision:
+        raise ForgejoError(f"Forgejo returned no commit SHA for {owner}/{repo}@{branch}")
+    return revision
+
+
 def clone_url(owner: str, repo: str, token: str | None) -> str:
     """Build a clone URL for the repo, authenticated when a token is available.
 

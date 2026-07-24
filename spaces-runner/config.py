@@ -42,6 +42,18 @@ DATABASE_URL: str = os.environ.get(
     "postgresql://openface:openface-postgres@postgres:5432/openface_metrics",
 )
 AGENT_CREDENTIALS_FILE: str = os.path.join(AGENT_DATA_DIR, "credentials.json")
+CONTROL_TOKEN: str | None = os.environ.get("OPENFACE_CONTROL_TOKEN") or None
+
+# Remote GPU workers are opt-in. CPU Spaces keep using the local LXC Docker
+# engine unless a repository explicitly carries the ``gpu`` topic.
+GPU_WORKERS_ENABLED: bool = os.environ.get("OPENFACE_GPU_WORKERS_ENABLED", "false").lower() == "true"
+GPU_WORKER_LEASE_SECONDS: int = max(
+    30, int(os.environ.get("OPENFACE_GPU_WORKER_LEASE_SECONDS", "90"))
+)
+GPU_WORKER_STALE_SECONDS: int = max(
+    GPU_WORKER_LEASE_SECONDS,
+    int(os.environ.get("OPENFACE_GPU_WORKER_STALE_SECONDS", "120")),
+)
 
 
 def read_forgejo_token() -> str | None:

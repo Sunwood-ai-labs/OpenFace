@@ -1,0 +1,38 @@
+name: openface-gpu-worker
+
+networks:
+  worker:
+    name: openface-gpu-worker
+
+volumes:
+  gpu-worker-data:
+
+services:
+  gpu-worker:
+    build:
+      context: ./gpu-worker
+    restart: unless-stopped
+    ports:
+      - "${GPU_WORKER_BIND_ADDRESS:-127.0.0.1}:${GPU_WORKER_PORT:-8787}:8787"
+    environment:
+      OPENFACE_URL: ${OPENFACE_URL:?Set the Tailscale URL of the OpenFace control plane}
+      OPENFACE_API_PREFIX: ${OPENFACE_API_PREFIX:-runner-api}
+      WORKER_NAME: ${WORKER_NAME:-local-gpu-01}
+      WORKER_PUBLIC_URL: ${WORKER_PUBLIC_URL:?Set the Tailscale URL of this worker}
+      WORKER_DOCKER_NETWORK: openface-gpu-worker
+      WORKER_ENROLLMENT_TOKEN_FILE: /run/secrets/openface-worker-enrollment-token
+      MAX_GPU_JOBS: ${MAX_GPU_JOBS:-1}
+      OPENFACE_VERIFY_TLS: ${OPENFACE_VERIFY_TLS:-true}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - gpu-worker-data:/data
+      - ./secrets:/run/secrets:ro
+    networks:
+      - worker
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

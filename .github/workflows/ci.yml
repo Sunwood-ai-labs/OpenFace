@@ -21,7 +21,10 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Validate Docker Compose
-        run: docker compose config --quiet
+        run: |
+          docker compose config --quiet
+          docker compose -f docker-compose.gpu-worker.yml \
+            --env-file gpu-worker/.env.example config --quiet
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
@@ -57,8 +60,16 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Compile runner Python sources
-        run: python -m compileall -q spaces-runner maintenance-agent
+      - name: Compile Python sources
+        run: python -m compileall -q spaces-runner gpu-worker maintenance-agent
+
+      - name: Install runner test dependencies
+        run: python -m pip install --disable-pip-version-check -r spaces-runner/requirements-dev.txt
+
+      - name: Test GPU worker scheduling
+        env:
+          PYTHONPATH: spaces-runner
+        run: python -m pytest -q spaces-runner/tests
 
       - name: Install maintenance-agent dependencies
         run: python -m pip install --disable-pip-version-check -r maintenance-agent/requirements.txt

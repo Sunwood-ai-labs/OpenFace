@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.datastructures import MutableHeaders
 
 import config
+import gpu_control
 import spaces
 
 _HOP_BY_HOP = {
@@ -46,6 +47,10 @@ def _not_running_response(owner: str, repo: str) -> JSONResponse:
 
 
 async def proxy_http(request: Request, owner: str, repo: str, path: str) -> StreamingResponse | JSONResponse:
+    if config.GPU_WORKERS_ENABLED:
+        route = await asyncio.to_thread(gpu_control.runtime_route, owner, repo)
+        if route:
+            return await _proxy_remote_http(request, route, path)
     status = spaces.probe_container_status(owner, repo)
     if status != "running":
         return _not_running_response(owner, repo)
@@ -97,7 +102,54 @@ async def proxy_http(request: Request, owner: str, repo: str, path: str) -> Stre
     )
 
 
+async def _proxy_remote_http(
+    request: Request, route: dict, path: str
+) -> StreamingResponse | JSONResponse:
+    target_url = f"{route['url'].rstrip('/')}/{path}"
+    headers = {k: v for k, v in request.headers.items() if k.lower() not in _HOP_BY_HOP}
+    headers["authorization"] = f"Bearer {route['token']}"
+    body = await request.body()
+    client = get_http_client()
+    try:
+        upstream_req = client.build_request(
+            request.method,
+            target_url,
+            headers=headers,
+            params=request.query_params,
+            content=body,
+        )
+        upstream_resp = await client.send(upstream_req, stream=True)
+    except httpx.RequestError:
+        return JSONResponse(
+            status_code=503,
+            content={"error": "remote GPU runtime is unavailable", "job_id": route["job_id"]},
+        )
+    response_headers = MutableHeaders()
+    for key, value in upstream_resp.headers.items():
+        if key.lower() not in _HOP_BY_HOP:
+            response_headers.append(key, value)
+
+    async def stream_body():
+        try:
+            async for chunk in upstream_resp.aiter_raw():
+                yield chunk
+        finally:
+            await upstream_resp.aclose()
+
+    return StreamingResponse(
+        stream_body(),
+        status_code=upstream_resp.status_code,
+        headers=dict(response_headers),
+        media_type=upstream_resp.headers.get("content-type"),
+    )
+
+
 async def proxy_websocket(ws: WebSocket, owner: str, repo: str, path: str) -> None:
+    if config.GPU_WORKERS_ENABLED:
+        route = await asyncio.to_thread(gpu_control.runtime_route, owner, repo)
+        if route:
+            await _proxy_remote_websocket(ws, route, path)
+            return
     status = spaces.probe_container_status(owner, repo)
     if status != "running":
         await ws.close(code=1013)  # try again later
@@ -172,3 +224,52 @@ async def proxy_websocket(ws: WebSocket, owner: str, repo: str, path: str) -> No
             await ws.close()
         except RuntimeError:
             pass
+
+
+async def _proxy_remote_websocket(ws: WebSocket, route: dict, path: str) -> None:
+    base = route["url"].replace("https://", "wss://").replace("http://", "ws://")
+    query = f"?{ws.url.query}" if ws.url.query else ""
+    target_url = f"{base.rstrip('/')}/{path}{query}"
+    try:
+        async with websockets.connect(
+            target_url,
+            extra_headers={"Authorization": f"Bearer {route['token']}"},
+            open_timeout=15,
+            max_size=None,
+        ) as upstream:
+            await ws.accept(subprotocol=upstream.subprotocol)
+
+            async def client_to_upstream():
+                try:
+                    while True:
+                        message = await ws.receive()
+                        if message["type"] == "websocket.disconnect":
+                            break
+                        if message.get("text") is not None:
+                            await upstream.send(message["text"])
+                        elif message.get("bytes") is not None:
+                            await upstream.send(message["bytes"])
+                except (WebSocketDisconnect, RuntimeError):
+                    pass
+
+            async def upstream_to_client():
+                try:
+                    async for message in upstream:
+                        if isinstance(message, bytes):
+                            await ws.send_bytes(message)
+                        else:
+                            await ws.send_text(message)
+                except websockets.ConnectionClosed:
+                    pass
+
+            _, pending = await asyncio.wait(
+                [
+                    asyncio.create_task(client_to_upstream()),
+                    asyncio.create_task(upstream_to_client()),
+                ],
+                return_when=asyncio.FIRST_COMPLETED,
+            )
+            for task in pending:
+                task.cancel()
+    except (OSError, websockets.InvalidHandshake, asyncio.TimeoutError):
+        await ws.close(code=1013)
