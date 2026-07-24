@@ -20338,16 +20338,20 @@ html body[data-openface-pull-view="files"] .diff-file-header-actions {
    reading rail. Organization pages intentionally retain their wider 24px
    mobile gutter. */
 @media (min-width: 768px) {
-  html body .page-content {
+  html body
+    .page-content.page-content.page-content.page-content.page-content.page-content {
     box-sizing: border-box !important;
     width: min(var(--openface-page-max), calc(100vw - 64px)) !important;
     max-width: min(var(--openface-page-max), calc(100vw - 64px)) !important;
     margin-inline: auto !important;
   }
 
-  html body .page-content > .ui.container,
-  html body .page-content > .secondary-nav,
-  html body .page-content > .secondary-nav > .ui.container {
+  html body
+    .page-content.page-content.page-content.page-content.page-content.page-content > .ui.container,
+  html body
+    .page-content.page-content.page-content.page-content.page-content.page-content > .secondary-nav,
+  html body
+    .page-content.page-content.page-content.page-content.page-content.page-content > .secondary-nav > .ui.container {
     box-sizing: border-box !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -20356,21 +20360,32 @@ html body[data-openface-pull-view="files"] .diff-file-header-actions {
 }
 
 @media (max-width: 767px) {
-  html body:not([data-openface-org]):not([data-openface-user-profile])
-    .page-content {
+  html body
+    .page-content.page-content.page-content.page-content.page-content.page-content {
     box-sizing: border-box !important;
     width: calc(100vw - 40px) !important;
     max-width: calc(100vw - 40px) !important;
     margin-inline: auto !important;
   }
 
-  html body .page-content > .ui.container,
-  html body .page-content > .secondary-nav,
-  html body .page-content > .secondary-nav > .ui.container {
+  html body
+    .page-content.page-content.page-content.page-content.page-content.page-content > .ui.container,
+  html body
+    .page-content.page-content.page-content.page-content.page-content.page-content > .secondary-nav,
+  html body
+    .page-content.page-content.page-content.page-content.page-content.page-content > .secondary-nav > .ui.container {
     box-sizing: border-box !important;
     width: 100% !important;
     max-width: 100% !important;
     margin-inline: auto !important;
+  }
+
+  html body[data-openface-org]
+    .page-content.page-content.page-content.page-content.page-content.page-content,
+  html body[data-openface-user-profile]
+    .page-content.page-content.page-content.page-content.page-content.page-content {
+    width: calc(100vw - 48px) !important;
+    max-width: calc(100vw - 48px) !important;
   }
 
   html body[data-openface-community-page="detail"]
