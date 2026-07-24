@@ -4,6 +4,7 @@
 
 html {
   scroll-behavior: smooth;
+  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 details > summary {
@@ -14,6 +15,21 @@ details > summary {
 
 body {
   background-color: #fafafa;
+  font-family: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+/* Editorial serif is retained for English, while Japanese headings use one
+   consistent UI Gothic face across navigation, cards, and long-form pages. */
+.font-serif:lang(ja) {
+  font-family: inherit;
+  letter-spacing: normal;
 }
 
 /* One predictable safe area for every portal page. Individual page
@@ -1046,7 +1062,7 @@ html[data-openface-theme="cyberpunk"] [class*="dark:bg-zinc-700"] {
   max-width: 100%;
   overflow-wrap: break-word;
   color: #1f2328;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 16px;
   line-height: 1.5;
 }

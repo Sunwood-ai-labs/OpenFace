@@ -18909,6 +18909,26 @@ html[data-openface-theme="cyberpunk"] body[data-openface-org-page] overflow-menu
   color: #f3fbff !important;
 }
 
+/* Organization navigation stays AA-readable regardless of the host OS color scheme. */
+html[data-openface-theme="cyberpunk"] body[data-openface-org-page]
+  overflow-menu.ui.secondary.pointing.tabular.menu
+  .overflow-menu-items > a.item {
+  color: #a9cddd !important;
+}
+
+html[data-openface-theme="solarpunk"] body[data-openface-org-page]
+  overflow-menu.ui.secondary.pointing.tabular.menu
+  .overflow-menu-items > a.item {
+  color: #46614f !important;
+}
+
+/* Keep Japanese glyph metrics consistent across Forgejo chrome and custom
+   OpenFace surfaces. Latin text still resolves to Source Sans Pro first. */
+html body,
+html body :is(button, input, select, textarea) {
+  font-family: "Source Sans Pro", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, ui-sans-serif, system-ui, sans-serif;
+}
+
 html[data-openface-theme="solarpunk"] body[data-openface-model-landing] :is(.openface-model-side-pane, .openface-model-side-pane section, .openface-provider-card) {
   background-color: #fbfcf5 !important;
   color: #173b2c !important;
