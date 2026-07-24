@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from html import escape
 import json
+import os
 import subprocess
 
 
@@ -9,7 +10,7 @@ class Handler(BaseHTTPRequestHandler):
         query = subprocess.run(
             [
                 "nvidia-smi",
-                "--query-gpu=name,memory.total,driver_version",
+                "--query-gpu=index,name,memory.total,driver_version",
                 "--format=csv,noheader",
             ],
             capture_output=True,
@@ -17,10 +18,16 @@ class Handler(BaseHTTPRequestHandler):
             timeout=10,
             check=True,
         )
+        rows = [line.strip() for line in query.stdout.splitlines() if line.strip()]
+        assigned = os.getenv("CUDA_VISIBLE_DEVICES", "all")
+        if assigned != "all":
+            assigned_ids = {value.strip() for value in assigned.split(",")}
+            rows = [row for row in rows if row.split(",", 1)[0].strip() in assigned_ids]
         payload = {
             "status": "ok",
             "runtime": "openface-remote-gpu",
-            "gpus": [line.strip() for line in query.stdout.splitlines() if line.strip()],
+            "assigned_gpu_ids": assigned,
+            "gpus": rows,
         }
         if self.path.rstrip("/") == "/api":
             body = json.dumps(payload, ensure_ascii=False).encode("utf-8")

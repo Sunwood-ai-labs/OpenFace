@@ -196,9 +196,20 @@ def heartbeat(worker_id: str, capabilities: dict[str, Any], running_jobs: int) -
 
 def worker_matches(capabilities: dict[str, Any], requirements: dict[str, Any]) -> bool:
     """Return whether a worker satisfies the deliberately small v1 contract."""
-    if requirements.get("gpu") and int(capabilities.get("gpu_count", 0)) < 1:
+    required_count = max(1, int(requirements.get("gpu_count", 1)))
+    if requirements.get("gpu") and int(capabilities.get("gpu_count", 0)) < required_count:
         return False
-    if int(capabilities.get("free_vram_mb", 0)) < int(requirements.get("min_vram_mb", 0)):
+    minimum_vram = int(requirements.get("min_vram_mb", 0))
+    devices = capabilities.get("gpu_devices") or []
+    if devices:
+        eligible_devices = [
+            device
+            for device in devices
+            if int(device.get("free_vram_mb", 0)) >= minimum_vram
+        ]
+        if len(eligible_devices) < required_count:
+            return False
+    elif int(capabilities.get("free_vram_mb", 0)) < minimum_vram * required_count:
         return False
     required_features = set(requirements.get("features") or [])
     if not required_features.issubset(set(capabilities.get("features") or [])):

@@ -100,7 +100,7 @@ class GpuJobRequest(BaseModel):
     owner: str = Field(min_length=1, max_length=100)
     repo: str = Field(min_length=1, max_length=100)
     revision: str = Field(min_length=7, max_length=64)
-    requirements: dict = Field(default_factory=lambda: {"gpu": True})
+    requirements: dict = Field(default_factory=lambda: {"gpu": True, "gpu_count": 1})
 
 
 def authenticated_agent(authorization: str | None):

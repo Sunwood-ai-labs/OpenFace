@@ -126,6 +126,7 @@ def discover_capabilities() -> dict[str, Any]:
         "architecture": platform.machine().lower(),
         "docker": False,
         "gpu_count": 0,
+        "gpu_devices": [],
         "free_vram_mb": 0,
         "total_vram_mb": 0,
         "features": [],
@@ -136,6 +137,14 @@ def discover_capabilities() -> dict[str, Any]:
                 "docker": True,
                 "docker_version": "fake-e2e",
                 "gpu_count": 1,
+                "gpu_devices": [
+                    {
+                        "id": "0",
+                        "name": "Fake NVIDIA GPU",
+                        "total_vram_mb": 24576,
+                        "free_vram_mb": 24576,
+                    }
+                ],
                 "free_vram_mb": 24576,
                 "total_vram_mb": 24576,
                 "features": ["nvidia", "cuda", "fake-e2e"],
@@ -152,7 +161,7 @@ def discover_capabilities() -> dict[str, Any]:
         result = subprocess.run(
             [
                 "nvidia-smi",
-                "--query-gpu=name,memory.total,memory.free,driver_version",
+                "--query-gpu=index,name,memory.total,memory.free,driver_version",
                 "--format=csv,noheader,nounits",
             ],
             capture_output=True,
@@ -164,10 +173,19 @@ def discover_capabilities() -> dict[str, Any]:
         capabilities.update(
             {
                 "gpu_count": len(rows),
-                "gpu_models": [row[0].strip() for row in rows],
-                "total_vram_mb": sum(int(row[1].strip()) for row in rows),
-                "free_vram_mb": sum(int(row[2].strip()) for row in rows),
-                "driver_version": rows[0][3].strip() if rows else None,
+                "gpu_models": [row[1].strip() for row in rows],
+                "gpu_devices": [
+                    {
+                        "id": row[0].strip(),
+                        "name": row[1].strip(),
+                        "total_vram_mb": int(row[2].strip()),
+                        "free_vram_mb": int(row[3].strip()),
+                    }
+                    for row in rows
+                ],
+                "total_vram_mb": sum(int(row[2].strip()) for row in rows),
+                "free_vram_mb": sum(int(row[3].strip()) for row in rows),
+                "driver_version": rows[0][4].strip() if rows else None,
                 "features": ["nvidia", "cuda"] if rows else [],
             }
         )
@@ -199,7 +217,25 @@ def _image_name(job_id: str) -> str:
     return f"openface-gpu-job-{job_id}:latest"
 
 
-def execute_job(job: dict[str, Any], runtime_token: str) -> str:
+def select_gpu_devices(requirements: dict[str, Any]) -> list[dict[str, Any]]:
+    required_count = max(1, int(requirements.get("gpu_count", 1)))
+    minimum_vram = int(requirements.get("min_vram_mb", 0))
+    eligible = [
+        device
+        for device in discover_capabilities().get("gpu_devices", [])
+        if int(device.get("free_vram_mb", 0)) >= minimum_vram
+    ]
+    # Best-fit keeps larger devices available for later jobs.
+    eligible.sort(key=lambda device: int(device.get("free_vram_mb", 0)))
+    selected = eligible[:required_count]
+    if len(selected) != required_count:
+        raise RuntimeError(
+            f"No {required_count} GPU device(s) satisfy min_vram_mb={minimum_vram}"
+        )
+    return selected
+
+
+def execute_job(job: dict[str, Any], runtime_token: str) -> tuple[str, list[dict[str, Any]]]:
     job_id = job["id"]
     if FAKE_EXECUTOR:
         with _state_lock:
@@ -210,8 +246,11 @@ def execute_job(job: dict[str, Any], runtime_token: str) -> str:
                 "repo": job["repo"],
             }
             _save_runtime_state()
-        return f"{WORKER_PUBLIC_URL}/runtime/{job_id}"
+        return f"{WORKER_PUBLIC_URL}/runtime/{job_id}", [
+            {"id": "0", "name": "Fake NVIDIA GPU"}
+        ]
 
+    selected_devices = select_gpu_devices(job.get("requirements") or {})
     checkout = WORKER_DATA_DIR / "jobs" / job_id
     shutil.rmtree(checkout, ignore_errors=True)
     checkout.parent.mkdir(parents=True, exist_ok=True)
@@ -242,13 +281,22 @@ def execute_job(job: dict[str, Any], runtime_token: str) -> str:
         name=name,
         detach=True,
         network=WORKER_DOCKER_NETWORK,
+        environment={
+            variable: ",".join(str(device["id"]) for device in selected_devices)
+            for variable in ("NVIDIA_VISIBLE_DEVICES", "CUDA_VISIBLE_DEVICES")
+        },
         labels={
             "openface.gpu-job": job_id,
             "openface.owner": job["owner"],
             "openface.repo": job["repo"],
             "openface.revision": job["revision"],
         },
-        device_requests=[DeviceRequest(count=-1, capabilities=[["gpu"]])],
+        device_requests=[
+            DeviceRequest(
+                device_ids=[str(device["id"]) for device in selected_devices],
+                capabilities=[["gpu"]],
+            )
+        ],
         restart_policy={"Name": "unless-stopped"},
     )
     with _state_lock:
@@ -259,7 +307,7 @@ def execute_job(job: dict[str, Any], runtime_token: str) -> str:
             "repo": job["repo"],
         }
         _save_runtime_state()
-    return f"{WORKER_PUBLIC_URL}/runtime/{job_id}"
+    return f"{WORKER_PUBLIC_URL}/runtime/{job_id}", selected_devices
 
 
 def stop_job(job_id: str) -> None:
@@ -279,7 +327,9 @@ async def run_claimed_job(client: httpx.AsyncClient, job: dict[str, Any]) -> Non
     runtime_token = secrets.token_urlsafe(32)
     try:
         await event(client, job_id, "building", {"revision": job["revision"]})
-        runtime_url = await asyncio.to_thread(execute_job, job, runtime_token)
+        runtime_url, assigned_devices = await asyncio.to_thread(
+            execute_job, job, runtime_token
+        )
         await event(
             client,
             job_id,
@@ -288,6 +338,7 @@ async def run_claimed_job(client: httpx.AsyncClient, job: dict[str, Any]) -> Non
                 "runtime_url": runtime_url,
                 "runtime_token": runtime_token,
                 "revision": job["revision"],
+                "assigned_gpu_devices": assigned_devices,
             },
         )
     except Exception as exc:

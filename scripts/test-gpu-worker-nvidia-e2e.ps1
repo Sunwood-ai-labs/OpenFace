@@ -20,6 +20,10 @@ function Remove-E2EResources {
             docker rm -f $name | Out-Null
         }
     }
+    $networkContainers = docker ps -aq --filter "network=$network"
+    if ($networkContainers) {
+        docker rm -f $networkContainers | Out-Null
+    }
     if (docker network ls --format "{{.Name}}" | Select-String -SimpleMatch $network) {
         docker network rm $network | Out-Null
     }
@@ -122,6 +126,7 @@ try {
         revision = $revision
         requirements = @{
             gpu = $true
+            gpu_count = 1
             min_vram_mb = 12288
             features = @("nvidia")
         }
@@ -140,6 +145,12 @@ try {
     $runtime = Invoke-RestMethod http://localhost:18001/demo/gpu-fixture/api
     if ($runtime.status -ne "ok" -or $runtime.gpus.Count -lt 1) {
         throw "The Space container did not report an NVIDIA GPU"
+    }
+    if ($runtime.gpus.Count -ne 1) {
+        throw "The Space container must see exactly one assigned GPU, got $($runtime.gpus.Count)"
+    }
+    if ($runtime.assigned_gpu_ids -eq "all") {
+        throw "The Space container did not receive an explicit GPU assignment"
     }
 
     $stop = Invoke-RestMethod -Method Post `
