@@ -185,7 +185,7 @@ Topics classify the repository itself. README frontmatter `tags` add multiple co
 
 ## 📚 Git-backed knowledge publishing
 
-The internal [`/docs`](https://localhost:8443/docs) category is a repository-backed publication library, separate from the VitePress operator manual. One person or team owns one repository. Add the `doc` repository topic and store Markdown in `articles/`, `procedures/`, or `wiki/` for organization. Reader-facing roles are composable: `formats: [article, wiki]` makes one entry both a readable publication and living shared knowledge. OpenFace aggregates every role while Git keeps authorship and history intact.
+The internal [`/docs`](https://localhost:8443/docs) category is a repository-backed publication library, separate from the VitePress operator manual. One person or team owns one repository. Add the `doc` repository topic and store Markdown in `articles/`, `procedures/`, `wiki/`, or `news/` for organization. Reader-facing roles are composable: `formats: [news, article]` makes one update both a news item and a readable publication. OpenFace aggregates every role while Git keeps authorship and history intact.
 
 The seed publication contains 18 useful sample entries. Each entry supports `title`, `description`, `emoji`, composable `formats`, `topics`, `published`, and `updated` front matter, plus automatic reading-time calculation. `emoji` becomes both the article marker and its faint card watermark; when it is omitted, OpenFace chooses a stable topic-aware fallback. Each knowledge page records real browser views; readers can switch between latest and view-ranked trends or browse reusable tags.
 
