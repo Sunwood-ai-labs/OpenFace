@@ -1323,6 +1323,12 @@ html[data-openface-theme="solarpunk"] .prose-openface a {
   color: #1e633d;
 }
 
+html[data-openface-theme="solarpunk"] .github-markdown-body blockquote,
+html[data-openface-theme="solarpunk"] .prose-openface blockquote {
+  color: #365f47;
+  border-color: #62a370;
+}
+
 html[data-openface-theme="solarpunk"] .github-markdown-body code,
 html[data-openface-theme="solarpunk"] .prose-openface code,
 html[data-openface-theme="solarpunk"] .github-markdown-body th {
@@ -1346,6 +1352,12 @@ html[data-openface-theme="solarpunk"] .skill-relationship-panel {
   color: #173b2c;
   border-color: #94b889 !important;
   background: #f8fbf1 !important;
+}
+
+/* Theme-wide text overrides must not break the compact navigation control's
+   selected-state contrast. */
+.openface-global-explore > summary > span {
+  color: inherit !important;
 }
 
 html[data-openface-theme="solarpunk"] .skill-relationship-header {
