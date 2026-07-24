@@ -11,6 +11,7 @@ export const themes = [
 
 export const routes = [
   { id: 'home', label: 'Home', path: '/', focus: 'Hero, navigation, discovery sections, and card density' },
+  { id: 'global-nav-explore', label: 'Global navigation Explore menu', path: '/docs', openDisclosureSelector: '.openface-global-explore > summary', openDisclosureViewport: 'desktop', focus: 'Four primary global links plus a large-icon two-column Explore card grid without crowding the search field' },
   { id: 'models', label: 'Models directory', path: '/models', focus: 'Filters, model cards, metadata, and pagination' },
   { id: 'models-filter-controls', label: 'Model filter controls', path: '/models', openDisclosureSelector: 'details[name="model-add-filter-menu"] > summary', openDisclosureViewport: 'mobile', focus: 'A visibly opened mobile filter menu in every theme' },
   { id: 'datasets', label: 'Datasets directory', path: '/datasets', focus: 'Filters, dataset cards, metadata, and pagination' },
