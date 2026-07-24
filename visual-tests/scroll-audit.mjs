@@ -59,11 +59,26 @@ const inspectViewport = ({ themeId, themeAware }) => {
       });
     }
   }
+  const primaryRail = document.querySelector('main[data-openface-page-frame], .page-content');
+  const primaryRailRect = primaryRail?.getBoundingClientRect();
+  const primaryRailStyle = primaryRail ? getComputedStyle(primaryRail) : null;
+  const leftInset = primaryRailRect && primaryRailStyle
+    ? primaryRailRect.left + (Number.parseFloat(primaryRailStyle.paddingLeft) || 0)
+    : null;
+  const rightInset = primaryRailRect && primaryRailStyle
+    ? viewport.width - primaryRailRect.right + (Number.parseFloat(primaryRailStyle.paddingRight) || 0)
+    : null;
   return {
     scrollY: Math.round(Math.max(window.scrollY, document.documentElement.scrollTop, document.body.scrollTop)),
     scrollHeight: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight),
     lightSurfaces: lightSurfaces.slice(0, 8),
     horizontalOverflow: Math.max(0, document.documentElement.scrollWidth - viewport.width),
+    primaryRail: primaryRail ? {
+      selector: primaryRail.matches('main[data-openface-page-frame]') ? 'portal-main' : 'forgejo-page-content',
+      leftInset: Math.round(leftInset),
+      rightInset: Math.round(rightInset),
+      minimumInset: Math.round(Math.min(leftInset, rightInset)),
+    } : null,
   };
 };
 
@@ -108,8 +123,13 @@ const captureRoute = async ({ context, route, theme, viewport }) => {
     await page.screenshot({ path: screenshotPath });
     const state = await page.evaluate(inspectViewport, { themeId: theme.id, themeAware: route.themeAware !== false });
     const defects = [];
+    const requiredInset = viewport.width < 768 ? 20 : 24;
     if (response.status() >= 400) defects.push(`HTTP ${response.status()}`);
     if (state.horizontalOverflow > 2) defects.push(`Horizontal overflow: ${state.horizontalOverflow}px`);
+    if (!route.allowFullBleed && !state.primaryRail) defects.push('Primary content rail is missing');
+    if (!route.allowFullBleed && state.primaryRail?.minimumInset < requiredInset) {
+      defects.push(`Content safe area: ${state.primaryRail.minimumInset}px; expected at least ${requiredInset}px`);
+    }
     if (state.lightSurfaces.length) defects.push(`${state.lightSurfaces.length} large light surface(s) in Cyberpunk`);
     if (pageErrors.length) defects.push(`${pageErrors.length} page error(s)`);
     const result = {

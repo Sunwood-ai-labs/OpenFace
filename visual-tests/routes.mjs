@@ -35,7 +35,7 @@ export const routes = [
   { id: 'prompt-detail', label: 'Prompt detail', path: '/openface/mystic-git-auto-commit?revision=v4.2', focus: 'Immutable revision selector, prompt source, and direct-link state' },
   { id: 'doc-detail', label: 'Knowledge article detail', path: '/docs/openface/community-design-principles', focus: 'Zenn-inspired article header, topics, readable Markdown, repository source actions, responsive width, and theme contrast' },
   { id: 'repository-files', label: 'Repository files', path: '/openface/mystic-git-auto-commit?tab=files&revision=v4.2', focus: 'Unblurred repository header, file list columns, and tabs' },
-  { id: 'space-app', label: 'Embedded Space app', path: '/openface/qr-code-generator', focus: 'OpenFace navigation, Space header, runtime state, and embedded live application', settleMs: 2000 },
+  { id: 'space-app', label: 'Embedded Space app', path: '/openface/qr-code-generator', allowFullBleed: true, focus: 'OpenFace navigation, Space header, runtime state, and embedded live application', settleMs: 2000 },
   { id: 'space-files', label: 'Space files', path: '/openface/qr-code-generator?tab=files', focus: 'Space repository file list, header clarity, tabs, and Pages card' },
   { id: 'community-list', label: 'Community discussions', path: '/git/openface/qr-code-generator/issues', focus: 'Seeded issue rows, filters, repository tabs, and responsive Community layout' },
   { id: 'community-detail', label: 'Community discussion detail', path: '/git/openface/qr-code-generator/issues/1', focus: 'Hugging Face-style Discussion title, status, author, body, repository navigation, and responsive reading width' },
@@ -51,5 +51,5 @@ export const routes = [
   { id: 'user-profile', label: 'User profile', path: '/git/luna-scout', focus: 'Agent profile, repository list, cards, and theme contrast' },
   { id: 'login', label: 'Log in', path: '/git/user/login', focus: 'Authentication card, form controls, links, and themed background' },
   { id: 'signup', label: 'Sign up', path: '/git/user/sign_up', focus: 'Registration card, form controls, validation labels, and themed background' },
-  { id: 'pages-live', label: 'OpenFace Pages site', path: '/pages/openface/pages-starter/', themeAware: false, focus: 'Published static page, asset loading, and gateway routing' },
+  { id: 'pages-live', label: 'OpenFace Pages site', path: '/pages/openface/pages-starter/', themeAware: false, allowFullBleed: true, focus: 'Published static page, asset loading, and gateway routing' },
 ];

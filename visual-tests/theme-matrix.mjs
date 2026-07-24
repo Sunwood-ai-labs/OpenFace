@@ -144,6 +144,15 @@ const inspectPage = () => {
   const bodyText = document.body?.innerText?.replace(/\s+/g, ' ').trim() || '';
   const viewportWidth = document.documentElement.clientWidth;
   const scrollWidth = Math.max(document.documentElement.scrollWidth, document.body?.scrollWidth || 0);
+  const primaryRail = document.querySelector('main[data-openface-page-frame], .page-content');
+  const primaryRailRect = primaryRail?.getBoundingClientRect();
+  const primaryRailStyle = primaryRail ? getComputedStyle(primaryRail) : null;
+  const leftInset = primaryRailRect && primaryRailStyle
+    ? primaryRailRect.left + (Number.parseFloat(primaryRailStyle.paddingLeft) || 0)
+    : null;
+  const rightInset = primaryRailRect && primaryRailStyle
+    ? viewportWidth - primaryRailRect.right + (Number.parseFloat(primaryRailStyle.paddingRight) || 0)
+    : null;
   const organizationPage = document.body?.hasAttribute('data-openface-org');
   const organizationContent = organizationPage ? document.querySelector('.page-content.organization, .page-content') : null;
   const organizationRect = organizationContent?.getBoundingClientRect();
@@ -156,6 +165,12 @@ const inspectPage = () => {
     viewportWidth,
     scrollWidth,
     horizontalOverflow: Math.max(0, scrollWidth - viewportWidth),
+    primaryRail: primaryRail ? {
+      selector: primaryRail.matches('main[data-openface-page-frame]') ? 'portal-main' : 'forgejo-page-content',
+      leftInset: Math.round(leftInset),
+      rightInset: Math.round(rightInset),
+      minimumInset: Math.round(Math.min(leftInset, rightInset)),
+    } : null,
     contrastRiskCount: contrastRisks.length,
     auditedTextCount: auditedContrasts.length,
     imageBackedTextCount,
@@ -270,12 +285,17 @@ const captureRoute = async ({ context, route, theme, colorScheme, viewport }) =>
     applicationUnavailable: false,
   }));
   const defects = [];
+  const requiredInset = viewport.width < 768 ? 20 : 24;
   const status = response?.status() ?? null;
   if (navigationError) defects.push(`Navigation failed: ${navigationError}`);
   if (status === null || status >= 400) defects.push(`Unexpected HTTP status: ${status ?? 'none'}`);
   if (route.themeAware !== false && state.theme !== theme.id) defects.push(`Expected ${theme.id} theme but found ${state.theme}`);
   if (state.bodyTextLength < 20) defects.push('Page is blank or nearly blank');
   if (state.horizontalOverflow > 2) defects.push(`Horizontal overflow: ${state.horizontalOverflow}px`);
+  if (!route.allowFullBleed && !state.primaryRail) defects.push('Primary content rail is missing');
+  if (!route.allowFullBleed && state.primaryRail?.minimumInset < requiredInset) {
+    defects.push(`Content safe area: ${state.primaryRail.minimumInset}px; expected at least ${requiredInset}px`);
+  }
   if (state.contrastRiskCount) defects.push(`${state.contrastRiskCount} WCAG text contrast failure(s)`);
   if (state.repositoryNotFound) defects.push('Repository not found state is visible');
   if (state.applicationUnavailable) defects.push('Application unavailable state is visible');

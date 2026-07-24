@@ -147,6 +147,15 @@ try {
             const style = window.getComputedStyle(element);
             return style.display !== 'none' && element.getBoundingClientRect().height > 0;
           });
+        const primaryRail = document.querySelector('main[data-openface-page-frame], .page-content');
+        const primaryRailRect = primaryRail?.getBoundingClientRect();
+        const primaryRailStyle = primaryRail ? getComputedStyle(primaryRail) : null;
+        const leftInset = primaryRailRect && primaryRailStyle
+          ? primaryRailRect.left + (Number.parseFloat(primaryRailStyle.paddingLeft) || 0)
+          : null;
+        const rightInset = primaryRailRect && primaryRailStyle
+          ? viewportWidth - primaryRailRect.right + (Number.parseFloat(primaryRailStyle.paddingRight) || 0)
+          : null;
         return {
           title: document.title,
           openFaceTheme: document.documentElement.getAttribute('data-openface-theme') || 'standard',
@@ -154,6 +163,12 @@ try {
           viewportWidth,
           scrollWidth,
           horizontalOverflow: Math.max(0, scrollWidth - viewportWidth),
+          primaryRail: primaryRail ? {
+            selector: primaryRail.matches('main[data-openface-page-frame]') ? 'portal-main' : 'forgejo-page-content',
+            leftInset: Math.round(leftInset),
+            rightInset: Math.round(rightInset),
+            minimumInset: Math.round(Math.min(leftInset, rightInset)),
+          } : null,
           repositoryNotFound: bodyText.includes('Repository not found'),
           applicationUnavailable: bodyText.includes('Application unavailable'),
           runningBadgeVisible: bodyText.includes('CPU · Running'),
@@ -232,9 +247,14 @@ try {
 
       const status = response?.status() ?? null;
       const defects = [];
+      const requiredInset = viewport.width < 768 ? 20 : 24;
       if (navigationError) defects.push(`Navigation failed: ${navigationError}`);
       if (status === null || status >= 400) defects.push(`Unexpected HTTP status: ${status ?? 'none'}`);
       if (pageState.horizontalOverflow > 2) defects.push(`Horizontal overflow: ${pageState.horizontalOverflow}px`);
+      if (!route.allowFullBleed && !pageState.primaryRail) defects.push('Primary content rail is missing');
+      if (!route.allowFullBleed && pageState.primaryRail?.minimumInset < requiredInset) {
+        defects.push(`Content safe area: ${pageState.primaryRail.minimumInset}px; expected at least ${requiredInset}px`);
+      }
       if (route.theme && pageState.openFaceTheme !== route.theme) defects.push(`Expected ${route.theme} theme but found ${pageState.openFaceTheme}`);
       if (shouldOpenDisclosure && disclosureCount !== 1) defects.push(`Expected one disclosure control but found ${disclosureCount}`);
       if (shouldOpenDisclosure && disclosureOpen !== true) defects.push('Disclosure control did not open after click');
