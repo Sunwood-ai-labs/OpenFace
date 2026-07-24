@@ -1230,7 +1230,7 @@ html[data-openface-theme="cyberpunk"] [class*="dark:bg-zinc-700"] {
 }
 
 .openface-purupuru-frame-incoming {
-  animation: openface-purupuru-frame-crossfade-in 360ms ease-in-out both;
+  animation: openface-purupuru-frame-crossfade-in 180ms cubic-bezier(.22, .75, .32, 1) both;
 }
 
 .openface-purupuru-frame-previous {

@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import HfIcon from './HfIcon';
 
+const FRAME_BLEND_MS = 180;
+
 export interface PuruPuruPreviewFrame {
   src: string;
   direction: string;
@@ -102,7 +104,7 @@ export default function PuruPuruPreview({
 
   useEffect(() => {
     if (!previousFrame) return undefined;
-    const timer = window.setTimeout(() => setPreviousFrame(null), 380);
+    const timer = window.setTimeout(() => setPreviousFrame(null), FRAME_BLEND_MS + 20);
     return () => window.clearTimeout(timer);
   }, [activeFrame?.src, previousFrame]);
 
@@ -122,6 +124,7 @@ export default function PuruPuruPreview({
       data-frame-path={activeFrame.src}
       data-frame-index={frameIndex}
       data-direction={activeFrame.direction}
+      data-transition-ms={FRAME_BLEND_MS}
       data-frames-ready={framesReady ? 'true' : 'false'}
       data-blend-active={previousFrame ? 'true' : 'false'}
     >
