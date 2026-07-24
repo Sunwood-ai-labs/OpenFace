@@ -70,21 +70,22 @@ const formatEmoji: Record<KnowledgeFormat, string> = {
 };
 
 const topicEmoji: Array<{ topics: string[]; emoji: string }> = [
+  { topics: ['recovery', 'operations'], emoji: '🛟' },
+  { topics: ['configuration'], emoji: '⚙️' },
+  { topics: ['services'], emoji: '🏗️' },
+  { topics: ['metrics'], emoji: '📊' },
+  { topics: ['identity', 'permissions'], emoji: '🔐' },
+  { topics: ['docs', 'publishing'], emoji: '📚' },
+  { topics: ['catalog', 'topics', 'metadata'], emoji: '🗂️' },
+  { topics: ['api'], emoji: '🔌' },
+  { topics: ['routes'], emoji: '🗺️' },
+  { topics: ['local-first'], emoji: '🏡' },
   { topics: ['community', 'design', 'accessibility'], emoji: '🧩' },
   { topics: ['cpu', 'inference'], emoji: '🧠' },
   { topics: ['visual-qa', 'themes'], emoji: '🔎' },
-  { topics: ['spaces', 'docker'], emoji: '🐳' },
-  { topics: ['recovery', 'operations'], emoji: '🛟' },
   { topics: ['agents', 'automation', 'review'], emoji: '🤖' },
-  { topics: ['identity', 'permissions', 'security'], emoji: '🔐' },
-  { topics: ['metrics', 'api'], emoji: '📊' },
-  { topics: ['catalog', 'topics', 'metadata'], emoji: '🗂️' },
-  { topics: ['routes'], emoji: '🗺️' },
-  { topics: ['services'], emoji: '🏗️' },
-  { topics: ['docs', 'publishing'], emoji: '📚' },
-  { topics: ['local-first'], emoji: '🏡' },
+  { topics: ['spaces', 'docker'], emoji: '🐳' },
   { topics: ['forgejo', 'git'], emoji: '🌿' },
-  { topics: ['configuration'], emoji: '⚙️' },
 ];
 
 const fallbackEmoji: Record<KnowledgeFormat, string[]> = {
