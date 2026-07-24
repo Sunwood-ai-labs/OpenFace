@@ -2,7 +2,7 @@
 title: Remote GPU workers
 type: guide
 description: Keep OpenFace on the LXC control plane while running selected workloads on trusted GPU machines.
-readingTime: 10 min
+readingTime: 14 min
 tags: [architecture, gpu, workers, tailscale, docker]
 related:
   - title: Architecture
@@ -15,14 +15,32 @@ related:
 
 # Remote GPU workers
 
-This document records the proposed architecture and implementation plan for
+This document records the implemented architecture and operating plan for
 using GPUs on local machines without moving the OpenFace control plane out of
 its Proxmox LXC.
 
-> [!IMPORTANT]
-> This is a target design, not a description of functionality already shipped.
-> CPU Spaces continue to run on the LXC until the worker protocol is
-> implemented and verified.
+> [!TIP]
+> The pull protocol, PostgreSQL persistence, capability scheduler, leases,
+> HTTP/WebSocket runtime proxy, and separate Docker Compose stack are
+> implemented. The feature defaults to disabled, so CPU placement does not
+> change until an administrator enables it.
+
+## Implementation status
+
+| Capability | Status |
+|---|---|
+| One-time enrollment and revocable worker credentials | Implemented |
+| Heartbeats, GPU capabilities, and VRAM constraints | Implemented |
+| FIFO claim, short leases, and expiry recovery | Implemented |
+| Commit-pinned clone, Docker build, and GPU run | Implemented |
+| Authenticated HTTP/WebSocket runtime gateway | Implemented |
+| Remote stop and container cleanup | Implemented |
+| Multiple workers and per-worker concurrency limits | Implemented |
+| Drain/revoke controls in the admin UI | Planned |
+| Dynamic VRAM reservations | Planned; claim-time free VRAM is enforced |
+
+The implementation is split across `spaces-runner/gpu_control.py`,
+`gpu-worker/worker.py`, and `docker-compose.gpu-worker.yml`.
 
 ## Goals
 
@@ -171,8 +189,7 @@ enrolling the worker:
 docker run --rm --gpus all nvidia/cuda:12.6.3-base-ubuntu24.04 nvidia-smi
 ```
 
-A future `docker-compose.gpu-worker.yml` should remain separate from the LXC
-stack:
+The `docker-compose.gpu-worker.yml` stack remains separate from the LXC stack:
 
 ```yaml
 services:
@@ -197,6 +214,60 @@ The worker, not individual Space repositories, applies the GPU device request
 when it starts a validated workload container. Default to one GPU job until
 VRAM accounting and cancellation have been exercised under load.
 
+## Setup
+
+### 1. Verify the GPU host
+
+```powershell
+nvidia-smi
+docker run --rm --gpus all nvidia/cuda:12.6.3-base-ubuntu24.04 nvidia-smi
+```
+
+### 2. Enable the control plane
+
+Add these values to the LXC `.env`, then rebuild the runner:
+
+```dotenv
+OPENFACE_GPU_WORKERS_ENABLED=true
+OPENFACE_GPU_WORKER_LEASE_SECONDS=90
+OPENFACE_GPU_WORKER_STALE_SECONDS=120
+```
+
+```bash
+docker compose up -d --build spaces-runner gateway
+```
+
+### 3. Issue a one-time enrollment token
+
+Issue the token on the LXC so it is never exposed to a browser:
+
+```bash
+docker compose exec -T spaces-runner python -c \
+  "import gpu_control; print(gpu_control.issue_enrollment_token('local-gpu-01')['token'])"
+```
+
+Save it on the GPU host as `secrets/openface-worker-enrollment-token`. The
+token is consumed during enrollment and the durable worker credential is
+stored in the worker volume.
+
+### 4. Start the GPU worker
+
+```powershell
+Copy-Item gpu-worker/.env.example gpu-worker/.env
+docker compose --env-file gpu-worker/.env `
+  -f docker-compose.gpu-worker.yml up -d --build
+```
+
+Set `OPENFACE_URL` to the Tailscale URL that reaches the LXC and
+`WORKER_PUBLIC_URL` to the worker tailnet URL that the LXC can reach. Bind
+`GPU_WORKER_BIND_ADDRESS` only to the GPU host's Tailscale IPv4 address.
+
+### 5. Route a Space to the GPU
+
+Give the repository both `space` and `gpu` topics. Add `nvidia`, `cuda`, or a
+constraint such as `vram-12gb` when needed. The normal Start action queues a
+GPU job for a compatible worker while preserving `/run/{owner}/{repo}/`.
+
 ## Interactive Space routing
 
 The browser keeps using `/run/{owner}/{repo}/`. The LXC runner looks up the
@@ -210,7 +281,7 @@ active runtime:
 Only ports created for a leased OpenFace job may be proxied. Worker route
 records need short lifetimes and must be removed when the job stops.
 
-## Delivery plan
+## Delivery plan and current status
 
 ### Phase 0 — host readiness
 
@@ -219,12 +290,18 @@ records need short lifetimes and must be removed when the job stops.
 - Record GPU, VRAM, driver, CUDA, storage, and expected online schedule.
 - Choose one non-sensitive GPU Space as the end-to-end fixture.
 
+**Status: complete.** `gpu-worker/fixtures/gpu-diagnostic` is verified on real
+GPUs.
+
 ### Phase 1 — control-plane foundation
 
 - Add worker, capability, heartbeat, job, lease, and audit tables.
 - Add token enrollment and authenticated worker endpoints.
 - Add a worker status page without changing current CPU scheduling.
 - Add stale-heartbeat cleanup and idempotency tests.
+
+**Status: implemented.** Workers, jobs, events, and leases are migrated into
+the `openface_metrics` database at service startup.
 
 ### Phase 2 — one pull-based worker
 
@@ -233,6 +310,9 @@ records need short lifetimes and must be removed when the job stops.
 - Pin jobs to an exact Forgejo commit SHA.
 - Verify restart, cancellation, build failure, and worker-disconnect behavior.
 
+**Status: implemented.** Credentials and runtime routes persist in the worker
+volume, and running containers are adopted after a worker restart.
+
 ### Phase 3 — interactive proxy
 
 - Route `/run/` HTTP and WebSocket traffic through the existing LXC gateway.
@@ -240,12 +320,39 @@ records need short lifetimes and must be removed when the job stops.
 - Show queued, building, running, offline, and failed states in the portal.
 - Add a manual administrator override for CPU or a named worker.
 
+**Status: partially complete.** HTTP/WebSocket proxying and state APIs are
+implemented. The named-worker override UI remains planned.
+
 ### Phase 4 — multiple workers and operations
 
 - Add capability-aware selection, concurrency limits, and VRAM reservations.
 - Add per-worker drain, disable, and revoke controls.
 - Add metrics for queue time, build time, runtime health, failures, and GPU use.
 - Document backup, token rotation, upgrade, and incident procedures.
+
+**Status: foundation implemented; operations UI remains.** Multiple workers,
+limits, revocable credentials, and audit events are available.
+
+## Verification
+
+Protocol E2E without a physical GPU:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/test-gpu-worker-e2e.ps1
+```
+
+NVIDIA E2E that passes real GPUs into a Space container:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/test-gpu-worker-nvidia-e2e.ps1
+```
+
+The 2026-07-24 hardware run completed enrollment, two-GPU discovery, claim,
+build, runtime proxy, stop, and cleanup. The Space container reported:
+
+- NVIDIA GeForce RTX 3060 — 12,288 MiB
+- NVIDIA GeForce RTX 4090 — 24,564 MiB
+- runtime response: `openface-remote-gpu`
 
 ## Acceptance criteria
 
