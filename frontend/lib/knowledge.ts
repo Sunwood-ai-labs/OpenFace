@@ -70,7 +70,7 @@ const formatEmoji: Record<KnowledgeFormat, string> = {
 };
 
 const topicEmoji: Array<{ topics: string[]; emoji: string }> = [
-  { topics: ['recovery', 'operations'], emoji: '🛟' },
+  { topics: ['recovery'], emoji: '🛟' },
   { topics: ['configuration'], emoji: '⚙️' },
   { topics: ['services'], emoji: '🏗️' },
   { topics: ['metrics'], emoji: '📊' },
