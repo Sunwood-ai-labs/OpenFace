@@ -347,12 +347,15 @@ NVIDIA E2E that passes real GPUs into a Space container:
 powershell -ExecutionPolicy Bypass -File scripts/test-gpu-worker-nvidia-e2e.ps1
 ```
 
-The 2026-07-24 hardware run completed enrollment, two-GPU discovery, claim,
-build, runtime proxy, stop, and cleanup. The Space container reported:
+The 2026-07-24 hardware run completed enrollment, two-GPU discovery, a
+single-device claim, build, runtime proxy, stop, and cleanup. The scheduler
+selected one device whose free VRAM satisfied the job. The Space container
+reported only its assigned resource:
 
-- NVIDIA GeForce RTX 3060 — 12,288 MiB
 - NVIDIA GeForce RTX 4090 — 24,564 MiB
 - runtime response: `openface-remote-gpu`
+
+![Remote GPU Space running inside the normal OpenFace URL](../evidence/gpu-worker/remote-gpu-runtime.png)
 
 ## Acceptance criteria
 

@@ -333,12 +333,14 @@ NVIDIA GPUを実際にSpace containerへ渡すE2E：
 powershell -ExecutionPolicy Bypass -File scripts/test-gpu-worker-nvidia-e2e.ps1
 ```
 
-2026-07-24の実機検証では、worker登録、2 GPU検出、claim、build、runtime proxy、
-stop、cleanupが完走し、Space container内から次を確認しました。
+2026-07-24の実機検証では、worker登録、2 GPU検出、単一deviceのclaim、build、
+runtime proxy、stop、cleanupが完走しました。schedulerはjobの空きVRAM要件を
+満たすGPUを1基だけ選び、Space container内からは割り当てresourceだけを確認しました。
 
-- NVIDIA GeForce RTX 3060 — 12,288 MiB
 - NVIDIA GeForce RTX 4090 — 24,564 MiB
 - runtime response：`openface-remote-gpu`
+
+![OpenFaceの通常URL内で動作するリモートGPU Space](../../evidence/gpu-worker/remote-gpu-runtime.png)
 
 ## 完了条件
 
