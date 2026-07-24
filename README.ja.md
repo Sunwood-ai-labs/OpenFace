@@ -130,11 +130,11 @@ PetはAyano Yukimura、Fuhyo、Hisha、Kakugyo、Kohaku、Maki、Momiji、Onizuk
 
 内部の [`/docs`](https://localhost:8443/docs) は、運用マニュアル用VitePressとは別の、Gitリポジトリを土台にしたナレッジカテゴリです。topicへ `doc` を追加し、読みものは `articles/*.md`、再現可能な作業は `procedures/*.md`、共同で育てる概念・仕様は `wiki/*.md` に分けます。実ファイル、コミット履歴、clone URL、権限はそのまま保持され、各ページの実閲覧数からトレンドを表示し、タグ単位でも探せます。
 
-| エディトリアルなDocs一覧 | モバイルのWiki詳細 |
+| PCのKnowledge一覧 | モバイルのKnowledge一覧 |
 |---|---|
-| <img src="docs/evidence/docs-category/screenshots/standard--light--desktop--docs.png" alt="StandardテーマのOpenFace Docs一覧" width="100%"> | <img src="docs/evidence/docs-category/screenshots/cyberpunk--dark--mobile--doc-detail.png" alt="Cyberpunkテーマで表示したGit-backed Wiki詳細" width="320"> |
+| <img src="docs/evidence/knowledge-library/2026-07-24/screenshots/standard--light--desktop--docs.png" alt="記事・手順・Wiki、トレンド、タグを表示したStandardテーマのKnowledge一覧" width="100%"> | <img src="docs/evidence/knowledge-library/2026-07-24/screenshots/cyberpunk--dark--mobile--docs.png" alt="CyberpunkテーマのモバイルKnowledge一覧" width="320"> |
 
-[DocsカテゴリのビジュアルQAレポート](docs/evidence/docs-category/THEME_MATRIX.md)には、3テーマ×OS配色2種×PC/モバイル×一覧/詳細の24スクリーンショットと、横はみ出し・WCAGコントラストの自動検査結果を保存しています。
+[KnowledgeのビジュアルQAレポート](docs/evidence/knowledge-library/2026-07-24/THEME_MATRIX.md)には、3テーマ×OS配色2種×PC/モバイル×一覧/詳細の24スクリーンショットと、横はみ出し・WCAGコントラストの自動検査結果を保存しています。
 
 ### Skills / MCPs
 

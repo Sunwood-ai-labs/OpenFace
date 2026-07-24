@@ -1,0 +1,1369 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-24T09:33:59.015Z",
+  "baseUrl": "https://openface-lxc.tail8be30.ts.net",
+  "dimensions": {
+    "themes": [
+      "standard",
+      "solarpunk",
+      "cyberpunk"
+    ],
+    "colorSchemes": [
+      "light",
+      "dark"
+    ],
+    "viewports": [
+      {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      }
+    ],
+    "routes": [
+      {
+        "id": "docs",
+        "path": "/docs"
+      },
+      {
+        "id": "doc-detail",
+        "path": "/docs/openface/community-design-principles"
+      }
+    ]
+  },
+  "summary": {
+    "total": 24,
+    "passed": 24,
+    "failed": 0,
+    "screenshots": 24,
+    "auditedTextNodes": 4076,
+    "imageBackedTextNodes": 220,
+    "minimumContrastMargin": 1.01
+  },
+  "results": [
+    {
+      "route": {
+        "id": "doc-detail",
+        "label": "Knowledge article detail",
+        "path": "/docs/openface/community-design-principles",
+        "focus": "OpenFace editorial article header, topics, real view count, readable Markdown, repository source actions, responsive width, and theme contrast"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "status": 200,
+      "durationMs": 1788,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/cyberpunk--dark--desktop--doc-detail.png",
+      "title": "ローカルAIコミュニティのデザイン - ナレッジ - OpenFace",
+      "theme": {
+        "id": "cyberpunk",
+        "label": "Cyberpunk",
+        "colorScheme": "dark"
+      },
+      "bodyTextLength": 637,
+      "bodyPreview": "OpenFace Models Datasets Spaces Skills MCPs Prompts Knowledge Characters JA ログイン 新規登録 ナレッジ一覧 openface ✍️ 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 3分前に更新 · 読了 1分 · 27 views #community #design #accessibility ローカルAIコ",
+      "viewportWidth": 1440,
+      "scrollWidth": 1440,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 32,
+        "rightInset": 32,
+        "minimumInset": 32
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 9,
+      "imageBackedTextCount": 29,
+      "minimumContrast": 14.33,
+      "minimumContrastMargin": 3.18,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "dark",
+        "label": "Dark OS"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "docs",
+        "label": "Docs library",
+        "path": "/docs",
+        "focus": "Editorial hero, article and Wiki taxonomy, search, filters, and responsive reading index"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "status": 200,
+      "durationMs": 1710,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/cyberpunk--dark--desktop--docs.png",
+      "title": "ナレッジ - OpenFace",
+      "theme": {
+        "id": "cyberpunk",
+        "label": "Cyberpunk",
+        "colorScheme": "dark"
+      },
+      "bodyTextLength": 2862,
+      "bodyPreview": "OpenFace Models Datasets Spaces Skills MCPs Prompts Knowledge Characters JA ログイン 新規登録 OPENFACE ナレッジライブラリ 読む。試す。 知識にする。 いま格納されている知識を、読みものの「記事」、再現できる「手順」、育ち続ける「Wiki」に分けて届けます。 ナレッジを公開する はじめ方を見る 公開ナレッジ 18 登録トピック 38 すべて 記事 手順",
+      "viewportWidth": 1440,
+      "scrollWidth": 1440,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 32,
+        "rightInset": 32,
+        "minimumInset": 32
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 331,
+      "imageBackedTextCount": 17,
+      "minimumContrast": 6.23,
+      "minimumContrastMargin": 1.38,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "dark",
+        "label": "Dark OS"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "doc-detail",
+        "label": "Knowledge article detail",
+        "path": "/docs/openface/community-design-principles",
+        "focus": "OpenFace editorial article header, topics, real view count, readable Markdown, repository source actions, responsive width, and theme contrast"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "status": 200,
+      "durationMs": 2268,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/cyberpunk--dark--mobile--doc-detail.png",
+      "title": "ローカルAIコミュニティのデザイン - ナレッジ - OpenFace",
+      "theme": {
+        "id": "cyberpunk",
+        "label": "Cyberpunk",
+        "colorScheme": "dark"
+      },
+      "bodyTextLength": 560,
+      "bodyPreview": "OpenFace ナレッジ一覧 openface ✍️ 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 3分前に更新 · 読了 1分 · 28 views #community #design #accessibility ローカルAIコミュニティのデザイン コミュニティカタログは、初めて来た人が「何があるか」「なぜ重要か」「どう参加するか」をすぐ理解できる必要があります。細かなメタデータ",
+      "viewportWidth": 390,
+      "scrollWidth": 390,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 20,
+        "rightInset": 20,
+        "minimumInset": 20
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 8,
+      "imageBackedTextCount": 19,
+      "minimumContrast": 14.33,
+      "minimumContrastMargin": 3.18,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "dark",
+        "label": "Dark OS"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "docs",
+        "label": "Docs library",
+        "path": "/docs",
+        "focus": "Editorial hero, article and Wiki taxonomy, search, filters, and responsive reading index"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "status": 200,
+      "durationMs": 2282,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/cyberpunk--dark--mobile--docs.png",
+      "title": "ナレッジ - OpenFace",
+      "theme": {
+        "id": "cyberpunk",
+        "label": "Cyberpunk",
+        "colorScheme": "dark"
+      },
+      "bodyTextLength": 2261,
+      "bodyPreview": "OpenFace OPENFACE ナレッジライブラリ 読む。試す。 知識にする。 いま格納されている知識を、読みものの「記事」、再現できる「手順」、育ち続ける「Wiki」に分けて届けます。 ナレッジを公開する はじめ方を見る 公開ナレッジ 18 登録トピック 38 すべて 記事 手順 WIKI いま読まれている / 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 OPENFACE が O",
+      "viewportWidth": 390,
+      "scrollWidth": 390,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 20,
+        "rightInset": 20,
+        "minimumInset": 20
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 296,
+      "imageBackedTextCount": 7,
+      "minimumContrast": 6.23,
+      "minimumContrastMargin": 1.38,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "dark",
+        "label": "Dark OS"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "doc-detail",
+        "label": "Knowledge article detail",
+        "path": "/docs/openface/community-design-principles",
+        "focus": "OpenFace editorial article header, topics, real view count, readable Markdown, repository source actions, responsive width, and theme contrast"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "status": 200,
+      "durationMs": 1876,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/cyberpunk--light--desktop--doc-detail.png",
+      "title": "ローカルAIコミュニティのデザイン - ナレッジ - OpenFace",
+      "theme": {
+        "id": "cyberpunk",
+        "label": "Cyberpunk",
+        "colorScheme": "dark"
+      },
+      "bodyTextLength": 637,
+      "bodyPreview": "OpenFace Models Datasets Spaces Skills MCPs Prompts Knowledge Characters JA ログイン 新規登録 ナレッジ一覧 openface ✍️ 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 3分前に更新 · 読了 1分 · 25 views #community #design #accessibility ローカルAIコ",
+      "viewportWidth": 1440,
+      "scrollWidth": 1440,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 32,
+        "rightInset": 32,
+        "minimumInset": 32
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 9,
+      "imageBackedTextCount": 29,
+      "minimumContrast": 14.33,
+      "minimumContrastMargin": 3.18,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "light",
+        "label": "Light OS"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "docs",
+        "label": "Docs library",
+        "path": "/docs",
+        "focus": "Editorial hero, article and Wiki taxonomy, search, filters, and responsive reading index"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "status": 200,
+      "durationMs": 1885,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/cyberpunk--light--desktop--docs.png",
+      "title": "ナレッジ - OpenFace",
+      "theme": {
+        "id": "cyberpunk",
+        "label": "Cyberpunk",
+        "colorScheme": "dark"
+      },
+      "bodyTextLength": 2862,
+      "bodyPreview": "OpenFace Models Datasets Spaces Skills MCPs Prompts Knowledge Characters JA ログイン 新規登録 OPENFACE ナレッジライブラリ 読む。試す。 知識にする。 いま格納されている知識を、読みものの「記事」、再現できる「手順」、育ち続ける「Wiki」に分けて届けます。 ナレッジを公開する はじめ方を見る 公開ナレッジ 18 登録トピック 38 すべて 記事 手順",
+      "viewportWidth": 1440,
+      "scrollWidth": 1440,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 32,
+        "rightInset": 32,
+        "minimumInset": 32
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 331,
+      "imageBackedTextCount": 17,
+      "minimumContrast": 6.23,
+      "minimumContrastMargin": 1.38,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "light",
+        "label": "Light OS"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "doc-detail",
+        "label": "Knowledge article detail",
+        "path": "/docs/openface/community-design-principles",
+        "focus": "OpenFace editorial article header, topics, real view count, readable Markdown, repository source actions, responsive width, and theme contrast"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "status": 200,
+      "durationMs": 2117,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/cyberpunk--light--mobile--doc-detail.png",
+      "title": "ローカルAIコミュニティのデザイン - ナレッジ - OpenFace",
+      "theme": {
+        "id": "cyberpunk",
+        "label": "Cyberpunk",
+        "colorScheme": "dark"
+      },
+      "bodyTextLength": 560,
+      "bodyPreview": "OpenFace ナレッジ一覧 openface ✍️ 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 3分前に更新 · 読了 1分 · 26 views #community #design #accessibility ローカルAIコミュニティのデザイン コミュニティカタログは、初めて来た人が「何があるか」「なぜ重要か」「どう参加するか」をすぐ理解できる必要があります。細かなメタデータ",
+      "viewportWidth": 390,
+      "scrollWidth": 390,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 20,
+        "rightInset": 20,
+        "minimumInset": 20
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 8,
+      "imageBackedTextCount": 19,
+      "minimumContrast": 14.33,
+      "minimumContrastMargin": 3.18,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "light",
+        "label": "Light OS"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "docs",
+        "label": "Docs library",
+        "path": "/docs",
+        "focus": "Editorial hero, article and Wiki taxonomy, search, filters, and responsive reading index"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "status": 200,
+      "durationMs": 2130,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/cyberpunk--light--mobile--docs.png",
+      "title": "ナレッジ - OpenFace",
+      "theme": {
+        "id": "cyberpunk",
+        "label": "Cyberpunk",
+        "colorScheme": "dark"
+      },
+      "bodyTextLength": 2261,
+      "bodyPreview": "OpenFace OPENFACE ナレッジライブラリ 読む。試す。 知識にする。 いま格納されている知識を、読みものの「記事」、再現できる「手順」、育ち続ける「Wiki」に分けて届けます。 ナレッジを公開する はじめ方を見る 公開ナレッジ 18 登録トピック 38 すべて 記事 手順 WIKI いま読まれている / 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 OPENFACE が O",
+      "viewportWidth": 390,
+      "scrollWidth": 390,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 20,
+        "rightInset": 20,
+        "minimumInset": 20
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 296,
+      "imageBackedTextCount": 7,
+      "minimumContrast": 6.23,
+      "minimumContrastMargin": 1.38,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "light",
+        "label": "Light OS"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "doc-detail",
+        "label": "Knowledge article detail",
+        "path": "/docs/openface/community-design-principles",
+        "focus": "OpenFace editorial article header, topics, real view count, readable Markdown, repository source actions, responsive width, and theme contrast"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "status": 200,
+      "durationMs": 1683,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/solarpunk--dark--desktop--doc-detail.png",
+      "title": "ローカルAIコミュニティのデザイン - ナレッジ - OpenFace",
+      "theme": {
+        "id": "solarpunk",
+        "label": "Solarpunk",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 637,
+      "bodyPreview": "OpenFace Models Datasets Spaces Skills MCPs Prompts Knowledge Characters JA ログイン 新規登録 ナレッジ一覧 openface ✍️ 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 3分前に更新 · 読了 1分 · 23 views #community #design #accessibility ローカルAIコ",
+      "viewportWidth": 1440,
+      "scrollWidth": 1440,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 32,
+        "rightInset": 32,
+        "minimumInset": 32
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 22,
+      "imageBackedTextCount": 16,
+      "minimumContrast": 5.24,
+      "minimumContrastMargin": 1.17,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "dark",
+        "label": "Dark OS"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "docs",
+        "label": "Docs library",
+        "path": "/docs",
+        "focus": "Editorial hero, article and Wiki taxonomy, search, filters, and responsive reading index"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "status": 200,
+      "durationMs": 1854,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/solarpunk--dark--desktop--docs.png",
+      "title": "ナレッジ - OpenFace",
+      "theme": {
+        "id": "solarpunk",
+        "label": "Solarpunk",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 2862,
+      "bodyPreview": "OpenFace Models Datasets Spaces Skills MCPs Prompts Knowledge Characters JA ログイン 新規登録 OPENFACE ナレッジライブラリ 読む。試す。 知識にする。 いま格納されている知識を、読みものの「記事」、再現できる「手順」、育ち続ける「Wiki」に分けて届けます。 ナレッジを公開する はじめ方を見る 公開ナレッジ 18 登録トピック 38 すべて 記事 手順",
+      "viewportWidth": 1440,
+      "scrollWidth": 1440,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 32,
+        "rightInset": 32,
+        "minimumInset": 32
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 345,
+      "imageBackedTextCount": 3,
+      "minimumContrast": 5.52,
+      "minimumContrastMargin": 1.23,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "dark",
+        "label": "Dark OS"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "doc-detail",
+        "label": "Knowledge article detail",
+        "path": "/docs/openface/community-design-principles",
+        "focus": "OpenFace editorial article header, topics, real view count, readable Markdown, repository source actions, responsive width, and theme contrast"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "status": 200,
+      "durationMs": 2103,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/solarpunk--dark--mobile--doc-detail.png",
+      "title": "ローカルAIコミュニティのデザイン - ナレッジ - OpenFace",
+      "theme": {
+        "id": "solarpunk",
+        "label": "Solarpunk",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 560,
+      "bodyPreview": "OpenFace ナレッジ一覧 openface ✍️ 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 3分前に更新 · 読了 1分 · 24 views #community #design #accessibility ローカルAIコミュニティのデザイン コミュニティカタログは、初めて来た人が「何があるか」「なぜ重要か」「どう参加するか」をすぐ理解できる必要があります。細かなメタデータ",
+      "viewportWidth": 390,
+      "scrollWidth": 390,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 20,
+        "rightInset": 20,
+        "minimumInset": 20
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 11,
+      "imageBackedTextCount": 16,
+      "minimumContrast": 5.24,
+      "minimumContrastMargin": 1.17,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "dark",
+        "label": "Dark OS"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "docs",
+        "label": "Docs library",
+        "path": "/docs",
+        "focus": "Editorial hero, article and Wiki taxonomy, search, filters, and responsive reading index"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "status": 200,
+      "durationMs": 2212,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/solarpunk--dark--mobile--docs.png",
+      "title": "ナレッジ - OpenFace",
+      "theme": {
+        "id": "solarpunk",
+        "label": "Solarpunk",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 2261,
+      "bodyPreview": "OpenFace OPENFACE ナレッジライブラリ 読む。試す。 知識にする。 いま格納されている知識を、読みものの「記事」、再現できる「手順」、育ち続ける「Wiki」に分けて届けます。 ナレッジを公開する はじめ方を見る 公開ナレッジ 18 登録トピック 38 すべて 記事 手順 WIKI いま読まれている / 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 OPENFACE が O",
+      "viewportWidth": 390,
+      "scrollWidth": 390,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 20,
+        "rightInset": 20,
+        "minimumInset": 20
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 300,
+      "imageBackedTextCount": 3,
+      "minimumContrast": 5.52,
+      "minimumContrastMargin": 1.23,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "dark",
+        "label": "Dark OS"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "doc-detail",
+        "label": "Knowledge article detail",
+        "path": "/docs/openface/community-design-principles",
+        "focus": "OpenFace editorial article header, topics, real view count, readable Markdown, repository source actions, responsive width, and theme contrast"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "status": 200,
+      "durationMs": 1836,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/solarpunk--light--desktop--doc-detail.png",
+      "title": "ローカルAIコミュニティのデザイン - ナレッジ - OpenFace",
+      "theme": {
+        "id": "solarpunk",
+        "label": "Solarpunk",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 637,
+      "bodyPreview": "OpenFace Models Datasets Spaces Skills MCPs Prompts Knowledge Characters JA ログイン 新規登録 ナレッジ一覧 openface ✍️ 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 3分前に更新 · 読了 1分 · 21 views #community #design #accessibility ローカルAIコ",
+      "viewportWidth": 1440,
+      "scrollWidth": 1440,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 32,
+        "rightInset": 32,
+        "minimumInset": 32
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 22,
+      "imageBackedTextCount": 16,
+      "minimumContrast": 5.24,
+      "minimumContrastMargin": 1.17,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "light",
+        "label": "Light OS"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "docs",
+        "label": "Docs library",
+        "path": "/docs",
+        "focus": "Editorial hero, article and Wiki taxonomy, search, filters, and responsive reading index"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "status": 200,
+      "durationMs": 2005,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/solarpunk--light--desktop--docs.png",
+      "title": "ナレッジ - OpenFace",
+      "theme": {
+        "id": "solarpunk",
+        "label": "Solarpunk",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 2862,
+      "bodyPreview": "OpenFace Models Datasets Spaces Skills MCPs Prompts Knowledge Characters JA ログイン 新規登録 OPENFACE ナレッジライブラリ 読む。試す。 知識にする。 いま格納されている知識を、読みものの「記事」、再現できる「手順」、育ち続ける「Wiki」に分けて届けます。 ナレッジを公開する はじめ方を見る 公開ナレッジ 18 登録トピック 38 すべて 記事 手順",
+      "viewportWidth": 1440,
+      "scrollWidth": 1440,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 32,
+        "rightInset": 32,
+        "minimumInset": 32
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 345,
+      "imageBackedTextCount": 3,
+      "minimumContrast": 4.73,
+      "minimumContrastMargin": 1.05,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "light",
+        "label": "Light OS"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "doc-detail",
+        "label": "Knowledge article detail",
+        "path": "/docs/openface/community-design-principles",
+        "focus": "OpenFace editorial article header, topics, real view count, readable Markdown, repository source actions, responsive width, and theme contrast"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "status": 200,
+      "durationMs": 2166,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/solarpunk--light--mobile--doc-detail.png",
+      "title": "ローカルAIコミュニティのデザイン - ナレッジ - OpenFace",
+      "theme": {
+        "id": "solarpunk",
+        "label": "Solarpunk",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 560,
+      "bodyPreview": "OpenFace ナレッジ一覧 openface ✍️ 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 3分前に更新 · 読了 1分 · 22 views #community #design #accessibility ローカルAIコミュニティのデザイン コミュニティカタログは、初めて来た人が「何があるか」「なぜ重要か」「どう参加するか」をすぐ理解できる必要があります。細かなメタデータ",
+      "viewportWidth": 390,
+      "scrollWidth": 390,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 20,
+        "rightInset": 20,
+        "minimumInset": 20
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 11,
+      "imageBackedTextCount": 16,
+      "minimumContrast": 5.24,
+      "minimumContrastMargin": 1.17,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "light",
+        "label": "Light OS"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "docs",
+        "label": "Docs library",
+        "path": "/docs",
+        "focus": "Editorial hero, article and Wiki taxonomy, search, filters, and responsive reading index"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "status": 200,
+      "durationMs": 2178,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/solarpunk--light--mobile--docs.png",
+      "title": "ナレッジ - OpenFace",
+      "theme": {
+        "id": "solarpunk",
+        "label": "Solarpunk",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 2261,
+      "bodyPreview": "OpenFace OPENFACE ナレッジライブラリ 読む。試す。 知識にする。 いま格納されている知識を、読みものの「記事」、再現できる「手順」、育ち続ける「Wiki」に分けて届けます。 ナレッジを公開する はじめ方を見る 公開ナレッジ 18 登録トピック 38 すべて 記事 手順 WIKI いま読まれている / 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 OPENFACE が O",
+      "viewportWidth": 390,
+      "scrollWidth": 390,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 20,
+        "rightInset": 20,
+        "minimumInset": 20
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 300,
+      "imageBackedTextCount": 3,
+      "minimumContrast": 4.73,
+      "minimumContrastMargin": 1.05,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "light",
+        "label": "Light OS"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "doc-detail",
+        "label": "Knowledge article detail",
+        "path": "/docs/openface/community-design-principles",
+        "focus": "OpenFace editorial article header, topics, real view count, readable Markdown, repository source actions, responsive width, and theme contrast"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "status": 200,
+      "durationMs": 1703,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/standard--dark--desktop--doc-detail.png",
+      "title": "ローカルAIコミュニティのデザイン - ナレッジ - OpenFace",
+      "theme": {
+        "id": "standard",
+        "label": "Standard",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 637,
+      "bodyPreview": "OpenFace Models Datasets Spaces Skills MCPs Prompts Knowledge Characters JA ログイン 新規登録 ナレッジ一覧 openface ✍️ 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 3分前に更新 · 読了 1分 · 19 views #community #design #accessibility ローカルAIコ",
+      "viewportWidth": 1440,
+      "scrollWidth": 1440,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 32,
+        "rightInset": 32,
+        "minimumInset": 32
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 38,
+      "imageBackedTextCount": 0,
+      "minimumContrast": 8.61,
+      "minimumContrastMargin": 1.91,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "dark",
+        "label": "Dark OS"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "docs",
+        "label": "Docs library",
+        "path": "/docs",
+        "focus": "Editorial hero, article and Wiki taxonomy, search, filters, and responsive reading index"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "status": 200,
+      "durationMs": 1854,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/standard--dark--desktop--docs.png",
+      "title": "ナレッジ - OpenFace",
+      "theme": {
+        "id": "standard",
+        "label": "Standard",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 2862,
+      "bodyPreview": "OpenFace Models Datasets Spaces Skills MCPs Prompts Knowledge Characters JA ログイン 新規登録 OPENFACE ナレッジライブラリ 読む。試す。 知識にする。 いま格納されている知識を、読みものの「記事」、再現できる「手順」、育ち続ける「Wiki」に分けて届けます。 ナレッジを公開する はじめ方を見る 公開ナレッジ 18 登録トピック 38 すべて 記事 手順",
+      "viewportWidth": 1440,
+      "scrollWidth": 1440,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 32,
+        "rightInset": 32,
+        "minimumInset": 32
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 348,
+      "imageBackedTextCount": 0,
+      "minimumContrast": 7.15,
+      "minimumContrastMargin": 1.84,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "dark",
+        "label": "Dark OS"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "doc-detail",
+        "label": "Knowledge article detail",
+        "path": "/docs/openface/community-design-principles",
+        "focus": "OpenFace editorial article header, topics, real view count, readable Markdown, repository source actions, responsive width, and theme contrast"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "status": 200,
+      "durationMs": 2197,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/standard--dark--mobile--doc-detail.png",
+      "title": "ローカルAIコミュニティのデザイン - ナレッジ - OpenFace",
+      "theme": {
+        "id": "standard",
+        "label": "Standard",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 560,
+      "bodyPreview": "OpenFace ナレッジ一覧 openface ✍️ 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 3分前に更新 · 読了 1分 · 20 views #community #design #accessibility ローカルAIコミュニティのデザイン コミュニティカタログは、初めて来た人が「何があるか」「なぜ重要か」「どう参加するか」をすぐ理解できる必要があります。細かなメタデータ",
+      "viewportWidth": 390,
+      "scrollWidth": 390,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 20,
+        "rightInset": 20,
+        "minimumInset": 20
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 27,
+      "imageBackedTextCount": 0,
+      "minimumContrast": 8.61,
+      "minimumContrastMargin": 1.91,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "dark",
+        "label": "Dark OS"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "docs",
+        "label": "Docs library",
+        "path": "/docs",
+        "focus": "Editorial hero, article and Wiki taxonomy, search, filters, and responsive reading index"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "status": 200,
+      "durationMs": 2206,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/standard--dark--mobile--docs.png",
+      "title": "ナレッジ - OpenFace",
+      "theme": {
+        "id": "standard",
+        "label": "Standard",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 2261,
+      "bodyPreview": "OpenFace OPENFACE ナレッジライブラリ 読む。試す。 知識にする。 いま格納されている知識を、読みものの「記事」、再現できる「手順」、育ち続ける「Wiki」に分けて届けます。 ナレッジを公開する はじめ方を見る 公開ナレッジ 18 登録トピック 38 すべて 記事 手順 WIKI いま読まれている / 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 OPENFACE が O",
+      "viewportWidth": 390,
+      "scrollWidth": 390,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 20,
+        "rightInset": 20,
+        "minimumInset": 20
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 303,
+      "imageBackedTextCount": 0,
+      "minimumContrast": 7.15,
+      "minimumContrastMargin": 1.84,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "dark",
+        "label": "Dark OS"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "doc-detail",
+        "label": "Knowledge article detail",
+        "path": "/docs/openface/community-design-principles",
+        "focus": "OpenFace editorial article header, topics, real view count, readable Markdown, repository source actions, responsive width, and theme contrast"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "status": 200,
+      "durationMs": 1996,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/standard--light--desktop--doc-detail.png",
+      "title": "ローカルAIコミュニティのデザイン - ナレッジ - OpenFace",
+      "theme": {
+        "id": "standard",
+        "label": "Standard",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 637,
+      "bodyPreview": "OpenFace Models Datasets Spaces Skills MCPs Prompts Knowledge Characters JA ログイン 新規登録 ナレッジ一覧 openface ✍️ 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 3分前に更新 · 読了 1分 · 17 views #community #design #accessibility ローカルAIコ",
+      "viewportWidth": 1440,
+      "scrollWidth": 1440,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 32,
+        "rightInset": 32,
+        "minimumInset": 32
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 38,
+      "imageBackedTextCount": 0,
+      "minimumContrast": 6.85,
+      "minimumContrastMargin": 1.52,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "light",
+        "label": "Light OS"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "docs",
+        "label": "Docs library",
+        "path": "/docs",
+        "focus": "Editorial hero, article and Wiki taxonomy, search, filters, and responsive reading index"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "status": 200,
+      "durationMs": 2133,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/standard--light--desktop--docs.png",
+      "title": "ナレッジ - OpenFace",
+      "theme": {
+        "id": "standard",
+        "label": "Standard",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 2862,
+      "bodyPreview": "OpenFace Models Datasets Spaces Skills MCPs Prompts Knowledge Characters JA ログイン 新規登録 OPENFACE ナレッジライブラリ 読む。試す。 知識にする。 いま格納されている知識を、読みものの「記事」、再現できる「手順」、育ち続ける「Wiki」に分けて届けます。 ナレッジを公開する はじめ方を見る 公開ナレッジ 18 登録トピック 38 すべて 記事 手順",
+      "viewportWidth": 1440,
+      "scrollWidth": 1440,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 32,
+        "rightInset": 32,
+        "minimumInset": 32
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 348,
+      "imageBackedTextCount": 0,
+      "minimumContrast": 4.56,
+      "minimumContrastMargin": 1.01,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "light",
+        "label": "Light OS"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "doc-detail",
+        "label": "Knowledge article detail",
+        "path": "/docs/openface/community-design-principles",
+        "focus": "OpenFace editorial article header, topics, real view count, readable Markdown, repository source actions, responsive width, and theme contrast"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs/openface/community-design-principles",
+      "status": 200,
+      "durationMs": 2264,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/standard--light--mobile--doc-detail.png",
+      "title": "ローカルAIコミュニティのデザイン - ナレッジ - OpenFace",
+      "theme": {
+        "id": "standard",
+        "label": "Standard",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 560,
+      "bodyPreview": "OpenFace ナレッジ一覧 openface ✍️ 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 3分前に更新 · 読了 1分 · 18 views #community #design #accessibility ローカルAIコミュニティのデザイン コミュニティカタログは、初めて来た人が「何があるか」「なぜ重要か」「どう参加するか」をすぐ理解できる必要があります。細かなメタデータ",
+      "viewportWidth": 390,
+      "scrollWidth": 390,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 20,
+        "rightInset": 20,
+        "minimumInset": 20
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 27,
+      "imageBackedTextCount": 0,
+      "minimumContrast": 6.85,
+      "minimumContrastMargin": 1.52,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "light",
+        "label": "Light OS"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    },
+    {
+      "route": {
+        "id": "docs",
+        "label": "Docs library",
+        "path": "/docs",
+        "focus": "Editorial hero, article and Wiki taxonomy, search, filters, and responsive reading index"
+      },
+      "requestedUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "finalUrl": "https://openface-lxc.tail8be30.ts.net/docs",
+      "status": 200,
+      "durationMs": 2277,
+      "disclosureOpen": null,
+      "screenshot": "screenshots/standard--light--mobile--docs.png",
+      "title": "ナレッジ - OpenFace",
+      "theme": {
+        "id": "standard",
+        "label": "Standard",
+        "colorScheme": "light"
+      },
+      "bodyTextLength": 2261,
+      "bodyPreview": "OpenFace OPENFACE ナレッジライブラリ 読む。試す。 知識にする。 いま格納されている知識を、読みものの「記事」、再現できる「手順」、育ち続ける「Wiki」に分けて届けます。 ナレッジを公開する はじめ方を見る 公開ナレッジ 18 登録トピック 38 すべて 記事 手順 WIKI いま読まれている / 記事 ローカルAIコミュニティのデザイン コミュニティカタログの情報設計とアクセシビリティ原則 OPENFACE が O",
+      "viewportWidth": 390,
+      "scrollWidth": 390,
+      "horizontalOverflow": 0,
+      "primaryRail": {
+        "selector": "portal-main",
+        "leftInset": 20,
+        "rightInset": 20,
+        "minimumInset": 20
+      },
+      "contrastRiskCount": 0,
+      "auditedTextCount": 303,
+      "imageBackedTextCount": 0,
+      "minimumContrast": 4.56,
+      "minimumContrastMargin": 1.01,
+      "lowestContrast": null,
+      "contrastRisks": [],
+      "repositoryNotFound": false,
+      "applicationUnavailable": false,
+      "organizationAudit": null,
+      "colorScheme": {
+        "id": "light",
+        "label": "Light OS"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "defects": [],
+      "passed": true
+    }
+  ]
+}

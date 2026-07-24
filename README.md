@@ -191,7 +191,7 @@ The seed publication contains 18 useful sample entries. Each entry supports `tit
 
 | OpenFace Standard | OpenFace Cyberpunk |
 |---|---|
-| <img src="docs/evidence/knowledge-library/openface-articles-mobile-standard.png" alt="OpenFace knowledge publications in the Standard theme" width="320"> | <img src="docs/evidence/knowledge-library/openface-articles-mobile-cyberpunk.png" alt="OpenFace knowledge publications in the Cyberpunk theme" width="320"> |
+| <img src="docs/evidence/knowledge-library/2026-07-24/screenshots/standard--light--mobile--docs.png" alt="OpenFace articles, procedures, Wiki, trends, and tags in the Standard theme" width="320"> | <img src="docs/evidence/knowledge-library/2026-07-24/screenshots/cyberpunk--dark--mobile--docs.png" alt="OpenFace knowledge library in the Cyberpunk theme" width="320"> |
 
 The [knowledge-library verification](docs/evidence/knowledge-library/README.md) includes article-detail captures and the complete theme matrix across all three platform themes, light/dark OS schemes, mobile/desktop viewports, horizontal-overflow checks, and computed WCAG text contrast.
 

@@ -28,6 +28,24 @@ The focused review led to two deliberate changes:
 
 ## Exhaustive verification
 
+### 2026-07-24 separated-library verification
+
+The current publication repository stores **5 articles**, **4 procedures**, and
+**9 Wiki pages** in separate directories. The obsolete procedure/Wiki copies
+under `articles/` were removed. Browser checks confirmed:
+
+- opening an article increased its metric from 0 to 1;
+- reloading counted a second real page load;
+- the directory promoted that article into the view-ranked trending feature;
+- the Procedure tab returned only procedures;
+- the `architecture` tag returned exactly three matching entries;
+- desktop and 390px mobile views had no horizontal overflow.
+
+The latest [24-screen theme matrix](2026-07-24/THEME_MATRIX.md) passed after
+checking all three themes, light/dark OS preferences, desktop/mobile viewports,
+the directory, and article detail. It audited 4,076 text nodes with zero
+remaining contrast failures.
+
 The focused visual matrix covers:
 
 - Standard, Solarpunk, and Cyberpunk;
