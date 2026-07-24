@@ -104,6 +104,16 @@ export default function CharacterRepositoryPanel({
               </div>
             ) : null
           ) : null}
+          {profile.characterSheets ? (
+            <div className="mt-4 text-xs">
+              <Link
+                href={forgejoTreeUrl(owner, repo, profile.characterSheets.catalogPath, branch)}
+                className="block rounded-lg border border-white/15 px-3 py-2 hover:bg-white/5"
+              >
+                metadata/characters.csv
+              </Link>
+            </div>
+          ) : null}
         </div>
       </div>
     </section>

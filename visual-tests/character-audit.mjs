@@ -27,8 +27,16 @@ const routes = [
       'PuruPuru · 30 states',
       'PuruPuru · 6 states',
     ],
-    imageMinimum: 11,
-    petCards: ['ayano-yukimura', 'fuhyo', 'hisha', 'kakugyo', 'kohaku', 'maki', 'momiji', 'onizuka'],
+    imageMinimum: 18,
+    petCards: ['ayano-yukimura-codex-pet', 'fuhyo-codex-pet', 'hisha-codex-pet', 'kakugyo-codex-pet', 'kohaku-codex-pet', 'maki-codex-pet', 'momiji-codex-pet', 'onizuka-codex-pet'],
+    hrefs: [
+      '/openface/momiji-codex-pet',
+      '/openface/momiji-character-sheet',
+    ],
+    forbiddenHrefs: [
+      '/openface/character-design-images',
+      '/openface/character-design-images?pet=momiji',
+    ],
     animatedPreview: true,
   },
   {
@@ -48,11 +56,19 @@ const routes = [
   },
   {
     id: 'codex-pet-momiji',
-    path: '/openface/character-design-images?pet=momiji',
-    required: ['Momiji · Codex Pet', '8パッケージ・1536×1872', '8キャラクター'],
+    path: '/openface/momiji-codex-pet',
+    required: ['Momiji · Codex Pet', '独立パッケージ', 'pet.json', 'spritesheet.webp'],
     hrefs: [
-      '/git/openface/character-design-images/src/branch/main/assets/pets/momiji/pet.json',
-      '/git/openface/character-design-images/src/branch/main/assets/pets/momiji/spritesheet.webp',
+      '/git/openface/momiji-codex-pet/src/branch/main/pet.json',
+      '/git/openface/momiji-codex-pet/src/branch/main/spritesheet.webp',
+    ],
+  },
+  {
+    id: 'character-sheet-momiji',
+    path: '/openface/momiji-character-sheet',
+    required: ['キャラクターシート', '独立リポジトリ', 'metadata/characters.csv'],
+    hrefs: [
+      '/git/openface/momiji-character-sheet/src/branch/main/metadata/characters.csv',
     ],
   },
 ];
@@ -150,6 +166,7 @@ for (const theme of themes) {
       }));
       const missingText = route.required.filter((text) => !state.text.includes(text));
       const missingLinks = (route.hrefs || []).filter((href) => !state.links.includes(href));
+      const forbiddenLinks = (route.forbiddenHrefs || []).filter((href) => state.links.includes(href));
       const characterImages = state.images.filter((image) => /preview|プレビュー/i.test(image.alt));
       const brokenImages = characterImages.filter((image) => !image.complete || image.naturalWidth < 1);
       const screenshot = join(outputDir, 'screenshots', `${theme}-${viewport.id}-${route.id}.png`);
@@ -162,6 +179,7 @@ for (const theme of themes) {
         activeTheme: state.theme,
         missingText,
         missingLinks,
+        forbiddenLinks,
         characterImages: characterImages.length,
         brokenImages,
         horizontalOverflow: Math.max(0, state.scrollWidth - state.clientWidth),
@@ -177,6 +195,7 @@ for (const theme of themes) {
           && state.theme === theme
           && missingText.length === 0
           && missingLinks.length === 0
+          && forbiddenLinks.length === 0
           && brokenImages.length === 0
           && characterImages.length >= (route.imageMinimum || 1)
           && (!route.petCards || route.petCards.every((id) => state.petCards.includes(id)))
@@ -206,7 +225,7 @@ await writeFile(join(outputDir, 'README.md'), [
   '',
   `- Coverage: ${themes.length} themes × ${viewports.length} viewports × ${routes.length} routes = ${results.length} screenshots`,
   `- Result: ${failures.length === 0 ? 'PASS' : 'FAIL'} (${results.length - failures.length}/${results.length})`,
-  '- Checks: eight distinct Codex Pet cards, selected-pet links, real PuruPuru frame changes, two-layer alpha crossfades, direction controls, active theme, console errors, and horizontal overflow.',
+  '- Checks: eight independent Codex Pet repositories, independent character-sheet links, no legacy query-param cards, real PuruPuru frame changes, two-layer alpha crossfades, direction controls, active theme, console errors, and horizontal overflow.',
   '',
 ].join('\n'));
 console.log(JSON.stringify({ outputDir, cases: results.length, failures: failures.length }, null, 2));
