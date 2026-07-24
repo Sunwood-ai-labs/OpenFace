@@ -25,6 +25,9 @@ OpenFaceはHTTP/HTTPS gatewayだけを公開し、アプリケーションサー
 | `seed` | admin、token、組織、サンプル、カタログ、Prompt tagの冪等な初期化 |
 | `forgejo-actions-runner` | 隔離したDocker-in-Docker上でPages workflowを実行 |
 
+計画中の[リモートGPUワーカー構成](./gpu-workers.md)では、これらのserviceをLXCに
+残したまま、Tailscale経由のpull型実行ノードを追加します。
+
 ## ルーティング
 
 - ポータルとリポジトリ画面はfrontendへ送ります。

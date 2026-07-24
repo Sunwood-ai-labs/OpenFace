@@ -25,6 +25,9 @@ OpenFace exposes one HTTP/HTTPS gateway and keeps application services on a priv
 | `seed` | Idempotent bootstrap of the admin, token, organization, examples, catalogs, and prompt tags |
 | `forgejo-actions-runner` | Executes Pages workflows against an isolated Docker-in-Docker daemon |
 
+The proposed [remote GPU worker architecture](./gpu-workers.md) keeps these
+services on the LXC and adds pull-based execution nodes over Tailscale.
+
 ## Request routing
 
 - `/`, `/models`, `/datasets`, `/spaces`, `/skills`, `/mcps`, `/prompts`, and repository routes go to the frontend.

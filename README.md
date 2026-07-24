@@ -119,6 +119,7 @@ flowchart LR
 ```
 
 See the [architecture guide](https://sunwood-ai-labs.github.io/OpenFace/guide/architecture) for routing, storage, and trust boundaries.
+The planned [remote GPU worker architecture](https://sunwood-ai-labs.github.io/OpenFace/guide/gpu-workers) keeps this LXC control plane while dispatching selected workloads to trusted GPU machines over Tailscale.
 
 ### Verified Proxmox LXC deployment
 

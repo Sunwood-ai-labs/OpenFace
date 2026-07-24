@@ -99,6 +99,7 @@ credential・runner状態はnamed Docker volumeへ保存します。LXCの完全
 | <img src="docs/evidence/proxmox-lxc/home-lan.png" alt="Proxmox LXCから配信中のOpenFaceホーム" width="100%"> | <img src="docs/evidence/proxmox-lxc/qr-space-running.png" alt="LXC内で実行中のQR Code Generator Space" width="100%"> |
 
 構築・復元・バックアップ手順は[Proxmox LXCへの配備](docs/ja/guide/proxmox-lxc.md)を参照してください。
+本体をLXCに残してローカルGPUを使う計画は[リモートGPUワーカー](docs/ja/guide/gpu-workers.md)にまとめています。
 
 ### テーマ切替
 
