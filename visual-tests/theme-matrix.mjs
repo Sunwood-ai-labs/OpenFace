@@ -299,7 +299,9 @@ const captureRoute = async ({ context, route, theme, colorScheme, viewport }) =>
   if (state.contrastRiskCount) defects.push(`${state.contrastRiskCount} WCAG text contrast failure(s)`);
   if (state.repositoryNotFound) defects.push('Repository not found state is visible');
   if (state.applicationUnavailable) defects.push('Application unavailable state is visible');
-  if (state.organizationAudit?.mobileSideGutter > 1) defects.push(`Organization mobile side gutter: ${state.organizationAudit.mobileSideGutter}px`);
+  if (state.organizationAudit && state.viewportWidth < 768 && state.organizationAudit.mobileSideGutter < 20) {
+    defects.push(`Organization mobile safe area: ${state.organizationAudit.mobileSideGutter}px (minimum 20px)`);
+  }
   if (state.organizationAudit?.memberPlaceholders) defects.push(`Organization has ${state.organizationAudit.memberPlaceholders} fake member placeholder(s)`);
   if (state.organizationAudit && state.organizationAudit.memberAvatars !== state.organizationAudit.declaredMembers) {
     defects.push(`Organization declares ${state.organizationAudit.declaredMembers} member(s) but renders ${state.organizationAudit.memberAvatars} avatar(s)`);
